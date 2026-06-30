@@ -8,7 +8,6 @@ registerDQ10Craft({
   itemOptionLabel: "木目",
   addItemLabel: "マスを追加",
   resourceLabel: "集中力",
-  turnLabel: "残り手数",
   stateLabel: "状態",
   defaultRecipeName: "木工メモ",
   defaultFocus: 135,
@@ -19,7 +18,6 @@ registerDQ10Craft({
     defaultStars: 3,
     toolTypes: [{ id: "woodworking-knife", label: "木工刀" }],
   }),
-  defaultTurns: 9,
   layout: {
     label: "木材配置",
     columns: 3,

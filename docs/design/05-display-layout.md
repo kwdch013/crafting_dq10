@@ -94,7 +94,7 @@ sequenceDiagram
   participant Table as 入力表
 
   UI->>Config: layoutとitemsを取得
-  UI->>Engine: 選択特技で各マスを評価
+  UI->>Engine: 全特技で各マスを評価
   Engine-->>UI: 判定済みマス一覧
   UI->>Board: gridCell順に配置
   UI->>Table: 同じマスを一覧表示
