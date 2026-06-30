@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DQ10 職人支援ツール</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow" id="modeLabel">Craft Support MVP</p>
+          <h1>DQ10 職人支援ツール</h1>
+        </div>
+        <div class="topbar-actions">
+          <button class="button secondary" id="exportButton" type="button" title="設定を書き出す">Export</button>
+          <button class="button secondary" id="resetButton" type="button" title="保存状態を初期化する">Reset</button>
+          <label class="button secondary file-button" title="設定を読み込む">
+            Import
+            <input id="importInput" type="file" accept="application/json" />
+          </label>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="control-panel">
+          <div class="panel-section">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Mode</p>
+                <h2>基本設定</h2>
+              </div>
+              <span class="badge ready">手入力MVP</span>
+            </div>
+
+            <div class="field-grid two">
+              <label>
+                職人種別
+                <select id="craftType"></select>
+              </label>
+              <label id="recipeNameLabel">
+                <span>品目名</span>
+                <input id="recipeName" type="text" value="料理メモ" maxlength="60" />
+              </label>
+              <label>
+                レシピ一覧
+                <select id="recipeSelect"></select>
+              </label>
+              <label>
+                職人レベル
+                <select id="levelSelect"></select>
+              </label>
+              <label>
+                使用道具
+                <select id="toolSelect"></select>
+              </label>
+              <label>
+                道具の★
+                <select id="toolStarsSelect"></select>
+              </label>
+              <label id="focusLabel">
+                <span>集中力</span>
+                <input id="focusInput" type="number" value="120" min="0" max="999" readonly />
+              </label>
+              <label id="turnLabel">
+                <span>残りターン</span>
+                <input id="turnInput" type="number" value="8" min="0" max="99" />
+              </label>
+              <label id="stateLabel">
+                <span>火力状態</span>
+                <select id="heatInput">
+                </select>
+              </label>
+              <label>
+                判定対象の特技
+                <select id="techniqueSelect"></select>
+              </label>
+            </div>
+          </div>
+
+          <div class="panel-section">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Technique</p>
+                <h2>特技データ</h2>
+              </div>
+            </div>
+            <div id="techniqueEditor" class="technique-editor"></div>
+          </div>
+
+          <div class="panel-section">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Capture</p>
+                <h2>キャプチャ接続</h2>
+              </div>
+              <span class="badge pending">後続実装</span>
+            </div>
+            <div class="capture-box">
+              <div>
+                <strong>ブラウザ版MVPでは手入力を使用</strong>
+                <span>DQ10ウィンドウ選択、範囲キャリブレーション、OCRは次フェーズで接続します。</span>
+              </div>
+              <button class="button secondary" id="captureButton" type="button">画面共有プレビュー</button>
+              <video id="capturePreview" muted autoplay playsinline hidden></video>
+            </div>
+          </div>
+        </section>
+
+        <section class="main-panel">
+          <div class="summary-grid">
+            <article class="summary-card">
+              <span>確定会心候補</span>
+              <strong id="guaranteedCount">0</strong>
+            </article>
+            <article class="summary-card">
+              <span>超過リスク</span>
+              <strong id="warningCount">0</strong>
+            </article>
+            <article class="summary-card">
+              <span>危険マス</span>
+              <strong id="dangerCount">0</strong>
+            </article>
+            <article class="summary-card">
+              <span>選択特技</span>
+              <strong id="selectedTechniqueLabel">-</strong>
+            </article>
+          </div>
+
+          <div class="panel-section">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Board</p>
+                <h2 id="layoutSectionTitle">配置</h2>
+              </div>
+            </div>
+            <div id="layoutBoard" class="craft-board"></div>
+          </div>
+
+          <div class="panel-section">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Values</p>
+                <h2 id="itemSectionTitle">状態入力</h2>
+              </div>
+              <button class="button secondary" id="addIngredientButton" type="button">項目を追加</button>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th id="itemNameHeader">項目名</th>
+                    <th id="itemOptionHeader">種別</th>
+                    <th>現在値</th>
+                    <th>基準値</th>
+                    <th>成功下限</th>
+                    <th>成功上限</th>
+                    <th>下限まで</th>
+                    <th>上限まで</th>
+                    <th>通常後</th>
+                    <th>会心後</th>
+                    <th>判定</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="ingredientBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="split-panel">
+            <section class="panel-section">
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Recommendation</p>
+                  <h2>候補手</h2>
+                </div>
+              </div>
+              <ol class="recommendation-list" id="recommendationList"></ol>
+            </section>
+
+            <section class="panel-section">
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Details</p>
+                  <h2>判定基準</h2>
+                </div>
+              </div>
+              <div class="legend-grid">
+                <span class="status status-guaranteed">確定会心</span>
+                <p>会心時の最小から最大までが成功範囲内に収まります。</p>
+                <span class="status status-aim">会心狙い</span>
+                <p>会心なら成功範囲に入る可能性があります。</p>
+                <span class="status status-warning">超過注意</span>
+                <p>通常または会心で成功上限を超えるリスクがあります。</p>
+                <span class="status status-danger">危険</span>
+                <p>選択中の特技では成功範囲に寄せにくい状態です。</p>
+              </div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <template id="ingredientRowTemplate">
+      <tr>
+        <td><input class="ingredient-name" type="text" maxlength="30" /></td>
+        <td><select class="ingredient-option"></select></td>
+        <td><input class="ingredient-current numeric" type="number" /></td>
+        <td><input class="ingredient-target numeric" type="number" /></td>
+        <td><input class="ingredient-min numeric" type="number" /></td>
+        <td><input class="ingredient-max numeric" type="number" /></td>
+        <td class="lower-diff"></td>
+        <td class="upper-diff"></td>
+        <td class="normal-range"></td>
+        <td class="critical-range"></td>
+        <td><span class="status"></span></td>
+        <td><button class="icon-button danger remove-ingredient" type="button" title="削除">×</button></td>
+      </tr>
+    </template>
+
+    <template id="techniqueTemplate">
+      <article class="technique-card">
+        <div class="technique-title"></div>
+        <div class="technique-value">
+          <span>消費集中</span>
+          <strong class="tech-focus numeric"></strong>
+        </div>
+        <div class="technique-value">
+          <span>通常</span>
+          <strong class="tech-normal-range numeric"></strong>
+        </div>
+        <div class="technique-value">
+          <span>会心</span>
+          <strong class="tech-critical-range numeric"></strong>
+        </div>
+        <div class="technique-value">
+          <span>威力</span>
+          <strong class="tech-multiplier numeric"></strong>
+        </div>
+      </article>
+    </template>
+
+    <script src="./config.js"></script>
+    <script src="./crafts/registry.js"></script>
+    <script src="./crafts/shared/smithing-damage.js"></script>
+    <script src="./crafts/shared/sewing-damage.js"></script>
+    <script src="./crafts/shared/woodworking-damage.js"></script>
+    <script src="./crafts/shared/cooking-damage.js"></script>
+    <script src="./crafts/cooking/config.js"></script>
+    <script src="./crafts/cooking/recipes.js"></script>
+    <script src="./crafts/weapon-smithing/config.js"></script>
+    <script src="./crafts/weapon-smithing/recipes.js"></script>
+    <script src="./crafts/armor-smithing/config.js"></script>
+    <script src="./crafts/armor-smithing/recipes.js"></script>
+    <script src="./crafts/tool-smithing/config.js"></script>
+    <script src="./crafts/tool-smithing/recipes.js"></script>
+    <script src="./crafts/sewing/config.js"></script>
+    <script src="./crafts/sewing/recipes.js"></script>
+    <script src="./crafts/woodworking/config.js"></script>
+    <script src="./crafts/woodworking/recipes.js"></script>
+    <script src="./crafts/lamp-alchemy/config.js"></script>
+    <script src="./crafts/lamp-alchemy/recipes.js"></script>
+    <script src="./crafts/pot-alchemy/config.js"></script>
+    <script src="./crafts/pot-alchemy/recipes.js"></script>
+    <script src="./engine.js"></script>
+    <script src="./main.js"></script>
+  </body>
+</html>

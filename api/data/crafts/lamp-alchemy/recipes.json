@@ -1,0 +1,11 @@
+[
+  {
+    "id": "lamp-3-slots",
+    "name": "ランプ錬金 3枠テンプレート",
+    "items": [
+      { "id": "slot-1", "name": "効果 1", "current": 0, "target": 65, "successMin": 55, "successMax": 75 },
+      { "id": "slot-2", "name": "効果 2", "current": 0, "target": 65, "successMin": 55, "successMax": 75 },
+      { "id": "slot-3", "name": "効果 3", "current": 0, "target": 65, "successMin": 55, "successMax": 75 }
+    ]
+  }
+]

@@ -1,0 +1,28 @@
+registerDQ10CraftRecipes("cooking", [
+  {
+    id: "cooking-3x3-standard",
+    name: "9マス料理テンプレート",
+    items: [
+      { id: "slot-1", name: "左上", optionId: "corner", gridCell: { row: 1, column: 1 }, current: 0, successMin: 60, successMax: 75 },
+      { id: "slot-2", name: "上", optionId: "cross", gridCell: { row: 1, column: 2 }, current: 0, successMin: 60, successMax: 75 },
+      { id: "slot-3", name: "右上", optionId: "corner", gridCell: { row: 1, column: 3 }, current: 0, successMin: 60, successMax: 75 },
+      { id: "slot-4", name: "左", optionId: "cross", gridCell: { row: 2, column: 1 }, current: 0, successMin: 60, successMax: 75 },
+      { id: "slot-5", name: "中央", optionId: "center", gridCell: { row: 2, column: 2 }, current: 0, successMin: 60, successMax: 75 },
+      { id: "slot-6", name: "右", optionId: "cross", gridCell: { row: 2, column: 3 }, current: 0, successMin: 60, successMax: 75 },
+      { id: "slot-7", name: "左下", optionId: "corner", gridCell: { row: 3, column: 1 }, current: 0, successMin: 60, successMax: 75 },
+      { id: "slot-8", name: "下", optionId: "cross", gridCell: { row: 3, column: 2 }, current: 0, successMin: 60, successMax: 75 },
+      { id: "slot-9", name: "右下", optionId: "corner", gridCell: { row: 3, column: 3 }, current: 0, successMin: 60, successMax: 75 },
+    ],
+  },
+  {
+    id: "cooking-center-cross",
+    name: "中央+上下左右テンプレート",
+    items: [
+      { id: "slot-1", name: "上", optionId: "cross", gridCell: { row: 1, column: 2 }, current: 0, successMin: 60, successMax: 75 },
+      { id: "slot-2", name: "左", optionId: "cross", gridCell: { row: 2, column: 1 }, current: 0, successMin: 60, successMax: 75 },
+      { id: "slot-3", name: "中央", optionId: "center", gridCell: { row: 2, column: 2 }, current: 0, successMin: 60, successMax: 75 },
+      { id: "slot-4", name: "右", optionId: "cross", gridCell: { row: 2, column: 3 }, current: 0, successMin: 60, successMax: 75 },
+      { id: "slot-5", name: "下", optionId: "cross", gridCell: { row: 3, column: 2 }, current: 0, successMin: 60, successMax: 75 },
+    ],
+  },
+]);
