@@ -7,7 +7,6 @@ registerDQ10Craft({
   itemNameLabel: "マス名",
   addItemLabel: "マスを追加",
   resourceLabel: "集中力",
-  turnLabel: "残り手数",
   stateLabel: "ぬいパワー",
   defaultRecipeName: "裁縫メモ",
   defaultFocus: 145,
@@ -18,7 +17,6 @@ registerDQ10Craft({
     defaultStars: 3,
     toolTypes: [{ id: "sewing-needle", label: "さいほう針" }],
   }),
-  defaultTurns: 10,
   layout: {
     label: "布配置",
     columns: 3,

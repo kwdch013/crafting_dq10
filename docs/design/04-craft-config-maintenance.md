@@ -21,8 +21,6 @@ app/crafts/
   tool-smithing/config.js
   sewing/config.js
   woodworking/config.js
-  lamp-alchemy/config.js
-  pot-alchemy/config.js
 ```
 
 ## 設定ファイルの役割
@@ -39,11 +37,9 @@ app/crafts/
 - `itemNameLabel`: マス名のラベル
 - `addItemLabel`: 追加ボタンの文言
 - `resourceLabel`: 集中力などのリソース名
-- `turnLabel`: 残りターンや残り手数のラベル
 - `defaultRecipeName`: 初期品目名
 - `defaultFocus`: 初期集中力
 - `focus`: レベル別集中力と道具補正
-- `defaultTurns`: 初期残り手数
 - `heatStates`: 火力や状態の選択肢
 - `techniques`: 特技一覧
 - `itemOptions`: マスや具材ごとの種別選択肢
@@ -218,6 +214,10 @@ focus: createDQ10FocusConfig({
 | `toolTypes` | 道具種類と★数ごとの集中力補正 |
 
 画面の集中力は `levels` の基礎集中力と `focusBonusByStars` の補正値を足して算出します。
+`focusBonus` を指定した道具は、全ての★で同じ集中力加算になります。
+
+鍛冶と調理の確認済み集中力は `app/crafts/registry.js` の共有表で管理します。
+Lv76-80 は未確認のため、暫定的に Lv75 以降を各レベル +2 として登録します。
 
 ## 初期マス設定
 
