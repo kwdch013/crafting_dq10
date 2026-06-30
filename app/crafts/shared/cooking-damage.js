@@ -41,6 +41,13 @@
     { id: "corner", label: "四隅" },
   ];
 
+  const ingredientTypes = [
+    { id: "meat", label: "肉" },
+    { id: "fish", label: "魚" },
+    { id: "egg", label: "卵" },
+    { id: "vegetable", label: "野菜" },
+  ];
+
   const heatStates = [
     { id: "normal", label: "通常" },
     { id: "strong", label: "強火" },
@@ -63,6 +70,7 @@
     source: "https://xn--10-yg4a1a3kyh.jp/dq10_artisan8.html",
     actions,
     positions,
+    ingredientTypes,
     heatStates,
     distributions,
     ranges,
