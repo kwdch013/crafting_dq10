@@ -47,9 +47,10 @@
                 レシピ一覧
                 <select id="recipeSelect"></select>
               </label>
-              <label id="recipeTraitLabel">
-                <span>レシピ特性</span>
-                <select id="recipeTraitSelect"></select>
+              <label id="recipeSpecialEventLabel">
+                特殊状況
+                <select id="recipeSpecialEventInput"></select>
+                <span class="field-help" id="recipeSpecialEventDescription"></span>
               </label>
               <label>
                 職人レベル
@@ -67,19 +68,12 @@
                 <span>集中力</span>
                 <input id="focusInput" type="number" value="120" min="0" max="999" readonly />
               </label>
-              <label id="turnLabel">
-                <span>残りターン</span>
-                <input id="turnInput" type="number" value="8" min="0" max="99" />
-              </label>
               <label id="stateLabel">
                 <span>火力状態</span>
                 <select id="heatInput">
                 </select>
               </label>
-              <label>
-                判定対象の特技
-                <select id="techniqueSelect"></select>
-              </label>
+              <p class="field-note" id="focusNote" hidden></p>
             </div>
           </div>
 
@@ -115,20 +109,16 @@
         <section class="main-panel">
           <div class="summary-grid">
             <article class="summary-card">
-              <span>確定会心候補</span>
+              <span>会心時確定</span>
               <strong id="guaranteedCount">0</strong>
             </article>
             <article class="summary-card">
-              <span>超過リスク</span>
+              <span>超過注意</span>
               <strong id="warningCount">0</strong>
             </article>
             <article class="summary-card">
-              <span>危険マス</span>
+              <span>不足</span>
               <strong id="dangerCount">0</strong>
-            </article>
-            <article class="summary-card">
-              <span>選択特技</span>
-              <strong id="selectedTechniqueLabel">-</strong>
             </article>
           </div>
 
@@ -138,8 +128,36 @@
                 <p class="eyebrow">Board</p>
                 <h2 id="layoutSectionTitle">配置</h2>
               </div>
+              <div class="board-actions" id="boardActions">
+                <button class="button secondary" id="undoBoardButton" type="button">戻る</button>
+                <button class="button secondary" id="redoBoardButton" type="button">進む</button>
+                <button class="button secondary" id="shiftBoardUpButton" type="button">上へずらす</button>
+              </div>
             </div>
             <div id="layoutBoard" class="craft-board"></div>
+          </div>
+
+          <div class="panel-section" id="craftReferencePanel" hidden>
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Reference</p>
+                <h2>調理メモ</h2>
+              </div>
+            </div>
+            <div class="reference-grid">
+              <section>
+                <h3>レシピ特殊状況</h3>
+                <div class="reference-list" id="recipeSpecialEventReference"></div>
+              </section>
+              <section>
+                <h3>食材別基準幅</h3>
+                <div class="reference-list" id="ingredientTypeRanges"></div>
+              </section>
+              <section>
+                <h3>位置別ダメージ</h3>
+                <div class="reference-list damage-reference" id="cookingDamageRanges"></div>
+              </section>
+            </div>
           </div>
 
           <div class="panel-section">
@@ -155,16 +173,16 @@
                 <thead>
                   <tr>
                     <th id="itemNameHeader">項目名</th>
+                    <th id="ingredientTypeHeader">食材種別</th>
                     <th id="itemOptionHeader">種別</th>
                     <th>現在値</th>
-                    <th>光</th>
-                    <th>基準値</th>
-                    <th>成功下限</th>
-                    <th>成功上限</th>
+                    <th id="targetHeader">基準値</th>
+                    <th id="successMinHeader">成功下限</th>
+                    <th id="successMaxHeader">成功上限</th>
                     <th>下限まで</th>
                     <th>上限まで</th>
-                    <th>通常後</th>
-                    <th>会心後</th>
+                    <th>通常後（全倍率）</th>
+                    <th>会心後（全倍率）</th>
                     <th>判定</th>
                     <th>操作</th>
                   </tr>
@@ -193,14 +211,14 @@
                 </div>
               </div>
               <div class="legend-grid">
-                <span class="status status-guaranteed">確定会心</span>
-                <p>会心時の最小から最大までが成功範囲内に収まります。</p>
-                <span class="status status-aim">会心狙い</span>
-                <p>会心なら成功範囲に入る可能性があります。</p>
+                <span class="status status-guaranteed">会心時確定</span>
+                <p>会心時に基準値へ届く場合は、超過せず基準値で止まります。</p>
+                <span class="status status-fake">偽会心の可能性あり</span>
+                <p>会心が出ても基準値で止まらない可能性があります。</p>
                 <span class="status status-warning">超過注意</span>
-                <p>通常または会心で成功上限を超えるリスクがあります。</p>
-                <span class="status status-danger">危険</span>
-                <p>選択中の特技では成功範囲に寄せにくい状態です。</p>
+                <p>通常または会心で基準上限を超えるリスクがあります。</p>
+                <span class="status status-shortage">不足</span>
+                <p>まだ安全に焼ける余地がある状態です。</p>
               </div>
             </section>
           </div>
@@ -211,9 +229,9 @@
     <template id="ingredientRowTemplate">
       <tr>
         <td><input class="ingredient-name" type="text" maxlength="30" /></td>
+        <td class="ingredient-type-cell"><select class="ingredient-type"></select></td>
         <td><select class="ingredient-option"></select></td>
         <td><input class="ingredient-current numeric" type="number" /></td>
-        <td><input class="ingredient-glowing" type="checkbox" title="光っている" /></td>
         <td><input class="ingredient-target numeric" type="number" /></td>
         <td><input class="ingredient-min numeric" type="number" /></td>
         <td><input class="ingredient-max numeric" type="number" /></td>
@@ -250,7 +268,6 @@
 
     <script src="./config.js"></script>
     <script src="./crafts/registry.js"></script>
-    <script src="./board-cell-editor.js"></script>
     <script src="./crafts/shared/smithing-damage.js"></script>
     <script src="./crafts/shared/sewing-damage.js"></script>
     <script src="./crafts/shared/woodworking-damage.js"></script>
@@ -267,10 +284,6 @@
     <script src="./crafts/sewing/recipes.js"></script>
     <script src="./crafts/woodworking/config.js"></script>
     <script src="./crafts/woodworking/recipes.js"></script>
-    <script src="./crafts/lamp-alchemy/config.js"></script>
-    <script src="./crafts/lamp-alchemy/recipes.js"></script>
-    <script src="./crafts/pot-alchemy/config.js"></script>
-    <script src="./crafts/pot-alchemy/recipes.js"></script>
     <script src="./engine.js"></script>
     <script src="./main.js"></script>
   </body>

@@ -1,11 +1,15 @@
 (function (global) {
   const statusLabels = {
-    stable: "安全",
-    aim: "会心狙い",
-    guaranteed: "確定会心",
+    guaranteed: "会心時確定",
+    fake: "偽会心の可能性あり",
     warning: "超過注意",
-    danger: "危険",
-    over: "超過",
+    shortage: "不足",
+  };
+  const statusRanks = {
+    guaranteed: 4,
+    fake: 3,
+    shortage: 2,
+    warning: 1,
   };
 
   function toNumber(value, fallback = 0) {
@@ -19,6 +23,52 @@
     return normalizedMin <= normalizedMax
       ? [normalizedMin, normalizedMax]
       : [normalizedMax, normalizedMin];
+  }
+
+  function resolveCriticalResult(current, criticalMin, criticalMax, targetMin, targetMax, targetMode) {
+    const rawCriticalAfterMin = current + criticalMin;
+    const rawCriticalAfterMax = current + criticalMax;
+
+    if (targetMode !== "random-in-range") {
+      const target = targetMin;
+      const criticalStopApplies = current <= target && rawCriticalAfterMax >= target;
+      const criticalAfterMin = criticalStopApplies && rawCriticalAfterMin >= target
+        ? target
+        : rawCriticalAfterMin;
+      const criticalAfterMax = criticalStopApplies
+        ? target
+        : rawCriticalAfterMax;
+
+      return {
+        rawCriticalAfterMin,
+        rawCriticalAfterMax,
+        criticalAfterMin,
+        criticalAfterMax,
+        criticalStopApplies,
+      };
+    }
+
+    const reachableTargetMin = Math.max(current, targetMin);
+    const criticalStopApplies = current <= targetMax && rawCriticalAfterMax >= reachableTargetMin;
+    let criticalAfterMin = rawCriticalAfterMin;
+    let criticalAfterMax = rawCriticalAfterMax;
+
+    if (criticalStopApplies) {
+      criticalAfterMin = rawCriticalAfterMin >= reachableTargetMin
+        ? reachableTargetMin
+        : rawCriticalAfterMin;
+      criticalAfterMax = current <= targetMin && rawCriticalAfterMax >= targetMax
+        ? targetMax
+        : rawCriticalAfterMax;
+    }
+
+    return {
+      rawCriticalAfterMin,
+      rawCriticalAfterMax,
+      criticalAfterMin,
+      criticalAfterMax,
+      criticalStopApplies,
+    };
   }
 
   function resolveTechnique(state, technique, ingredient) {
@@ -112,24 +162,31 @@
     return technique;
   }
 
-  function analyzeIngredient(ingredient, technique) {
+  function analyzeIngredient(ingredient, technique, targetMode = "fixed") {
     const [successMin, successMax] = normalizeRange(ingredient.successMin, ingredient.successMax);
     const [normalMin, normalMax] = normalizeRange(technique.normalMin, technique.normalMax);
     const [criticalMin, criticalMax] = normalizeRange(technique.criticalMin, technique.criticalMax);
     const current = toNumber(ingredient.current);
-    const target = toNumber(ingredient.target, Math.round((successMin + successMax) / 2));
+    const target = targetMode === "random-in-range"
+      ? Math.round((successMin + successMax) / 2)
+      : toNumber(ingredient.target, Math.round((successMin + successMax) / 2));
 
     const normalAfterMin = current + normalMin;
     const normalAfterMax = current + normalMax;
-    const rawCriticalAfterMin = current + criticalMin;
-    const rawCriticalAfterMax = current + criticalMax;
-    const criticalStopApplies = current <= target && rawCriticalAfterMax >= target;
-    const criticalAfterMin = criticalStopApplies && rawCriticalAfterMin >= target
-      ? target
-      : rawCriticalAfterMin;
-    const criticalAfterMax = criticalStopApplies
-      ? target
-      : rawCriticalAfterMax;
+    const {
+      rawCriticalAfterMin,
+      rawCriticalAfterMax,
+      criticalAfterMin,
+      criticalAfterMax,
+      criticalStopApplies,
+    } = resolveCriticalResult(
+      current,
+      criticalMin,
+      criticalMax,
+      targetMode === "random-in-range" ? successMin : target,
+      targetMode === "random-in-range" ? successMax : target,
+      targetMode,
+    );
 
     const lowerDiff = successMin - current;
     const upperDiff = successMax - current;
@@ -137,25 +194,25 @@
       normalAfterMin >= successMin && normalAfterMax <= successMax;
     const normalCanHit =
       normalAfterMax >= successMin && normalAfterMin <= successMax;
-    const guaranteedCritical =
-      criticalAfterMin >= successMin && criticalAfterMax <= successMax;
+    const guaranteedCritical = targetMode === "random-in-range"
+      ? current <= successMin && rawCriticalAfterMin >= successMax
+      : criticalAfterMin >= successMin && criticalAfterMax <= successMax;
     const criticalCanHit =
       criticalAfterMax >= successMin && criticalAfterMin <= successMax;
-    const criticalOver = criticalAfterMax > successMax;
+    const partialTargetOver = targetMode === "random-in-range" && current > successMin && current <= successMax;
+    const criticalOver = criticalAfterMax > successMax || partialTargetOver;
     const currentOver = current > successMax;
-    const closeToUpper = upperDiff >= 0 && upperDiff < normalMin;
+    const normalOver = normalAfterMax > successMax;
 
-    let status = "danger";
+    let status = "shortage";
     if (currentOver) {
-      status = "over";
+      status = "warning";
     } else if (guaranteedCritical) {
       status = "guaranteed";
-    } else if (criticalOver && upperDiff <= criticalMax) {
+    } else if (normalOver || criticalOver) {
       status = "warning";
     } else if (criticalCanHit) {
-      status = "aim";
-    } else if (normalHits || normalCanHit) {
-      status = closeToUpper ? "warning" : "stable";
+      status = "fake";
     }
 
     return {
@@ -183,25 +240,46 @@
       criticalCanHit,
       criticalOver,
       currentOver,
+      targetMode,
       status,
       statusLabel: statusLabels[status],
     };
   }
 
+  function analyzeIngredientAcrossTechniques(state, ingredient) {
+    const techniqueAnalyses = state.techniques.map((technique) => {
+      const resolvedTechnique = resolveTechnique(state, technique, ingredient);
+      return {
+        ...analyzeIngredient(ingredient, resolvedTechnique, state.targetMode),
+        technique: resolvedTechnique,
+      };
+    });
+    const representative = [...techniqueAnalyses].sort((a, b) =>
+      statusRanks[b.status] - statusRanks[a.status],
+    )[0];
+
+    return {
+      ...representative,
+      techniqueAnalyses,
+    };
+  }
+
   function analyzeState(state) {
-    const selectedTechnique =
-      state.techniques.find((candidate) => candidate.id === state.selectedTechniqueId) ||
-      state.techniques[0];
     const ingredients = state.ingredients.map((ingredient) =>
-      analyzeIngredient(ingredient, resolveTechnique(state, selectedTechnique, ingredient)),
+      analyzeIngredientAcrossTechniques(state, ingredient),
     );
 
     return {
-      technique: resolveTechnique(state, selectedTechnique, state.ingredients[0]),
       ingredients,
-      guaranteedCount: ingredients.filter((item) => item.guaranteedCritical).length,
-      warningCount: ingredients.filter((item) => item.status === "warning" || item.status === "over").length,
-      dangerCount: ingredients.filter((item) => item.status === "danger").length,
+      guaranteedCount: ingredients.filter((item) =>
+        item.techniqueAnalyses.some((analysis) => analysis.guaranteedCritical),
+      ).length,
+      warningCount: ingredients.filter((item) =>
+        item.techniqueAnalyses.some((analysis) => analysis.status === "warning"),
+      ).length,
+      dangerCount: ingredients.filter((item) =>
+        item.techniqueAnalyses.every((analysis) => analysis.status === "shortage"),
+      ).length,
     };
   }
 
@@ -210,7 +288,7 @@
     const focus = state.focus;
     const resolvedTechnique = resolveTechnique(state, technique, ingredients[0]);
     const analysis = ingredients.map((ingredient) =>
-      analyzeIngredient(ingredient, resolveTechnique(state, technique, ingredient)),
+      analyzeIngredient(ingredient, resolveTechnique(state, technique, ingredient), state.targetMode),
     );
     const affordable = toNumber(focus) >= toNumber(resolvedTechnique.focusCost);
     const scoring = {
@@ -241,12 +319,8 @@
         score -= scoring.warningPenalty;
       }
 
-      if (item.status === "danger") {
+      if (item.status === "shortage") {
         score -= scoring.dangerPenalty;
-      }
-
-      if (item.status === "over") {
-        score -= scoring.overPenalty;
       }
     });
 
@@ -254,17 +328,17 @@
 
     const reasonParts = [];
     const guaranteed = analysis.filter((item) => item.guaranteedCritical).length;
-    const warnings = analysis.filter((item) => item.status === "warning" || item.status === "over").length;
-    const aim = analysis.filter((item) => item.status === "aim").length;
+    const warnings = analysis.filter((item) => item.status === "warning").length;
+    const fake = analysis.filter((item) => item.status === "fake").length;
 
     if (!affordable) {
       reasonParts.push("集中力不足");
     }
     if (guaranteed > 0) {
-      reasonParts.push(`確定会心候補 ${guaranteed} 件`);
+      reasonParts.push(`会心時確定 ${guaranteed} 件`);
     }
-    if (aim > 0) {
-      reasonParts.push(`会心狙い ${aim} 件`);
+    if (fake > 0) {
+      reasonParts.push(`偽会心の可能性 ${fake} 件`);
     }
     if (warnings > 0) {
       reasonParts.push(`超過リスク ${warnings} 件`);
@@ -292,6 +366,7 @@
     statusLabels,
     resolveTechnique,
     analyzeIngredient,
+    analyzeIngredientAcrossTechniques,
     analyzeState,
     recommendTechniques,
   };
