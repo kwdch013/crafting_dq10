@@ -41,6 +41,10 @@
     { id: "corner", label: "四隅" },
   ];
 
+  const specialRanges = [
+    { id: "light", label: "光マス", range: [24, 36] },
+  ];
+
   const heatStates = [
     { id: "normal", label: "通常" },
     { id: "strong", label: "強火" },
@@ -63,6 +67,7 @@
     source: "https://xn--10-yg4a1a3kyh.jp/dq10_artisan8.html",
     actions,
     positions,
+    specialRanges,
     heatStates,
     distributions,
     ranges,

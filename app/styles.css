@@ -333,11 +333,11 @@ select:focus {
   grid-template-columns: 76px minmax(0, 1fr);
 }
 
-.special-event-reference {
+.trait-reference {
   grid-template-columns: 76px minmax(0, 1fr);
 }
 
-.special-event-reference span {
+.trait-reference span {
   line-height: 1.4;
 }
 

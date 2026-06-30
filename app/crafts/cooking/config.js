@@ -12,27 +12,32 @@ registerDQ10Craft({
   defaultRecipeName: "料理メモ",
   targetMode: "random-in-range",
   focusNote: "Lv76-80はLv75以降を各レベル+2として置いた暫定値です。",
-  defaultSpecialEventId: "none",
-  specialEvents: [
+  defaultTraitId: "none",
+  traits: [
     {
       id: "none",
-      label: "通常",
-      description: "4ターンごとの特殊状況はありません。",
+      label: "未設定",
+      description: "レシピの特性が未設定です。",
     },
     {
-      id: "recovery",
-      label: "回復",
-      description: "4ターンごとに、超過しているもの、または基準値外にあるもののうち、最も値が大きい食材が1つ回復します。",
+      id: "light-return",
+      label: "光・戻り",
+      description: "4ターンごとに上下左右が光ります。次の4ターン後には四隅が戻り、以後交互に訪れます。",
+    },
+    {
+      id: "return",
+      label: "戻り",
+      description: "4ターンごとに、超過しているもの、または基準値外にあるもののうち、最も値が大きい食材が1つ戻ります。",
+    },
+    {
+      id: "light",
+      label: "光",
+      description: "4ターンごとに、食材が置いてあるランダムな1マスが光ります。",
     },
     {
       id: "double-half",
       label: "倍半",
       description: "4ターンごとに、威力が倍になる状態と半分になる状態が交互に訪れます。",
-    },
-    {
-      id: "light-recovery",
-      label: "光・回復",
-      description: "4ターンごとに上下左右が光ります。次の4ターン後には四隅が回復し、以後交互に訪れます。",
     },
   ],
   defaultFocus: 247,
