@@ -19,8 +19,6 @@ api/data/
   crafts/tool-smithing/recipes.json
   crafts/sewing/recipes.json
   crafts/woodworking/recipes.json
-  crafts/lamp-alchemy/recipes.json
-  crafts/pot-alchemy/recipes.json
 ```
 
 フロント側:
@@ -48,6 +46,7 @@ app/crafts/<職人>/recipes.js
     "id": "cooking-3x3-standard",
     "name": "9マス料理テンプレート",
     "recipeTrait": "glow",
+    "specialEventId": "none",
     "items": [
       {
         "id": "slot-5",
@@ -71,6 +70,7 @@ app/crafts/<職人>/recipes.js
 | `id` | レシピまたはマスの内部ID |
 | `name` | 画面表示名 |
 | `recipeTrait` | 調理のレシピ特性。未指定時は `none` |
+| `specialEventId` | 調理レシピの特殊状況 |
 | `items` | レシピに含まれるマス一覧 |
 | `optionId` | 調理の場所、木工の木目 |
 | `gridCell` | 盤面上の位置 |
@@ -86,6 +86,36 @@ app/crafts/<職人>/recipes.js
 | `none` | 特性なし |
 | `glow` | マスごとに光状態を入力 |
 | `glow-return` | 上下左右が光る状態、または四隅が戻る状態を選択 |
+
+## 調理レシピの特殊状況
+
+調理職人では、レシピごとに4ターンごとの特殊状況を `specialEventId` で管理します。
+
+| ID | 意味 |
+| --- | --- |
+| `none` | 特殊状況なし |
+| `recovery` | 回復 |
+| `double-half` | 倍半 |
+| `light-recovery` | 光・回復 |
+
+詳細な挙動は [調理職人メモ](../crafts/cooking.md) を参照します。
+
+## 複数マス食材
+
+調理職人には、1マス食材と2マス食材があります。
+
+2マス食材は複数のマスが同時に動くため、今後は同一食材を構成するマスをグループとして扱います。
+
+候補フィールド:
+
+```json
+{
+  "ingredientGroupId": "meat-1",
+  "ingredientSize": 2
+}
+```
+
+現時点では未実装のため、レシピ実データへ追加する場合は [調理職人メモ](../crafts/cooking.md) と合わせて更新します。
 
 ## 画面動作
 
