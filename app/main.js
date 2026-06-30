@@ -118,6 +118,9 @@ function normalizeState(value) {
       target: numberOr(ingredient.target, defaultItem?.target ?? Math.round((successMin + successMax) / 2)),
       successMin,
       successMax,
+      ingredientGroupId: ingredient.ingredientGroupId || defaultItem?.ingredientGroupId || "",
+      ingredientGroupLabel: ingredient.ingredientGroupLabel || defaultItem?.ingredientGroupLabel || "",
+      ingredientSize: numberOr(ingredient.ingredientSize, defaultItem?.ingredientSize ?? 1),
     };
   });
   const heat = config.heatStates.some((candidate) => candidate.id === value.heat)
@@ -595,13 +598,18 @@ function renderCookingDamageRanges(cookingDamage) {
     `;
   });
   const specialRows = (cookingDamage.specialRanges || []).map((specialRange) => {
-    const [min, max] = specialRange.range || [];
+    const ranges = ["normal", "strong", "half"].map((conditionId) => {
+      const range = cookingDamage.getSpecialRange
+        ? cookingDamage.getSpecialRange(specialRange.id, conditionId)
+        : specialRange.ranges?.[conditionId] || specialRange.range;
+      return `${heatLabels[conditionId]} ${range ? `${range[0]}-${range[1]}` : "-"}`;
+    }).join(" / ");
 
     return `
       <div class="reference-row">
         <strong>${escapeHtml(specialRange.label)}</strong>
-        <span class="numeric">${escapeHtml(`${min} - ${max}`)}</span>
-        <small>特性で光ったマスのダメージ幅</small>
+        <span class="numeric">${escapeHtml(ranges)}</span>
+        <small>通常の光マス基準幅に火力補正をかけたダメージ幅</small>
       </div>
     `;
   });
@@ -666,6 +674,8 @@ function renderLayoutBoard() {
   const analysis = DQ10CraftEngine.analyzeState(state);
   const occupiedCells = new Set();
   const canRearrange = canRearrangeBoard(config);
+  const selectedIngredient = state.ingredients.find((ingredient) => ingredient.id === selectedBoardIngredientId);
+  const selectedGroupId = getIngredientGroupId(selectedIngredient);
 
   elements.layoutBoard.replaceChildren();
   elements.layoutBoard.style.gridTemplateColumns = `repeat(${columns}, minmax(110px, 1fr))`;
@@ -700,7 +710,7 @@ function renderLayoutBoard() {
       cell.style.gridRow = `span ${rowSpan}`;
       cell.style.gridColumn = `span ${columnSpan}`;
       cell.dataset.id = item.id;
-      if (item.id === selectedBoardIngredientId) {
+      if (item.id === selectedBoardIngredientId || isSameIngredientGroup(item, selectedGroupId)) {
         cell.classList.add("selected");
       }
 
@@ -714,6 +724,7 @@ function renderLayoutBoard() {
         <div class="board-cell-head">
           <strong>${escapeHtml(item.name)}</strong>
           <div class="board-cell-badges">
+            ${formatBoardBadge(item.ingredientGroupLabel)}
             ${formatBoardBadge(getItemOptionLabel(config, item.optionId))}
           </div>
         </div>
@@ -784,19 +795,32 @@ function handleBoardCellClick(item, targetCell) {
     return;
   }
 
-  pushBoardHistory();
-  const sourceCell = createMovedGridCell(selectedIngredient.gridCell, selectedIngredient.gridCell);
+  const selectedGroup = getIngredientGroupMembers(selectedIngredient);
+  const targetGroup = targetIngredient ? getIngredientGroupMembers(targetIngredient) : [];
+  const selectedGroupIds = new Set(selectedGroup.map((ingredient) => ingredient.id));
+  const targetGroupIds = new Set(targetGroup.map((ingredient) => ingredient.id));
 
-  if (targetIngredient) {
-    selectedIngredient.gridCell = createMovedGridCell(selectedIngredient.gridCell, targetIngredient.gridCell);
-    targetIngredient.gridCell = createMovedGridCell(targetIngredient.gridCell, sourceCell);
-    updateIngredientPositionOption(selectedIngredient);
-    updateIngredientPositionOption(targetIngredient);
-  } else {
-    selectedIngredient.gridCell = createMovedGridCell(selectedIngredient.gridCell, targetCell);
-    updateIngredientPositionOption(selectedIngredient);
+  if (targetIngredient && selectedGroupIds.has(targetIngredient.id)) {
+    selectedBoardIngredientId = null;
+    renderLayoutBoard();
+    return;
   }
 
+  const moves = targetIngredient
+    ? [
+      ...createGroupMoves(selectedGroup, selectedIngredient, targetIngredient.gridCell),
+      ...createGroupMoves(targetGroup, targetIngredient, selectedIngredient.gridCell),
+    ]
+    : createGroupMoves(selectedGroup, selectedIngredient, targetCell);
+  const ignoredIds = new Set([...selectedGroupIds, ...targetGroupIds]);
+
+  if (!canApplyGroupMoves(moves, ignoredIds)) {
+    renderLayoutBoard();
+    return;
+  }
+
+  pushBoardHistory();
+  applyGroupMoves(moves);
   selectedBoardIngredientId = null;
   markCustomRecipe();
   renderIngredients();
@@ -812,6 +836,73 @@ function createMovedGridCell(currentCell, targetCell) {
     row: targetCell?.row,
     column: targetCell?.column,
   };
+}
+
+function getIngredientGroupId(ingredient) {
+  return ingredient?.ingredientGroupId || "";
+}
+
+function isSameIngredientGroup(ingredient, groupId) {
+  return Boolean(groupId && ingredient?.ingredientGroupId === groupId);
+}
+
+function getIngredientGroupMembers(ingredient) {
+  const groupId = getIngredientGroupId(ingredient);
+  if (!groupId) {
+    return ingredient ? [ingredient] : [];
+  }
+
+  return state.ingredients.filter((candidate) => candidate.ingredientGroupId === groupId);
+}
+
+function createGroupMoves(group, anchorIngredient, targetCell) {
+  const sourceCell = anchorIngredient?.gridCell || {};
+  const rowDelta = numberOr(targetCell?.row, sourceCell.row) - numberOr(sourceCell.row, 1);
+  const columnDelta = numberOr(targetCell?.column, sourceCell.column) - numberOr(sourceCell.column, 1);
+
+  return group.map((ingredient) => {
+    const row = numberOr(ingredient.gridCell?.row, 1) + rowDelta;
+    const column = numberOr(ingredient.gridCell?.column, 1) + columnDelta;
+
+    return {
+      ingredient,
+      gridCell: createMovedGridCell(ingredient.gridCell, { row, column }),
+    };
+  });
+}
+
+function canApplyGroupMoves(moves, ignoredIds) {
+  const layout = getCurrentCraftConfig().layout;
+  const rows = Math.max(1, numberOr(layout?.rows, 1));
+  const columns = Math.max(1, numberOr(layout?.columns, 1));
+  const destinationCells = new Set();
+  const occupiedCells = new Set(state.ingredients
+    .filter((ingredient) => !ignoredIds.has(ingredient.id))
+    .map((ingredient) => `${ingredient.gridCell?.row}:${ingredient.gridCell?.column}`));
+
+  return moves.every((move) => {
+    const row = numberOr(move.gridCell?.row, 0);
+    const column = numberOr(move.gridCell?.column, 0);
+    const key = `${row}:${column}`;
+
+    if (row < 1 || row > rows || column < 1 || column > columns) {
+      return false;
+    }
+
+    if (destinationCells.has(key) || occupiedCells.has(key)) {
+      return false;
+    }
+
+    destinationCells.add(key);
+    return true;
+  });
+}
+
+function applyGroupMoves(moves) {
+  moves.forEach((move) => {
+    move.ingredient.gridCell = move.gridCell;
+    updateIngredientPositionOption(move.ingredient);
+  });
 }
 
 function updateIngredientPositionOption(ingredient) {

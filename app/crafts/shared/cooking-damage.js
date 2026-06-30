@@ -42,7 +42,15 @@
   ];
 
   const specialRanges = [
-    { id: "light", label: "光マス", range: [24, 36] },
+    {
+      id: "light",
+      label: "光マス",
+      ranges: {
+        normal: [24, 36],
+        strong: [36, 54],
+        half: [18, 27],
+      },
+    },
   ];
 
   const heatStates = [
@@ -63,6 +71,11 @@
     return ranges[positionId]?.[conditionId] || null;
   }
 
+  function getSpecialRange(specialId, conditionId) {
+    const specialRange = specialRanges.find((item) => item.id === specialId);
+    return specialRange?.ranges?.[conditionId] || null;
+  }
+
   global.DQ10CookingDamage = {
     source: "https://xn--10-yg4a1a3kyh.jp/dq10_artisan8.html",
     actions,
@@ -72,5 +85,6 @@
     distributions,
     ranges,
     getRange,
+    getSpecialRange,
   };
 })(window);
