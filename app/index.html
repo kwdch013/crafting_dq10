@@ -146,10 +146,6 @@
                 <div class="reference-list" id="recipeSpecialEventReference"></div>
               </section>
               <section>
-                <h3>食材別基準幅</h3>
-                <div class="reference-list" id="ingredientTypeRanges"></div>
-              </section>
-              <section>
                 <h3>位置別ダメージ</h3>
                 <div class="reference-list damage-reference" id="cookingDamageRanges"></div>
               </section>
@@ -169,7 +165,6 @@
                 <thead>
                   <tr>
                     <th id="itemNameHeader">項目名</th>
-                    <th id="ingredientTypeHeader">食材種別</th>
                     <th id="itemOptionHeader">種別</th>
                     <th>現在値</th>
                     <th id="targetHeader">基準値</th>
@@ -225,7 +220,6 @@
     <template id="ingredientRowTemplate">
       <tr>
         <td><input class="ingredient-name" type="text" maxlength="30" /></td>
-        <td class="ingredient-type-cell"><select class="ingredient-type"></select></td>
         <td><select class="ingredient-option"></select></td>
         <td><input class="ingredient-current numeric" type="number" /></td>
         <td><input class="ingredient-target numeric" type="number" /></td>
