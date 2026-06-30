@@ -45,8 +45,7 @@ app/crafts/<職人>/recipes.js
   {
     "id": "cooking-3x3-standard",
     "name": "9マス料理テンプレート",
-    "recipeTrait": "glow",
-    "specialEventId": "none",
+    "traitId": "light",
     "items": [
       {
         "id": "slot-5",
@@ -69,8 +68,7 @@ app/crafts/<職人>/recipes.js
 | --- | --- |
 | `id` | レシピまたはマスの内部ID |
 | `name` | 画面表示名 |
-| `recipeTrait` | 調理のレシピ特性。未指定時は `none` |
-| `specialEventId` | 調理レシピの特殊状況 |
+| `traitId` | 調理レシピの特性 |
 | `items` | レシピに含まれるマス一覧 |
 | `optionId` | 調理の場所、木工の木目 |
 | `gridCell` | 盤面上の位置 |
@@ -79,24 +77,17 @@ app/crafts/<職人>/recipes.js
 | `successMin` | 成功範囲の下限 |
 | `successMax` | 成功範囲の上限 |
 
-調理の `recipeTrait` は以下を使用します。
+## 調理レシピの特性
 
-| 値 | 意味 |
-| --- | --- |
-| `none` | 特性なし |
-| `glow` | マスごとに光状態を入力 |
-| `glow-return` | 上下左右が光る状態、または四隅が戻る状態を選択 |
-
-## 調理レシピの特殊状況
-
-調理職人では、レシピごとに4ターンごとの特殊状況を `specialEventId` で管理します。
+調理職人では、レシピごとに4ターンごとの特性を `traitId` で管理します。
 
 | ID | 意味 |
 | --- | --- |
-| `none` | 特殊状況なし |
-| `recovery` | 回復 |
+| `none` | 未設定 |
+| `light-return` | 光・戻り |
+| `return` | 戻り |
+| `light` | 光 |
 | `double-half` | 倍半 |
-| `light-recovery` | 光・回復 |
 
 詳細な挙動は [調理職人メモ](../crafts/cooking.md) を参照します。
 

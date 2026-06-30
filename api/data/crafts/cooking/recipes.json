@@ -32,7 +32,7 @@
         "successMax": 120
       }
     ],
-    "specialEventId": "none"
+    "traitId": "none"
   },
   {
     "id": "cooking-002",
@@ -80,7 +80,7 @@
         "successMax": 140
       }
     ],
-    "specialEventId": "none"
+    "traitId": "none"
   },
   {
     "id": "cooking-003",
@@ -128,7 +128,7 @@
         "successMax": 160
       }
     ],
-    "specialEventId": "none"
+    "traitId": "none"
   },
   {
     "id": "cooking-004",
@@ -189,7 +189,7 @@
         "successMax": 115
       }
     ],
-    "specialEventId": "none"
+    "traitId": "none"
   },
   {
     "id": "cooking-005",
@@ -263,7 +263,7 @@
         "successMax": 165
       }
     ],
-    "specialEventId": "none"
+    "traitId": "none"
   },
   {
     "id": "cooking-006",
@@ -337,7 +337,7 @@
         "successMax": 190
       }
     ],
-    "specialEventId": "none"
+    "traitId": "none"
   },
   {
     "id": "cooking-007",
@@ -424,7 +424,7 @@
         "successMax": 190
       }
     ],
-    "specialEventId": "light-recovery"
+    "traitId": "light-return"
   },
   {
     "id": "cooking-008",
@@ -459,7 +459,7 @@
         "successMax": 130
       }
     ],
-    "specialEventId": "none"
+    "traitId": "none"
   },
   {
     "id": "cooking-009",
@@ -507,7 +507,7 @@
         "successMax": 115
       }
     ],
-    "specialEventId": "none"
+    "traitId": "none"
   },
   {
     "id": "cooking-010",
@@ -555,7 +555,7 @@
         "successMax": 120
       }
     ],
-    "specialEventId": "none"
+    "traitId": "none"
   },
   {
     "id": "cooking-011",
@@ -629,7 +629,7 @@
         "successMax": 140
       }
     ],
-    "specialEventId": "none"
+    "traitId": "none"
   },
   {
     "id": "cooking-012",
@@ -716,7 +716,7 @@
         "successMax": 160
       }
     ],
-    "specialEventId": "none"
+    "traitId": "none"
   },
   {
     "id": "cooking-013",
@@ -803,7 +803,7 @@
         "successMax": 170
       }
     ],
-    "specialEventId": "none"
+    "traitId": "none"
   },
   {
     "id": "cooking-014",
@@ -890,7 +890,7 @@
         "successMax": 225
       }
     ],
-    "specialEventId": "none"
+    "traitId": "none"
   },
   {
     "id": "cooking-015",
@@ -977,7 +977,7 @@
         "successMax": 210
       }
     ],
-    "specialEventId": "none"
+    "traitId": "none"
   },
   {
     "id": "cooking-016",
@@ -1012,7 +1012,7 @@
         "successMax": 110
       }
     ],
-    "specialEventId": "none"
+    "traitId": "none"
   },
   {
     "id": "cooking-017",
@@ -1047,7 +1047,7 @@
         "successMax": 100
       }
     ],
-    "specialEventId": "none"
+    "traitId": "none"
   },
   {
     "id": "cooking-018",
@@ -1108,7 +1108,7 @@
         "successMax": 120
       }
     ],
-    "specialEventId": "none"
+    "traitId": "none"
   },
   {
     "id": "cooking-019",
@@ -1182,7 +1182,7 @@
         "successMax": 175
       }
     ],
-    "specialEventId": "none"
+    "traitId": "none"
   },
   {
     "id": "cooking-020",
@@ -1269,7 +1269,7 @@
         "successMax": 150
       }
     ],
-    "specialEventId": "none"
+    "traitId": "none"
   },
   {
     "id": "cooking-021",
@@ -1356,7 +1356,7 @@
         "successMax": 210
       }
     ],
-    "specialEventId": "none"
+    "traitId": "none"
   },
   {
     "id": "cooking-022",
@@ -1378,7 +1378,7 @@
         "successMax": 90
       }
     ],
-    "specialEventId": "none"
+    "traitId": "none"
   },
   {
     "id": "cooking-023",
@@ -1413,7 +1413,7 @@
         "successMax": 100
       }
     ],
-    "specialEventId": "none"
+    "traitId": "none"
   },
   {
     "id": "cooking-024",
@@ -1474,7 +1474,7 @@
         "successMax": 140
       }
     ],
-    "specialEventId": "none"
+    "traitId": "none"
   },
   {
     "id": "cooking-025",
@@ -1535,7 +1535,7 @@
         "successMax": 170
       }
     ],
-    "specialEventId": "none"
+    "traitId": "none"
   },
   {
     "id": "cooking-026",
@@ -1596,7 +1596,7 @@
         "successMax": 160
       }
     ],
-    "specialEventId": "none"
+    "traitId": "none"
   },
   {
     "id": "cooking-027",
@@ -1657,7 +1657,7 @@
         "successMax": 190
       }
     ],
-    "specialEventId": "none"
+    "traitId": "none"
   },
   {
     "id": "cooking-028",
@@ -1718,7 +1718,7 @@
         "successMax": 180
       }
     ],
-    "specialEventId": "none"
+    "traitId": "none"
   },
   {
     "id": "cooking-029",
@@ -1792,7 +1792,7 @@
         "successMax": 160
       }
     ],
-    "specialEventId": "none"
+    "traitId": "none"
   },
   {
     "id": "cooking-030",
@@ -1840,6 +1840,6 @@
         "successMax": 105
       }
     ],
-    "specialEventId": "none"
+    "traitId": "none"
   }
 ]

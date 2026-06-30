@@ -8,9 +8,9 @@ const elements = {
   focusLabel: document.querySelector("#focusLabel span"),
   stateLabel: document.querySelector("#stateLabel span"),
   recipeSelect: document.querySelector("#recipeSelect"),
-  recipeSpecialEventLabel: document.querySelector("#recipeSpecialEventLabel"),
-  recipeSpecialEventInput: document.querySelector("#recipeSpecialEventInput"),
-  recipeSpecialEventDescription: document.querySelector("#recipeSpecialEventDescription"),
+  recipeTraitLabel: document.querySelector("#recipeTraitLabel"),
+  recipeTraitInput: document.querySelector("#recipeTraitInput"),
+  recipeTraitDescription: document.querySelector("#recipeTraitDescription"),
   levelSelect: document.querySelector("#levelSelect"),
   toolSelect: document.querySelector("#toolSelect"),
   toolStarsSelect: document.querySelector("#toolStarsSelect"),
@@ -25,7 +25,7 @@ const elements = {
   successMaxHeader: document.querySelector("#successMaxHeader"),
   techniqueEditor: document.querySelector("#techniqueEditor"),
   craftReferencePanel: document.querySelector("#craftReferencePanel"),
-  recipeSpecialEventReference: document.querySelector("#recipeSpecialEventReference"),
+  recipeTraitReference: document.querySelector("#recipeTraitReference"),
   cookingDamageRanges: document.querySelector("#cookingDamageRanges"),
   layoutSectionTitle: document.querySelector("#layoutSectionTitle"),
   boardActions: document.querySelector("#boardActions"),
@@ -124,13 +124,13 @@ function normalizeState(value) {
     ? value.heat
     : config.heatStates[0].id;
   const focusSelection = normalizeFocusSelection(config, value);
-  const recipeSpecialEventId = getRecipeSpecialEventId(config, recipeId);
-  const specialEventId = normalizeSpecialEventId(config, value.specialEventId || recipeSpecialEventId);
+  const recipeTraitId = getRecipeTraitId(config, recipeId);
+  const traitId = normalizeTraitId(config, value.traitId || value.specialEventId || recipeTraitId);
 
   return {
     recipeId,
     recipeName: value.recipeName || getRecipeLabel(config, recipeId),
-    specialEventId,
+    traitId,
     craftType: config.id,
     level: focusSelection.level,
     toolId: focusSelection.toolId,
@@ -189,27 +189,29 @@ function getRecipeLabel(config, recipeId) {
   return getSelectedRecipe(config, recipeId)?.name || config.defaultRecipeName;
 }
 
-function getRecipeSpecialEventId(config, recipeId) {
-  return getSelectedRecipe(config, recipeId)?.specialEventId || config.defaultSpecialEventId || "none";
+function getRecipeTraitId(config, recipeId) {
+  const recipe = getSelectedRecipe(config, recipeId);
+  return recipe?.traitId || recipe?.specialEventId || config.defaultTraitId || "none";
 }
 
-function getSpecialEvents(config) {
-  return config.specialEvents || [];
+function getTraits(config) {
+  return config.traits || [];
 }
 
-function hasSpecialEvents(config) {
-  return getSpecialEvents(config).length > 0;
+function normalizeTraitId(config, traitId) {
+  const traits = getTraits(config);
+  const fallback = config.defaultTraitId || traits[0]?.id || "";
+  const aliases = {
+    "light-recovery": "light-return",
+    recovery: "return",
+  };
+  const normalized = aliases[traitId] || traitId;
+  return traits.some((trait) => trait.id === normalized) ? normalized : fallback;
 }
 
-function normalizeSpecialEventId(config, specialEventId) {
-  const events = getSpecialEvents(config);
-  const fallback = config.defaultSpecialEventId || events[0]?.id || "";
-  return events.some((event) => event.id === specialEventId) ? specialEventId : fallback;
-}
-
-function getSpecialEvent(config, specialEventId) {
-  const normalized = normalizeSpecialEventId(config, specialEventId);
-  return getSpecialEvents(config).find((event) => event.id === normalized);
+function getTrait(config, traitId) {
+  const normalized = normalizeTraitId(config, traitId);
+  return getTraits(config).find((trait) => trait.id === normalized);
 }
 
 function findDefaultItem(config, ingredient, index) {
@@ -303,7 +305,7 @@ function createDefaultState(craftType) {
     craftType: config.id,
     recipeId: defaultRecipe?.id || "custom",
     recipeName: defaultRecipe?.name || config.defaultRecipeName,
-    specialEventId: defaultRecipe?.specialEventId || config.defaultSpecialEventId || "none",
+    traitId: defaultRecipe?.traitId || defaultRecipe?.specialEventId || config.defaultTraitId || "none",
     level: focusSelection.level,
     toolId: focusSelection.toolId,
     toolStars: focusSelection.toolStars,
@@ -368,7 +370,7 @@ function render() {
   renderCraftLabels();
   syncStaticInputs();
   renderRecipeOptions();
-  renderSpecialEventOptions();
+  renderTraitOptions();
   renderFocusOptions();
   renderHeatOptions();
   renderTechniqueEditor();
@@ -383,7 +385,7 @@ function render() {
 function syncStaticInputs() {
   elements.craftType.value = state.craftType;
   elements.recipeSelect.value = state.recipeId;
-  elements.recipeSpecialEventInput.value = state.specialEventId;
+  elements.recipeTraitInput.value = state.traitId;
   elements.levelSelect.value = state.level;
   elements.toolSelect.value = state.toolId;
   elements.toolStarsSelect.value = state.toolStars;
@@ -413,33 +415,33 @@ function renderRecipeOptions() {
     : "custom";
 }
 
-function renderSpecialEventOptions() {
+function renderTraitOptions() {
   const config = getCurrentCraftConfig();
-  const events = getSpecialEvents(config);
-  const shouldShow = events.length > 0;
-  elements.recipeSpecialEventLabel.hidden = !shouldShow;
+  const traits = getTraits(config);
+  const shouldShow = traits.length > 0;
+  elements.recipeTraitLabel.hidden = !shouldShow;
 
   if (!shouldShow) {
     return;
   }
 
-  state.specialEventId = normalizeSpecialEventId(config, state.specialEventId);
-  elements.recipeSpecialEventInput.replaceChildren();
-  events.forEach((event) => {
+  state.traitId = normalizeTraitId(config, state.traitId);
+  elements.recipeTraitInput.replaceChildren();
+  traits.forEach((trait) => {
     const option = document.createElement("option");
-    option.value = event.id;
-    option.textContent = event.label;
-    elements.recipeSpecialEventInput.append(option);
+    option.value = trait.id;
+    option.textContent = trait.label;
+    elements.recipeTraitInput.append(option);
   });
 
-  elements.recipeSpecialEventInput.value = state.specialEventId;
-  renderSpecialEventDescription();
+  elements.recipeTraitInput.value = state.traitId;
+  renderTraitDescription();
 }
 
-function renderSpecialEventDescription() {
+function renderTraitDescription() {
   const config = getCurrentCraftConfig();
-  const event = getSpecialEvent(config, state.specialEventId);
-  elements.recipeSpecialEventDescription.textContent = event?.description || "";
+  const trait = getTrait(config, state.traitId);
+  elements.recipeTraitDescription.textContent = trait?.description || "";
 }
 
 function renderFocusOptions() {
@@ -557,16 +559,16 @@ function renderCraftReference() {
     return;
   }
 
-  renderRecipeSpecialEventReference(config);
+  renderRecipeTraitReference(config);
   renderCookingDamageRanges(cookingDamage);
 }
 
-function renderRecipeSpecialEventReference(config) {
-  const event = getSpecialEvent(config, state.specialEventId);
-  elements.recipeSpecialEventReference.innerHTML = `
-    <div class="reference-row special-event-reference">
-      <strong>${escapeHtml(event?.label || "-")}</strong>
-      <span>${escapeHtml(event?.description || "-")}</span>
+function renderRecipeTraitReference(config) {
+  const trait = getTrait(config, state.traitId);
+  elements.recipeTraitReference.innerHTML = `
+    <div class="reference-row trait-reference">
+      <strong>${escapeHtml(trait?.label || "-")}</strong>
+      <span>${escapeHtml(trait?.description || "-")}</span>
     </div>
   `;
 }
@@ -577,7 +579,7 @@ function renderCookingDamageRanges(cookingDamage) {
     strong: "強火焼き",
     half: "弱火焼き",
   };
-  const rows = cookingDamage.positions.map((position) => {
+  const positionRows = cookingDamage.positions.map((position) => {
     const ranges = ["normal", "strong", "half"].map((conditionId) => {
       const range = cookingDamage.getRange(position.id, conditionId);
       const values = cookingDamage.distributions?.[position.id]?.[conditionId] || range;
@@ -592,8 +594,19 @@ function renderCookingDamageRanges(cookingDamage) {
       </div>
     `;
   });
+  const specialRows = (cookingDamage.specialRanges || []).map((specialRange) => {
+    const [min, max] = specialRange.range || [];
 
-  elements.cookingDamageRanges.innerHTML = rows.join("");
+    return `
+      <div class="reference-row">
+        <strong>${escapeHtml(specialRange.label)}</strong>
+        <span class="numeric">${escapeHtml(`${min} - ${max}`)}</span>
+        <small>特性で光ったマスのダメージ幅</small>
+      </div>
+    `;
+  });
+
+  elements.cookingDamageRanges.innerHTML = [...positionRows, ...specialRows].join("");
 }
 
 function getDefaultHeatLabel(positionId) {
@@ -1076,7 +1089,7 @@ function applyRecipe(recipeId) {
 
   state.recipeId = recipe.id;
   state.recipeName = recipe.name;
-  state.specialEventId = normalizeSpecialEventId(config, recipe.specialEventId || config.defaultSpecialEventId || "none");
+  state.traitId = normalizeTraitId(config, recipe.traitId || recipe.specialEventId || config.defaultTraitId || "none");
   state.ingredients = cloneConfigItems(recipe.items);
   state.layoutSignature = createLayoutSignature(config);
   render();
@@ -1172,11 +1185,11 @@ async function startCapturePreview() {
   }
 }
 
-elements.recipeSpecialEventInput.addEventListener("change", () => {
+elements.recipeTraitInput.addEventListener("change", () => {
   const config = getCurrentCraftConfig();
-  state.specialEventId = normalizeSpecialEventId(config, elements.recipeSpecialEventInput.value);
+  state.traitId = normalizeTraitId(config, elements.recipeTraitInput.value);
   markCustomRecipe();
-  renderSpecialEventDescription();
+  renderTraitDescription();
   renderCraftReference();
   saveState();
 });
