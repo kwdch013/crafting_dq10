@@ -5,10 +5,8 @@ const apiBaseUrl = window.DQ10_API_BASE_URL || "http://localhost:8000";
 const elements = {
   modeLabel: document.querySelector("#modeLabel"),
   craftType: document.querySelector("#craftType"),
-  recipeNameLabel: document.querySelector("#recipeNameLabel span"),
   focusLabel: document.querySelector("#focusLabel span"),
   stateLabel: document.querySelector("#stateLabel span"),
-  recipeName: document.querySelector("#recipeName"),
   recipeSelect: document.querySelector("#recipeSelect"),
   recipeSpecialEventLabel: document.querySelector("#recipeSpecialEventLabel"),
   recipeSpecialEventInput: document.querySelector("#recipeSpecialEventInput"),
@@ -388,7 +386,6 @@ function render() {
 function syncStaticInputs() {
   elements.craftType.value = state.craftType;
   elements.recipeSelect.value = state.recipeId;
-  elements.recipeName.value = state.recipeName;
   elements.recipeSpecialEventInput.value = state.specialEventId;
   elements.levelSelect.value = state.level;
   elements.toolSelect.value = state.toolId;
@@ -405,7 +402,7 @@ function renderRecipeOptions() {
   recipes.forEach((recipe) => {
     const option = document.createElement("option");
     option.value = recipe.id;
-    option.textContent = recipe.category ? `${recipe.category}: ${recipe.name}` : recipe.name;
+    option.textContent = recipe.name;
     elements.recipeSelect.append(option);
   });
 
@@ -502,7 +499,6 @@ function renderCraftOptions() {
 function renderCraftLabels() {
   const config = getCurrentCraftConfig();
   elements.modeLabel.textContent = config.modeLabel;
-  elements.recipeNameLabel.textContent = config.recipeLabel;
   elements.focusLabel.textContent = config.resourceLabel;
   elements.stateLabel.textContent = config.stateLabel || "火力状態";
   elements.focusNote.textContent = config.focusNote || "";
@@ -1277,11 +1273,6 @@ async function startCapturePreview() {
   }
 }
 
-elements.recipeName.addEventListener("input", () => {
-  state.recipeName = elements.recipeName.value;
-  markCustomRecipe();
-  saveState();
-});
 elements.recipeSpecialEventInput.addEventListener("change", () => {
   const config = getCurrentCraftConfig();
   state.specialEventId = normalizeSpecialEventId(config, elements.recipeSpecialEventInput.value);
