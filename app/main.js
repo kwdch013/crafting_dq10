@@ -19,7 +19,6 @@ const elements = {
   heatInput: document.querySelector("#heatInput"),
   itemSectionTitle: document.querySelector("#itemSectionTitle"),
   itemNameHeader: document.querySelector("#itemNameHeader"),
-  ingredientTypeHeader: document.querySelector("#ingredientTypeHeader"),
   itemOptionHeader: document.querySelector("#itemOptionHeader"),
   targetHeader: document.querySelector("#targetHeader"),
   successMinHeader: document.querySelector("#successMinHeader"),
@@ -27,7 +26,6 @@ const elements = {
   techniqueEditor: document.querySelector("#techniqueEditor"),
   craftReferencePanel: document.querySelector("#craftReferencePanel"),
   recipeSpecialEventReference: document.querySelector("#recipeSpecialEventReference"),
-  ingredientTypeRanges: document.querySelector("#ingredientTypeRanges"),
   cookingDamageRanges: document.querySelector("#cookingDamageRanges"),
   layoutSectionTitle: document.querySelector("#layoutSectionTitle"),
   boardActions: document.querySelector("#boardActions"),
@@ -114,7 +112,6 @@ function normalizeState(value) {
     return {
       id: ingredient.id || defaultItem?.id || createId(),
       name: ingredient.name || defaultItem?.name || `${config.itemNameLabel.replace("名", "")} ${index + 1}`,
-      ingredientTypeId: ingredient.ingredientTypeId || defaultItem?.ingredientTypeId || "",
       optionId: ingredient.optionId || defaultItem?.optionId || config.itemOptions?.[0]?.id || "",
       gridCell: normalizeGridCell(ingredient.gridCell || defaultItem?.gridCell, index, config.layout),
       current: numberOr(ingredient.current, defaultItem?.current ?? 0),
@@ -506,8 +503,6 @@ function renderCraftLabels() {
   elements.itemSectionTitle.textContent = config.itemSectionTitle;
   elements.layoutSectionTitle.textContent = config.layout?.label || `${config.label}配置`;
   elements.itemNameHeader.textContent = config.itemNameLabel;
-  elements.ingredientTypeHeader.textContent = config.ingredientTypeLabel || "食材種別";
-  elements.ingredientTypeHeader.hidden = !hasIngredientTypes(config);
   elements.itemOptionHeader.textContent = config.itemOptionLabel || "種別";
   elements.targetHeader.textContent = config.targetMode === "random-in-range" ? "代表値" : "基準値";
   elements.successMinHeader.textContent = config.targetMode === "random-in-range" ? "基準下限" : "成功下限";
@@ -562,7 +557,6 @@ function renderCraftReference() {
     return;
   }
 
-  renderIngredientTypeRanges(config);
   renderRecipeSpecialEventReference(config);
   renderCookingDamageRanges(cookingDamage);
 }
@@ -573,37 +567,6 @@ function renderRecipeSpecialEventReference(config) {
     <div class="reference-row special-event-reference">
       <strong>${escapeHtml(event?.label || "-")}</strong>
       <span>${escapeHtml(event?.description || "-")}</span>
-    </div>
-  `;
-}
-
-function renderIngredientTypeRanges(config) {
-  const assigned = new Set();
-  const rows = (config.ingredientTypes || []).map((ingredientType) => {
-    const ingredients = state.ingredients.filter((ingredient) => ingredient.ingredientTypeId === ingredientType.id);
-    ingredients.forEach((ingredient) => assigned.add(ingredient.id));
-    return createIngredientTypeRangeRow(ingredientType.label, ingredients);
-  });
-  const unassigned = state.ingredients.filter((ingredient) => !assigned.has(ingredient.id));
-
-  if (unassigned.length > 0) {
-    rows.push(createIngredientTypeRangeRow("未設定", unassigned));
-  }
-
-  elements.ingredientTypeRanges.innerHTML = rows.join("");
-}
-
-function createIngredientTypeRangeRow(label, ingredients) {
-  const ranges = [...new Set(ingredients.map((ingredient) => `${ingredient.successMin} - ${ingredient.successMax}`))];
-  const names = ingredients.map((ingredient) => ingredient.name).join("、");
-  const rangeText = ranges.length > 0 ? ranges.join(" / ") : "-";
-  const nameText = names || "-";
-
-  return `
-    <div class="reference-row">
-      <strong>${escapeHtml(label)}</strong>
-      <span class="numeric">${escapeHtml(rangeText)}</span>
-      <small>${escapeHtml(nameText)}</small>
     </div>
   `;
 }
@@ -657,7 +620,6 @@ function renderIngredients() {
     row.dataset.id = ingredient.id;
 
     bindIngredientText(row.querySelector(".ingredient-name"), ingredient.id, "name", ingredient.name);
-    bindIngredientType(row.querySelector(".ingredient-type"), row.querySelector(".ingredient-type-cell"), ingredient.id, ingredient.ingredientTypeId);
     bindIngredientOption(row.querySelector(".ingredient-option"), ingredient.id, ingredient.optionId);
     bindIngredientNumber(row.querySelector(".ingredient-current"), ingredient.id, "current", ingredient.current);
     const targetInput = row.querySelector(".ingredient-target");
@@ -739,7 +701,6 @@ function renderLayoutBoard() {
         <div class="board-cell-head">
           <strong>${escapeHtml(item.name)}</strong>
           <div class="board-cell-badges">
-            ${formatBoardBadge(getIngredientTypeLabel(config, item.ingredientTypeId))}
             ${formatBoardBadge(getItemOptionLabel(config, item.optionId))}
           </div>
         </div>
@@ -919,11 +880,6 @@ function getItemOptionLabel(config, optionId) {
   return option?.label || "";
 }
 
-function getIngredientTypeLabel(config, ingredientTypeId) {
-  const ingredientType = config.ingredientTypes?.find((item) => item.id === ingredientTypeId);
-  return ingredientType?.label || "";
-}
-
 function formatBoardBadge(label) {
   return label ? `<span>${escapeHtml(label)}</span>` : "";
 }
@@ -935,38 +891,6 @@ function focusIngredientRow(id) {
   if (input) {
     input.focus();
   }
-}
-
-function hasIngredientTypes(config) {
-  return Array.isArray(config.ingredientTypes) && config.ingredientTypes.length > 0;
-}
-
-function bindIngredientType(select, cell, id, value) {
-  const config = getCurrentCraftConfig();
-  const ingredientTypes = config.ingredientTypes || [];
-  cell.hidden = !hasIngredientTypes(config);
-
-  if (!hasIngredientTypes(config)) {
-    return;
-  }
-
-  select.replaceChildren();
-  const emptyOption = document.createElement("option");
-  emptyOption.value = "";
-  emptyOption.textContent = "未設定";
-  select.append(emptyOption);
-
-  ingredientTypes.forEach((ingredientType) => {
-    const option = document.createElement("option");
-    option.value = ingredientType.id;
-    option.textContent = ingredientType.label;
-    select.append(option);
-  });
-
-  select.value = ingredientTypes.some((ingredientType) => ingredientType.id === value) ? value : "";
-  select.addEventListener("change", () => {
-    updateIngredientType(id, select.value);
-  });
 }
 
 function bindIngredientOption(select, id, value) {
@@ -994,30 +918,6 @@ function bindIngredientOption(select, id, value) {
   select.addEventListener("change", () => {
     updateIngredient(id, "optionId", select.value);
   });
-}
-
-function updateIngredientType(id, ingredientTypeId) {
-  const config = getCurrentCraftConfig();
-  const ingredientType = config.ingredientTypes?.find((item) => item.id === ingredientTypeId);
-  const ingredient = state.ingredients.find((item) => item.id === id);
-
-  if (!ingredient) {
-    return;
-  }
-
-  ingredient.ingredientTypeId = ingredientTypeId;
-  if (Number.isFinite(ingredientType?.successMin) && Number.isFinite(ingredientType?.successMax)) {
-    ingredient.successMin = ingredientType.successMin;
-    ingredient.successMax = ingredientType.successMax;
-    ingredient.target = Math.round((ingredient.successMin + ingredient.successMax) / 2);
-  }
-
-  markCustomRecipe();
-  refreshIngredientRow(id);
-  renderLayoutBoard();
-  renderCraftReference();
-  renderAnalysis();
-  saveState();
 }
 
 function bindIngredientText(input, id, key, value) {
@@ -1152,7 +1052,6 @@ function addIngredient() {
   state.ingredients.push({
     id: createId(),
     name: `${config.itemNameLabel.replace("名", "")} ${next}`,
-    ingredientTypeId: "",
     optionId: getBoardOptionId(gridCell.row, gridCell.column) || config.itemOptions?.[0]?.id || "",
     gridCell,
     current: 0,

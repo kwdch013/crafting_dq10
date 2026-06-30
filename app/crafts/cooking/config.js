@@ -5,7 +5,6 @@ registerDQ10Craft({
   recipeLabel: "料理名",
   itemSectionTitle: "調理状態入力",
   itemNameLabel: "具材名",
-  ingredientTypeLabel: "食材種別",
   itemOptionLabel: "場所",
   addItemLabel: "具材を追加",
   resourceLabel: "集中力",
@@ -59,7 +58,6 @@ registerDQ10Craft({
     fixed: true,
   },
   itemOptions: DQ10CookingDamage.positions,
-  ingredientTypes: DQ10CookingDamage.ingredientTypes,
   techniquePreviewOptionId: "center",
   heatStates: DQ10CookingDamage.heatStates,
   techniques: [
