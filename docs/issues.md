@@ -1,12 +1,18 @@
-# GitHub Issue候補
+# GitHub Issues
 
 ## 目的
 
-GitHub接続後にissue化するため、現状の問題点と残タスクをタスク単位で整理します。
+現状の問題点と残タスクをGitHub issueで管理します。
 
-## Issues
+リポジトリ:
 
-### 1. 実レシピ別の基準値と成功範囲を収集する
+```text
+https://github.com/kwdch013/crafting_dq10
+```
+
+## 登録済みIssue
+
+### #1 実レシピ別の基準値と成功範囲を収集する
 
 現状:
 
@@ -18,7 +24,13 @@ GitHub接続後にissue化するため、現状の問題点と残タスクをタ
 - 主要レシピ名、マス配置、基準値、成功下限、成功上限がJSONに入っている。
 - 出典または確認メモが残っている。
 
-### 2. 集中力データを実値へ置き換える
+URL:
+
+```text
+https://github.com/kwdch013/crafting_dq10/issues/1
+```
+
+### #2 集中力データを実値へ置き換える
 
 現状:
 
@@ -29,7 +41,13 @@ GitHub接続後にissue化するため、現状の問題点と残タスクをタ
 - 職人別にレベル別集中力が入力されている。
 - 道具種類と星数ごとの補正が入力されている。
 
-### 3. 特技データの網羅性を確認する
+URL:
+
+```text
+https://github.com/kwdch013/crafting_dq10/issues/2
+```
+
+### #3 特技データの網羅性を確認する
 
 現状:
 
@@ -41,7 +59,13 @@ GitHub接続後にissue化するため、現状の問題点と残タスクをタ
 - 職人別に使用可能特技が一覧化されている。
 - 未対応特技の扱いがissue化されている。
 
-### 4. APIへ計算処理を移すか判断する
+URL:
+
+```text
+https://github.com/kwdch013/crafting_dq10/issues/3
+```
+
+### #4 APIへ計算処理を移すか判断する
 
 現状:
 
@@ -53,7 +77,13 @@ GitHub接続後にissue化するため、現状の問題点と残タスクをタ
 - フロント計算継続かAPI計算移行かを決める。
 - API移行する場合は `/api/analyze` の入出力仕様を作る。
 
-### 5. ブラウザE2Eテストを追加する
+URL:
+
+```text
+https://github.com/kwdch013/crafting_dq10/issues/4
+```
+
+### #5 ブラウザE2Eテストを追加する
 
 現状:
 
@@ -65,14 +95,19 @@ GitHub接続後にissue化するため、現状の問題点と残タスクをタ
 - 職人選択、レシピ選択、会心停止表示をE2Eで確認できる。
 - CIまたはローカル手順が文書化されている。
 
-### 6. GitHubリポジトリ連携を設定する
+URL:
 
-現状:
+```text
+https://github.com/kwdch013/crafting_dq10/issues/5
+```
 
-- `crafting_dq10/` はローカルGitリポジトリとして初期化済みです。
-- GitHub remoteとissue作成CLIは未設定です。
+## 完了済み
 
-完了条件:
+### GitHubリポジトリ連携を設定する
 
-- GitHub remoteが設定されている。
-- この文書の各項目がGitHub issueとして登録されている。
+結果:
+
+- `origin` は `git@github.com:kwdch013/crafting_dq10.git` に設定済みです。
+- `main`、`dev`、`docs/agent-branch-workflow` はremoteへpush済みです。
+- `gh` CLIは導入済みで、`kwdch013` として認証済みです。
+- この文書の未完了タスクはGitHub issue #1-#5 として登録済みです。
