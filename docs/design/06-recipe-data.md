@@ -76,6 +76,9 @@ app/crafts/<職人>/recipes.js
 | `target` | 会心発生時に止まる誤差0の基準値 |
 | `successMin` | 成功範囲の下限 |
 | `successMax` | 成功範囲の上限 |
+| `ingredientGroupId` | 調理で同時に移動する食材グループID |
+| `ingredientGroupLabel` | 食材グループの画面表示名 |
+| `ingredientSize` | 同一食材グループのマス数 |
 
 ## 調理レシピの特性
 
@@ -93,20 +96,23 @@ app/crafts/<職人>/recipes.js
 
 ## 複数マス食材
 
-調理職人には、1マス食材と2マス食材があります。
+調理職人には、1マス食材と複数マス食材があります。
 
-2マス食材は複数のマスが同時に動くため、今後は同一食材を構成するマスをグループとして扱います。
+複数マス食材は、同一食材を構成するマスをグループとして扱います。
 
-候補フィールド:
+使用フィールド:
 
 ```json
 {
   "ingredientGroupId": "meat-1",
+  "ingredientGroupLabel": "肉",
   "ingredientSize": 2
 }
 ```
 
-現時点では未実装のため、レシピ実データへ追加する場合は [調理職人メモ](../crafts/cooking.md) と合わせて更新します。
+`ingredientGroupId` が同じマスは、フライパン配置で移動、入れ替え、上へずらす操作を同時に行います。
+
+レシピ実データへ追加する場合は [調理職人メモ](../crafts/cooking.md) と合わせて更新します。
 
 ## 画面動作
 

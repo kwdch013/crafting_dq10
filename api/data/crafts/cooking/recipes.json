@@ -356,7 +356,10 @@
         "current": 0,
         "target": 150,
         "successMin": 135,
-        "successMax": 165
+        "successMax": 165,
+        "ingredientGroupId": "battle-steak-meat-top",
+        "ingredientGroupLabel": "肉",
+        "ingredientSize": 2
       },
       {
         "id": "slot-1-3",
@@ -369,7 +372,10 @@
         "current": 0,
         "target": 150,
         "successMin": 135,
-        "successMax": 165
+        "successMax": 165,
+        "ingredientGroupId": "battle-steak-meat-top",
+        "ingredientGroupLabel": "肉",
+        "ingredientSize": 2
       },
       {
         "id": "slot-2-3",
@@ -382,7 +388,10 @@
         "current": 0,
         "target": 175,
         "successMin": 160,
-        "successMax": 190
+        "successMax": 190,
+        "ingredientGroupId": "battle-steak-vegetable",
+        "ingredientGroupLabel": "野菜",
+        "ingredientSize": 2
       },
       {
         "id": "slot-3-1",
@@ -395,7 +404,10 @@
         "current": 0,
         "target": 150,
         "successMin": 135,
-        "successMax": 165
+        "successMax": 165,
+        "ingredientGroupId": "battle-steak-meat-bottom",
+        "ingredientGroupLabel": "肉",
+        "ingredientSize": 2
       },
       {
         "id": "slot-3-2",
@@ -408,7 +420,10 @@
         "current": 0,
         "target": 150,
         "successMin": 135,
-        "successMax": 165
+        "successMax": 165,
+        "ingredientGroupId": "battle-steak-meat-bottom",
+        "ingredientGroupLabel": "肉",
+        "ingredientSize": 2
       },
       {
         "id": "slot-3-3",
@@ -421,7 +436,10 @@
         "current": 0,
         "target": 175,
         "successMin": 160,
-        "successMax": 190
+        "successMax": 190,
+        "ingredientGroupId": "battle-steak-vegetable",
+        "ingredientGroupLabel": "野菜",
+        "ingredientSize": 2
       }
     ],
     "traitId": "light-return"
@@ -1841,5 +1859,108 @@
       }
     ],
     "traitId": "none"
+  },
+  {
+    "id": "cooking-031",
+    "name": "ヒールカルボナーラ",
+    "category": "パスタ＆ライス",
+    "categoryId": "pasta-rice",
+    "items": [
+      {
+        "id": "slot-1-2",
+        "name": "上",
+        "ingredientGroupId": "heal-carbonara-meat",
+        "ingredientGroupLabel": "肉",
+        "ingredientSize": 2,
+        "optionId": "cross",
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        },
+        "current": 0,
+        "target": 195,
+        "successMin": 180,
+        "successMax": 210
+      },
+      {
+        "id": "slot-1-3",
+        "name": "右上",
+        "ingredientGroupId": "heal-carbonara-meat",
+        "ingredientGroupLabel": "肉",
+        "ingredientSize": 2,
+        "optionId": "corner",
+        "gridCell": {
+          "row": 1,
+          "column": 3
+        },
+        "current": 0,
+        "target": 195,
+        "successMin": 180,
+        "successMax": 210
+      },
+      {
+        "id": "slot-2-1",
+        "name": "左",
+        "ingredientGroupId": "heal-carbonara-noodle",
+        "ingredientGroupLabel": "麺",
+        "ingredientSize": 3,
+        "optionId": "cross",
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        },
+        "current": 0,
+        "target": 165,
+        "successMin": 150,
+        "successMax": 180
+      },
+      {
+        "id": "slot-3-1",
+        "name": "左下",
+        "ingredientGroupId": "heal-carbonara-noodle",
+        "ingredientGroupLabel": "麺",
+        "ingredientSize": 3,
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        },
+        "current": 0,
+        "target": 165,
+        "successMin": 150,
+        "successMax": 180
+      },
+      {
+        "id": "slot-3-2",
+        "name": "下",
+        "ingredientGroupId": "heal-carbonara-noodle",
+        "ingredientGroupLabel": "麺",
+        "ingredientSize": 3,
+        "optionId": "cross",
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        },
+        "current": 0,
+        "target": 165,
+        "successMin": 150,
+        "successMax": 180
+      },
+      {
+        "id": "slot-3-3",
+        "name": "右下",
+        "ingredientGroupLabel": "卵",
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 3
+        },
+        "current": 0,
+        "target": 85,
+        "successMin": 70,
+        "successMax": 100
+      }
+    ],
+    "traitId": "return"
   }
 ]
