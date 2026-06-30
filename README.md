@@ -44,6 +44,21 @@ docker compose down
 - [要件サマリー](./docs/requirements.md)
 - [設計書トップ](./docs/design/README.md)
 - [操作方法](./docs/design/03-operations.md)
+- [GitHub issue一覧](./docs/issues.md)
+
+## GitHub
+
+```text
+https://github.com/kwdch013/crafting_dq10
+```
+
+ブランチ運用:
+
+- `main`: 安定版
+- `dev`: 開発統合ブランチ
+- 作業ブランチ: `dev` から目的別に作成
+
+残タスクはGitHub issueで管理します。
 
 ## 設定ファイル構成
 

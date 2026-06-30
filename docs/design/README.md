@@ -12,7 +12,7 @@ DQ10 職人支援ツールの設計ドキュメントです。
 - [職人設定の保守方法](./04-craft-config-maintenance.md)
 - [盤面表示設計](./05-display-layout.md)
 - [レシピデータ設計](./06-recipe-data.md)
-- [GitHub Issue候補](../issues.md)
+- [GitHub Issues](../issues.md)
 
 ## 現在の実装範囲
 

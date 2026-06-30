@@ -43,12 +43,14 @@ http://localhost:8000
 
 ## GitHub Issues
 
-実装完了後、現状の問題点と残タスクをGitHub issueとしてタスク単位に分割します。
+残タスクはGitHub issueで管理します。
 
-issue化の前に、以下を確認します。
+issue作成または更新の前に、以下を確認します。
 
 - 再現条件
 - 期待する動作
 - 現在の動作
 - 完了条件
 - 関連ファイル
+
+作成済みissueの一覧と対応関係は `docs/issues.md` を確認します。
