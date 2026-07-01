@@ -26,8 +26,7 @@ const cookingIngredients = require("../app/cooking-ingredients.js");
     { categoryId: "fish-dishes", category: "魚料理", name: "いやしのムニエル" },
   );
 
-  assert.equal(visual.id, "fish");
-  assert.equal(visual.isInferred, true);
+  assert.equal(visual, null);
 }
 
 {
@@ -36,8 +35,7 @@ const cookingIngredients = require("../app/cooking-ingredients.js");
     { categoryId: "pasta-rice", category: "パスタ＆ライス", name: "ヒールカルボナーラ" },
   );
 
-  assert.equal(visual.id, "noodle");
-  assert.equal(visual.isInferred, true);
+  assert.equal(visual, null);
 }
 
 {
@@ -59,6 +57,20 @@ const cookingIngredients = require("../app/cooking-ingredients.js");
   );
 
   assert.equal(context.categoryId, "meat-dishes");
+  assert.equal(visual, null);
+}
+
+{
+  const context = cookingIngredients.getCookingIngredientVisualContext(null, {
+    recipeName: "手入力",
+    recipeCategoryId: "meat-dishes",
+    recipeCategory: "肉料理",
+  });
+  const visual = cookingIngredients.getCookingIngredientVisual(
+    { ingredientGroupLabel: "肉" },
+    context,
+  );
+
   assert.equal(visual.id, "meat");
-  assert.equal(visual.isInferred, true);
+  assert.equal(visual.isInferred, false);
 }
