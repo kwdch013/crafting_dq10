@@ -180,12 +180,12 @@ https://github.com/kwdch013/crafting_dq10/issues/8
 現状:
 
 - レシピごとの `traitId` は記録できます。
-- 4ターンごとの倍率、戻り、光状態は計算に反映していません。
+- 4ターンごとの光・戻り、光、回復状態は計算に反映していません。
 
 完了条件:
 
 - ターン数または周期状態を管理できる。
-- 光・戻り、戻り、光、倍半が計算へ反映される。
+- 光・戻り、光、回復が計算へ反映される。
 - 特性がUIで確認できる。
 
 URL:
@@ -215,6 +215,45 @@ URL:
 https://github.com/kwdch013/crafting_dq10/issues/10
 ```
 
+### #11 調理職人: レシピ特性の実データ割り当てを検証する
+
+現状:
+
+- UI選択肢は `光`、`光・戻り`、`回復` の3種類に整理済みです。
+- 旧 `none` は `light`、旧 `return` は `recovery` として扱います。
+- 全レシピの実特性は参照画像または実測で未検証のものがあります。
+
+完了条件:
+
+- 全調理レシピの特性が信頼できる参照または実測で確認される。
+- 未確認レシピがある場合は暫定値であることを追跡できる。
+- 調理職人メモとレシピデータ設計が更新される。
+
+URL:
+
+```text
+https://github.com/kwdch013/crafting_dq10/issues/11
+```
+
+### #12 調理職人: 複数マス食材の方向入れ替えをブラウザ操作で検証する
+
+現状:
+
+- `app/board-layout.js` と `tests/board-layout.test.js` で方向入れ替えのロジック単体テストはあります。
+- ブラウザ上のクリック操作、方向ボタン、Undo/Redoを含むE2E検証は未整備です。
+
+完了条件:
+
+- 方向ボタンと盤面クリックの両方で代表ケースを確認できる。
+- 2マス+1マス、2マス+空白、2マス+1マス+空白で座標表示が崩れない。
+- Undo/Redo後も場所種別と盤面座標が一致する。
+
+URL:
+
+```text
+https://github.com/kwdch013/crafting_dq10/issues/12
+```
+
 ## 完了済み
 
 ### GitHubリポジトリ連携を設定する
@@ -224,4 +263,4 @@ https://github.com/kwdch013/crafting_dq10/issues/10
 - `origin` は `git@github.com:kwdch013/crafting_dq10.git` に設定済みです。
 - `main`、`dev`、`docs/agent-branch-workflow` はremoteへpush済みです。
 - `gh` CLIは導入済みで、`kwdch013` として認証済みです。
-- この文書の未完了タスクはGitHub issue #1-#10 として登録済みです。
+- この文書の未完了タスクはGitHub issue #1-#12 として登録済みです。
