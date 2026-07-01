@@ -39,6 +39,8 @@ docker compose down
 - frontend / api の2コンテナ構成
 - APIからのレシピ一覧取得
 - 会心発生時に基準値へ届く場合、超過せず誤差0で止まる判定
+- 調理レシピ特性の `光`、`光・戻り`、`回復` 選択
+- 調理の複数マス食材グループ移動と方向入れ替え
 
 ## ドキュメント
 
@@ -74,6 +76,8 @@ api/
   data/crafts/<職人>/recipes.json
 frontend/
   server.js
+app/
+  board-layout.js
 app/crafts/
   registry.js
   shared/cooking-damage.js
@@ -96,6 +100,9 @@ app/crafts/
 鍛冶系の温度別ダメージは `app/crafts/shared/smithing-damage.js` に集約しています。
 このファイルでは、各温度と威力ごとの最小値・最大値だけを保持します。
 裁縫と木工の基礎データも `app/crafts/shared/` に分離しています。
+
+調理のフライパン配置入れ替えは `app/board-layout.js` に分離しています。
+同じ `ingredientGroupId` を持つ具材は、選択、移動、入れ替え、上へずらす操作で同時に扱います。
 
 ## 後続フェーズ
 

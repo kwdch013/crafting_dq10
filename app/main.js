@@ -32,6 +32,10 @@ const elements = {
   undoBoardButton: document.querySelector("#undoBoardButton"),
   redoBoardButton: document.querySelector("#redoBoardButton"),
   shiftBoardUpButton: document.querySelector("#shiftBoardUpButton"),
+  swapBoardUpButton: document.querySelector("#swapBoardUpButton"),
+  swapBoardDownButton: document.querySelector("#swapBoardDownButton"),
+  swapBoardLeftButton: document.querySelector("#swapBoardLeftButton"),
+  swapBoardRightButton: document.querySelector("#swapBoardRightButton"),
   layoutBoard: document.querySelector("#layoutBoard"),
   ingredientBody: document.querySelector("#ingredientBody"),
   ingredientRowTemplate: document.querySelector("#ingredientRowTemplate"),
@@ -206,7 +210,8 @@ function normalizeTraitId(config, traitId) {
   const fallback = config.defaultTraitId || traits[0]?.id || "";
   const aliases = {
     "light-recovery": "light-return",
-    recovery: "return",
+    none: fallback,
+    return: "recovery",
   };
   const normalized = aliases[traitId] || traitId;
   return traits.some((trait) => trait.id === normalized) ? normalized : fallback;
@@ -754,10 +759,17 @@ function canRearrangeBoard(config = getCurrentCraftConfig()) {
 
 function syncBoardActionButtons() {
   const canRearrange = state ? canRearrangeBoard() : false;
+  const selectedIngredient = canRearrange
+    ? state.ingredients.find((ingredient) => ingredient.id === selectedBoardIngredientId)
+    : null;
   elements.boardActions.hidden = !canRearrange;
   elements.undoBoardButton.disabled = !canRearrange || undoStack.length === 0;
   elements.redoBoardButton.disabled = !canRearrange || redoStack.length === 0;
   elements.shiftBoardUpButton.disabled = !canRearrange || state.ingredients.length === 0;
+  elements.swapBoardUpButton.disabled = !selectedIngredient || !canSwapBoardDirection("up");
+  elements.swapBoardDownButton.disabled = !selectedIngredient || !canSwapBoardDirection("down");
+  elements.swapBoardLeftButton.disabled = !selectedIngredient || !canSwapBoardDirection("left");
+  elements.swapBoardRightButton.disabled = !selectedIngredient || !canSwapBoardDirection("right");
 }
 
 function handleBoardCellClick(item, targetCell) {
@@ -806,13 +818,27 @@ function handleBoardCellClick(item, targetCell) {
     return;
   }
 
-  const moves = targetIngredient
-    ? [
-      ...createGroupMoves(selectedGroup, selectedIngredient, targetIngredient.gridCell),
-      ...createGroupMoves(targetGroup, targetIngredient, selectedIngredient.gridCell),
-    ]
-    : createGroupMoves(selectedGroup, selectedIngredient, targetCell);
-  const ignoredIds = new Set([...selectedGroupIds, ...targetGroupIds]);
+  const targetDirection = getAdjacentDirectionForCell(selectedGroup, targetCell);
+  let moves = null;
+  let ignoredIds = null;
+
+  if (targetDirection) {
+    moves = createDirectionalSwapMoves(selectedGroup, targetDirection);
+    ignoredIds = moves ? new Set(moves.map((move) => move.ingredient.id)) : new Set();
+  } else if (targetIngredient) {
+    moves = [
+      ...createSwapGroupMoves(selectedGroup, targetGroup),
+    ];
+    ignoredIds = new Set([...selectedGroupIds, ...targetGroupIds]);
+  } else {
+    moves = createGroupMoves(selectedGroup, selectedIngredient, targetCell);
+    ignoredIds = new Set([...selectedGroupIds, ...targetGroupIds]);
+  }
+
+  if (!moves) {
+    renderLayoutBoard();
+    return;
+  }
 
   if (!canApplyGroupMoves(moves, ignoredIds)) {
     renderLayoutBoard();
@@ -831,71 +857,68 @@ function handleBoardCellClick(item, targetCell) {
 }
 
 function createMovedGridCell(currentCell, targetCell) {
-  return {
-    ...(currentCell || {}),
-    row: targetCell?.row,
-    column: targetCell?.column,
-  };
+  return DQ10BoardLayout.createMovedGridCell(currentCell, targetCell);
 }
 
 function getIngredientGroupId(ingredient) {
-  return ingredient?.ingredientGroupId || "";
+  return DQ10BoardLayout.getIngredientGroupId(ingredient);
 }
 
 function isSameIngredientGroup(ingredient, groupId) {
-  return Boolean(groupId && ingredient?.ingredientGroupId === groupId);
+  return DQ10BoardLayout.isSameIngredientGroup(ingredient, groupId);
 }
 
 function getIngredientGroupMembers(ingredient) {
-  const groupId = getIngredientGroupId(ingredient);
-  if (!groupId) {
-    return ingredient ? [ingredient] : [];
-  }
-
-  return state.ingredients.filter((candidate) => candidate.ingredientGroupId === groupId);
+  return DQ10BoardLayout.getIngredientGroupMembers(state.ingredients, ingredient);
 }
 
 function createGroupMoves(group, anchorIngredient, targetCell) {
-  const sourceCell = anchorIngredient?.gridCell || {};
-  const rowDelta = numberOr(targetCell?.row, sourceCell.row) - numberOr(sourceCell.row, 1);
-  const columnDelta = numberOr(targetCell?.column, sourceCell.column) - numberOr(sourceCell.column, 1);
+  return DQ10BoardLayout.createGroupMoves(group, anchorIngredient, targetCell);
+}
 
-  return group.map((ingredient) => {
-    const row = numberOr(ingredient.gridCell?.row, 1) + rowDelta;
-    const column = numberOr(ingredient.gridCell?.column, 1) + columnDelta;
+function createSwapGroupMoves(selectedGroup, targetGroup) {
+  return DQ10BoardLayout.createSwapGroupMoves(selectedGroup, targetGroup);
+}
 
-    return {
-      ingredient,
-      gridCell: createMovedGridCell(ingredient.gridCell, { row, column }),
-    };
-  });
+function createDirectionalSwapMoves(selectedGroup, direction) {
+  return DQ10BoardLayout.createDirectionalSwapMoves(state.ingredients, selectedGroup, direction);
+}
+
+function getAdjacentDirectionForCell(group, targetCell) {
+  return DQ10BoardLayout.getAdjacentDirectionForCell(group, targetCell);
 }
 
 function canApplyGroupMoves(moves, ignoredIds) {
-  const layout = getCurrentCraftConfig().layout;
-  const rows = Math.max(1, numberOr(layout?.rows, 1));
-  const columns = Math.max(1, numberOr(layout?.columns, 1));
-  const destinationCells = new Set();
-  const occupiedCells = new Set(state.ingredients
-    .filter((ingredient) => !ignoredIds.has(ingredient.id))
-    .map((ingredient) => `${ingredient.gridCell?.row}:${ingredient.gridCell?.column}`));
+  return DQ10BoardLayout.canApplyGroupMoves(
+    state.ingredients,
+    moves,
+    ignoredIds,
+    getCurrentCraftConfig().layout,
+  );
+}
 
-  return moves.every((move) => {
-    const row = numberOr(move.gridCell?.row, 0);
-    const column = numberOr(move.gridCell?.column, 0);
-    const key = `${row}:${column}`;
+function getBoardDirectionSwap(direction) {
+  const selectedIngredient = state.ingredients.find((ingredient) => ingredient.id === selectedBoardIngredientId);
+  if (!selectedIngredient) {
+    return null;
+  }
 
-    if (row < 1 || row > rows || column < 1 || column > columns) {
-      return false;
-    }
+  const selectedGroup = getIngredientGroupMembers(selectedIngredient);
+  const moves = createDirectionalSwapMoves(selectedGroup, direction);
+  if (!moves) {
+    return null;
+  }
 
-    if (destinationCells.has(key) || occupiedCells.has(key)) {
-      return false;
-    }
+  const ignoredIds = new Set(moves.map((move) => move.ingredient.id));
+  if (!canApplyGroupMoves(moves, ignoredIds)) {
+    return null;
+  }
 
-    destinationCells.add(key);
-    return true;
-  });
+  return { moves, ignoredIds };
+}
+
+function canSwapBoardDirection(direction) {
+  return Boolean(getBoardDirectionSwap(direction));
 }
 
 function applyGroupMoves(moves) {
@@ -903,6 +926,26 @@ function applyGroupMoves(moves) {
     move.ingredient.gridCell = move.gridCell;
     updateIngredientPositionOption(move.ingredient);
   });
+}
+
+function swapBoardDirection(direction) {
+  if (!canRearrangeBoard()) {
+    return;
+  }
+
+  const swap = getBoardDirectionSwap(direction);
+  if (!swap) {
+    return;
+  }
+
+  pushBoardHistory();
+  applyGroupMoves(swap.moves);
+  markCustomRecipe();
+  renderIngredients();
+  renderLayoutBoard();
+  renderCraftReference();
+  renderAnalysis();
+  saveState();
 }
 
 function updateIngredientPositionOption(ingredient) {
@@ -1317,6 +1360,10 @@ elements.addIngredientButton.addEventListener("click", addIngredient);
 elements.undoBoardButton.addEventListener("click", undoBoardAction);
 elements.redoBoardButton.addEventListener("click", redoBoardAction);
 elements.shiftBoardUpButton.addEventListener("click", shiftBoardUp);
+elements.swapBoardUpButton.addEventListener("click", () => swapBoardDirection("up"));
+elements.swapBoardDownButton.addEventListener("click", () => swapBoardDirection("down"));
+elements.swapBoardLeftButton.addEventListener("click", () => swapBoardDirection("left"));
+elements.swapBoardRightButton.addEventListener("click", () => swapBoardDirection("right"));
 elements.exportButton.addEventListener("click", exportState);
 elements.resetButton.addEventListener("click", resetState);
 elements.importInput.addEventListener("change", importState);
