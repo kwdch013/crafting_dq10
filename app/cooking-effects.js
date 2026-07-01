@@ -73,10 +73,33 @@
 		};
 	}
 
+	function getCookingHeatButtonState(state) {
+		const isCooking = state?.craftType === "cooking";
+
+		return {
+			normal: {
+				hidden: !isCooking,
+				disabled: false,
+				active: isCooking && state.heat === "normal",
+			},
+			strong: {
+				hidden: !isCooking,
+				disabled: false,
+				active: isCooking && state.heat === "strong",
+			},
+			half: {
+				hidden: !isCooking,
+				disabled: false,
+				active: isCooking && state.heat === "half",
+			},
+		};
+	}
+
 	const api = {
 		clearCookingLight,
 		getInitialCookingEffectMode,
 		getCookingEffectButtonState,
+		getCookingHeatButtonState,
 		normalizeCookingEffectMode,
 		normalizeSavedCookingEffectMode,
 		toggleCookingLight,
