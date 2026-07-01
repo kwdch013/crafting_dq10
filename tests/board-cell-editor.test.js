@@ -36,6 +36,16 @@ const editor = require("../app/board-cell-editor.js");
 {
 	const result = editor.normalizeEditValue(
 		{ current: 12 },
+		{ current: "18", cookingEffectMode: "none" },
+	);
+
+	assert.equal(result.current, 18);
+	assert.equal(result.cookingEffectMode, "none");
+}
+
+{
+	const result = editor.normalizeEditValue(
+		{ current: 12 },
 		{ current: "", isGlowing: undefined },
 	);
 
