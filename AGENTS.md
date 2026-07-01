@@ -42,7 +42,7 @@ http://localhost:8000
 - レシピの実数値は `api/data/crafts/<職人>/recipes.json` に追加します。
 - フロント側の `app/crafts/<職人>/recipes.js` はAPI停止時のフォールバックとして扱います。
 - 会心判定では、基準値 `target` に届く場合は超過せず `target` で停止します。
-- ドキュメントは1ファイル300行以内を維持します。
+- ドキュメントは1ファイル300行で警告、500行で要修正とします。
 - 変更後は `docker compose up --build -d --remove-orphans` とAPI疎通確認を行います。
 
 ## GitHub Issues
