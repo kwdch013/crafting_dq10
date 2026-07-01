@@ -32,6 +32,8 @@ const elements = {
   undoBoardButton: document.querySelector("#undoBoardButton"),
   redoBoardButton: document.querySelector("#redoBoardButton"),
   shiftBoardUpButton: document.querySelector("#shiftBoardUpButton"),
+  miracleGrillButton: document.querySelector("#miracleGrillButton"),
+  miracleGrillResult: document.querySelector("#miracleGrillResult"),
   clearCookingLightButton: document.querySelector("#clearCookingLightButton"),
   clearCookingEffectButton: document.querySelector("#clearCookingEffectButton"),
   crossGlowButton: document.querySelector("#crossGlowButton"),
@@ -124,6 +126,7 @@ function normalizeState(value) {
       optionId: ingredient.optionId || defaultItem?.optionId || config.itemOptions?.[0]?.id || "",
       gridCell: normalizeGridCell(ingredient.gridCell || defaultItem?.gridCell, index, config.layout),
       current: numberOr(ingredient.current, defaultItem?.current ?? 0),
+      locked: ingredient.locked === true,
       isGlowing: ingredient.isGlowing === true,
       target: numberOr(ingredient.target, defaultItem?.target ?? Math.round((successMin + successMax) / 2)),
       successMin,
@@ -169,9 +172,12 @@ function normalizeState(value) {
       multiplier: technique.multiplier,
       criticalMultiplier: technique.criticalMultiplier,
       conditionId: technique.conditionId,
+      specialAction: technique.specialAction,
       scoring: technique.scoring || undefined,
     })),
     ingredients,
+    miracleGrillUsed: value.miracleGrillUsed === true,
+    miracleGrillResult: typeof value.miracleGrillResult === "string" ? value.miracleGrillResult : "",
   };
 }
 
@@ -317,7 +323,11 @@ function getCurrentCraftConfig() {
 }
 
 function cloneConfigItems(items) {
-  return items.map((item) => ({ ...item }));
+  return items.map((item) => ({
+    ...item,
+    gridCell: item.gridCell ? { ...item.gridCell } : undefined,
+    locked: item.locked === true,
+  }));
 }
 
 function createDefaultState(craftType) {
@@ -344,6 +354,8 @@ function createDefaultState(craftType) {
     targetMode: config.targetMode || "fixed",
     techniques: cloneConfigItems(config.techniques),
     ingredients: cloneConfigItems(defaultRecipe?.items || config.items),
+    miracleGrillUsed: false,
+    miracleGrillResult: "",
   });
 }
 
@@ -364,6 +376,8 @@ function createBoardSnapshot() {
       gridCell: ingredient.gridCell ? { ...ingredient.gridCell } : undefined,
     })),
     cookingEffectMode: state.cookingEffectMode,
+    miracleGrillUsed: state.miracleGrillUsed,
+    miracleGrillResult: state.miracleGrillResult,
   };
 }
 
@@ -373,6 +387,8 @@ function restoreBoardSnapshot(snapshot) {
     gridCell: ingredient.gridCell ? { ...ingredient.gridCell } : undefined,
   }));
   state.cookingEffectMode = normalizeCookingEffectMode(state.traitId, snapshot.cookingEffectMode);
+  state.miracleGrillUsed = snapshot.miracleGrillUsed === true;
+  state.miracleGrillResult = snapshot.miracleGrillResult || "";
   selectedBoardIngredientId = null;
   renderIngredients();
   renderLayoutBoard();
@@ -574,9 +590,15 @@ function renderTechniqueEditor() {
     card.dataset.id = technique.id;
     card.querySelector(".technique-title").textContent = technique.name;
     card.querySelector(".tech-focus").textContent = resolvedTechnique.focusCost;
-    card.querySelector(".tech-normal-range").textContent = `${resolvedTechnique.normalMin} - ${resolvedTechnique.normalMax}`;
-    card.querySelector(".tech-critical-range").textContent = `${resolvedTechnique.criticalMin} - ${resolvedTechnique.criticalMax}`;
-    card.querySelector(".tech-multiplier").textContent = `${resolvedTechnique.multiplier || 1}倍`;
+    if (technique.specialAction === "miracle-grill") {
+      card.querySelector(".tech-normal-range").textContent = "理想値";
+      card.querySelector(".tech-critical-range").textContent = "確定";
+      card.querySelector(".tech-multiplier").textContent = "必殺";
+    } else {
+      card.querySelector(".tech-normal-range").textContent = `${resolvedTechnique.normalMin} - ${resolvedTechnique.normalMax}`;
+      card.querySelector(".tech-critical-range").textContent = `${resolvedTechnique.criticalMin} - ${resolvedTechnique.criticalMax}`;
+      card.querySelector(".tech-multiplier").textContent = `${resolvedTechnique.multiplier || 1}倍`;
+    }
     elements.techniqueEditor.append(card);
   });
 }
@@ -709,11 +731,8 @@ function renderLayoutBoard() {
   const selectedGroupId = getIngredientGroupId(selectedIngredient);
 
   elements.layoutBoard.replaceChildren();
-  const isSquareBoard = config.id === "cooking" && rows === columns;
-  elements.layoutBoard.classList.toggle("square-board", isSquareBoard);
-  elements.layoutBoard.style.gridTemplateColumns = isSquareBoard
-    ? `repeat(${columns}, minmax(0, 1fr))`
-    : `repeat(${columns}, minmax(110px, 1fr))`;
+  elements.layoutBoard.classList.remove("square-board");
+  elements.layoutBoard.style.gridTemplateColumns = `repeat(${columns}, minmax(110px, 1fr))`;
   elements.layoutBoard.style.gridTemplateRows = `repeat(${rows}, minmax(0, 1fr))`;
 
   for (let rowIndex = 1; rowIndex <= rows; rowIndex += 1) {
@@ -776,6 +795,7 @@ function renderLayoutBoard() {
           <div class="board-cell-badges">
             ${special.isGlowing ? '<span class="glow-badge">光</span>' : ""}
             ${special.isReturning ? '<span class="return-badge">戻</span>' : ""}
+            ${item.locked ? '<span class="locked-badge">固定</span>' : ""}
             ${formatBoardBadge(item.ingredientGroupLabel)}
             ${ingredientVisual?.isInferred ? formatBoardBadge("推定") : ""}
             ${formatBoardBadge(getItemOptionLabel(config, item.optionId))}
@@ -826,11 +846,28 @@ function syncBoardActionButtons() {
   elements.undoBoardButton.disabled = !canRearrange || undoStack.length === 0;
   elements.redoBoardButton.disabled = !canRearrange || redoStack.length === 0;
   elements.shiftBoardUpButton.disabled = !canRearrange || state.ingredients.length === 0;
+  syncMiracleGrillButton(canRearrange, selectedIngredient);
   elements.swapBoardUpButton.disabled = !selectedIngredient || !canSwapBoardDirection("up");
   elements.swapBoardDownButton.disabled = !selectedIngredient || !canSwapBoardDirection("down");
   elements.swapBoardLeftButton.disabled = !selectedIngredient || !canSwapBoardDirection("left");
   elements.swapBoardRightButton.disabled = !selectedIngredient || !canSwapBoardDirection("right");
   syncCookingEffectButtons();
+}
+
+function syncMiracleGrillButton(canRearrange, selectedIngredient) {
+  if (!elements.miracleGrillButton) {
+    return;
+  }
+
+  const isCooking = state?.craftType === "cooking";
+  elements.miracleGrillButton.hidden = !isCooking;
+  elements.miracleGrillButton.disabled = !canRearrange || !selectedIngredient || state.miracleGrillUsed === true;
+  elements.miracleGrillButton.classList.toggle("active", state.miracleGrillUsed === true);
+
+  if (elements.miracleGrillResult) {
+    elements.miracleGrillResult.hidden = !isCooking || !state.miracleGrillResult;
+    elements.miracleGrillResult.textContent = state.miracleGrillResult || "";
+  }
 }
 
 function syncCookingEffectButtons() {
@@ -1001,6 +1038,29 @@ function applyGroupMoves(moves) {
     move.ingredient.gridCell = move.gridCell;
     updateIngredientPositionOption(move.ingredient);
   });
+}
+
+function applyMiracleGrillToSelected() {
+  if (state.craftType !== "cooking" || state.miracleGrillUsed === true) {
+    return;
+  }
+
+  const ingredient = state.ingredients.find((item) => item.id === selectedBoardIngredientId);
+  if (!ingredient) {
+    return;
+  }
+
+  pushBoardHistory();
+  const result = DQ10CraftEngine.applyMiracleGrill(ingredient);
+  state.miracleGrillUsed = true;
+  state.miracleGrillResult = result.outcome === "hit"
+    ? `${ingredient.name}: ミラクルグリル成功 ${result.before} -> ${result.after} / 固定`
+    : `${ingredient.name}: ミラクルグリル miss / 理想値 ${result.target} 超過`;
+  selectedBoardIngredientId = null;
+  renderIngredients();
+  renderLayoutBoard();
+  renderAnalysis();
+  saveState();
 }
 
 function swapBoardDirection(direction) {
@@ -1347,6 +1407,9 @@ function applyBoardCellEditor(editor) {
     pushBoardHistory();
   }
 
+  if (ingredient.current !== normalized.current) {
+    ingredient.locked = false;
+  }
   ingredient.current = normalized.current;
   ingredient.isGlowing = normalized.isGlowing;
   state.cookingEffectMode = normalizeCookingEffectMode(state.traitId, normalized.cookingEffectMode);
@@ -1418,6 +1481,9 @@ function updateIngredient(id, key, value) {
   }
 
   ingredient[key] = value;
+  if (key === "current") {
+    ingredient.locked = false;
+  }
   if (key !== "current" && key !== "isGlowing") {
     markCustomRecipe();
   }
@@ -1558,6 +1624,8 @@ function applyRecipe(recipeId) {
   state.traitId = normalizeTraitId(config, recipe.traitId || recipe.specialEventId || config.defaultTraitId || "none");
   state.cookingEffectMode = getInitialCookingEffectMode(state.traitId);
   state.ingredients = cloneConfigItems(recipe.items);
+  state.miracleGrillUsed = false;
+  state.miracleGrillResult = "";
   state.layoutSignature = createLayoutSignature(config);
   render();
 }
@@ -1702,6 +1770,7 @@ elements.addIngredientButton.addEventListener("click", addIngredient);
 elements.undoBoardButton.addEventListener("click", undoBoardAction);
 elements.redoBoardButton.addEventListener("click", redoBoardAction);
 elements.shiftBoardUpButton.addEventListener("click", shiftBoardUp);
+elements.miracleGrillButton.addEventListener("click", applyMiracleGrillToSelected);
 elements.clearCookingLightButton.addEventListener("click", clearCookingLight);
 elements.clearCookingEffectButton.addEventListener("click", () => setCookingEffectMode("none"));
 elements.crossGlowButton.addEventListener("click", () => setCookingEffectMode("cross-glow"));
