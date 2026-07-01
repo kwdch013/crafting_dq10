@@ -1694,11 +1694,45 @@ function markCustomRecipe() {
   }
 }
 
+function createResetStateForCurrentSelection() {
+  const config = getCurrentCraftConfig();
+  const recipes = getCraftRecipes(config.id);
+  const resetRecipe = window.DQ10StateReset?.findResetRecipe(recipes, state) || null;
+  const focusSelection = normalizeFocusSelection(
+    config,
+    window.DQ10StateReset?.getResetFocusSelection(state) || state,
+  );
+  const traitId = normalizeTraitId(
+    config,
+    resetRecipe?.traitId || resetRecipe?.specialEventId || state.traitId || config.defaultTraitId || "none",
+  );
+
+  return normalizeState({
+    craftType: config.id,
+    recipeId: resetRecipe?.id || state.recipeId || "custom",
+    recipeName: resetRecipe?.name || state.recipeName || config.defaultRecipeName,
+    recipeCategory: resetRecipe?.category || state.recipeCategory || "",
+    recipeCategoryId: resetRecipe?.categoryId || state.recipeCategoryId || "",
+    traitId,
+    cookingEffectMode: getInitialCookingEffectMode(traitId),
+    level: focusSelection.level,
+    toolId: focusSelection.toolId,
+    toolStars: focusSelection.toolStars,
+    focus: calculateFocus(config, focusSelection),
+    heat: config.heatStates[0].id,
+    targetMode: config.targetMode || "fixed",
+    techniques: cloneConfigItems(config.techniques),
+    ingredients: cloneConfigItems(resetRecipe?.items || config.items),
+    miracleGrillUsed: false,
+    miracleGrillResult: "",
+  });
+}
+
 function resetState() {
   localStorage.removeItem(storageKey);
   localStorage.removeItem(legacyStorageKey);
   clearBoardHistory();
-  state = createDefaultState("cooking");
+  state = createResetStateForCurrentSelection();
   render();
 }
 
