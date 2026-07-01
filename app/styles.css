@@ -410,12 +410,13 @@ select:focus {
 .board-cell {
   display: grid;
   grid-template-rows: auto 1fr auto;
-  gap: 10px;
+  gap: 8px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   min-height: 116px;
   background: var(--surface-soft);
   padding: 10px;
+  overflow: hidden;
 }
 
 .square-board .board-cell {
@@ -423,11 +424,11 @@ select:focus {
 }
 
 .board-cell.has-ingredient-visual {
-  grid-template-rows: auto minmax(44px, 1fr) auto auto;
+  grid-template-rows: auto minmax(42px, 1fr) auto auto auto;
 }
 
 .square-board .board-cell.has-ingredient-visual {
-  grid-template-rows: auto minmax(36px, 1fr) auto auto;
+  grid-template-rows: auto minmax(34px, 1fr) auto auto auto;
 }
 
 .board-actions {
@@ -517,6 +518,7 @@ select:focus {
   display: grid;
   place-items: center;
   overflow: hidden;
+  width: 100%;
   min-height: 44px;
 }
 
@@ -526,7 +528,7 @@ select:focus {
 
 .cooking-ingredient-image {
   display: block;
-  width: 100%;
+  width: auto;
   max-width: 104px;
   max-height: 54px;
   object-fit: contain;
@@ -539,6 +541,7 @@ select:focus {
 
 .cooking-ingredient-fish {
   max-height: 58px;
+  clip-path: inset(0 10px 0 0);
 }
 
 .cooking-ingredient-vegetable {
@@ -555,6 +558,22 @@ select:focus {
 
 .board-cell-values {
   align-self: center;
+}
+
+.board-light-toggle {
+  justify-self: stretch;
+  min-height: 24px;
+  border: 1px solid #f59e0b;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #92400e;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.board-light-toggle.active {
+  background: #fef3c7;
 }
 
 .board-cell-editor {
@@ -827,12 +846,13 @@ td input {
   }
 
   .square-board .board-cell {
-    gap: 5px;
-    padding: 6px;
+    gap: 3px;
+    padding: 5px;
   }
 
   .square-board .board-cell-head strong {
-    font-size: 12px;
+    font-size: 11px;
+    line-height: 1.15;
   }
 
   .square-board .board-cell-head span {
@@ -841,7 +861,7 @@ td input {
   }
 
   .square-board .board-cell-values span {
-    font-size: 20px;
+    font-size: 18px;
   }
 
   .square-board .board-cell-values small {
@@ -851,13 +871,23 @@ td input {
   }
 
   .square-board .status {
-    min-height: 22px;
+    min-height: 20px;
     padding: 2px 6px;
     font-size: 10px;
   }
 
+  .square-board .board-light-toggle {
+    min-height: 20px;
+    font-size: 10px;
+  }
+
   .square-board .cooking-ingredient-image {
-    max-height: 38px;
+    max-width: 76px;
+    max-height: 30px;
+  }
+
+  .square-board .cooking-ingredient-fish {
+    max-height: 34px;
   }
 
   .technique-title {

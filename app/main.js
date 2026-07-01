@@ -786,8 +786,16 @@ function renderLayoutBoard() {
           <span class="numeric">${item.current}</span>
           <small class="numeric">${escapeHtml(formatBoardTargetSummary(item, state.targetMode))}</small>
         </div>
+        ${formatCookingLightToggle(item, special)}
         <span class="status status-${item.status}">${escapeHtml(item.statusLabel)}</span>
       `;
+      const lightToggle = cell.querySelector(".board-light-toggle");
+      if (lightToggle) {
+        lightToggle.addEventListener("click", (event) => {
+          event.stopPropagation();
+          toggleCookingLight(item.id);
+        });
+      }
       cell.addEventListener("click", () => {
         if (canRearrange) {
           handleBoardCellClick(item, { row: rowIndex, column: columnIndex });
@@ -826,19 +834,17 @@ function syncBoardActionButtons() {
 }
 
 function syncCookingEffectButtons() {
-  const isCooking = state?.craftType === "cooking";
-  const isLight = isCooking && state.traitId === "light";
-  const isLightReturn = isCooking && state.traitId === "light-return";
-  const hasGlowing = isLight && state.ingredients.some((ingredient) => ingredient.isGlowing === true);
+  const buttonState = DQ10CookingEffects.getCookingEffectButtonState(state);
+  syncCookingEffectButton(elements.clearCookingLightButton, buttonState.clearLight);
+  syncCookingEffectButton(elements.clearCookingEffectButton, buttonState.clearEffect);
+  syncCookingEffectButton(elements.crossGlowButton, buttonState.crossGlow);
+  syncCookingEffectButton(elements.cornerReturnButton, buttonState.cornerReturn);
+}
 
-  elements.clearCookingLightButton.hidden = !isLight;
-  elements.clearCookingLightButton.disabled = !hasGlowing;
-  elements.clearCookingEffectButton.hidden = !isLightReturn;
-  elements.crossGlowButton.hidden = !isLightReturn;
-  elements.cornerReturnButton.hidden = !isLightReturn;
-  elements.clearCookingEffectButton.classList.toggle("active", isLightReturn && state.cookingEffectMode === "none");
-  elements.crossGlowButton.classList.toggle("active", isLightReturn && state.cookingEffectMode === "cross-glow");
-  elements.cornerReturnButton.classList.toggle("active", isLightReturn && state.cookingEffectMode === "corner-return");
+function syncCookingEffectButton(button, buttonState) {
+  button.hidden = buttonState.hidden;
+  button.disabled = buttonState.disabled;
+  button.classList.toggle("active", buttonState.active);
 }
 
 function handleBoardCellClick(item, targetCell) {
@@ -1022,9 +1028,12 @@ function clearCookingLight() {
     return;
   }
 
-  state.ingredients.forEach((ingredient) => {
-    ingredient.isGlowing = false;
-  });
+  if (!state.ingredients.some((ingredient) => ingredient.isGlowing === true)) {
+    return;
+  }
+
+  pushBoardHistory();
+  DQ10CookingEffects.clearCookingLight(state.ingredients);
   renderIngredients();
   renderLayoutBoard();
   renderAnalysis();
@@ -1036,9 +1045,32 @@ function setCookingEffectMode(mode) {
     return;
   }
 
-  state.cookingEffectMode = normalizeCookingEffectMode(state.traitId, mode);
+  const nextMode = normalizeCookingEffectMode(state.traitId, mode);
+  if (state.cookingEffectMode === nextMode) {
+    return;
+  }
+
+  pushBoardHistory();
+  state.cookingEffectMode = nextMode;
   renderLayoutBoard();
   renderCraftReference();
+  renderAnalysis();
+  saveState();
+}
+
+function toggleCookingLight(ingredientId) {
+  if (state.traitId !== "light") {
+    return;
+  }
+
+  if (!state.ingredients.some((ingredient) => ingredient.id === ingredientId)) {
+    return;
+  }
+
+  pushBoardHistory();
+  DQ10CookingEffects.toggleCookingLight(state.ingredients, ingredientId);
+  renderIngredients();
+  renderLayoutBoard();
   renderAnalysis();
   saveState();
 }
@@ -1153,6 +1185,21 @@ function getIngredientSpecialState(ingredient) {
 
 function formatBoardBadge(label) {
   return label ? `<span>${escapeHtml(label)}</span>` : "";
+}
+
+function formatCookingLightToggle(item, special) {
+  if (state.craftType !== "cooking" || state.traitId !== "light") {
+    return "";
+  }
+
+  const label = special.isGlowing ? `${item.name}の光を解除` : `${item.name}を光らせる`;
+  const activeClass = special.isGlowing ? " active" : "";
+
+  return `
+    <button class="board-light-toggle${activeClass}" type="button" aria-label="${escapeHtml(label)}" title="${escapeHtml(label)}">
+      光
+    </button>
+  `;
 }
 
 function getCookingIngredientVisual(ingredient, recipe) {
@@ -1292,6 +1339,14 @@ function applyBoardCellEditor(editor) {
     isGlowing: state.traitId === "light" && editor.querySelector(".editor-glowing").checked,
     cookingEffectMode: editor.querySelector("[name='editorEffectMode']:checked")?.value,
   });
+  const willChangeEffect =
+    (state.traitId === "light" && ingredient.isGlowing !== normalized.isGlowing) ||
+    (state.traitId === "light-return" && state.cookingEffectMode !== normalizeCookingEffectMode(state.traitId, normalized.cookingEffectMode));
+
+  if (willChangeEffect) {
+    pushBoardHistory();
+  }
+
   ingredient.current = normalized.current;
   ingredient.isGlowing = normalized.isGlowing;
   state.cookingEffectMode = normalizeCookingEffectMode(state.traitId, normalized.cookingEffectMode);
