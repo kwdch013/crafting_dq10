@@ -63,20 +63,6 @@
   }
 
   function inferCookingIngredientKind(recipe) {
-    const recipeName = String(recipe?.name || "");
-
-    if (recipeName.includes("パスタ") || recipeName.includes("カルボナーラ")) {
-      return "noodle";
-    }
-
-    if (recipe?.categoryId === "meat-dishes" || recipe?.category === "肉料理") {
-      return "meat";
-    }
-
-    if (recipe?.categoryId === "fish-dishes" || recipe?.category === "魚料理") {
-      return "fish";
-    }
-
     return "";
   }
 
