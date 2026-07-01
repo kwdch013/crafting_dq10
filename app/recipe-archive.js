@@ -9,9 +9,14 @@
       : [];
   }
 
+  function shouldShowCustomRecipeOption(config) {
+    return config?.allowCustomRecipes !== false;
+  }
+
   const api = {
     getVisibleRecipes,
     isArchivedRecipe,
+    shouldShowCustomRecipeOption,
   };
 
   global.DQ10RecipeArchive = api;

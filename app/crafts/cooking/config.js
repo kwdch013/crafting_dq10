@@ -7,6 +7,7 @@ registerDQ10Craft({
   itemNameLabel: "具材名",
   itemOptionLabel: "場所",
   addItemLabel: "具材を追加",
+  allowCustomRecipes: false,
   resourceLabel: "集中力",
   stateLabel: "火力状態",
   defaultRecipeName: "料理メモ",
