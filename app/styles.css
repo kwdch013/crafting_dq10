@@ -710,7 +710,7 @@ td input {
   white-space: nowrap;
 }
 
-.status-fake {
+.status-critical-candidate {
   background: #fef3c7;
   color: #92400e;
 }

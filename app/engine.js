@@ -4,7 +4,7 @@
     "locked-critical": "本会心固定",
     "locked-fake": "偽会心の可能性あり",
     guaranteed: "会心時確定",
-    fake: "偽会心の可能性あり",
+    "critical-candidate": "会心狙い",
     warning: "超過注意",
     shortage: "不足",
   };
@@ -13,7 +13,7 @@
     "locked-fake": 5,
     locked: 5,
     guaranteed: 4,
-    fake: 3,
+    "critical-candidate": 3,
     shortage: 2,
     warning: 1,
   };
@@ -357,7 +357,7 @@
     } else if (normalOver || criticalOver) {
       status = "warning";
     } else if (criticalCanHit) {
-      status = "fake";
+      status = "critical-candidate";
     }
 
     return {
@@ -474,7 +474,7 @@
     const reasonParts = [];
     const guaranteed = analysis.filter((item) => item.guaranteedCritical).length;
     const warnings = analysis.filter((item) => item.status === "warning").length;
-    const fake = analysis.filter((item) => item.status === "fake").length;
+    const criticalCandidate = analysis.filter((item) => item.status === "critical-candidate").length;
 
     if (!affordable) {
       reasonParts.push("集中力不足");
@@ -482,8 +482,8 @@
     if (guaranteed > 0) {
       reasonParts.push(`会心時確定 ${guaranteed} 件`);
     }
-    if (fake > 0) {
-      reasonParts.push(`偽会心の可能性 ${fake} 件`);
+    if (criticalCandidate > 0) {
+      reasonParts.push(`会心狙い ${criticalCandidate} 件`);
     }
     if (warnings > 0) {
       reasonParts.push(`超過リスク ${warnings} 件`);
