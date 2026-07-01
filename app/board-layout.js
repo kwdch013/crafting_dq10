@@ -154,6 +154,13 @@
     );
   }
 
+  function isOneCellMove(ingredient, gridCell) {
+    const rowDistance = Math.abs(numberOr(gridCell?.row, 0) - numberOr(ingredient?.gridCell?.row, 0));
+    const columnDistance = Math.abs(numberOr(gridCell?.column, 0) - numberOr(ingredient?.gridCell?.column, 0));
+
+    return rowDistance + columnDistance <= 1;
+  }
+
   function createDirectionalSwapMoves(ingredients, selectedGroup, direction) {
     const delta = getDirectionDelta(direction);
     if (!delta || selectedGroup.length === 0) {
@@ -208,6 +215,10 @@
           column: vacatedCell.column,
         }),
       }));
+
+    if (targetMoves.some((move) => !isOneCellMove(move.ingredient, move.gridCell))) {
+      return null;
+    }
 
     return [
       ...createRelativeGroupMoves(selectedGroup, delta),

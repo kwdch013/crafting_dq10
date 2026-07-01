@@ -144,21 +144,10 @@ function positionById(moves) {
     ingredient("single", 2, 3),
   ];
   const selectedGroup = boardLayout.getIngredientGroupMembers(ingredients, ingredients[0]);
-  const moves = boardLayout.createDirectionalSwapMoves(ingredients, selectedGroup, "right");
 
-  assert.deepEqual(positionById(moves), {
-    "pair-left": [2, 2],
-    "pair-right": [2, 3],
-    "single": [2, 1],
-  });
   assert.equal(
-    boardLayout.canApplyGroupMoves(
-      ingredients,
-      moves,
-      new Set(moves.map((move) => move.ingredient.id)),
-      { rows: 3, columns: 3 },
-    ),
-    true,
+    boardLayout.createDirectionalSwapMoves(ingredients, selectedGroup, "right"),
+    null,
   );
 }
 
@@ -192,21 +181,24 @@ function positionById(moves) {
     ingredient("single", 3, 2),
   ];
   const selectedGroup = boardLayout.getIngredientGroupMembers(ingredients, ingredients[0]);
-  const moves = boardLayout.createDirectionalSwapMoves(ingredients, selectedGroup, "down");
 
-  assert.deepEqual(positionById(moves), {
-    "pair-top": [2, 2],
-    "pair-bottom": [3, 2],
-    "single": [1, 2],
-  });
   assert.equal(
-    boardLayout.canApplyGroupMoves(
-      ingredients,
-      moves,
-      new Set(moves.map((move) => move.ingredient.id)),
-      { rows: 3, columns: 3 },
-    ),
-    true,
+    boardLayout.createDirectionalSwapMoves(ingredients, selectedGroup, "down"),
+    null,
+  );
+}
+
+{
+  const ingredients = [
+    ingredient("meat-numpad-1", 3, 1, "meat", "肉"),
+    ingredient("meat-numpad-2", 3, 2, "meat", "肉"),
+    ingredient("vegetable-numpad-3", 3, 3, "", "野菜"),
+  ];
+  const selectedGroup = boardLayout.getIngredientGroupMembers(ingredients, ingredients[0]);
+
+  assert.equal(
+    boardLayout.createDirectionalSwapMoves(ingredients, selectedGroup, "right"),
+    null,
   );
 }
 
