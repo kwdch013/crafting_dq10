@@ -128,6 +128,8 @@ function normalizeState(value) {
       gridCell: normalizeGridCell(ingredient.gridCell || defaultItem?.gridCell, index, config.layout),
       current: numberOr(ingredient.current, defaultItem?.current ?? 0),
       locked: ingredient.locked === true,
+      lockJudgement: ingredient.lockJudgement || "",
+      lockJudgementLabel: ingredient.lockJudgementLabel || "",
       isGlowing: ingredient.isGlowing === true,
       target: numberOr(ingredient.target, defaultItem?.target ?? Math.round((successMin + successMax) / 2)),
       successMin,
@@ -330,6 +332,8 @@ function cloneConfigItems(items) {
     ...item,
     gridCell: item.gridCell ? { ...item.gridCell } : undefined,
     locked: item.locked === true,
+    lockJudgement: item.lockJudgement || "",
+    lockJudgementLabel: item.lockJudgementLabel || "",
   }));
 }
 
@@ -799,7 +803,7 @@ function renderLayoutBoard() {
           <div class="board-cell-badges">
             ${special.isGlowing ? '<span class="glow-badge">光</span>' : ""}
             ${special.isReturning ? '<span class="return-badge">戻</span>' : ""}
-            ${item.locked ? '<span class="locked-badge">固定</span>' : ""}
+            ${formatLockBadge(item)}
             ${formatBoardBadge(item.ingredientGroupLabel)}
             ${ingredientVisual?.isInferred ? formatBoardBadge("推定") : ""}
             ${formatBoardBadge(getItemOptionLabel(config, item.optionId))}
@@ -1054,17 +1058,36 @@ function applyMiracleGrillToSelected() {
     return;
   }
 
+  const targets = getIngredientGroupMembers(ingredient);
   pushBoardHistory();
-  const result = DQ10CraftEngine.applyMiracleGrill(ingredient);
+  const result = DQ10CraftEngine.applyMiracleGrillToIngredients(targets, state);
   state.miracleGrillUsed = true;
-  state.miracleGrillResult = result.outcome === "hit"
-    ? `${ingredient.name}: ミラクルグリル成功 ${result.before} -> ${result.after} / 固定`
-    : `${ingredient.name}: ミラクルグリル miss / 理想値 ${result.target} 超過`;
+  state.miracleGrillResult = formatMiracleGrillResult(targets, result);
   selectedBoardIngredientId = null;
   renderIngredients();
   renderLayoutBoard();
   renderAnalysis();
   saveState();
+}
+
+function formatMiracleGrillResult(targets, result) {
+  const targetLabel = targets.length > 1
+    ? `${targets[0].ingredientGroupLabel || targets[0].name} ${targets.length}マス`
+    : targets[0].name;
+  const lockLabels = [...new Set(result.results
+    .filter((item) => item.outcome === "hit")
+    .map((item) => item.lockJudgementLabel)
+    .filter(Boolean))];
+
+  if (result.missCount > 0 && result.hitCount > 0) {
+    return `${targetLabel}: ミラクルグリル一部成功 / miss ${result.missCount}マス`;
+  }
+
+  if (result.missCount > 0) {
+    return `${targetLabel}: ミラクルグリル miss / 理想値超過`;
+  }
+
+  return `${targetLabel}: ミラクルグリル成功 / ${lockLabels.join("・") || "固定"}`;
 }
 
 function swapBoardDirection(direction) {
@@ -1251,6 +1274,14 @@ function formatBoardBadge(label) {
   return label ? `<span>${escapeHtml(label)}</span>` : "";
 }
 
+function formatLockBadge(item) {
+  if (!item.locked) {
+    return "";
+  }
+
+  return `<span class="locked-badge">${escapeHtml(item.lockJudgementLabel || "固定")}</span>`;
+}
+
 function formatCookingLightToggle(item, special) {
   if (state.craftType !== "cooking" || state.traitId !== "light") {
     return "";
@@ -1417,6 +1448,8 @@ function applyBoardCellEditor(editor) {
 
   if (ingredient.current !== normalized.current) {
     ingredient.locked = false;
+    ingredient.lockJudgement = "";
+    ingredient.lockJudgementLabel = "";
   }
   ingredient.current = normalized.current;
   ingredient.isGlowing = normalized.isGlowing;
@@ -1491,6 +1524,8 @@ function updateIngredient(id, key, value) {
   ingredient[key] = value;
   if (key === "current") {
     ingredient.locked = false;
+    ingredient.lockJudgement = "";
+    ingredient.lockJudgementLabel = "";
   }
   if (key !== "current" && key !== "isGlowing") {
     markCustomRecipe();

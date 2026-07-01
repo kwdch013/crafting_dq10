@@ -1,12 +1,16 @@
 (function (global) {
   const statusLabels = {
     locked: "固定",
+    "locked-critical": "本会心固定",
+    "locked-fake": "偽会心の可能性あり",
     guaranteed: "会心時確定",
     fake: "偽会心の可能性あり",
     warning: "超過注意",
     shortage: "不足",
   };
   const statusRanks = {
+    "locked-critical": 6,
+    "locked-fake": 5,
     locked: 5,
     guaranteed: 4,
     fake: 3,
@@ -185,15 +189,58 @@
     return toNumber(ingredient?.target, Math.round((successMin + successMax) / 2));
   }
 
-  function applyMiracleGrill(ingredient) {
+  function getCookingCriticalDamageValues(ingredient, state = {}) {
+    const cookingDamage = global.DQ10CookingDamage;
+    const positionId = ingredient?.optionId || "center";
+    const conditionId = state.heat || "normal";
+    const distribution = cookingDamage?.distributions?.[positionId]?.[conditionId];
+    const range = cookingDamage?.getRange?.(positionId, conditionId);
+    const values = Array.isArray(distribution)
+      ? distribution
+      : Array.isArray(range)
+        ? range
+        : [];
+
+    return values.map((value) => Math.ceil(toNumber(value) * 2));
+  }
+
+  function resolveCriticalLockJudgement(ingredient, observedGain, state = {}) {
+    if (observedGain <= 0) {
+      return {
+        lockJudgement: "true-critical",
+        lockJudgementLabel: "本会心固定",
+      };
+    }
+
+    const criticalValues = getCookingCriticalDamageValues(ingredient, state);
+    const possibleFake = criticalValues.includes(observedGain);
+
+    return possibleFake
+      ? {
+        lockJudgement: "possible-fake-critical",
+        lockJudgementLabel: "偽会心の可能性あり",
+      }
+      : {
+        lockJudgement: "true-critical",
+        lockJudgementLabel: "本会心固定",
+      };
+  }
+
+  function applyMiracleGrill(ingredient, state = {}) {
     const current = toNumber(ingredient.current);
     const target = resolveIngredientTarget(ingredient);
     const outcome = current > target ? "miss" : "hit";
     const after = outcome === "hit" ? target : current;
+    const observedGain = after - current;
+    const judgement = outcome === "hit"
+      ? resolveCriticalLockJudgement(ingredient, observedGain, state)
+      : { lockJudgement: "", lockJudgementLabel: "" };
 
     ingredient.current = after;
     ingredient.target = target;
     ingredient.locked = outcome === "hit";
+    ingredient.lockJudgement = judgement.lockJudgement;
+    ingredient.lockJudgementLabel = judgement.lockJudgementLabel;
 
     return {
       action: "miracle-grill",
@@ -202,7 +249,22 @@
       after,
       target,
       diff: target - after,
+      observedGain,
       locked: ingredient.locked,
+      ...judgement,
+    };
+  }
+
+  function applyMiracleGrillToIngredients(ingredients, state = {}) {
+    const results = ingredients.map((ingredient) => applyMiracleGrill(ingredient, state));
+    const hasMiss = results.some((result) => result.outcome === "miss");
+
+    return {
+      action: "miracle-grill",
+      outcome: hasMiss ? "partial" : "hit",
+      results,
+      hitCount: results.filter((result) => result.outcome === "hit").length,
+      missCount: results.filter((result) => result.outcome === "miss").length,
     };
   }
 
@@ -217,6 +279,11 @@
 
     if (ingredient.locked === true) {
       const inSuccessRange = current >= successMin && current <= successMax;
+      const lockedStatus = ingredient.lockJudgement === "possible-fake-critical"
+        ? "locked-fake"
+        : ingredient.lockJudgement === "true-critical"
+          ? "locked-critical"
+          : "locked";
 
       return {
         ...ingredient,
@@ -244,8 +311,8 @@
         criticalOver: current > successMax,
         currentOver: current > successMax,
         targetMode,
-        status: "locked",
-        statusLabel: statusLabels.locked,
+        status: lockedStatus,
+        statusLabel: statusLabels[lockedStatus],
       };
     }
 
@@ -444,7 +511,9 @@
     statusLabels,
     resolveTechnique,
     resolveIngredientTarget,
+    resolveCriticalLockJudgement,
     applyMiracleGrill,
+    applyMiracleGrillToIngredients,
     analyzeIngredient,
     analyzeIngredientAcrossTechniques,
     analyzeState,

@@ -735,6 +735,16 @@ td input {
   color: #065f46;
 }
 
+.status-locked-critical {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-locked-fake {
+  background: #fef3c7;
+  color: #92400e;
+}
+
 .split-panel {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(320px, 0.8fr);
