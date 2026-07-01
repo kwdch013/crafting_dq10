@@ -54,6 +54,7 @@ const elements = {
 
 let state;
 let selectedBoardIngredientId = null;
+let boardCellEditorElement;
 let undoStack = [];
 let redoStack = [];
 const maxHistoryEntries = 50;
@@ -119,6 +120,7 @@ function normalizeState(value) {
       optionId: ingredient.optionId || defaultItem?.optionId || config.itemOptions?.[0]?.id || "",
       gridCell: normalizeGridCell(ingredient.gridCell || defaultItem?.gridCell, index, config.layout),
       current: numberOr(ingredient.current, defaultItem?.current ?? 0),
+      isGlowing: ingredient.isGlowing === true,
       target: numberOr(ingredient.target, defaultItem?.target ?? Math.round((successMin + successMax) / 2)),
       successMin,
       successMax,
@@ -138,6 +140,7 @@ function normalizeState(value) {
     recipeId,
     recipeName: value.recipeName || getRecipeLabel(config, recipeId),
     traitId,
+    cookingEffectMode: normalizeCookingEffectMode(traitId, value.cookingEffectMode),
     craftType: config.id,
     level: focusSelection.level,
     toolId: focusSelection.toolId,
@@ -209,6 +212,8 @@ function normalizeTraitId(config, traitId) {
   const traits = getTraits(config);
   const fallback = config.defaultTraitId || traits[0]?.id || "";
   const aliases = {
+    glow: "light",
+    "glow-return": "light-return",
     "light-recovery": "light-return",
     none: fallback,
     return: "recovery",
@@ -220,6 +225,14 @@ function normalizeTraitId(config, traitId) {
 function getTrait(config, traitId) {
   const normalized = normalizeTraitId(config, traitId);
   return getTraits(config).find((trait) => trait.id === normalized);
+}
+
+function normalizeCookingEffectMode(traitId, value) {
+  if (traitId !== "light-return") {
+    return "none";
+  }
+
+  return value === "corner-return" ? "corner-return" : "cross-glow";
 }
 
 function findDefaultItem(config, ingredient, index) {
@@ -314,6 +327,7 @@ function createDefaultState(craftType) {
     recipeId: defaultRecipe?.id || "custom",
     recipeName: defaultRecipe?.name || config.defaultRecipeName,
     traitId: defaultRecipe?.traitId || defaultRecipe?.specialEventId || config.defaultTraitId || "none",
+    cookingEffectMode: "none",
     level: focusSelection.level,
     toolId: focusSelection.toolId,
     toolStars: focusSelection.toolStars,
@@ -648,6 +662,7 @@ function renderIngredients() {
     bindIngredientText(row.querySelector(".ingredient-name"), ingredient.id, "name", ingredient.name);
     bindIngredientOption(row.querySelector(".ingredient-option"), ingredient.id, ingredient.optionId);
     bindIngredientNumber(row.querySelector(".ingredient-current"), ingredient.id, "current", ingredient.current);
+    bindIngredientBoolean(row.querySelector(".ingredient-glowing"), ingredient.id, "isGlowing", ingredient.isGlowing);
     const targetInput = row.querySelector(".ingredient-target");
     bindIngredientNumber(targetInput, ingredient.id, "target", ingredient.target);
     targetInput.readOnly = state.targetMode === "random-in-range";
@@ -710,6 +725,15 @@ function renderLayoutBoard() {
         continue;
       }
 
+      const special = getIngredientSpecialState(item);
+
+      if (special.isGlowing) {
+        cell.classList.add("glowing");
+      }
+      if (special.isReturning) {
+        cell.classList.add("returning");
+      }
+
       const rowSpan = Math.max(1, numberOr(item.gridCell?.rowSpan, 1));
       const columnSpan = Math.max(1, numberOr(item.gridCell?.columnSpan, 1));
       cell.style.gridRow = `span ${rowSpan}`;
@@ -729,6 +753,8 @@ function renderLayoutBoard() {
         <div class="board-cell-head">
           <strong>${escapeHtml(item.name)}</strong>
           <div class="board-cell-badges">
+            ${special.isGlowing ? '<span class="glow-badge">光</span>' : ""}
+            ${special.isReturning ? '<span class="return-badge">戻</span>' : ""}
             ${formatBoardBadge(item.ingredientGroupLabel)}
             ${formatBoardBadge(getItemOptionLabel(config, item.optionId))}
           </div>
@@ -747,6 +773,9 @@ function renderLayoutBoard() {
 
         focusIngredientRow(item.id);
       });
+      if (state.craftType === "cooking") {
+        cell.addEventListener("contextmenu", (event) => openBoardCellEditor(event, item));
+      }
       elements.layoutBoard.append(cell);
     }
   }
@@ -1027,6 +1056,27 @@ function getItemOptionLabel(config, optionId) {
   return option?.label || "";
 }
 
+function getIngredientSpecialState(ingredient) {
+  if (state.traitId === "light") {
+    return {
+      isGlowing: ingredient.isGlowing === true,
+      isReturning: false,
+    };
+  }
+
+  if (state.traitId === "light-return") {
+    return {
+      isGlowing: state.cookingEffectMode === "cross-glow" && ingredient.optionId === "cross",
+      isReturning: state.cookingEffectMode === "corner-return" && ingredient.optionId === "corner",
+    };
+  }
+
+  return {
+    isGlowing: false,
+    isReturning: false,
+  };
+}
+
 function formatBoardBadge(label) {
   return label ? `<span>${escapeHtml(label)}</span>` : "";
 }
@@ -1038,6 +1088,119 @@ function focusIngredientRow(id) {
   if (input) {
     input.focus();
   }
+}
+
+function getBoardCellEditorElement() {
+  if (boardCellEditorElement) {
+    return boardCellEditorElement;
+  }
+
+  const editor = document.createElement("div");
+  editor.className = "board-cell-editor";
+  editor.hidden = true;
+  editor.innerHTML = `
+    <form>
+      <strong class="editor-title"></strong>
+      <label>
+        現在値
+        <input class="editor-current numeric" type="number" />
+      </label>
+      <label class="checkbox-field">
+        <input class="editor-glowing" type="checkbox" />
+        <span>光っている</span>
+      </label>
+      <fieldset class="editor-effect-mode">
+        <legend>光・戻り</legend>
+        <label class="checkbox-field">
+          <input name="editorEffectMode" type="radio" value="cross-glow" />
+          <span>上下左右が光る</span>
+        </label>
+        <label class="checkbox-field">
+          <input name="editorEffectMode" type="radio" value="corner-return" />
+          <span>四隅が戻り</span>
+        </label>
+      </fieldset>
+      <div class="editor-actions">
+        <button class="button primary" type="submit">更新</button>
+        <button class="button secondary editor-cancel" type="button">閉じる</button>
+      </div>
+    </form>
+  `;
+
+  editor.querySelector("form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    applyBoardCellEditor(editor);
+  });
+  editor.querySelector(".editor-cancel").addEventListener("click", closeBoardCellEditor);
+  document.body.append(editor);
+  boardCellEditorElement = editor;
+  return editor;
+}
+
+function openBoardCellEditor(event, item) {
+  event.preventDefault();
+  event.stopPropagation();
+
+  const editor = getBoardCellEditorElement();
+  editor.dataset.id = item.id;
+  editor.querySelector(".editor-title").textContent = `${item.name}を編集`;
+  editor.querySelector(".editor-current").value = item.current;
+  editor.querySelector(".editor-glowing").checked = item.isGlowing === true;
+  syncBoardCellEditorTrait(editor);
+  editor.hidden = false;
+  positionBoardCellEditor(editor, event.clientX, event.clientY);
+  editor.querySelector(".editor-current").focus();
+  editor.querySelector(".editor-current").select();
+}
+
+function syncBoardCellEditorTrait(editor) {
+  const glowField = editor.querySelector(".checkbox-field");
+  const effectModeField = editor.querySelector(".editor-effect-mode");
+  glowField.hidden = state.traitId !== "light";
+  effectModeField.hidden = state.traitId !== "light-return";
+
+  effectModeField.querySelectorAll("input").forEach((input) => {
+    input.checked = input.value === state.cookingEffectMode;
+  });
+}
+
+function positionBoardCellEditor(editor, x, y) {
+  const margin = 12;
+  const rect = editor.getBoundingClientRect();
+  const left = Math.min(x, window.innerWidth - rect.width - margin);
+  const top = Math.min(y, window.innerHeight - rect.height - margin);
+  editor.style.left = `${Math.max(margin, left)}px`;
+  editor.style.top = `${Math.max(margin, top)}px`;
+}
+
+function closeBoardCellEditor() {
+  if (boardCellEditorElement) {
+    boardCellEditorElement.hidden = true;
+  }
+}
+
+function applyBoardCellEditor(editor) {
+  const ingredient = state.ingredients.find((item) => item.id === editor.dataset.id);
+
+  if (!ingredient) {
+    closeBoardCellEditor();
+    return;
+  }
+
+  const normalized = DQ10BoardCellEditor.normalizeEditValue(ingredient, {
+    current: editor.querySelector(".editor-current").value,
+    isGlowing: state.traitId === "light" && editor.querySelector(".editor-glowing").checked,
+    cookingEffectMode: editor.querySelector("[name='editorEffectMode']:checked")?.value,
+  });
+  ingredient.current = normalized.current;
+  ingredient.isGlowing = normalized.isGlowing;
+  state.cookingEffectMode = normalizeCookingEffectMode(state.traitId, normalized.cookingEffectMode);
+  refreshIngredientRow(ingredient.id);
+  renderLayoutBoard();
+  renderCraftReference();
+  renderAnalysis();
+  saveState();
+  closeBoardCellEditor();
 }
 
 function bindIngredientOption(select, id, value) {
@@ -1081,6 +1244,17 @@ function bindIngredientNumber(input, id, key, value) {
   });
 }
 
+function bindIngredientBoolean(input, id, key, value) {
+  const enabled = state.traitId === "light";
+  input.checked = value === true;
+  input.disabled = !enabled;
+  input.hidden = !enabled;
+  input.title = enabled ? "光っている" : "このレシピ特性では個別の光状態を使いません";
+  input.addEventListener("change", () => {
+    updateIngredient(id, key, input.checked);
+  });
+}
+
 function updateIngredient(id, key, value) {
   const ingredient = state.ingredients.find((item) => item.id === id);
 
@@ -1089,7 +1263,7 @@ function updateIngredient(id, key, value) {
   }
 
   ingredient[key] = value;
-  if (key !== "current") {
+  if (key !== "current" && key !== "isGlowing") {
     markCustomRecipe();
   }
   refreshIngredientRow(id);
@@ -1108,6 +1282,8 @@ function refreshIngredientRow(id) {
   }
 
   const analysis = DQ10CraftEngine.analyzeIngredientAcrossTechniques(state, ingredient);
+  row.querySelector(".ingredient-current").value = ingredient.current;
+  row.querySelector(".ingredient-glowing").checked = ingredient.isGlowing === true;
   row.querySelector(".lower-diff").textContent = formatSigned(analysis.lowerDiff);
   row.querySelector(".upper-diff").textContent = formatSigned(analysis.upperDiff);
   row.querySelector(".normal-range").innerHTML = formatTechniqueResults(analysis.techniqueAnalyses, "normal");
@@ -1202,6 +1378,7 @@ function addIngredient() {
     optionId: getBoardOptionId(gridCell.row, gridCell.column) || config.itemOptions?.[0]?.id || "",
     gridCell,
     current: 0,
+    isGlowing: false,
     target: Math.round(((config.items[0]?.successMin || 60) + (config.items[0]?.successMax || 75)) / 2),
     successMin: config.items[0]?.successMin || 60,
     successMax: config.items[0]?.successMax || 75,
@@ -1224,6 +1401,7 @@ function applyRecipe(recipeId) {
   state.recipeId = recipe.id;
   state.recipeName = recipe.name;
   state.traitId = normalizeTraitId(config, recipe.traitId || recipe.specialEventId || config.defaultTraitId || "none");
+  state.cookingEffectMode = normalizeCookingEffectMode(state.traitId, state.cookingEffectMode);
   state.ingredients = cloneConfigItems(recipe.items);
   state.layoutSignature = createLayoutSignature(config);
   render();
@@ -1322,9 +1500,18 @@ async function startCapturePreview() {
 elements.recipeTraitInput.addEventListener("change", () => {
   const config = getCurrentCraftConfig();
   state.traitId = normalizeTraitId(config, elements.recipeTraitInput.value);
+  state.cookingEffectMode = normalizeCookingEffectMode(state.traitId, state.cookingEffectMode);
+  if (state.traitId !== "light") {
+    state.ingredients.forEach((ingredient) => {
+      ingredient.isGlowing = false;
+    });
+  }
   markCustomRecipe();
+  renderIngredients();
+  renderLayoutBoard();
   renderTraitDescription();
   renderCraftReference();
+  renderAnalysis();
   saveState();
 });
 elements.recipeSelect.addEventListener("change", () => {
@@ -1368,7 +1555,17 @@ elements.exportButton.addEventListener("click", exportState);
 elements.resetButton.addEventListener("click", resetState);
 elements.importInput.addEventListener("change", importState);
 elements.captureButton.addEventListener("click", startCapturePreview);
+document.addEventListener("pointerdown", (event) => {
+  if (boardCellEditorElement && !boardCellEditorElement.hidden && !boardCellEditorElement.contains(event.target)) {
+    closeBoardCellEditor();
+  }
+});
 document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    closeBoardCellEditor();
+    return;
+  }
+
   const usesShortcutModifier = event.ctrlKey || event.metaKey;
   if (!usesShortcutModifier || !canRearrangeBoard()) {
     return;
