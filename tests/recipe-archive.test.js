@@ -52,6 +52,17 @@ function loadFallbackCookingRecipes() {
 }
 
 {
+  assert.equal(
+    recipeArchive.shouldShowCustomRecipeOption({ id: "cooking", allowCustomRecipes: false }),
+    false,
+  );
+  assert.equal(
+    recipeArchive.shouldShowCustomRecipeOption({ id: "weapon-smithing" }),
+    true,
+  );
+}
+
+{
   assert.deepEqual(
     recipeArchive.getVisibleRecipes(cookingRecipes).map((recipe) => recipe.name),
     visibleCookingRecipeNames,

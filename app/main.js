@@ -221,6 +221,10 @@ function getRecipeTraitId(config, recipeId) {
   return recipe?.traitId || recipe?.specialEventId || config.defaultTraitId || "none";
 }
 
+function shouldShowCustomRecipeOption(config) {
+  return window.DQ10RecipeArchive?.shouldShowCustomRecipeOption(config) ?? true;
+}
+
 function getTraits(config) {
   return config.traits || [];
 }
@@ -453,6 +457,7 @@ function syncStaticInputs() {
 function renderRecipeOptions() {
   const config = getCurrentCraftConfig();
   const recipes = getCraftRecipes(config.id);
+  const showCustomRecipeOption = shouldShowCustomRecipeOption(config);
   elements.recipeSelect.replaceChildren();
 
   recipes.forEach((recipe) => {
@@ -462,14 +467,19 @@ function renderRecipeOptions() {
     elements.recipeSelect.append(option);
   });
 
-  const customOption = document.createElement("option");
-  customOption.value = "custom";
-  customOption.textContent = "手入力";
-  elements.recipeSelect.append(customOption);
-  elements.recipeSelect.disabled = recipes.length === 0;
+  if (showCustomRecipeOption) {
+    const customOption = document.createElement("option");
+    customOption.value = "custom";
+    customOption.textContent = "手入力";
+    elements.recipeSelect.append(customOption);
+  }
+
+  elements.recipeSelect.disabled = recipes.length === 0 && !showCustomRecipeOption;
   elements.recipeSelect.value = recipes.some((recipe) => recipe.id === state.recipeId)
     ? state.recipeId
-    : "custom";
+    : showCustomRecipeOption
+      ? "custom"
+      : "";
 }
 
 function renderTraitOptions() {
