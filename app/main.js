@@ -34,6 +34,9 @@ const elements = {
   shiftBoardUpButton: document.querySelector("#shiftBoardUpButton"),
   miracleGrillButton: document.querySelector("#miracleGrillButton"),
   miracleGrillResult: document.querySelector("#miracleGrillResult"),
+  normalHeatButton: document.querySelector("#normalHeatButton"),
+  strongHeatButton: document.querySelector("#strongHeatButton"),
+  halfHeatButton: document.querySelector("#halfHeatButton"),
   clearCookingLightButton: document.querySelector("#clearCookingLightButton"),
   clearCookingEffectButton: document.querySelector("#clearCookingEffectButton"),
   crossGlowButton: document.querySelector("#crossGlowButton"),
@@ -896,6 +899,11 @@ function syncCookingEffectButtons() {
   syncCookingEffectButton(elements.clearCookingEffectButton, buttonState.clearEffect);
   syncCookingEffectButton(elements.crossGlowButton, buttonState.crossGlow);
   syncCookingEffectButton(elements.cornerReturnButton, buttonState.cornerReturn);
+
+  const heatButtonState = DQ10CookingEffects.getCookingHeatButtonState(state);
+  syncCookingEffectButton(elements.normalHeatButton, heatButtonState.normal);
+  syncCookingEffectButton(elements.strongHeatButton, heatButtonState.strong);
+  syncCookingEffectButton(elements.halfHeatButton, heatButtonState.half);
 }
 
 function syncCookingEffectButton(button, buttonState) {
@@ -1154,6 +1162,26 @@ function setCookingEffectMode(mode) {
   renderLayoutBoard();
   renderCraftReference();
   renderAnalysis();
+  saveState();
+}
+
+function setCookingHeatMode(mode) {
+  if (state.craftType !== "cooking") {
+    return;
+  }
+
+  const config = getCurrentCraftConfig();
+  const isSupportedHeat = config.heatStates.some((heatState) => heatState.id === mode);
+  if (!isSupportedHeat || state.heat === mode) {
+    return;
+  }
+
+  state.heat = mode;
+  elements.heatInput.value = mode;
+  renderTechniqueEditor();
+  renderIngredients();
+  renderAnalysis();
+  syncBoardActionButtons();
   saveState();
 }
 
@@ -1855,6 +1883,7 @@ elements.heatInput.addEventListener("change", () => {
   renderTechniqueEditor();
   renderIngredients();
   renderAnalysis();
+  syncBoardActionButtons();
   saveState();
 });
 elements.addIngredientButton.addEventListener("click", addIngredient);
@@ -1862,6 +1891,9 @@ elements.undoBoardButton.addEventListener("click", undoBoardAction);
 elements.redoBoardButton.addEventListener("click", redoBoardAction);
 elements.shiftBoardUpButton.addEventListener("click", shiftBoardUp);
 elements.miracleGrillButton.addEventListener("click", applyMiracleGrillToSelected);
+elements.normalHeatButton.addEventListener("click", () => setCookingHeatMode("normal"));
+elements.strongHeatButton.addEventListener("click", () => setCookingHeatMode("strong"));
+elements.halfHeatButton.addEventListener("click", () => setCookingHeatMode("half"));
 elements.clearCookingLightButton.addEventListener("click", clearCookingLight);
 elements.clearCookingEffectButton.addEventListener("click", () => setCookingEffectMode("none"));
 elements.crossGlowButton.addEventListener("click", () => setCookingEffectMode("cross-glow"));

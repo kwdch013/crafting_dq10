@@ -58,6 +58,7 @@ const effects = require("../app/cooking-effects.js");
 		craftType: "cooking",
 		traitId: "light-return",
 		cookingEffectMode: "none",
+		heat: "normal",
 		ingredients: [{ isGlowing: true }],
 	};
 	const buttonState = effects.getCookingEffectButtonState(state);
@@ -70,4 +71,41 @@ const effects = require("../app/cooking-effects.js");
 	});
 	assert.equal(buttonState.crossGlow.active, false);
 	assert.equal(buttonState.cornerReturn.active, false);
+}
+
+{
+	const state = {
+		craftType: "cooking",
+		heat: "strong",
+		ingredients: [],
+	};
+	const buttonState = effects.getCookingHeatButtonState(state);
+
+	assert.deepEqual(buttonState.normal, {
+		hidden: false,
+		disabled: false,
+		active: false,
+	});
+	assert.deepEqual(buttonState.strong, {
+		hidden: false,
+		disabled: false,
+		active: true,
+	});
+	assert.deepEqual(buttonState.half, {
+		hidden: false,
+		disabled: false,
+		active: false,
+	});
+}
+
+{
+	const buttonState = effects.getCookingHeatButtonState({
+		craftType: "weapon-smithing",
+		heat: "normal",
+		ingredients: [],
+	});
+
+	assert.equal(buttonState.normal.hidden, true);
+	assert.equal(buttonState.strong.hidden, true);
+	assert.equal(buttonState.half.hidden, true);
 }
