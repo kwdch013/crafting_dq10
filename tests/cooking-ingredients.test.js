@@ -46,3 +46,19 @@ const cookingIngredients = require("../app/cooking-ingredients.js");
     { categoryId: "sweets", category: "スイーツ", name: "クイックケーキ" },
   ), null);
 }
+
+{
+  const context = cookingIngredients.getCookingIngredientVisualContext(null, {
+    recipeName: "手入力",
+    recipeCategoryId: "meat-dishes",
+    recipeCategory: "肉料理",
+  });
+  const visual = cookingIngredients.getCookingIngredientVisual(
+    { ingredientGroupLabel: "" },
+    context,
+  );
+
+  assert.equal(context.categoryId, "meat-dishes");
+  assert.equal(visual.id, "meat");
+  assert.equal(visual.isInferred, true);
+}
