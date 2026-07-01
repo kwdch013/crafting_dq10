@@ -1,11 +1,13 @@
 (function (global) {
   const statusLabels = {
+    locked: "固定",
     guaranteed: "会心時確定",
     fake: "偽会心の可能性あり",
     warning: "超過注意",
     shortage: "不足",
   };
   const statusRanks = {
+    locked: 5,
     guaranteed: 4,
     fake: 3,
     shortage: 2,
@@ -72,6 +74,22 @@
   }
 
   function resolveTechnique(state, technique, ingredient) {
+    if (technique.specialAction === "miracle-grill") {
+      const target = resolveIngredientTarget(ingredient);
+      const current = toNumber(ingredient?.current);
+      const required = Math.max(0, target - current);
+
+      return {
+        ...technique,
+        focusCost: 0,
+        normalMin: required,
+        normalMax: required,
+        criticalMin: required,
+        criticalMax: required,
+        multiplier: 1,
+      };
+    }
+
     if (technique.damageModel === "cooking-fixed") {
       const cookingDamage = global.DQ10CookingDamage;
       const positionId = ingredient?.optionId || "center";
@@ -162,14 +180,74 @@
     return technique;
   }
 
+  function resolveIngredientTarget(ingredient) {
+    const [successMin, successMax] = normalizeRange(ingredient?.successMin, ingredient?.successMax);
+    return toNumber(ingredient?.target, Math.round((successMin + successMax) / 2));
+  }
+
+  function applyMiracleGrill(ingredient) {
+    const current = toNumber(ingredient.current);
+    const target = resolveIngredientTarget(ingredient);
+    const outcome = current > target ? "miss" : "hit";
+    const after = outcome === "hit" ? target : current;
+
+    ingredient.current = after;
+    ingredient.target = target;
+    ingredient.locked = outcome === "hit";
+
+    return {
+      action: "miracle-grill",
+      outcome,
+      before: current,
+      after,
+      target,
+      diff: target - after,
+      locked: ingredient.locked,
+    };
+  }
+
   function analyzeIngredient(ingredient, technique, targetMode = "fixed") {
     const [successMin, successMax] = normalizeRange(ingredient.successMin, ingredient.successMax);
     const [normalMin, normalMax] = normalizeRange(technique.normalMin, technique.normalMax);
     const [criticalMin, criticalMax] = normalizeRange(technique.criticalMin, technique.criticalMax);
     const current = toNumber(ingredient.current);
     const target = targetMode === "random-in-range"
-      ? Math.round((successMin + successMax) / 2)
+      ? resolveIngredientTarget(ingredient)
       : toNumber(ingredient.target, Math.round((successMin + successMax) / 2));
+
+    if (ingredient.locked === true) {
+      const inSuccessRange = current >= successMin && current <= successMax;
+
+      return {
+        ...ingredient,
+        current,
+        target,
+        successMin,
+        successMax,
+        lowerDiff: successMin - current,
+        upperDiff: successMax - current,
+        normalMin: 0,
+        normalMax: 0,
+        normalAfterMin: current,
+        normalAfterMax: current,
+        criticalMin: 0,
+        criticalMax: 0,
+        rawCriticalAfterMin: current,
+        rawCriticalAfterMax: current,
+        criticalAfterMin: current,
+        criticalAfterMax: current,
+        criticalStopApplies: true,
+        normalHits: inSuccessRange,
+        normalCanHit: inSuccessRange,
+        guaranteedCritical: inSuccessRange,
+        criticalCanHit: inSuccessRange,
+        criticalOver: current > successMax,
+        currentOver: current > successMax,
+        targetMode,
+        status: "locked",
+        statusLabel: statusLabels.locked,
+      };
+    }
 
     const normalAfterMin = current + normalMin;
     const normalAfterMax = current + normalMax;
@@ -365,6 +443,8 @@
   global.DQ10CraftEngine = {
     statusLabels,
     resolveTechnique,
+    resolveIngredientTarget,
+    applyMiracleGrill,
     analyzeIngredient,
     analyzeIngredientAcrossTechniques,
     analyzeState,

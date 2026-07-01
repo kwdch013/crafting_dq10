@@ -94,6 +94,17 @@ registerDQ10Craft({
       criticalMultiplier: DQ10CookingDamage.actions.aim.criticalMultiplier,
       criticalWeight: 1.8,
     },
+    {
+      id: "miracle-grill",
+      name: "ミラクルグリル",
+      focusCost: 0,
+      normalMin: 0,
+      normalMax: 0,
+      criticalMin: 0,
+      criticalMax: 0,
+      criticalWeight: 2,
+      specialAction: "miracle-grill",
+    },
   ],
   items: [
     { id: "slot-1", name: "左上", optionId: "corner", gridCell: { row: 1, column: 1 }, current: 0, successMin: 60, successMax: 75 },

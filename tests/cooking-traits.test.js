@@ -35,3 +35,13 @@ assert.equal(
   ]),
 );
 assert.equal(registeredConfig.defaultTraitId, "light");
+assert.equal(
+  JSON.stringify(registeredConfig.techniques.map((technique) => [technique.id, technique.name, technique.specialAction || ""])),
+  JSON.stringify([
+    ["basic", "このまま焼く", ""],
+    ["weak", "弱火焼き", ""],
+    ["strong", "強火焼き", ""],
+    ["aim", "ねらい焼き", ""],
+    ["miracle-grill", "ミラクルグリル", "miracle-grill"],
+  ]),
+);
