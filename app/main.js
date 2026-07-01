@@ -32,6 +32,10 @@ const elements = {
   undoBoardButton: document.querySelector("#undoBoardButton"),
   redoBoardButton: document.querySelector("#redoBoardButton"),
   shiftBoardUpButton: document.querySelector("#shiftBoardUpButton"),
+  clearCookingLightButton: document.querySelector("#clearCookingLightButton"),
+  clearCookingEffectButton: document.querySelector("#clearCookingEffectButton"),
+  crossGlowButton: document.querySelector("#crossGlowButton"),
+  cornerReturnButton: document.querySelector("#cornerReturnButton"),
   swapBoardUpButton: document.querySelector("#swapBoardUpButton"),
   swapBoardDownButton: document.querySelector("#swapBoardDownButton"),
   swapBoardLeftButton: document.querySelector("#swapBoardLeftButton"),
@@ -140,7 +144,7 @@ function normalizeState(value) {
     recipeId,
     recipeName: value.recipeName || getRecipeLabel(config, recipeId),
     traitId,
-    cookingEffectMode: normalizeCookingEffectMode(traitId, value.cookingEffectMode),
+    cookingEffectMode: normalizeSavedCookingEffectMode(traitId, value.cookingEffectMode),
     craftType: config.id,
     level: focusSelection.level,
     toolId: focusSelection.toolId,
@@ -228,11 +232,15 @@ function getTrait(config, traitId) {
 }
 
 function normalizeCookingEffectMode(traitId, value) {
-  if (traitId !== "light-return") {
-    return "none";
-  }
+  return DQ10CookingEffects.normalizeCookingEffectMode(traitId, value);
+}
 
-  return value === "corner-return" ? "corner-return" : "cross-glow";
+function getInitialCookingEffectMode(traitId) {
+  return DQ10CookingEffects.getInitialCookingEffectMode(traitId);
+}
+
+function normalizeSavedCookingEffectMode(traitId, value) {
+  return DQ10CookingEffects.normalizeSavedCookingEffectMode(traitId, value);
 }
 
 function findDefaultItem(config, ingredient, index) {
@@ -327,7 +335,7 @@ function createDefaultState(craftType) {
     recipeId: defaultRecipe?.id || "custom",
     recipeName: defaultRecipe?.name || config.defaultRecipeName,
     traitId: defaultRecipe?.traitId || defaultRecipe?.specialEventId || config.defaultTraitId || "none",
-    cookingEffectMode: "none",
+    cookingEffectMode: getInitialCookingEffectMode(),
     level: focusSelection.level,
     toolId: focusSelection.toolId,
     toolStars: focusSelection.toolStars,
@@ -355,6 +363,7 @@ function createBoardSnapshot() {
       ...ingredient,
       gridCell: ingredient.gridCell ? { ...ingredient.gridCell } : undefined,
     })),
+    cookingEffectMode: state.cookingEffectMode,
   };
 }
 
@@ -363,6 +372,7 @@ function restoreBoardSnapshot(snapshot) {
     ...ingredient,
     gridCell: ingredient.gridCell ? { ...ingredient.gridCell } : undefined,
   }));
+  state.cookingEffectMode = normalizeCookingEffectMode(state.traitId, snapshot.cookingEffectMode);
   selectedBoardIngredientId = null;
   renderIngredients();
   renderLayoutBoard();
@@ -692,13 +702,19 @@ function renderLayoutBoard() {
   const rows = Math.max(1, numberOr(layout.rows, 1));
   const columns = Math.max(1, numberOr(layout.columns, state.ingredients.length || 1));
   const analysis = DQ10CraftEngine.analyzeState(state);
+  const selectedRecipe = getSelectedRecipe(config, state.recipeId);
   const occupiedCells = new Set();
   const canRearrange = canRearrangeBoard(config);
   const selectedIngredient = state.ingredients.find((ingredient) => ingredient.id === selectedBoardIngredientId);
   const selectedGroupId = getIngredientGroupId(selectedIngredient);
 
   elements.layoutBoard.replaceChildren();
-  elements.layoutBoard.style.gridTemplateColumns = `repeat(${columns}, minmax(110px, 1fr))`;
+  const isSquareBoard = config.id === "cooking" && rows === columns;
+  elements.layoutBoard.classList.toggle("square-board", isSquareBoard);
+  elements.layoutBoard.style.gridTemplateColumns = isSquareBoard
+    ? `repeat(${columns}, minmax(0, 1fr))`
+    : `repeat(${columns}, minmax(110px, 1fr))`;
+  elements.layoutBoard.style.gridTemplateRows = `repeat(${rows}, minmax(0, 1fr))`;
 
   for (let rowIndex = 1; rowIndex <= rows; rowIndex += 1) {
     for (let columnIndex = 1; columnIndex <= columns; columnIndex += 1) {
@@ -749,6 +765,11 @@ function renderLayoutBoard() {
         }
       }
 
+      const ingredientVisual = getCookingIngredientVisual(item, selectedRecipe);
+      if (ingredientVisual) {
+        cell.classList.add("has-ingredient-visual", `ingredient-${ingredientVisual.id}`);
+      }
+
       cell.innerHTML = `
         <div class="board-cell-head">
           <strong>${escapeHtml(item.name)}</strong>
@@ -756,12 +777,14 @@ function renderLayoutBoard() {
             ${special.isGlowing ? '<span class="glow-badge">光</span>' : ""}
             ${special.isReturning ? '<span class="return-badge">戻</span>' : ""}
             ${formatBoardBadge(item.ingredientGroupLabel)}
+            ${ingredientVisual?.isInferred ? formatBoardBadge("推定") : ""}
             ${formatBoardBadge(getItemOptionLabel(config, item.optionId))}
           </div>
         </div>
+        ${formatCookingIngredientVisual(ingredientVisual)}
         <div class="board-cell-values">
           <span class="numeric">${item.current}</span>
-          <small class="numeric">${escapeHtml(formatTargetSummary(item, state.targetMode))}</small>
+          <small class="numeric">${escapeHtml(formatBoardTargetSummary(item, state.targetMode))}</small>
         </div>
         <span class="status status-${item.status}">${escapeHtml(item.statusLabel)}</span>
       `;
@@ -799,6 +822,23 @@ function syncBoardActionButtons() {
   elements.swapBoardDownButton.disabled = !selectedIngredient || !canSwapBoardDirection("down");
   elements.swapBoardLeftButton.disabled = !selectedIngredient || !canSwapBoardDirection("left");
   elements.swapBoardRightButton.disabled = !selectedIngredient || !canSwapBoardDirection("right");
+  syncCookingEffectButtons();
+}
+
+function syncCookingEffectButtons() {
+  const isCooking = state?.craftType === "cooking";
+  const isLight = isCooking && state.traitId === "light";
+  const isLightReturn = isCooking && state.traitId === "light-return";
+  const hasGlowing = isLight && state.ingredients.some((ingredient) => ingredient.isGlowing === true);
+
+  elements.clearCookingLightButton.hidden = !isLight;
+  elements.clearCookingLightButton.disabled = !hasGlowing;
+  elements.clearCookingEffectButton.hidden = !isLightReturn;
+  elements.crossGlowButton.hidden = !isLightReturn;
+  elements.cornerReturnButton.hidden = !isLightReturn;
+  elements.clearCookingEffectButton.classList.toggle("active", isLightReturn && state.cookingEffectMode === "none");
+  elements.crossGlowButton.classList.toggle("active", isLightReturn && state.cookingEffectMode === "cross-glow");
+  elements.cornerReturnButton.classList.toggle("active", isLightReturn && state.cookingEffectMode === "corner-return");
 }
 
 function handleBoardCellClick(item, targetCell) {
@@ -977,6 +1017,32 @@ function swapBoardDirection(direction) {
   saveState();
 }
 
+function clearCookingLight() {
+  if (state.traitId !== "light") {
+    return;
+  }
+
+  state.ingredients.forEach((ingredient) => {
+    ingredient.isGlowing = false;
+  });
+  renderIngredients();
+  renderLayoutBoard();
+  renderAnalysis();
+  saveState();
+}
+
+function setCookingEffectMode(mode) {
+  if (state.traitId !== "light-return") {
+    return;
+  }
+
+  state.cookingEffectMode = normalizeCookingEffectMode(state.traitId, mode);
+  renderLayoutBoard();
+  renderCraftReference();
+  renderAnalysis();
+  saveState();
+}
+
 function updateIngredientPositionOption(ingredient) {
   const optionId = getBoardOptionId(ingredient.gridCell?.row, ingredient.gridCell?.column);
   if (optionId) {
@@ -1051,6 +1117,14 @@ function formatTargetSummary(item, targetMode) {
   return `基準 ${item.target} / ${item.successMin} - ${item.successMax}`;
 }
 
+function formatBoardTargetSummary(item, targetMode) {
+  if (targetMode === "random-in-range") {
+    return `基準 ${item.successMin}-${item.successMax}`;
+  }
+
+  return `基準 ${item.target} / ${item.successMin}-${item.successMax}`;
+}
+
 function getItemOptionLabel(config, optionId) {
   const option = config.itemOptions?.find((itemOption) => itemOption.id === optionId);
   return option?.label || "";
@@ -1079,6 +1153,28 @@ function getIngredientSpecialState(ingredient) {
 
 function formatBoardBadge(label) {
   return label ? `<span>${escapeHtml(label)}</span>` : "";
+}
+
+function getCookingIngredientVisual(ingredient, recipe) {
+  if (state.craftType !== "cooking") {
+    return null;
+  }
+
+  return window.DQ10CookingIngredients?.getCookingIngredientVisual(ingredient, recipe) || null;
+}
+
+function formatCookingIngredientVisual(visual) {
+  if (!visual) {
+    return "";
+  }
+
+  const label = visual.isInferred ? `${visual.label}（推定）` : visual.label;
+
+  return `
+    <div class="board-cell-visual" aria-label="${escapeHtml(label)}" title="${escapeHtml(label)}">
+      <img class="cooking-ingredient-image ${escapeHtml(visual.className)}" src="${escapeHtml(visual.src)}" alt="" />
+    </div>
+  `;
 }
 
 function focusIngredientRow(id) {
@@ -1111,6 +1207,10 @@ function getBoardCellEditorElement() {
       </label>
       <fieldset class="editor-effect-mode">
         <legend>光・戻り</legend>
+        <label class="checkbox-field">
+          <input name="editorEffectMode" type="radio" value="none" />
+          <span>効果なし</span>
+        </label>
         <label class="checkbox-field">
           <input name="editorEffectMode" type="radio" value="cross-glow" />
           <span>上下左右が光る</span>
@@ -1401,7 +1501,7 @@ function applyRecipe(recipeId) {
   state.recipeId = recipe.id;
   state.recipeName = recipe.name;
   state.traitId = normalizeTraitId(config, recipe.traitId || recipe.specialEventId || config.defaultTraitId || "none");
-  state.cookingEffectMode = normalizeCookingEffectMode(state.traitId, state.cookingEffectMode);
+  state.cookingEffectMode = getInitialCookingEffectMode(state.traitId);
   state.ingredients = cloneConfigItems(recipe.items);
   state.layoutSignature = createLayoutSignature(config);
   render();
@@ -1500,7 +1600,7 @@ async function startCapturePreview() {
 elements.recipeTraitInput.addEventListener("change", () => {
   const config = getCurrentCraftConfig();
   state.traitId = normalizeTraitId(config, elements.recipeTraitInput.value);
-  state.cookingEffectMode = normalizeCookingEffectMode(state.traitId, state.cookingEffectMode);
+  state.cookingEffectMode = getInitialCookingEffectMode(state.traitId);
   if (state.traitId !== "light") {
     state.ingredients.forEach((ingredient) => {
       ingredient.isGlowing = false;
@@ -1547,6 +1647,10 @@ elements.addIngredientButton.addEventListener("click", addIngredient);
 elements.undoBoardButton.addEventListener("click", undoBoardAction);
 elements.redoBoardButton.addEventListener("click", redoBoardAction);
 elements.shiftBoardUpButton.addEventListener("click", shiftBoardUp);
+elements.clearCookingLightButton.addEventListener("click", clearCookingLight);
+elements.clearCookingEffectButton.addEventListener("click", () => setCookingEffectMode("none"));
+elements.crossGlowButton.addEventListener("click", () => setCookingEffectMode("cross-glow"));
+elements.cornerReturnButton.addEventListener("click", () => setCookingEffectMode("corner-return"));
 elements.swapBoardUpButton.addEventListener("click", () => swapBoardDirection("up"));
 elements.swapBoardDownButton.addEventListener("click", () => swapBoardDirection("down"));
 elements.swapBoardLeftButton.addEventListener("click", () => swapBoardDirection("left"));
