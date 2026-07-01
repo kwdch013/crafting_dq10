@@ -109,6 +109,7 @@ function normalizeState(value) {
   const recipeId = recipes.some((recipe) => recipe.id === value.recipeId)
     ? value.recipeId
     : defaultRecipe?.id || "custom";
+  const selectedRecipe = getSelectedRecipe(config, recipeId);
   const layoutSignature = createLayoutSignature(config);
   const shouldResetFixedLayout = config.layout?.fixed && value.layoutSignature !== layoutSignature;
   const defaultItems = getRecipeItems(config, recipeId);
@@ -146,6 +147,8 @@ function normalizeState(value) {
   return {
     recipeId,
     recipeName: value.recipeName || getRecipeLabel(config, recipeId),
+    recipeCategory: value.recipeCategory || selectedRecipe?.category || "",
+    recipeCategoryId: value.recipeCategoryId || selectedRecipe?.categoryId || "",
     traitId,
     cookingEffectMode: normalizeSavedCookingEffectMode(traitId, value.cookingEffectMode),
     craftType: config.id,
@@ -725,6 +728,7 @@ function renderLayoutBoard() {
   const columns = Math.max(1, numberOr(layout.columns, state.ingredients.length || 1));
   const analysis = DQ10CraftEngine.analyzeState(state);
   const selectedRecipe = getSelectedRecipe(config, state.recipeId);
+  const visualContext = getCookingIngredientVisualContext(selectedRecipe);
   const occupiedCells = new Set();
   const canRearrange = canRearrangeBoard(config);
   const selectedIngredient = state.ingredients.find((ingredient) => ingredient.id === selectedBoardIngredientId);
@@ -784,7 +788,7 @@ function renderLayoutBoard() {
         }
       }
 
-      const ingredientVisual = getCookingIngredientVisual(item, selectedRecipe);
+      const ingredientVisual = getCookingIngredientVisual(item, visualContext);
       if (ingredientVisual) {
         cell.classList.add("has-ingredient-visual", `ingredient-${ingredientVisual.id}`);
       }
@@ -1270,6 +1274,10 @@ function getCookingIngredientVisual(ingredient, recipe) {
   return window.DQ10CookingIngredients?.getCookingIngredientVisual(ingredient, recipe) || null;
 }
 
+function getCookingIngredientVisualContext(recipe) {
+  return window.DQ10CookingIngredients?.getCookingIngredientVisualContext(recipe, state) || recipe || null;
+}
+
 function formatCookingIngredientVisual(visual) {
   if (!visual) {
     return "";
@@ -1621,6 +1629,8 @@ function applyRecipe(recipeId) {
 
   state.recipeId = recipe.id;
   state.recipeName = recipe.name;
+  state.recipeCategory = recipe.category || "";
+  state.recipeCategoryId = recipe.categoryId || "";
   state.traitId = normalizeTraitId(config, recipe.traitId || recipe.specialEventId || config.defaultTraitId || "none");
   state.cookingEffectMode = getInitialCookingEffectMode(state.traitId);
   state.ingredients = cloneConfigItems(recipe.items);

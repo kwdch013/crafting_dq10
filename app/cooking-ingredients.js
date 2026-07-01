@@ -102,7 +102,24 @@
       : null;
   }
 
+  function getCookingIngredientVisualContext(recipe, state) {
+    if (recipe) {
+      return recipe;
+    }
+
+    const fallback = {
+      name: state?.recipeName || "",
+      categoryId: state?.recipeCategoryId || "",
+      category: state?.recipeCategory || "",
+    };
+
+    return fallback.name || fallback.categoryId || fallback.category
+      ? fallback
+      : null;
+  }
+
   const api = {
+    getCookingIngredientVisualContext,
     getCookingIngredientVisual,
     inferCookingIngredientKind,
     normalizeCookingIngredientKind,
