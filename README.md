@@ -69,6 +69,7 @@ https://github.com/kwdch013/crafting_dq10
 職人固有の数値や表示名は `app/crafts/<職人>/config.js` に分離しています。
 
 API側のレシピJSONは `api/data/crafts/<職人>/recipes.json` に分離しています。
+調理職人の表示プリセットは主要レシピに絞り、表示対象外のレシピは `archived: true` で保持します。
 
 ```text
 api/

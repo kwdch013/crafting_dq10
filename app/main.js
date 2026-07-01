@@ -199,7 +199,9 @@ function createId() {
 }
 
 function getCraftRecipes(craftId) {
-  return window.DQ10CraftRecipes?.[craftId] || [];
+  const recipes = window.DQ10CraftRecipes?.[craftId] || [];
+  return window.DQ10RecipeArchive?.getVisibleRecipes(recipes) ||
+    recipes.filter((recipe) => recipe?.archived !== true);
 }
 
 function getSelectedRecipe(config, recipeId) {
