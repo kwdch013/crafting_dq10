@@ -128,7 +128,8 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 160
       }
     ],
-    "traitId": "light"
+    "traitId": "light",
+    "archived": true
   },
   {
     "id": "cooking-004",
@@ -189,7 +190,8 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 115
       }
     ],
-    "traitId": "light"
+    "traitId": "light",
+    "archived": true
   },
   {
     "id": "cooking-005",
@@ -263,7 +265,8 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 165
       }
     ],
-    "traitId": "light"
+    "traitId": "light",
+    "archived": true
   },
   {
     "id": "cooking-006",
@@ -473,7 +476,8 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 130
       }
     ],
-    "traitId": "light"
+    "traitId": "light",
+    "archived": true
   },
   {
     "id": "cooking-009",
@@ -521,7 +525,8 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 115
       }
     ],
-    "traitId": "light"
+    "traitId": "light",
+    "archived": true
   },
   {
     "id": "cooking-010",
@@ -569,7 +574,8 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 120
       }
     ],
-    "traitId": "light"
+    "traitId": "light",
+    "archived": true
   },
   {
     "id": "cooking-011",
@@ -643,7 +649,8 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 140
       }
     ],
-    "traitId": "light"
+    "traitId": "light",
+    "archived": true
   },
   {
     "id": "cooking-012",
@@ -730,7 +737,8 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 160
       }
     ],
-    "traitId": "light"
+    "traitId": "light",
+    "archived": true
   },
   {
     "id": "cooking-013",
@@ -817,7 +825,8 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 170
       }
     ],
-    "traitId": "light"
+    "traitId": "light",
+    "archived": true
   },
   {
     "id": "cooking-014",
@@ -991,7 +1000,8 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 210
       }
     ],
-    "traitId": "light"
+    "traitId": "light",
+    "archived": true
   },
   {
     "id": "cooking-016",
@@ -1026,7 +1036,8 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 110
       }
     ],
-    "traitId": "light"
+    "traitId": "light",
+    "archived": true
   },
   {
     "id": "cooking-017",
@@ -1061,7 +1072,8 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 100
       }
     ],
-    "traitId": "light"
+    "traitId": "light",
+    "archived": true
   },
   {
     "id": "cooking-018",
@@ -1122,7 +1134,8 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 120
       }
     ],
-    "traitId": "light"
+    "traitId": "light",
+    "archived": true
   },
   {
     "id": "cooking-019",
@@ -1283,7 +1296,8 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 150
       }
     ],
-    "traitId": "light"
+    "traitId": "light",
+    "archived": true
   },
   {
     "id": "cooking-021",
@@ -1370,7 +1384,8 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 210
       }
     ],
-    "traitId": "light"
+    "traitId": "light",
+    "archived": true
   },
   {
     "id": "cooking-022",
@@ -1427,7 +1442,8 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 100
       }
     ],
-    "traitId": "light"
+    "traitId": "light",
+    "archived": true
   },
   {
     "id": "cooking-024",
@@ -1806,7 +1822,8 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 160
       }
     ],
-    "traitId": "light"
+    "traitId": "light",
+    "archived": true
   },
   {
     "id": "cooking-030",
@@ -1854,7 +1871,8 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 105
       }
     ],
-    "traitId": "light"
+    "traitId": "light",
+    "archived": true
   },
   {
     "id": "cooking-031",
@@ -1953,5 +1971,4 @@ registerDQ10CraftRecipes("cooking", [
     ],
     "traitId": "recovery"
   }
-]
-);
+]);

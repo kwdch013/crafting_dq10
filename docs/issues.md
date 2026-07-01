@@ -352,6 +352,25 @@ URL:
 https://github.com/kwdch013/crafting_dq10/issues/25
 ```
 
+### #29 調理職人: バトルパッツァのレシピデータを追加する
+
+現状:
+
+- `バトルパッツァ` は表示プリセット候補ですが、レシピデータに未登録です。
+- 参照画像は `refarence/cooking/バトルパッツァ.png` にあります。
+
+完了条件:
+
+- `バトルパッツァ` の実数値がAPI用JSONに登録される。
+- フロントフォールバックの `app/crafts/cooking/recipes.js` と同期される。
+- 表示プリセットのテストと関連ドキュメントが更新される。
+
+URL:
+
+```text
+https://github.com/kwdch013/crafting_dq10/issues/29
+```
+
 ## 完了済み
 
 ### GitHubリポジトリ連携を設定する
