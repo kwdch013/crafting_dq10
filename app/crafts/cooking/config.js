@@ -20,6 +20,12 @@ registerDQ10Craft({
     toolTypes: [{ id: "frying-pan", label: "フライパン" }],
   }),
   defaultTurns: 8,
+  defaultRecipeTrait: "none",
+  recipeTraits: [
+    { id: "none", label: "なし" },
+    { id: "glow", label: "光" },
+    { id: "glow-return", label: "光・戻り" },
+  ],
   layout: {
     label: "フライパン配置",
     columns: 3,

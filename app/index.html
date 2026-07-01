@@ -47,6 +47,10 @@
                 レシピ一覧
                 <select id="recipeSelect"></select>
               </label>
+              <label id="recipeTraitLabel">
+                <span>レシピ特性</span>
+                <select id="recipeTraitSelect"></select>
+              </label>
               <label>
                 職人レベル
                 <select id="levelSelect"></select>
@@ -153,6 +157,7 @@
                     <th id="itemNameHeader">項目名</th>
                     <th id="itemOptionHeader">種別</th>
                     <th>現在値</th>
+                    <th>光</th>
                     <th>基準値</th>
                     <th>成功下限</th>
                     <th>成功上限</th>
@@ -208,6 +213,7 @@
         <td><input class="ingredient-name" type="text" maxlength="30" /></td>
         <td><select class="ingredient-option"></select></td>
         <td><input class="ingredient-current numeric" type="number" /></td>
+        <td><input class="ingredient-glowing" type="checkbox" title="光っている" /></td>
         <td><input class="ingredient-target numeric" type="number" /></td>
         <td><input class="ingredient-min numeric" type="number" /></td>
         <td><input class="ingredient-max numeric" type="number" /></td>
@@ -244,6 +250,7 @@
 
     <script src="./config.js"></script>
     <script src="./crafts/registry.js"></script>
+    <script src="./board-cell-editor.js"></script>
     <script src="./crafts/shared/smithing-damage.js"></script>
     <script src="./crafts/shared/sewing-damage.js"></script>
     <script src="./crafts/shared/woodworking-damage.js"></script>

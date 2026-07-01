@@ -9,8 +9,10 @@ const elements = {
   focusLabel: document.querySelector("#focusLabel span"),
   turnLabel: document.querySelector("#turnLabel span"),
   stateLabel: document.querySelector("#stateLabel span"),
+  recipeTraitLabel: document.querySelector("#recipeTraitLabel"),
   recipeName: document.querySelector("#recipeName"),
   recipeSelect: document.querySelector("#recipeSelect"),
+  recipeTraitSelect: document.querySelector("#recipeTraitSelect"),
   levelSelect: document.querySelector("#levelSelect"),
   toolSelect: document.querySelector("#toolSelect"),
   toolStarsSelect: document.querySelector("#toolStarsSelect"),
@@ -41,6 +43,7 @@ const elements = {
 };
 
 let state;
+let boardCellEditorElement;
 
 async function hydrateRecipesFromApi() {
   try {
@@ -86,6 +89,7 @@ function normalizeState(value) {
   const recipeId = recipes.some((recipe) => recipe.id === value.recipeId)
     ? value.recipeId
     : defaultRecipe?.id || "custom";
+  const selectedRecipe = getSelectedRecipe(config, recipeId);
   const layoutSignature = createLayoutSignature(config);
   const shouldResetFixedLayout = config.layout?.fixed && value.layoutSignature !== layoutSignature;
   const defaultItems = getRecipeItems(config, recipeId);
@@ -103,6 +107,7 @@ function normalizeState(value) {
       optionId: ingredient.optionId || defaultItem?.optionId || config.itemOptions?.[0]?.id || "",
       gridCell: normalizeGridCell(ingredient.gridCell || defaultItem?.gridCell, index, config.layout),
       current: numberOr(ingredient.current, defaultItem?.current ?? 0),
+      isGlowing: ingredient.isGlowing === true,
       target: numberOr(ingredient.target, defaultItem?.target ?? Math.round((successMin + successMax) / 2)),
       successMin,
       successMax,
@@ -114,11 +119,14 @@ function normalizeState(value) {
   const heat = config.heatStates.some((candidate) => candidate.id === value.heat)
     ? value.heat
     : config.heatStates[0].id;
+  const recipeTrait = normalizeRecipeTrait(config, value.recipeTrait || selectedRecipe?.recipeTrait);
   const focusSelection = normalizeFocusSelection(config, value);
 
   return {
     recipeId,
     recipeName: value.recipeName || getRecipeLabel(config, recipeId),
+    recipeTrait,
+    cookingEffectMode: normalizeCookingEffectMode(recipeTrait, value.cookingEffectMode),
     craftType: config.id,
     level: focusSelection.level,
     toolId: focusSelection.toolId,
@@ -176,6 +184,21 @@ function getRecipeItems(config, recipeId) {
 
 function getRecipeLabel(config, recipeId) {
   return getSelectedRecipe(config, recipeId)?.name || config.defaultRecipeName;
+}
+
+function normalizeRecipeTrait(config, value) {
+  const traits = config.recipeTraits || [{ id: "none", label: "なし" }];
+  return traits.some((trait) => trait.id === value)
+    ? value
+    : config.defaultRecipeTrait || traits[0].id;
+}
+
+function normalizeCookingEffectMode(recipeTrait, value) {
+  if (recipeTrait !== "glow-return") {
+    return "none";
+  }
+
+  return value === "corner-return" ? "corner-return" : "cross-glow";
 }
 
 function findDefaultItem(config, ingredient, index) {
@@ -269,12 +292,14 @@ function createDefaultState(craftType) {
     craftType: config.id,
     recipeId: defaultRecipe?.id || "custom",
     recipeName: defaultRecipe?.name || config.defaultRecipeName,
+    recipeTrait: defaultRecipe?.recipeTrait || config.defaultRecipeTrait,
     level: focusSelection.level,
     toolId: focusSelection.toolId,
     toolStars: focusSelection.toolStars,
     focus: calculateFocus(config, focusSelection),
     turns: config.defaultTurns,
     heat: config.heatStates[0].id,
+    cookingEffectMode: "none",
     selectedTechniqueId: config.techniques[0].id,
     techniques: cloneConfigItems(config.techniques),
     ingredients: cloneConfigItems(defaultRecipe?.items || config.items),
@@ -296,6 +321,7 @@ function render() {
   renderCraftLabels();
   syncStaticInputs();
   renderRecipeOptions();
+  renderRecipeTraitOptions();
   renderFocusOptions();
   renderHeatOptions();
   renderTechniqueOptions();
@@ -309,6 +335,7 @@ function render() {
 function syncStaticInputs() {
   elements.craftType.value = state.craftType;
   elements.recipeSelect.value = state.recipeId;
+  elements.recipeTraitSelect.value = state.recipeTrait;
   elements.recipeName.value = state.recipeName;
   elements.levelSelect.value = state.level;
   elements.toolSelect.value = state.toolId;
@@ -338,6 +365,22 @@ function renderRecipeOptions() {
   elements.recipeSelect.value = recipes.some((recipe) => recipe.id === state.recipeId)
     ? state.recipeId
     : "custom";
+}
+
+function renderRecipeTraitOptions() {
+  const config = getCurrentCraftConfig();
+  const traits = config.recipeTraits || [{ id: "none", label: "なし" }];
+  elements.recipeTraitSelect.replaceChildren();
+
+  traits.forEach((trait) => {
+    const option = document.createElement("option");
+    option.value = trait.id;
+    option.textContent = trait.label;
+    elements.recipeTraitSelect.append(option);
+  });
+
+  elements.recipeTraitSelect.value = normalizeRecipeTrait(config, state.recipeTrait);
+  elements.recipeTraitLabel.hidden = traits.length <= 1 && traits[0].id === "none";
 }
 
 function renderFocusOptions() {
@@ -475,6 +518,7 @@ function renderIngredients() {
     bindIngredientText(row.querySelector(".ingredient-name"), ingredient.id, "name", ingredient.name);
     bindIngredientOption(row.querySelector(".ingredient-option"), ingredient.id, ingredient.optionId);
     bindIngredientNumber(row.querySelector(".ingredient-current"), ingredient.id, "current", ingredient.current);
+    bindIngredientBoolean(row.querySelector(".ingredient-glowing"), ingredient.id, "isGlowing", ingredient.isGlowing);
     bindIngredientNumber(row.querySelector(".ingredient-target"), ingredient.id, "target", ingredient.target);
     bindIngredientNumber(row.querySelector(".ingredient-min"), ingredient.id, "successMin", ingredient.successMin);
     bindIngredientNumber(row.querySelector(".ingredient-max"), ingredient.id, "successMax", ingredient.successMax);
@@ -525,6 +569,15 @@ function renderLayoutBoard() {
         continue;
       }
 
+      const special = getIngredientSpecialState(item);
+
+      if (special.isGlowing) {
+        cell.classList.add("glowing");
+      }
+      if (special.isReturning) {
+        cell.classList.add("returning");
+      }
+
       const rowSpan = Math.max(1, numberOr(item.gridCell?.rowSpan, 1));
       const columnSpan = Math.max(1, numberOr(item.gridCell?.columnSpan, 1));
       cell.style.gridRow = `span ${rowSpan}`;
@@ -540,7 +593,11 @@ function renderLayoutBoard() {
       cell.innerHTML = `
         <div class="board-cell-head">
           <strong>${escapeHtml(item.name)}</strong>
-          <span>${escapeHtml(getItemOptionLabel(config, item.optionId))}</span>
+          <div class="board-cell-badges">
+            ${special.isGlowing ? '<span class="glow-badge">光</span>' : ""}
+            ${special.isReturning ? '<span class="return-badge">戻</span>' : ""}
+            <span>${escapeHtml(getItemOptionLabel(config, item.optionId))}</span>
+          </div>
         </div>
         <div class="board-cell-values">
           <span class="numeric">${item.current}</span>
@@ -549,6 +606,9 @@ function renderLayoutBoard() {
         <span class="status status-${item.status}">${escapeHtml(item.statusLabel)}</span>
       `;
       cell.addEventListener("click", () => focusIngredientRow(item.id));
+      if (state.craftType === "cooking") {
+        cell.addEventListener("contextmenu", (event) => openBoardCellEditor(event, item));
+      }
       elements.layoutBoard.append(cell);
     }
   }
@@ -559,6 +619,27 @@ function getItemOptionLabel(config, optionId) {
   return option?.label || "";
 }
 
+function getIngredientSpecialState(ingredient) {
+  if (state.recipeTrait === "glow") {
+    return {
+      isGlowing: ingredient.isGlowing === true,
+      isReturning: false,
+    };
+  }
+
+  if (state.recipeTrait === "glow-return") {
+    return {
+      isGlowing: state.cookingEffectMode === "cross-glow" && ingredient.optionId === "cross",
+      isReturning: state.cookingEffectMode === "corner-return" && ingredient.optionId === "corner",
+    };
+  }
+
+  return {
+    isGlowing: false,
+    isReturning: false,
+  };
+}
+
 function focusIngredientRow(id) {
   const row = elements.ingredientBody.querySelector(`tr[data-id="${CSS.escape(id)}"]`);
   const input = row?.querySelector(".ingredient-current");
@@ -566,6 +647,118 @@ function focusIngredientRow(id) {
   if (input) {
     input.focus();
   }
+}
+
+function getBoardCellEditorElement() {
+  if (boardCellEditorElement) {
+    return boardCellEditorElement;
+  }
+
+  const editor = document.createElement("div");
+  editor.className = "board-cell-editor";
+  editor.hidden = true;
+  editor.innerHTML = `
+    <form>
+      <strong class="editor-title"></strong>
+      <label>
+        現在値
+        <input class="editor-current numeric" type="number" />
+      </label>
+      <label class="checkbox-field">
+        <input class="editor-glowing" type="checkbox" />
+        <span>光っている</span>
+      </label>
+      <fieldset class="editor-effect-mode">
+        <legend>光・戻り</legend>
+        <label class="checkbox-field">
+          <input name="editorEffectMode" type="radio" value="cross-glow" />
+          <span>上下左右が光る</span>
+        </label>
+        <label class="checkbox-field">
+          <input name="editorEffectMode" type="radio" value="corner-return" />
+          <span>四隅が戻り</span>
+        </label>
+      </fieldset>
+      <div class="editor-actions">
+        <button class="button primary" type="submit">更新</button>
+        <button class="button secondary editor-cancel" type="button">閉じる</button>
+      </div>
+    </form>
+  `;
+
+  editor.querySelector("form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    applyBoardCellEditor(editor);
+  });
+  editor.querySelector(".editor-cancel").addEventListener("click", closeBoardCellEditor);
+  document.body.append(editor);
+  boardCellEditorElement = editor;
+  return editor;
+}
+
+function openBoardCellEditor(event, item) {
+  event.preventDefault();
+  event.stopPropagation();
+
+  const editor = getBoardCellEditorElement();
+  editor.dataset.id = item.id;
+  editor.querySelector(".editor-title").textContent = `${item.name}を編集`;
+  editor.querySelector(".editor-current").value = item.current;
+  editor.querySelector(".editor-glowing").checked = item.isGlowing === true;
+  syncBoardCellEditorTrait(editor);
+  editor.hidden = false;
+  positionBoardCellEditor(editor, event.clientX, event.clientY);
+  editor.querySelector(".editor-current").focus();
+  editor.querySelector(".editor-current").select();
+}
+
+function syncBoardCellEditorTrait(editor) {
+  const glowField = editor.querySelector(".checkbox-field");
+  const effectModeField = editor.querySelector(".editor-effect-mode");
+  glowField.hidden = state.recipeTrait !== "glow";
+  effectModeField.hidden = state.recipeTrait !== "glow-return";
+
+  effectModeField.querySelectorAll("input").forEach((input) => {
+    input.checked = input.value === state.cookingEffectMode;
+  });
+}
+
+function positionBoardCellEditor(editor, x, y) {
+  const margin = 12;
+  const rect = editor.getBoundingClientRect();
+  const left = Math.min(x, window.innerWidth - rect.width - margin);
+  const top = Math.min(y, window.innerHeight - rect.height - margin);
+  editor.style.left = `${Math.max(margin, left)}px`;
+  editor.style.top = `${Math.max(margin, top)}px`;
+}
+
+function closeBoardCellEditor() {
+  if (boardCellEditorElement) {
+    boardCellEditorElement.hidden = true;
+  }
+}
+
+function applyBoardCellEditor(editor) {
+  const ingredient = state.ingredients.find((item) => item.id === editor.dataset.id);
+
+  if (!ingredient) {
+    closeBoardCellEditor();
+    return;
+  }
+
+  const normalized = DQ10BoardCellEditor.normalizeEditValue(ingredient, {
+    current: editor.querySelector(".editor-current").value,
+    isGlowing: state.recipeTrait === "glow" && editor.querySelector(".editor-glowing").checked,
+    cookingEffectMode: editor.querySelector("[name='editorEffectMode']:checked")?.value,
+  });
+  ingredient.current = normalized.current;
+  ingredient.isGlowing = normalized.isGlowing;
+  state.cookingEffectMode = normalizeCookingEffectMode(state.recipeTrait, normalized.cookingEffectMode);
+  refreshIngredientRow(ingredient.id);
+  renderLayoutBoard();
+  renderAnalysis();
+  saveState();
+  closeBoardCellEditor();
 }
 
 function bindIngredientOption(select, id, value) {
@@ -609,6 +802,17 @@ function bindIngredientNumber(input, id, key, value) {
   });
 }
 
+function bindIngredientBoolean(input, id, key, value) {
+  const enabled = state.recipeTrait === "glow";
+  input.checked = value === true;
+  input.disabled = !enabled;
+  input.hidden = !enabled;
+  input.title = enabled ? "光っている" : "このレシピ特性では個別の光状態を使いません";
+  input.addEventListener("change", () => {
+    updateIngredient(id, key, input.checked);
+  });
+}
+
 function updateIngredient(id, key, value) {
   const ingredient = state.ingredients.find((item) => item.id === id);
 
@@ -617,7 +821,7 @@ function updateIngredient(id, key, value) {
   }
 
   ingredient[key] = value;
-  if (key !== "current") {
+  if (key !== "current" && key !== "isGlowing") {
     markCustomRecipe();
   }
   refreshIngredientRow(id);
@@ -637,6 +841,8 @@ function refreshIngredientRow(id) {
 
   const technique = DQ10CraftEngine.resolveTechnique(state, selectedTechnique, ingredient);
   const analysis = DQ10CraftEngine.analyzeIngredient(ingredient, technique);
+  row.querySelector(".ingredient-current").value = ingredient.current;
+  row.querySelector(".ingredient-glowing").checked = ingredient.isGlowing === true;
   row.querySelector(".lower-diff").textContent = formatSigned(analysis.lowerDiff);
   row.querySelector(".upper-diff").textContent = formatSigned(analysis.upperDiff);
   row.querySelector(".normal-range").textContent = `${analysis.normalAfterMin} - ${analysis.normalAfterMax}`;
@@ -719,6 +925,7 @@ function addIngredient() {
     optionId: config.itemOptions?.[0]?.id || "",
     gridCell,
     current: 0,
+    isGlowing: false,
     target: Math.round(((config.items[0]?.successMin || 60) + (config.items[0]?.successMax || 75)) / 2),
     successMin: config.items[0]?.successMin || 60,
     successMax: config.items[0]?.successMax || 75,
@@ -739,8 +946,24 @@ function applyRecipe(recipeId) {
 
   state.recipeId = recipe.id;
   state.recipeName = recipe.name;
+  state.recipeTrait = normalizeRecipeTrait(config, recipe.recipeTrait);
+  state.cookingEffectMode = normalizeCookingEffectMode(state.recipeTrait, state.cookingEffectMode);
   state.ingredients = cloneConfigItems(recipe.items);
   state.layoutSignature = createLayoutSignature(config);
+  render();
+}
+
+function updateRecipeTrait(value) {
+  const config = getCurrentCraftConfig();
+  state.recipeTrait = normalizeRecipeTrait(config, value);
+  state.cookingEffectMode = normalizeCookingEffectMode(state.recipeTrait, state.cookingEffectMode);
+
+  if (state.recipeTrait !== "glow") {
+    state.ingredients.forEach((ingredient) => {
+      ingredient.isGlowing = false;
+    });
+  }
+
   render();
 }
 
@@ -840,6 +1063,9 @@ elements.recipeName.addEventListener("input", () => {
 elements.recipeSelect.addEventListener("change", () => {
   applyRecipe(elements.recipeSelect.value);
 });
+elements.recipeTraitSelect.addEventListener("change", () => {
+  updateRecipeTrait(elements.recipeTraitSelect.value);
+});
 elements.craftType.addEventListener("change", () => {
   state = createDefaultState(elements.craftType.value);
   render();
@@ -878,6 +1104,16 @@ elements.exportButton.addEventListener("click", exportState);
 elements.resetButton.addEventListener("click", resetState);
 elements.importInput.addEventListener("change", importState);
 elements.captureButton.addEventListener("click", startCapturePreview);
+document.addEventListener("pointerdown", (event) => {
+  if (boardCellEditorElement && !boardCellEditorElement.hidden && !boardCellEditorElement.contains(event.target)) {
+    closeBoardCellEditor();
+  }
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    closeBoardCellEditor();
+  }
+});
 
 async function initialize() {
   await hydrateRecipesFromApi();

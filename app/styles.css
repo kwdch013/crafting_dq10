@@ -146,6 +146,11 @@ button:disabled {
   color: var(--text);
 }
 
+.button.primary {
+  background: var(--primary);
+  color: #ffffff;
+}
+
 .icon-button {
   width: 40px;
   padding: 0;
@@ -333,6 +338,16 @@ select:focus {
   cursor: pointer;
 }
 
+.board-cell.glowing {
+  border-color: #f59e0b;
+  box-shadow: inset 0 0 0 2px rgba(245, 158, 11, 0.24);
+}
+
+.board-cell.returning {
+  border-color: #2563eb;
+  box-shadow: inset 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
 .board-cell.empty {
   place-items: center;
   border-style: dashed;
@@ -364,8 +379,86 @@ select:focus {
   white-space: nowrap;
 }
 
+.board-cell-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: end;
+  gap: 4px;
+}
+
+.board-cell-head .glow-badge {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.board-cell-head .return-badge {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
 .board-cell-values {
   align-self: center;
+}
+
+.board-cell-editor {
+  position: fixed;
+  z-index: 30;
+  width: min(260px, calc(100vw - 24px));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: 0 18px 44px rgba(23, 32, 51, 0.2);
+  padding: 12px;
+}
+
+.board-cell-editor[hidden] {
+  display: none;
+}
+
+.board-cell-editor form {
+  display: grid;
+  gap: 10px;
+}
+
+.editor-title {
+  font-size: 14px;
+}
+
+.checkbox-field {
+  display: flex;
+  grid-template-columns: none;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkbox-field input {
+  width: 18px;
+  height: 18px;
+}
+
+.editor-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.editor-effect-mode {
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  margin: 0;
+  padding: 10px;
+}
+
+.editor-effect-mode[hidden] {
+  display: none;
+}
+
+.editor-effect-mode legend {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
 }
 
 .board-cell-values span {
@@ -389,7 +482,7 @@ select:focus {
 
 table {
   width: 100%;
-  min-width: 1080px;
+  min-width: 1130px;
   border-collapse: collapse;
 }
 

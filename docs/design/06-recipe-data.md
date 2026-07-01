@@ -47,6 +47,7 @@ app/crafts/<職人>/recipes.js
   {
     "id": "cooking-3x3-standard",
     "name": "9マス料理テンプレート",
+    "recipeTrait": "glow",
     "items": [
       {
         "id": "slot-5",
@@ -69,6 +70,7 @@ app/crafts/<職人>/recipes.js
 | --- | --- |
 | `id` | レシピまたはマスの内部ID |
 | `name` | 画面表示名 |
+| `recipeTrait` | 調理のレシピ特性。未指定時は `none` |
 | `items` | レシピに含まれるマス一覧 |
 | `optionId` | 調理の場所、木工の木目 |
 | `gridCell` | 盤面上の位置 |
@@ -76,6 +78,14 @@ app/crafts/<職人>/recipes.js
 | `target` | 会心発生時に止まる誤差0の基準値 |
 | `successMin` | 成功範囲の下限 |
 | `successMax` | 成功範囲の上限 |
+
+調理の `recipeTrait` は以下を使用します。
+
+| 値 | 意味 |
+| --- | --- |
+| `none` | 特性なし |
+| `glow` | マスごとに光状態を入力 |
+| `glow-return` | 上下左右が光る状態、または四隅が戻る状態を選択 |
 
 ## 画面動作
 
