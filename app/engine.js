@@ -4,18 +4,20 @@
     "locked-critical": "本会心固定",
     "locked-fake": "偽会心の可能性あり",
     guaranteed: "会心時確定",
-    "critical-candidate": "会心狙い",
-    warning: "超過注意",
+    "normal-over-risk": "通常時超過の可能性あり",
+    over: "超過中",
+    "possible-fake-critical": "偽会心の可能性あり",
     shortage: "不足",
   };
   const statusRanks = {
-    "locked-critical": 6,
-    "locked-fake": 5,
-    locked: 5,
+    "locked-critical": 7,
+    "locked-fake": 6,
+    locked: 6,
+    over: 5,
     guaranteed: 4,
-    "critical-candidate": 3,
-    shortage: 2,
-    warning: 1,
+    "normal-over-risk": 3,
+    "possible-fake-critical": 2,
+    shortage: 1,
   };
 
   function toNumber(value, fallback = 0) {
@@ -29,6 +31,10 @@
     return normalizedMin <= normalizedMax
       ? [normalizedMin, normalizedMax]
       : [normalizedMax, normalizedMin];
+  }
+
+  function rangesOverlap(minA, maxA, minB, maxB) {
+    return maxA >= minB && minA <= maxB;
   }
 
   function resolveCriticalResult(current, criticalMin, criticalMax, targetMin, targetMax, targetMode) {
@@ -308,6 +314,10 @@
         normalCanHit: inSuccessRange,
         guaranteedCritical: inSuccessRange,
         criticalCanHit: inSuccessRange,
+        inTargetRangeUnlocked: false,
+        criticalCanEnterTargetRangeBeforeGuarantee: false,
+        possibleFakeCritical: ingredient.lockJudgement === "possible-fake-critical",
+        normalOver: false,
         criticalOver: current > successMax,
         currentOver: current > successMax,
         targetMode,
@@ -348,16 +358,29 @@
     const criticalOver = criticalAfterMax > successMax || partialTargetOver;
     const currentOver = current > successMax;
     const normalOver = normalAfterMax > successMax;
+    const inTargetRangeUnlocked = current >= successMin && current <= successMax;
+    const possibleFakeRangeMax = targetMode === "random-in-range"
+      ? successMax
+      : Math.min(successMax, target - 1);
+    const criticalCanEnterTargetRangeBeforeGuarantee =
+      !currentOver &&
+      !guaranteedCritical &&
+      possibleFakeRangeMax >= successMin &&
+      rangesOverlap(rawCriticalAfterMin, rawCriticalAfterMax, successMin, possibleFakeRangeMax);
+    const possibleFakeCritical =
+      !currentOver &&
+      !guaranteedCritical &&
+      (inTargetRangeUnlocked || criticalCanEnterTargetRangeBeforeGuarantee);
 
     let status = "shortage";
     if (currentOver) {
-      status = "warning";
+      status = "over";
     } else if (guaranteedCritical) {
       status = "guaranteed";
-    } else if (normalOver || criticalOver) {
-      status = "warning";
-    } else if (criticalCanHit) {
-      status = "critical-candidate";
+    } else if (normalOver) {
+      status = "normal-over-risk";
+    } else if (possibleFakeCritical) {
+      status = "possible-fake-critical";
     }
 
     return {
@@ -383,6 +406,10 @@
       normalCanHit,
       guaranteedCritical,
       criticalCanHit,
+      inTargetRangeUnlocked,
+      criticalCanEnterTargetRangeBeforeGuarantee,
+      possibleFakeCritical,
+      normalOver,
       criticalOver,
       currentOver,
       targetMode,
@@ -420,7 +447,7 @@
         item.techniqueAnalyses.some((analysis) => analysis.guaranteedCritical),
       ).length,
       warningCount: ingredients.filter((item) =>
-        item.techniqueAnalyses.some((analysis) => analysis.status === "warning"),
+        item.techniqueAnalyses.some((analysis) => analysis.status === "normal-over-risk"),
       ).length,
       dangerCount: ingredients.filter((item) =>
         item.techniqueAnalyses.every((analysis) => analysis.status === "shortage"),
@@ -460,12 +487,16 @@
         score += scoring.normalCandidate;
       }
 
-      if (item.status === "warning") {
+      if (item.status === "normal-over-risk") {
         score -= scoring.warningPenalty;
       }
 
       if (item.status === "shortage") {
         score -= scoring.dangerPenalty;
+      }
+
+      if (item.status === "over") {
+        score -= scoring.overPenalty;
       }
     });
 
@@ -473,8 +504,8 @@
 
     const reasonParts = [];
     const guaranteed = analysis.filter((item) => item.guaranteedCritical).length;
-    const warnings = analysis.filter((item) => item.status === "warning").length;
-    const criticalCandidate = analysis.filter((item) => item.status === "critical-candidate").length;
+    const warnings = analysis.filter((item) => item.status === "normal-over-risk").length;
+    const fakeCritical = analysis.filter((item) => item.status === "possible-fake-critical").length;
 
     if (!affordable) {
       reasonParts.push("集中力不足");
@@ -482,11 +513,11 @@
     if (guaranteed > 0) {
       reasonParts.push(`会心時確定 ${guaranteed} 件`);
     }
-    if (criticalCandidate > 0) {
-      reasonParts.push(`会心狙い ${criticalCandidate} 件`);
+    if (fakeCritical > 0) {
+      reasonParts.push(`偽会心の可能性 ${fakeCritical} 件`);
     }
     if (warnings > 0) {
-      reasonParts.push(`超過リスク ${warnings} 件`);
+      reasonParts.push(`通常時超過リスク ${warnings} 件`);
     }
     if (reasonParts.length === 0) {
       reasonParts.push("成功範囲への寄せやすさを優先");

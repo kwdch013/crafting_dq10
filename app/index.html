@@ -109,7 +109,7 @@
               <strong id="guaranteedCount">0</strong>
             </article>
             <article class="summary-card">
-              <span>超過注意</span>
+              <span>通常時超過</span>
               <strong id="warningCount">0</strong>
             </article>
             <article class="summary-card">
@@ -217,11 +217,13 @@
               </div>
               <div class="legend-grid">
                 <span class="status status-guaranteed">会心時確定</span>
-                <p>会心時に基準値へ届く場合は、超過せず基準値で止まります。</p>
-                <span class="status status-critical-candidate">会心狙い</span>
-                <p>会心が出れば成功範囲に入る可能性があります。</p>
-                <span class="status status-warning">超過注意</span>
-                <p>通常または会心で基準上限を超えるリスクがあります。</p>
+                <p>現在値が基準範囲の最小以下で、会心最小値でも基準範囲の最大に届きます。</p>
+                <span class="status status-possible-fake-critical">偽会心の可能性あり</span>
+                <p>基準範囲内未固定、または会心後に基準範囲へ入る状態で、基準値より少ない位置で固定される可能性があります。</p>
+                <span class="status status-normal-over-risk">通常時超過の可能性あり</span>
+                <p>通常ダメージで基準範囲の最大を超える可能性があります。</p>
+                <span class="status status-over">超過中</span>
+                <p>現在値がすでに基準範囲の最大を超えています。</p>
                 <span class="status status-shortage">不足</span>
                 <p>まだ安全に焼ける余地がある状態です。</p>
                 <span class="status status-locked-critical">本会心固定</span>

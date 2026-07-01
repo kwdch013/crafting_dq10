@@ -710,7 +710,7 @@ td input {
   white-space: nowrap;
 }
 
-.status-critical-candidate {
+.status-possible-fake-critical {
   background: #fef3c7;
   color: #92400e;
 }
@@ -720,9 +720,14 @@ td input {
   color: #1e40af;
 }
 
-.status-warning {
+.status-normal-over-risk {
   background: #ffedd5;
   color: #9a3412;
+}
+
+.status-over {
+  background: #fee2e2;
+  color: #991b1b;
 }
 
 .status-shortage {
