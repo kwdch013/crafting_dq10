@@ -26,7 +26,7 @@
     cross: {
       normal: [6, 7, 7, 8, 8, 9, 9],
       strong: [9, 10, 11, 12, 12, 13, 14],
-      half: [5, 5, 6, 6, 6, 7, 7],
+      half: [5, 6, 6, 6, 6, 7, 7],
     },
     corner: {
       normal: [3, 4, 4, 4, 4, 5, 5],
@@ -47,25 +47,25 @@
       label: "光マス",
       ranges: {
         normal: [24, 36],
-        strong: [36, 54],
+        strong: [36, 56],
         half: [18, 27],
       },
     },
   ];
+
+  const specialDistributions = {
+    light: {
+      normal: [24, 26, 28, 30, 32, 34, 36],
+      strong: [36, 39, 42, 45, 48, 51, 56],
+      half: [18, 20, 21, 23, 24, 26, 27],
+    },
+  };
 
   const heatStates = [
     { id: "normal", label: "通常" },
     { id: "strong", label: "強火" },
     { id: "half", label: "半減" },
   ];
-
-  const actions = {
-    basic: { label: "このまま焼く", focusCost: 0, conditionId: null, criticalMultiplier: 2 },
-    weak: { label: "弱火焼き", focusCost: 12, conditionId: "half", criticalMultiplier: 2 },
-    strong: { label: "強火焼き", focusCost: 8, conditionId: "strong", criticalMultiplier: 2 },
-    aim: { label: "ねらい焼き", focusCost: 16, conditionId: null, criticalMultiplier: 2 },
-    critical: { label: "会心焼き", focusCost: 27, conditionId: null, criticalMultiplier: 2 },
-  };
 
   function getRange(positionId, conditionId) {
     return ranges[positionId]?.[conditionId] || null;
@@ -76,15 +76,20 @@
     return specialRange?.ranges?.[conditionId] || null;
   }
 
+  function getSpecialValues(specialId, conditionId) {
+    return specialDistributions[specialId]?.[conditionId] || null;
+  }
+
   global.DQ10CookingDamage = {
     source: "https://xn--10-yg4a1a3kyh.jp/dq10_artisan8.html",
-    actions,
     positions,
     specialRanges,
     heatStates,
     distributions,
+    specialDistributions,
     ranges,
     getRange,
     getSpecialRange,
+    getSpecialValues,
   };
 })(window);

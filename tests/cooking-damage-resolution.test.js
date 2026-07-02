@@ -75,9 +75,12 @@ const engine = require("../app/engine.js");
 	);
 
 	assert.equal(result.normalMin, 36);
-	assert.equal(result.normalMax, 54);
+	assert.equal(result.normalMax, 56);
 	assert.equal(result.criticalMin, 72);
-	assert.equal(result.criticalMax, 108);
+	assert.equal(result.criticalMax, 112);
+	assert.deepEqual(globalThis.DQ10CookingDamage.getSpecialValues("light", "normal"), [24, 26, 28, 30, 32, 34, 36]);
+	assert.deepEqual(globalThis.DQ10CookingDamage.getSpecialValues("light", "strong"), [36, 39, 42, 45, 48, 51, 56]);
+	assert.deepEqual(globalThis.DQ10CookingDamage.getSpecialValues("light", "half"), [18, 20, 21, 23, 24, 26, 27]);
 }
 
 {
@@ -108,4 +111,45 @@ const engine = require("../app/engine.js");
 
 	assert.equal(result.lockJudgement, "possible-fake-critical");
 	assert.equal(result.lockJudgementLabel, "偽会心の可能性あり");
+}
+
+{
+	const result = engine.analyzeIngredientAcrossTechniques(
+		{
+			heat: "strong",
+			traitId: "light",
+			targetMode: "random-in-range",
+			techniques: [
+				{
+					id: "current-heat",
+					name: "現在火力",
+					damageModel: "cooking-fixed",
+					conditionId: null,
+					criticalMultiplier: 2,
+					recommendable: false,
+				},
+				{
+					id: "miracle-grill",
+					name: "ミラクルグリル",
+					specialAction: "miracle-grill",
+					includeInAnalysis: false,
+				},
+			],
+		},
+		{
+			optionId: "center",
+			isGlowing: false,
+			current: 70,
+			target: 125,
+			successMin: 110,
+			successMax: 140,
+		},
+	);
+
+	assert.equal(result.techniqueAnalyses.length, 1);
+	assert.equal(result.techniqueAnalyses[0].technique.id, "current-heat");
+	assert.equal(result.normalMin, 18);
+	assert.equal(result.normalMax, 27);
+	assert.equal(result.criticalMin, 36);
+	assert.equal(result.criticalMax, 54);
 }

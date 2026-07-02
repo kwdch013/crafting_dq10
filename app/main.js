@@ -606,27 +606,29 @@ function renderTechniqueEditor() {
   const config = getCurrentCraftConfig();
   const previewIngredient = getTechniquePreviewIngredient(config);
 
-  state.techniques.forEach((technique) => {
-    const resolvedTechnique = DQ10CraftEngine.resolveTechnique(state, technique, previewIngredient);
-    const card = elements.techniqueTemplate.content.firstElementChild.cloneNode(true);
-    const multiplierRow = card.querySelector(".tech-multiplier")?.closest(".technique-value");
-    card.dataset.id = technique.id;
-    card.querySelector(".technique-title").textContent = technique.name;
-    card.querySelector(".tech-focus").textContent = resolvedTechnique.focusCost;
-    if (config.id === "cooking" && multiplierRow) {
-      multiplierRow.hidden = true;
-    }
-    if (technique.specialAction === "miracle-grill") {
-      card.querySelector(".tech-normal-range").textContent = "理想値";
-      card.querySelector(".tech-critical-range").textContent = "確定";
-      card.querySelector(".tech-multiplier").textContent = "必殺";
-    } else {
-      card.querySelector(".tech-normal-range").textContent = `${resolvedTechnique.normalMin} - ${resolvedTechnique.normalMax}`;
-      card.querySelector(".tech-critical-range").textContent = `${resolvedTechnique.criticalMin} - ${resolvedTechnique.criticalMax}`;
-      card.querySelector(".tech-multiplier").textContent = `${resolvedTechnique.multiplier || 1}倍`;
-    }
-    elements.techniqueEditor.append(card);
-  });
+  state.techniques
+    .filter((technique) => technique.showInTechniqueEditor !== false)
+    .forEach((technique) => {
+      const resolvedTechnique = DQ10CraftEngine.resolveTechnique(state, technique, previewIngredient);
+      const card = elements.techniqueTemplate.content.firstElementChild.cloneNode(true);
+      const multiplierRow = card.querySelector(".tech-multiplier")?.closest(".technique-value");
+      card.dataset.id = technique.id;
+      card.querySelector(".technique-title").textContent = technique.name;
+      card.querySelector(".tech-focus").textContent = resolvedTechnique.focusCost;
+      if (config.id === "cooking" && multiplierRow) {
+        multiplierRow.hidden = true;
+      }
+      if (technique.specialAction === "miracle-grill") {
+        card.querySelector(".tech-normal-range").textContent = "理想値";
+        card.querySelector(".tech-critical-range").textContent = "確定";
+        card.querySelector(".tech-multiplier").textContent = "必殺";
+      } else {
+        card.querySelector(".tech-normal-range").textContent = `${resolvedTechnique.normalMin} - ${resolvedTechnique.normalMax}`;
+        card.querySelector(".tech-critical-range").textContent = `${resolvedTechnique.criticalMin} - ${resolvedTechnique.criticalMax}`;
+        card.querySelector(".tech-multiplier").textContent = `${resolvedTechnique.multiplier || 1}倍`;
+      }
+      elements.techniqueEditor.append(card);
+    });
 }
 
 function renderCraftReference() {
@@ -675,10 +677,11 @@ function renderCookingDamageRanges(cookingDamage) {
   });
   const specialRows = (cookingDamage.specialRanges || []).map((specialRange) => {
     const ranges = ["normal", "strong", "half"].map((conditionId) => {
+      const values = cookingDamage.getSpecialValues?.(specialRange.id, conditionId);
       const range = cookingDamage.getSpecialRange
         ? cookingDamage.getSpecialRange(specialRange.id, conditionId)
         : specialRange.ranges?.[conditionId] || specialRange.range;
-      return `${heatLabels[conditionId]} ${range ? `${range[0]}-${range[1]}` : "-"}`;
+      return `${heatLabels[conditionId]} ${values ? values.join("/") : range ? `${range[0]}-${range[1]}` : "-"}`;
     }).join(" / ");
 
     return `

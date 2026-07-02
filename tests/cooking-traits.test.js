@@ -14,12 +14,6 @@ const context = {
   DQ10CookingDamage: {
     positions: [],
     heatStates: [],
-    actions: {
-      basic: { focusCost: 0, conditionId: "normal", multiplier: 1, criticalMultiplier: 2 },
-      weak: { focusCost: 0, conditionId: "weak", multiplier: 1, criticalMultiplier: 2 },
-      strong: { focusCost: 0, conditionId: "strong", multiplier: 1, criticalMultiplier: 2 },
-      aim: { focusCost: 0, conditionId: "aim", multiplier: 1, criticalMultiplier: 2 },
-    },
   },
 };
 
@@ -38,10 +32,19 @@ assert.equal(registeredConfig.defaultTraitId, "light");
 assert.equal(
   JSON.stringify(registeredConfig.techniques.map((technique) => [technique.id, technique.name, technique.specialAction || ""])),
   JSON.stringify([
-    ["basic", "このまま焼く", ""],
-    ["weak", "弱火焼き", ""],
-    ["strong", "強火焼き", ""],
-    ["aim", "ねらい焼き", ""],
+    ["current-heat", "現在火力", ""],
     ["miracle-grill", "ミラクルグリル", "miracle-grill"],
   ]),
+);
+assert.equal(
+  JSON.stringify(registeredConfig.techniques
+    .filter((technique) => technique.showInTechniqueEditor !== false)
+    .map((technique) => technique.id)),
+  JSON.stringify(["miracle-grill"]),
+);
+assert.equal(
+  JSON.stringify(registeredConfig.techniques
+    .filter((technique) => technique.includeInAnalysis !== false)
+    .map((technique) => technique.id)),
+  JSON.stringify(["current-heat"]),
 );

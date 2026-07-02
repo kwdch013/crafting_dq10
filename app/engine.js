@@ -465,7 +465,8 @@
   }
 
   function analyzeIngredientAcrossTechniques(state, ingredient) {
-    const techniqueAnalyses = state.techniques.map((technique) => {
+    const analysisTechniques = state.techniques.filter((technique) => technique.includeInAnalysis !== false);
+    const techniqueAnalyses = analysisTechniques.map((technique) => {
       const resolvedTechnique = resolveTechnique(state, technique, ingredient);
       return {
         ...analyzeIngredient(ingredient, resolvedTechnique, state.targetMode),
@@ -579,6 +580,7 @@
 
   function recommendTechniques(state, limit = 3) {
     return state.techniques
+      .filter((technique) => technique.recommendable !== false)
       .map((technique) => evaluateTechnique(state, technique))
       .sort((a, b) => b.score - a.score)
       .slice(0, limit);
