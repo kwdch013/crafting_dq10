@@ -678,6 +678,7 @@ td input {
   min-height: 36px;
 }
 
+.target-diff,
 .lower-diff,
 .upper-diff,
 .normal-range,

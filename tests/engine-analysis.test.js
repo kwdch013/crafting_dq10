@@ -51,10 +51,10 @@ const engine = require("../app/engine.js");
 	assert.equal(result.criticalCanHit, true);
 	assert.equal(result.guaranteedCritical, false);
 	assert.equal(result.inTargetRangeUnlocked, false);
-	assert.equal(result.criticalCanEnterTargetRangeBeforeGuarantee, true);
-	assert.equal(result.possibleFakeCritical, true);
-	assert.equal(result.status, "fake-critical-risk");
-	assert.equal(result.statusLabel, "偽会心の可能性あり");
+	assert.equal(result.criticalCanEnterTargetRangeBeforeGuarantee, false);
+	assert.equal(result.possibleFakeCritical, false);
+	assert.equal(result.status, "shortage");
+	assert.equal(result.statusLabel, "不足");
 }
 
 {
@@ -83,6 +83,58 @@ const engine = require("../app/engine.js");
 	assert.equal(result.possibleFakeCritical, false);
 	assert.equal(result.status, "guaranteed");
 	assert.equal(result.statusLabel, "会心時確定");
+}
+
+{
+	const result = engine.analyzeIngredient(
+		{
+			id: "meat",
+			current: 101,
+			target: 125,
+			successMin: 110,
+			successMax: 140,
+		},
+		{
+			id: "current-heat",
+			name: "現在火力",
+			normalMin: 12,
+			normalMax: 18,
+			criticalMin: 24,
+			criticalMax: 36,
+		},
+		"random-in-range",
+	);
+
+	assert.equal(result.targetDiff, 24);
+	assert.equal(result.guaranteedCritical, true);
+	assert.equal(result.criticalCanEnterTargetRangeBeforeGuarantee, false);
+	assert.equal(result.status, "guaranteed");
+}
+
+{
+	const result = engine.analyzeIngredient(
+		{
+			id: "meat",
+			current: 118,
+			target: 125,
+			successMin: 110,
+			successMax: 140,
+		},
+		{
+			id: "current-heat",
+			name: "現在火力",
+			normalMin: 3,
+			normalMax: 8,
+			criticalMin: 6,
+			criticalMax: 16,
+		},
+		"random-in-range",
+	);
+
+	assert.equal(result.targetDiff, 7);
+	assert.equal(result.normalOver, true);
+	assert.equal(result.status, "normal-over-risk");
+	assert.equal(result.statusLabel, "通常時超過の可能性あり");
 }
 
 {
@@ -176,10 +228,10 @@ const engine = require("../app/engine.js");
 	);
 
 	assert.equal(shortage.status, "shortage");
-	assert.equal(fakeMin.criticalCanEnterTargetRangeBeforeGuarantee, true);
-	assert.equal(fakeMin.status, "fake-critical-risk");
-	assert.equal(fakeMax.criticalCanEnterTargetRangeBeforeGuarantee, true);
-	assert.equal(fakeMax.status, "fake-critical-risk");
+	assert.equal(fakeMin.criticalCanEnterTargetRangeBeforeGuarantee, false);
+	assert.equal(fakeMin.status, "shortage");
+	assert.equal(fakeMax.criticalCanEnterTargetRangeBeforeGuarantee, false);
+	assert.equal(fakeMax.status, "guaranteed");
 	assert.equal(guaranteedMin.criticalCanEnterTargetRangeBeforeGuarantee, false);
 	assert.equal(guaranteedMin.status, "guaranteed");
 	assert.equal(guaranteedMax.inTargetRangeUnlocked, true);
@@ -209,8 +261,8 @@ const engine = require("../app/engine.js");
 
 	assert.equal(result.inTargetRangeUnlocked, true);
 	assert.equal(result.guaranteedCritical, false);
-	assert.equal(result.possibleFakeCritical, true);
-	assert.equal(result.status, "fake-critical-risk");
+	assert.equal(result.possibleFakeCritical, false);
+	assert.equal(result.status, "shortage");
 }
 
 {

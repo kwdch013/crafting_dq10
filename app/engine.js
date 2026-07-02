@@ -325,6 +325,7 @@
     const target = targetMode === "random-in-range"
       ? resolveIngredientTarget(ingredient)
       : toNumber(ingredient.target, Math.round((successMin + successMax) / 2));
+    const targetDiff = target - current;
 
     if (ingredient.locked === true) {
       const inSuccessRange = current >= successMin && current <= successMax;
@@ -343,6 +344,7 @@
         target,
         successMin,
         successMax,
+        targetDiff,
         lowerDiff: successMin - current,
         upperDiff: successMax - current,
         normalMin: 0,
@@ -384,39 +386,50 @@
       current,
       criticalMin,
       criticalMax,
-      targetMode === "random-in-range" ? successMin : target,
-      targetMode === "random-in-range" ? successMax : target,
+      target,
+      target,
       targetMode,
     );
 
     const lowerDiff = successMin - current;
     const upperDiff = successMax - current;
+    const useTargetGapCriteria = targetMode === "random-in-range";
+    const canReachTarget = current <= target;
+    const criticalCanReachTarget = canReachTarget && criticalMax >= targetDiff;
+    const criticalAlwaysReachesTarget = canReachTarget && criticalMin >= targetDiff;
     const normalHits =
       normalAfterMin >= successMin && normalAfterMax <= successMax;
     const normalCanHit =
       normalAfterMax >= successMin && normalAfterMin <= successMax;
-    const guaranteedCritical = targetMode === "random-in-range"
-      ? current <= successMin && rawCriticalAfterMin >= successMax
+    const guaranteedCritical = useTargetGapCriteria
+      ? criticalAlwaysReachesTarget
       : criticalAfterMin >= successMin && criticalAfterMax <= successMax;
     const criticalCanHit =
       criticalAfterMax >= successMin && criticalAfterMin <= successMax;
-    const partialTargetOver = targetMode === "random-in-range" && current > successMin && current <= successMax;
-    const criticalOver = criticalAfterMax > successMax || partialTargetOver;
+    const criticalOver = useTargetGapCriteria
+      ? current > target
+      : criticalAfterMax > successMax;
     const currentOver = current > successMax;
-    const normalOver = normalAfterMax > successMax;
+    const normalOver = useTargetGapCriteria
+      ? current > target || normalMax > targetDiff
+      : normalAfterMax > successMax;
     const inTargetRangeUnlocked = current >= successMin && current <= successMax;
-    const possibleFakeRangeMax = targetMode === "random-in-range"
-      ? successMax
+    const possibleFakeRangeMax = useTargetGapCriteria
+      ? target
       : Math.min(successMax, target - 1);
     const criticalCanEnterTargetRangeBeforeGuarantee =
       !currentOver &&
       !guaranteedCritical &&
-      possibleFakeRangeMax >= successMin &&
-      rangesOverlap(rawCriticalAfterMin, rawCriticalAfterMax, successMin, possibleFakeRangeMax);
+      (useTargetGapCriteria
+        ? criticalCanReachTarget
+        : possibleFakeRangeMax >= successMin &&
+          rangesOverlap(rawCriticalAfterMin, rawCriticalAfterMax, successMin, possibleFakeRangeMax));
     const possibleFakeCritical =
       !currentOver &&
       !guaranteedCritical &&
-      (inTargetRangeUnlocked || criticalCanEnterTargetRangeBeforeGuarantee);
+      (useTargetGapCriteria
+        ? criticalCanEnterTargetRangeBeforeGuarantee
+        : inTargetRangeUnlocked || criticalCanEnterTargetRangeBeforeGuarantee);
 
     let status = "shortage";
     if (currentOver) {
@@ -435,6 +448,7 @@
       target,
       successMin,
       successMax,
+      targetDiff,
       lowerDiff,
       upperDiff,
       normalMin,

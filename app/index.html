@@ -184,6 +184,7 @@
                     <th id="targetHeader">基準値</th>
                     <th id="successMinHeader">成功下限</th>
                     <th id="successMaxHeader">成功上限</th>
+                    <th>基準まで</th>
                     <th>下限まで</th>
                     <th>上限まで</th>
                     <th>通常後（全倍率）</th>
@@ -217,11 +218,11 @@
               </div>
               <div class="legend-grid">
                 <span class="status status-guaranteed">会心時確定</span>
-                <p>現在値が基準範囲の最小以下で、会心最小値でも基準範囲の最大に届きます。</p>
+                <p>現在火力と位置別ダメージの会心最小値でも、現在値から基準値までの差分に届きます。</p>
                 <span class="status status-fake-critical-risk">偽会心の可能性あり</span>
-                <p>基準範囲内未固定、会心後に基準範囲へ入る状態、または固定時の増加量が通常ダメージ候補の2倍と一致する状態です。</p>
+                <p>会心最大値なら基準値へ届きますが、会心最小値では届かない状態、または固定時の増加量が通常ダメージ候補の2倍と一致する状態です。</p>
                 <span class="status status-normal-over-risk">通常時超過の可能性あり</span>
-                <p>通常ダメージで基準範囲の最大を超える可能性があります。</p>
+                <p>現在火力と位置別ダメージの通常最大値が、現在値から基準値までの差分を超える可能性があります。</p>
                 <span class="status status-over">超過中</span>
                 <p>現在値がすでに基準範囲の最大を超えています。</p>
                 <span class="status status-shortage">不足</span>
@@ -244,6 +245,7 @@
         <td><input class="ingredient-target numeric" type="number" /></td>
         <td><input class="ingredient-min numeric" type="number" /></td>
         <td><input class="ingredient-max numeric" type="number" /></td>
+        <td class="target-diff"></td>
         <td class="lower-diff"></td>
         <td class="upper-diff"></td>
         <td class="normal-range"></td>
