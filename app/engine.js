@@ -6,6 +6,7 @@
     "normal-over-risk": "通常時超過の可能性あり",
     over: "超過中",
     "fake-critical-risk": "偽会心の可能性あり",
+    "in-range": "基準内",
     shortage: "不足",
   };
   const statusRanks = {
@@ -15,6 +16,7 @@
     guaranteed: 4,
     "normal-over-risk": 3,
     "fake-critical-risk": 2,
+    "in-range": 1.5,
     shortage: 1,
   };
 
@@ -329,14 +331,9 @@
 
     if (ingredient.locked === true) {
       const inSuccessRange = current >= successMin && current <= successMax;
-      const fakeCriticalLocked =
-        ingredient.lockJudgement === "possible-fake-critical" ||
-        ingredient.lockJudgement === "fake-critical-risk";
-      const lockedStatus = fakeCriticalLocked
-        ? "fake-critical-risk"
-        : ingredient.lockJudgement === "true-critical"
-          ? "locked-critical"
-          : "locked";
+      const lockedStatus = ingredient.lockJudgement === "true-critical"
+        ? "locked-critical"
+        : "locked";
 
       return {
         ...ingredient,
@@ -360,11 +357,11 @@
         criticalStopApplies: true,
         normalHits: inSuccessRange,
         normalCanHit: inSuccessRange,
-        guaranteedCritical: inSuccessRange,
+        guaranteedCritical: false,
         criticalCanHit: inSuccessRange,
         inTargetRangeUnlocked: false,
         criticalCanEnterTargetRangeBeforeGuarantee: false,
-        possibleFakeCritical: fakeCriticalLocked,
+        possibleFakeCritical: false,
         normalOver: false,
         criticalOver: current > successMax,
         currentOver: current > successMax,
@@ -386,58 +383,55 @@
       current,
       criticalMin,
       criticalMax,
-      target,
-      target,
+      targetMode === "random-in-range" ? successMin : target,
+      targetMode === "random-in-range" ? successMax : target,
       targetMode,
     );
 
     const lowerDiff = successMin - current;
     const upperDiff = successMax - current;
-    const useTargetGapCriteria = targetMode === "random-in-range";
-    const canReachTarget = current <= target;
-    const criticalCanReachTarget = canReachTarget && criticalMax >= targetDiff;
-    const criticalAlwaysReachesTarget = canReachTarget && criticalMin >= targetDiff;
+    const criticalCanReachTarget = current < successMin && current + criticalMax >= successMin;
     const normalHits =
       normalAfterMin >= successMin && normalAfterMax <= successMax;
     const normalCanHit =
       normalAfterMax >= successMin && normalAfterMin <= successMax;
-    const guaranteedCritical = useTargetGapCriteria
-      ? criticalAlwaysReachesTarget
-      : criticalAfterMin >= successMin && criticalAfterMax <= successMax;
+    const currentOver = current > successMax;
+    const shortage = !currentOver && current + criticalMax < successMin;
+    const normalOver = !currentOver && !shortage && normalAfterMax > successMax;
+    const guaranteedCritical =
+      !currentOver &&
+      !shortage &&
+      !normalOver &&
+      current < successMin &&
+      current + criticalMin >= successMin;
     const criticalCanHit =
       criticalAfterMax >= successMin && criticalAfterMin <= successMax;
-    const criticalOver = useTargetGapCriteria
-      ? current > target
-      : criticalAfterMax > successMax;
-    const currentOver = current > successMax;
-    const normalOver = useTargetGapCriteria
-      ? current > target || normalMax > targetDiff
-      : normalAfterMax > successMax;
+    const criticalOver = currentOver;
     const inTargetRangeUnlocked = current >= successMin && current <= successMax;
-    const possibleFakeRangeMax = useTargetGapCriteria
-      ? target
-      : Math.min(successMax, target - 1);
     const criticalCanEnterTargetRangeBeforeGuarantee =
       !currentOver &&
+      !shortage &&
+      !normalOver &&
       !guaranteedCritical &&
-      (useTargetGapCriteria
-        ? criticalCanReachTarget
-        : possibleFakeRangeMax >= successMin &&
-          rangesOverlap(rawCriticalAfterMin, rawCriticalAfterMax, successMin, possibleFakeRangeMax));
+      current < successMin &&
+      current + criticalMin < successMin &&
+      criticalCanReachTarget;
     const possibleFakeCritical =
       !currentOver &&
+      !shortage &&
+      !normalOver &&
       !guaranteedCritical &&
-      (useTargetGapCriteria
-        ? criticalCanEnterTargetRangeBeforeGuarantee
-        : inTargetRangeUnlocked || criticalCanEnterTargetRangeBeforeGuarantee);
+      criticalCanEnterTargetRangeBeforeGuarantee;
 
-    let status = "shortage";
+    let status = "in-range";
     if (currentOver) {
       status = "over";
-    } else if (guaranteedCritical) {
-      status = "guaranteed";
+    } else if (shortage) {
+      status = "shortage";
     } else if (normalOver) {
       status = "normal-over-risk";
+    } else if (guaranteedCritical) {
+      status = "guaranteed";
     } else if (possibleFakeCritical) {
       status = "fake-critical-risk";
     }

@@ -218,15 +218,19 @@
               </div>
               <div class="legend-grid">
                 <span class="status status-guaranteed">会心時確定</span>
-                <p>現在火力と位置別ダメージの会心最小値でも、現在値から基準値までの差分に届きます。</p>
+                <p>現在値が基準下限未満で、会心最小値でも基準下限に届きます。</p>
                 <span class="status status-fake-critical-risk">偽会心の可能性あり</span>
-                <p>会心最大値なら基準値へ届きますが、会心最小値では届かない状態、または固定時の増加量が通常ダメージ候補の2倍と一致する状態です。</p>
+                <p>会心最大値なら基準下限へ届きますが、会心最小値では届かない状態です。</p>
                 <span class="status status-normal-over-risk">通常時超過の可能性あり</span>
-                <p>現在火力と位置別ダメージの通常最大値が、現在値から基準値までの差分を超える可能性があります。</p>
+                <p>通常最大値を加えると基準上限を超える可能性があります。</p>
                 <span class="status status-over">超過中</span>
                 <p>現在値がすでに基準範囲の最大を超えています。</p>
                 <span class="status status-shortage">不足</span>
-                <p>まだ安全に焼ける余地がある状態です。</p>
+                <p>会心最大値でも基準下限に届かない状態です。</p>
+                <span class="status status-in-range">基準内</span>
+                <p>現在値が基準範囲内で、通常最大値でも基準上限を超えない状態です。</p>
+                <span class="status status-locked">固定</span>
+                <p>固定済みのため、通常時も会心時も数値が変動しない状態です。</p>
                 <span class="status status-locked-critical">本会心固定</span>
                 <p>固定時の増加量が通常ダメージ候補の2倍では表せない状態です。</p>
               </div>
