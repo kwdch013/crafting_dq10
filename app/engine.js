@@ -2,21 +2,19 @@
   const statusLabels = {
     locked: "固定",
     "locked-critical": "本会心固定",
-    "locked-fake": "偽会心の可能性あり",
     guaranteed: "会心時確定",
     "normal-over-risk": "通常時超過の可能性あり",
     over: "超過中",
-    "possible-fake-critical": "偽会心の可能性あり",
+    "fake-critical-risk": "偽会心の可能性あり",
     shortage: "不足",
   };
   const statusRanks = {
     "locked-critical": 7,
-    "locked-fake": 6,
     locked: 6,
     over: 5,
     guaranteed: 4,
     "normal-over-risk": 3,
-    "possible-fake-critical": 2,
+    "fake-critical-risk": 2,
     shortage: 1,
   };
 
@@ -285,8 +283,11 @@
 
     if (ingredient.locked === true) {
       const inSuccessRange = current >= successMin && current <= successMax;
-      const lockedStatus = ingredient.lockJudgement === "possible-fake-critical"
-        ? "locked-fake"
+      const fakeCriticalLocked =
+        ingredient.lockJudgement === "possible-fake-critical" ||
+        ingredient.lockJudgement === "fake-critical-risk";
+      const lockedStatus = fakeCriticalLocked
+        ? "fake-critical-risk"
         : ingredient.lockJudgement === "true-critical"
           ? "locked-critical"
           : "locked";
@@ -316,7 +317,7 @@
         criticalCanHit: inSuccessRange,
         inTargetRangeUnlocked: false,
         criticalCanEnterTargetRangeBeforeGuarantee: false,
-        possibleFakeCritical: ingredient.lockJudgement === "possible-fake-critical",
+        possibleFakeCritical: fakeCriticalLocked,
         normalOver: false,
         criticalOver: current > successMax,
         currentOver: current > successMax,
@@ -380,7 +381,7 @@
     } else if (normalOver) {
       status = "normal-over-risk";
     } else if (possibleFakeCritical) {
-      status = "possible-fake-critical";
+      status = "fake-critical-risk";
     }
 
     return {
@@ -505,7 +506,7 @@
     const reasonParts = [];
     const guaranteed = analysis.filter((item) => item.guaranteedCritical).length;
     const warnings = analysis.filter((item) => item.status === "normal-over-risk").length;
-    const fakeCritical = analysis.filter((item) => item.status === "possible-fake-critical").length;
+    const fakeCritical = analysis.filter((item) => item.status === "fake-critical-risk").length;
 
     if (!affordable) {
       reasonParts.push("集中力不足");
