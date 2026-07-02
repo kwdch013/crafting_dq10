@@ -609,9 +609,13 @@ function renderTechniqueEditor() {
   state.techniques.forEach((technique) => {
     const resolvedTechnique = DQ10CraftEngine.resolveTechnique(state, technique, previewIngredient);
     const card = elements.techniqueTemplate.content.firstElementChild.cloneNode(true);
+    const multiplierRow = card.querySelector(".tech-multiplier")?.closest(".technique-value");
     card.dataset.id = technique.id;
     card.querySelector(".technique-title").textContent = technique.name;
     card.querySelector(".tech-focus").textContent = resolvedTechnique.focusCost;
+    if (config.id === "cooking" && multiplierRow) {
+      multiplierRow.hidden = true;
+    }
     if (technique.specialAction === "miracle-grill") {
       card.querySelector(".tech-normal-range").textContent = "理想値";
       card.querySelector(".tech-critical-range").textContent = "確定";
@@ -666,7 +670,6 @@ function renderCookingDamageRanges(cookingDamage) {
       <div class="reference-row">
         <strong>${escapeHtml(position.label)}</strong>
         <span class="numeric">${escapeHtml(ranges)}</span>
-        <small>${escapeHtml(getDefaultHeatLabel(position.id))}</small>
       </div>
     `;
   });
@@ -682,22 +685,12 @@ function renderCookingDamageRanges(cookingDamage) {
       <div class="reference-row">
         <strong>${escapeHtml(specialRange.label)}</strong>
         <span class="numeric">${escapeHtml(ranges)}</span>
-        <small>通常の光マス基準幅に火力補正をかけたダメージ幅</small>
+        <small>光マスの火力別ダメージ幅</small>
       </div>
     `;
   });
 
   elements.cookingDamageRanges.innerHTML = [...positionRows, ...specialRows].join("");
-}
-
-function getDefaultHeatLabel(positionId) {
-  const labels = {
-    center: "デフォルト火力: 強",
-    cross: "デフォルト火力: 中",
-    corner: "デフォルト火力: 弱",
-  };
-
-  return labels[positionId] || "";
 }
 
 function getTechniquePreviewIngredient(config) {

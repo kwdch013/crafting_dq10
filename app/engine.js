@@ -35,6 +35,59 @@
     return maxA >= minB && minA <= maxB;
   }
 
+  function expandIntegerRange(range) {
+    if (!Array.isArray(range)) {
+      return [];
+    }
+
+    const [min, max] = normalizeRange(range[0], range[1]);
+    return Array.from({ length: max - min + 1 }, (_, index) => min + index);
+  }
+
+  function isCookingLightActive(state = {}, ingredient = {}) {
+    if (state.traitId === "light") {
+      return ingredient.isGlowing === true;
+    }
+
+    return state.traitId === "light-return" &&
+      state.cookingEffectMode === "cross-glow" &&
+      ingredient.optionId === "cross";
+  }
+
+  function resolveCookingDamageSource(state = {}, ingredient = {}, conditionId = "normal") {
+    const cookingDamage = global.DQ10CookingDamage;
+
+    if (!cookingDamage) {
+      return null;
+    }
+
+    if (isCookingLightActive(state, ingredient)) {
+      const range = cookingDamage.getSpecialRange?.("light", conditionId);
+      return range
+        ? {
+          range,
+          values: cookingDamage.getSpecialValues?.("light", conditionId) || expandIntegerRange(range),
+          sourceId: "light",
+        }
+        : null;
+    }
+
+    const positionId = ingredient?.optionId || "center";
+    const distribution = cookingDamage.distributions?.[positionId]?.[conditionId];
+    const range = cookingDamage.getRange?.(positionId, conditionId) ||
+      (Array.isArray(distribution) && distribution.length > 0
+        ? normalizeRange(Math.min(...distribution), Math.max(...distribution))
+        : null);
+
+    return range
+      ? {
+        range,
+        values: distribution || expandIntegerRange(range),
+        sourceId: positionId,
+      }
+      : null;
+  }
+
   function resolveCriticalResult(current, criticalMin, criticalMax, targetMin, targetMax, targetMode) {
     const rawCriticalAfterMin = current + criticalMin;
     const rawCriticalAfterMax = current + criticalMax;
@@ -99,10 +152,9 @@
     }
 
     if (technique.damageModel === "cooking-fixed") {
-      const cookingDamage = global.DQ10CookingDamage;
-      const positionId = ingredient?.optionId || "center";
       const conditionId = technique.conditionId || state.heat || "normal";
-      const range = cookingDamage?.getRange(positionId, conditionId);
+      const damageSource = resolveCookingDamageSource(state, ingredient, conditionId);
+      const range = damageSource?.range;
 
       if (!range) {
         return technique;
@@ -194,16 +246,9 @@
   }
 
   function getCookingCriticalDamageValues(ingredient, state = {}) {
-    const cookingDamage = global.DQ10CookingDamage;
-    const positionId = ingredient?.optionId || "center";
     const conditionId = state.heat || "normal";
-    const distribution = cookingDamage?.distributions?.[positionId]?.[conditionId];
-    const range = cookingDamage?.getRange?.(positionId, conditionId);
-    const values = Array.isArray(distribution)
-      ? distribution
-      : Array.isArray(range)
-        ? range
-        : [];
+    const damageSource = resolveCookingDamageSource(state, ingredient, conditionId);
+    const values = damageSource?.values || [];
 
     return values.map((value) => Math.ceil(toNumber(value) * 2));
   }

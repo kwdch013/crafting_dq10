@@ -60,11 +60,11 @@
   ];
 
   const actions = {
-    basic: { label: "このまま焼く", focusCost: 0, conditionId: null, multiplier: 1, criticalMultiplier: 2 },
-    weak: { label: "弱火焼き", focusCost: 12, conditionId: "half", multiplier: 0.5, criticalMultiplier: 2 },
-    strong: { label: "強火焼き", focusCost: 8, conditionId: "strong", multiplier: 1.5, criticalMultiplier: 2 },
-    aim: { label: "ねらい焼き", focusCost: 16, conditionId: null, multiplier: 1, criticalMultiplier: 2 },
-    critical: { label: "会心焼き", focusCost: 27, conditionId: null, multiplier: 1, criticalMultiplier: 2 },
+    basic: { label: "このまま焼く", focusCost: 0, conditionId: null, criticalMultiplier: 2 },
+    weak: { label: "弱火焼き", focusCost: 12, conditionId: "half", criticalMultiplier: 2 },
+    strong: { label: "強火焼き", focusCost: 8, conditionId: "strong", criticalMultiplier: 2 },
+    aim: { label: "ねらい焼き", focusCost: 16, conditionId: null, criticalMultiplier: 2 },
+    critical: { label: "会心焼き", focusCost: 27, conditionId: null, criticalMultiplier: 2 },
   };
 
   function getRange(positionId, conditionId) {
