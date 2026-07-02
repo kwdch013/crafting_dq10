@@ -49,12 +49,12 @@ const engine = require("../app/engine.js");
 	);
 
 	assert.equal(result.criticalCanHit, true);
-	assert.equal(result.guaranteedCritical, false);
+	assert.equal(result.guaranteedCritical, true);
 	assert.equal(result.inTargetRangeUnlocked, false);
 	assert.equal(result.criticalCanEnterTargetRangeBeforeGuarantee, false);
 	assert.equal(result.possibleFakeCritical, false);
-	assert.equal(result.status, "shortage");
-	assert.equal(result.statusLabel, "不足");
+	assert.equal(result.status, "guaranteed");
+	assert.equal(result.statusLabel, "会心時確定");
 }
 
 {
@@ -132,9 +132,9 @@ const engine = require("../app/engine.js");
 	);
 
 	assert.equal(result.targetDiff, 7);
-	assert.equal(result.normalOver, true);
-	assert.equal(result.status, "normal-over-risk");
-	assert.equal(result.statusLabel, "通常時超過の可能性あり");
+	assert.equal(result.normalOver, false);
+	assert.equal(result.status, "in-range");
+	assert.equal(result.statusLabel, "基準内");
 }
 
 {
@@ -228,15 +228,15 @@ const engine = require("../app/engine.js");
 	);
 
 	assert.equal(shortage.status, "shortage");
-	assert.equal(fakeMin.criticalCanEnterTargetRangeBeforeGuarantee, false);
-	assert.equal(fakeMin.status, "shortage");
+	assert.equal(fakeMin.criticalCanEnterTargetRangeBeforeGuarantee, true);
+	assert.equal(fakeMin.status, "fake-critical-risk");
 	assert.equal(fakeMax.criticalCanEnterTargetRangeBeforeGuarantee, false);
 	assert.equal(fakeMax.status, "guaranteed");
 	assert.equal(guaranteedMin.criticalCanEnterTargetRangeBeforeGuarantee, false);
 	assert.equal(guaranteedMin.status, "guaranteed");
 	assert.equal(guaranteedMax.inTargetRangeUnlocked, true);
 	assert.equal(guaranteedMax.criticalCanEnterTargetRangeBeforeGuarantee, false);
-	assert.equal(guaranteedMax.status, "guaranteed");
+	assert.equal(guaranteedMax.status, "normal-over-risk");
 }
 
 {
@@ -262,7 +262,89 @@ const engine = require("../app/engine.js");
 	assert.equal(result.inTargetRangeUnlocked, true);
 	assert.equal(result.guaranteedCritical, false);
 	assert.equal(result.possibleFakeCritical, false);
-	assert.equal(result.status, "shortage");
+	assert.equal(result.status, "in-range");
+	assert.equal(result.statusLabel, "基準内");
+}
+
+{
+	const technique = {
+		id: "priority-rule",
+		name: "優先順位確認",
+		normalMin: 6,
+		normalMax: 8,
+		criticalMin: 12,
+		criticalMax: 16,
+	};
+	const baseIngredient = {
+		id: "meat",
+		target: 115,
+		successMin: 100,
+		successMax: 130,
+	};
+
+	const over = engine.analyzeIngredient(
+		{ ...baseIngredient, current: 131 },
+		technique,
+		"random-in-range",
+	);
+	const shortage = engine.analyzeIngredient(
+		{ ...baseIngredient, current: 83 },
+		technique,
+		"random-in-range",
+	);
+	const normalOverRisk = engine.analyzeIngredient(
+		{ ...baseIngredient, current: 125 },
+		technique,
+		"random-in-range",
+	);
+	const guaranteed = engine.analyzeIngredient(
+		{ ...baseIngredient, current: 88 },
+		technique,
+		"random-in-range",
+	);
+	const fakeByCriticalRange = engine.analyzeIngredient(
+		{ ...baseIngredient, current: 85 },
+		technique,
+		"random-in-range",
+	);
+	const lowerBoundary = engine.analyzeIngredient(
+		{ ...baseIngredient, current: 100 },
+		technique,
+		"random-in-range",
+	);
+	const upperBoundary = engine.analyzeIngredient(
+		{ ...baseIngredient, current: 130 },
+		{ ...technique, normalMin: 0, normalMax: 0, criticalMin: 0, criticalMax: 0 },
+		"random-in-range",
+	);
+	const shortageBoundary = engine.analyzeIngredient(
+		{ ...baseIngredient, current: 84 },
+		technique,
+		"random-in-range",
+	);
+	const normalOverBoundary = engine.analyzeIngredient(
+		{ ...baseIngredient, current: 122 },
+		technique,
+		"random-in-range",
+	);
+	const locked = engine.analyzeIngredient(
+		{ ...baseIngredient, current: 100, locked: true },
+		technique,
+		"random-in-range",
+	);
+
+	assert.equal(over.status, "over");
+	assert.equal(shortage.status, "shortage");
+	assert.equal(normalOverRisk.status, "normal-over-risk");
+	assert.equal(guaranteed.status, "guaranteed");
+	assert.equal(fakeByCriticalRange.status, "fake-critical-risk");
+	assert.equal(lowerBoundary.status, "in-range");
+	assert.equal(upperBoundary.status, "in-range");
+	assert.equal(shortageBoundary.status, "fake-critical-risk");
+	assert.equal(normalOverBoundary.status, "in-range");
+	assert.equal(locked.status, "locked");
+	assert.equal(locked.normalAfterMin, 100);
+	assert.equal(locked.criticalAfterMax, 100);
 }
 
 {
@@ -286,8 +368,8 @@ const engine = require("../app/engine.js");
 		},
 	);
 
-	assert.equal(result.status, "fake-critical-risk");
-	assert.equal(result.statusLabel, "偽会心の可能性あり");
+	assert.equal(result.status, "locked");
+	assert.equal(result.statusLabel, "固定");
 }
 
 {
@@ -298,6 +380,7 @@ const engine = require("../app/engine.js");
 	assert.deepEqual(Object.keys(engine.statusLabels).sort(), [
 		"fake-critical-risk",
 		"guaranteed",
+		"in-range",
 		"locked",
 		"locked-critical",
 		"normal-over-risk",

@@ -717,7 +717,7 @@ function renderIngredients() {
     bindIngredientNumber(targetInput, ingredient.id, "target", ingredient.target);
     targetInput.readOnly = state.targetMode === "random-in-range";
     targetInput.title = state.targetMode === "random-in-range"
-      ? "現在値から基準値までの差分と、現在火力・位置別ダメージ範囲を判定に使います。"
+      ? "基準下限と基準上限、現在火力・位置別ダメージ範囲を判定に使います。"
       : "";
     bindIngredientNumber(row.querySelector(".ingredient-min"), ingredient.id, "successMin", ingredient.successMin);
     bindIngredientNumber(row.querySelector(".ingredient-max"), ingredient.id, "successMax", ingredient.successMax);
