@@ -576,7 +576,7 @@ function renderCraftLabels() {
   elements.layoutSectionTitle.textContent = config.layout?.label || `${config.label}配置`;
   elements.itemNameHeader.textContent = config.itemNameLabel;
   elements.itemOptionHeader.textContent = config.itemOptionLabel || "種別";
-  elements.targetHeader.textContent = config.targetMode === "random-in-range" ? "代表値" : "基準値";
+  elements.targetHeader.textContent = "基準値";
   elements.successMinHeader.textContent = config.targetMode === "random-in-range" ? "基準下限" : "成功下限";
   elements.successMaxHeader.textContent = config.targetMode === "random-in-range" ? "基準上限" : "成功上限";
   elements.addIngredientButton.textContent = config.addItemLabel;
@@ -717,11 +717,12 @@ function renderIngredients() {
     bindIngredientNumber(targetInput, ingredient.id, "target", ingredient.target);
     targetInput.readOnly = state.targetMode === "random-in-range";
     targetInput.title = state.targetMode === "random-in-range"
-      ? "ランダム基準幅の代表値です。判定には基準下限と基準上限を使います。"
+      ? "現在値から基準値までの差分と、現在火力・位置別ダメージ範囲を判定に使います。"
       : "";
     bindIngredientNumber(row.querySelector(".ingredient-min"), ingredient.id, "successMin", ingredient.successMin);
     bindIngredientNumber(row.querySelector(".ingredient-max"), ingredient.id, "successMax", ingredient.successMax);
 
+    row.querySelector(".target-diff").textContent = formatSigned(ingredient.targetDiff);
     row.querySelector(".lower-diff").textContent = formatSigned(ingredient.lowerDiff);
     row.querySelector(".upper-diff").textContent = formatSigned(ingredient.upperDiff);
     row.querySelector(".normal-range").innerHTML = formatTechniqueResults(ingredient.techniqueAnalyses, "normal");
@@ -1584,6 +1585,7 @@ function refreshIngredientRow(id) {
   const analysis = DQ10CraftEngine.analyzeIngredientAcrossTechniques(state, ingredient);
   row.querySelector(".ingredient-current").value = ingredient.current;
   row.querySelector(".ingredient-glowing").checked = ingredient.isGlowing === true;
+  row.querySelector(".target-diff").textContent = formatSigned(analysis.targetDiff);
   row.querySelector(".lower-diff").textContent = formatSigned(analysis.lowerDiff);
   row.querySelector(".upper-diff").textContent = formatSigned(analysis.upperDiff);
   row.querySelector(".normal-range").innerHTML = formatTechniqueResults(analysis.techniqueAnalyses, "normal");
