@@ -710,7 +710,7 @@ td input {
   white-space: nowrap;
 }
 
-.status-possible-fake-critical {
+.status-fake-critical-risk {
   background: #fef3c7;
   color: #92400e;
 }
@@ -743,11 +743,6 @@ td input {
 .status-locked-critical {
   background: #d1fae5;
   color: #065f46;
-}
-
-.status-locked-fake {
-  background: #fef3c7;
-  color: #92400e;
 }
 
 .split-panel {

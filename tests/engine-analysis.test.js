@@ -23,7 +23,7 @@ const engine = require("../app/engine.js");
 	assert.equal(result.criticalCanHit, true);
 	assert.equal(result.inTargetRangeUnlocked, false);
 	assert.equal(result.criticalCanEnterTargetRangeBeforeGuarantee, true);
-	assert.equal(result.status, "possible-fake-critical");
+	assert.equal(result.status, "fake-critical-risk");
 	assert.equal(result.statusLabel, "偽会心の可能性あり");
 	assert.equal(result.possibleFakeCritical, true);
 }
@@ -53,7 +53,7 @@ const engine = require("../app/engine.js");
 	assert.equal(result.inTargetRangeUnlocked, false);
 	assert.equal(result.criticalCanEnterTargetRangeBeforeGuarantee, true);
 	assert.equal(result.possibleFakeCritical, true);
-	assert.equal(result.status, "possible-fake-critical");
+	assert.equal(result.status, "fake-critical-risk");
 	assert.equal(result.statusLabel, "偽会心の可能性あり");
 }
 
@@ -177,9 +177,9 @@ const engine = require("../app/engine.js");
 
 	assert.equal(shortage.status, "shortage");
 	assert.equal(fakeMin.criticalCanEnterTargetRangeBeforeGuarantee, true);
-	assert.equal(fakeMin.status, "possible-fake-critical");
+	assert.equal(fakeMin.status, "fake-critical-risk");
 	assert.equal(fakeMax.criticalCanEnterTargetRangeBeforeGuarantee, true);
-	assert.equal(fakeMax.status, "possible-fake-critical");
+	assert.equal(fakeMax.status, "fake-critical-risk");
 	assert.equal(guaranteedMin.criticalCanEnterTargetRangeBeforeGuarantee, false);
 	assert.equal(guaranteedMin.status, "guaranteed");
 	assert.equal(guaranteedMax.inTargetRangeUnlocked, true);
@@ -210,7 +210,7 @@ const engine = require("../app/engine.js");
 	assert.equal(result.inTargetRangeUnlocked, true);
 	assert.equal(result.guaranteedCritical, false);
 	assert.equal(result.possibleFakeCritical, true);
-	assert.equal(result.status, "possible-fake-critical");
+	assert.equal(result.status, "fake-critical-risk");
 }
 
 {
@@ -234,6 +234,23 @@ const engine = require("../app/engine.js");
 		},
 	);
 
-	assert.equal(result.status, "locked-fake");
+	assert.equal(result.status, "fake-critical-risk");
 	assert.equal(result.statusLabel, "偽会心の可能性あり");
+}
+
+{
+	const fakeCriticalLabels = Object.values(engine.statusLabels).filter(
+		(label) => label === "偽会心の可能性あり",
+	);
+
+	assert.deepEqual(Object.keys(engine.statusLabels).sort(), [
+		"fake-critical-risk",
+		"guaranteed",
+		"locked",
+		"locked-critical",
+		"normal-over-risk",
+		"over",
+		"shortage",
+	]);
+	assert.equal(fakeCriticalLabels.length, 1);
 }
