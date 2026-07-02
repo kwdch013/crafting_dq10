@@ -14,6 +14,7 @@
 			current,
 			isGlowing: inputValue.isGlowing === true,
 			cookingEffectMode: inputValue.cookingEffectMode || "none",
+			locked: inputValue.locked === true,
 		};
 	}
 

@@ -46,9 +46,20 @@ const editor = require("../app/board-cell-editor.js");
 {
 	const result = editor.normalizeEditValue(
 		{ current: 12 },
-		{ current: "", isGlowing: undefined },
+		{ current: "", isGlowing: undefined, locked: true },
 	);
 
 	assert.equal(result.current, 12);
 	assert.equal(result.isGlowing, false);
+	assert.equal(result.locked, true);
+}
+
+{
+	const result = editor.normalizeEditValue(
+		{ current: 12, locked: true },
+		{ current: "12", locked: false },
+	);
+
+	assert.equal(result.current, 12);
+	assert.equal(result.locked, false);
 }

@@ -1388,6 +1388,10 @@ function getBoardCellEditorElement() {
         <input class="editor-glowing" type="checkbox" />
         <span>光っている</span>
       </label>
+      <label class="checkbox-field">
+        <input class="editor-locked" type="checkbox" />
+        <span>固定する</span>
+      </label>
       <fieldset class="editor-effect-mode">
         <legend>光・戻り</legend>
         <label class="checkbox-field">
@@ -1429,6 +1433,7 @@ function openBoardCellEditor(event, item) {
   editor.querySelector(".editor-title").textContent = `${item.name}を編集`;
   editor.querySelector(".editor-current").value = item.current;
   editor.querySelector(".editor-glowing").checked = item.isGlowing === true;
+  editor.querySelector(".editor-locked").checked = item.locked === true;
   syncBoardCellEditorTrait(editor);
   editor.hidden = false;
   positionBoardCellEditor(editor, event.clientX, event.clientY);
@@ -1474,6 +1479,7 @@ function applyBoardCellEditor(editor) {
     current: editor.querySelector(".editor-current").value,
     isGlowing: state.traitId === "light" && editor.querySelector(".editor-glowing").checked,
     cookingEffectMode: editor.querySelector("[name='editorEffectMode']:checked")?.value,
+    locked: editor.querySelector(".editor-locked").checked,
   });
   const willChangeEffect =
     (state.traitId === "light" && ingredient.isGlowing !== normalized.isGlowing) ||
@@ -1483,8 +1489,11 @@ function applyBoardCellEditor(editor) {
     pushBoardHistory();
   }
 
-  if (ingredient.current !== normalized.current) {
-    ingredient.locked = false;
+  const currentChanged = ingredient.current !== normalized.current;
+  const lockedChanged = ingredient.locked !== normalized.locked;
+
+  if (currentChanged || lockedChanged) {
+    ingredient.locked = normalized.locked;
     ingredient.lockJudgement = "";
     ingredient.lockJudgementLabel = "";
   }
