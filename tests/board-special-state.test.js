@@ -20,6 +20,11 @@ assert.match(
 	"ミラクルグリルの横に必殺状態表示があること",
 );
 assert.match(mainJs, /const specialChargeStates = \["uncharged", "charging", "active"\];/);
+assert.match(mainJs, /charging: "チャージ済み"/);
+assert.match(mainJs, /active: "使用済み"/);
 assert.match(mainJs, /function normalizeSpecialChargeState\(value\)/);
 assert.match(mainJs, /function toggleBoardSpecialState\(\)/);
 assert.match(mainJs, /elements\.specialChargeToggle\.addEventListener\("click", toggleBoardSpecialState\);/);
+
+const css = fs.readFileSync("app/styles.css", "utf8");
+assert.match(css, /\.board-special-state\[data-state="charging"\][\s\S]*background: #eff6ff;/);

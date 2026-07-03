@@ -68,8 +68,8 @@ const maxHistoryEntries = 50;
 const specialChargeStates = ["uncharged", "charging", "active"];
 const specialChargeLabels = {
   uncharged: "未チャージ",
-  charging: "チャージ中",
-  active: "使用中",
+  charging: "チャージ済み",
+  active: "使用済み",
 };
 
 async function hydrateRecipesFromApi() {
