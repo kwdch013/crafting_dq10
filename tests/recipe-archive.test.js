@@ -9,6 +9,7 @@ const visibleCookingRecipeNames = [
   "パワフルステーキ",
   "あいじょうオムレツ",
   "バトルステーキ",
+  "バトルパッツァ",
   "スマッシュポテト",
   "バランスパスタ",
   "クイックケーキ",
@@ -36,6 +37,54 @@ function loadFallbackCookingRecipes() {
     context,
   );
   return context.recipes;
+}
+
+function getRecipeByName(recipes, name) {
+  return recipes.find((recipe) => recipe.name === name);
+}
+
+function getItemById(recipe, id) {
+  return recipe.items.find((item) => item.id === id);
+}
+
+function assertBattlePazzaRecipe(recipe) {
+  assert.ok(recipe, "バトルパッツァのレシピが登録されていません");
+  assert.equal(recipe.category, "魚料理");
+  assert.equal(recipe.categoryId, "fish-dishes");
+  assert.equal(recipe.traitId, "light");
+  assert.equal(recipe.archived, undefined);
+  assert.deepEqual(Array.from(recipe.items, (item) => item.id), [
+    "slot-1-2",
+    "slot-2-1",
+    "slot-2-2",
+    "slot-2-3",
+    "slot-3-1",
+    "slot-3-3",
+  ]);
+
+  for (const id of ["slot-1-2", "slot-2-1", "slot-2-2", "slot-3-1"]) {
+    const item = getItemById(recipe, id);
+    assert.equal(item.target, 155);
+    assert.equal(item.successMin, 140);
+    assert.equal(item.successMax, 170);
+    assert.equal(item.ingredientGroupLabel, "魚の切り身");
+    assert.equal(item.ingredientSize, 2);
+  }
+
+  assert.equal(getItemById(recipe, "slot-1-2").ingredientGroupId, "battle-pazza-fish-top");
+  assert.equal(getItemById(recipe, "slot-2-2").ingredientGroupId, "battle-pazza-fish-top");
+  assert.equal(getItemById(recipe, "slot-2-1").ingredientGroupId, "battle-pazza-fish-left");
+  assert.equal(getItemById(recipe, "slot-3-1").ingredientGroupId, "battle-pazza-fish-left");
+
+  for (const id of ["slot-2-3", "slot-3-3"]) {
+    const item = getItemById(recipe, id);
+    assert.equal(item.target, 175);
+    assert.equal(item.successMin, 160);
+    assert.equal(item.successMax, 190);
+    assert.equal(item.ingredientGroupLabel, "野菜");
+    assert.equal(item.ingredientGroupId, undefined);
+    assert.equal(item.ingredientSize, undefined);
+  }
 }
 
 {
@@ -74,4 +123,9 @@ function loadFallbackCookingRecipes() {
     Array.from(recipeArchive.getVisibleRecipes(loadFallbackCookingRecipes()), (recipe) => recipe.name),
     visibleCookingRecipeNames,
   );
+}
+
+{
+  assertBattlePazzaRecipe(getRecipeByName(cookingRecipes, "バトルパッツァ"));
+  assertBattlePazzaRecipe(getRecipeByName(loadFallbackCookingRecipes(), "バトルパッツァ"));
 }
