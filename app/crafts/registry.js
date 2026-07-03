@@ -85,7 +85,7 @@
       { level: 77, focus: 201, provisional: true },
       { level: 78, focus: 203, provisional: true },
       { level: 79, focus: 205, provisional: true },
-      { level: 80, focus: 207, provisional: true },
+      { level: 80, focus: 208, provisional: true },
     ],
     cooking: [
       { level: 1, focus: 50 },

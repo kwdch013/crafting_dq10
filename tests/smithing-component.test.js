@@ -37,6 +37,13 @@ vm.createContext(context);
 	[0, 1, 2, 3].forEach((star) => {
 		assert.equal(lightHammer?.focusBonusByStars[star], 45);
 	});
+
+	const focusByLevel = Object.fromEntries(config.focus.levels.map((entry) => [entry.level, entry.focus]));
+	assert.equal(focusByLevel[76], 199);
+	assert.equal(focusByLevel[77], 201);
+	assert.equal(focusByLevel[78], 203);
+	assert.equal(focusByLevel[79], 205);
+	assert.equal(focusByLevel[80], 208);
 });
 
 assert.equal(context.DQ10CraftConfigs["weapon-smithing"].techniques[0].name, "たたく");
