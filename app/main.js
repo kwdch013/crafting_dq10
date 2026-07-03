@@ -60,11 +60,13 @@ const elements = {
   openAddRecipeButton: document.querySelector("#openAddRecipeButton"),
   addRecipeDialog: document.querySelector("#addRecipeDialog"),
   addRecipeForm: document.querySelector("#addRecipeForm"),
+  addRecipeDialogTitle: document.querySelector("#addRecipeDialogTitle"),
   addRecipeCloseButton: document.querySelector("#addRecipeCloseButton"),
   cancelAddRecipeButton: document.querySelector("#cancelAddRecipeButton"),
   addRecipeFields: document.querySelector("#addRecipeFields"),
   addRecipeItems: document.querySelector("#addRecipeItems"),
   addRecipeItemButton: document.querySelector("#addRecipeItemButton"),
+  saveRecipeButton: document.querySelector("#saveRecipeButton"),
   resetButton: document.querySelector("#resetButton"),
   captureButton: document.querySelector("#captureButton"),
   capturePreview: document.querySelector("#capturePreview"),
@@ -82,6 +84,7 @@ let redoStack = [];
 let smithingTechniqueReference = { techniques: [] };
 let managedRecipeCraftId = "";
 let managedRecipeCategoryId = "";
+let managedRecipeEditId = "";
 const maxHistoryEntries = 50;
 const specialChargeStates = ["uncharged", "charging", "active"];
 const specialChargeLabels = {
@@ -297,8 +300,11 @@ function getUserRecipes(craftId) {
 
 function getAllCraftRecipes(craftId) {
   const deletedIds = new Set(getDeletedRecipeIds(craftId));
-  const baseRecipes = (window.DQ10CraftRecipes?.[craftId] || []).filter((recipe) => !deletedIds.has(recipe.id));
-  return [...baseRecipes, ...getUserRecipes(craftId).filter((recipe) => !deletedIds.has(recipe.id))];
+  const userRecipes = getUserRecipes(craftId).filter((recipe) => !deletedIds.has(recipe.id));
+  const userRecipeMap = new Map(userRecipes.map((recipe) => [recipe.id, recipe]));
+  const baseRecipes = (window.DQ10CraftRecipes?.[craftId] || [])
+    .filter((recipe) => !deletedIds.has(recipe.id) && !userRecipeMap.has(recipe.id));
+  return [...baseRecipes, ...userRecipes];
 }
 
 function getCraftRecipes(craftId) {
@@ -308,6 +314,9 @@ function getCraftRecipes(craftId) {
 }
 
 function getRecipeCategoryOptions(config) {
+  if (config.id === "cooking") {
+    return [];
+  }
   return Array.isArray(config.recipeCategoryOptions) ? config.recipeCategoryOptions : [];
 }
 
@@ -2073,7 +2082,7 @@ function renderRecipeManagerList(config, categoryId, container) {
       <button class="button secondary recipe-delete-button" type="button">削除</button>
     `;
     row.querySelector(".recipe-manager-name").addEventListener("click", () => {
-      selectManagedRecipe(config, recipe);
+      openEditRecipeDialog(config, recipe);
     });
     row.querySelector(".recipe-delete-button").addEventListener("click", () => {
       deleteManagedRecipe(config.id, recipe.id, recipe.name);
@@ -2125,17 +2134,39 @@ function deleteManagedRecipe(craftId, recipeId, recipeName) {
 
 function openAddRecipeDialog() {
   const config = getManagedRecipeConfig();
+  managedRecipeEditId = "";
+  if (elements.addRecipeDialogTitle) {
+    elements.addRecipeDialogTitle.textContent = "レシピ追加";
+  }
+  if (elements.saveRecipeButton) {
+    elements.saveRecipeButton.textContent = "追加";
+  }
   renderAddRecipeFields(config);
   renderAddRecipeItems(config);
   elements.addRecipeDialog.showModal();
 }
 
-function renderAddRecipeFields(config) {
+function openEditRecipeDialog(config, recipe) {
+  managedRecipeCraftId = config.id;
+  managedRecipeCategoryId = recipe.categoryId || managedRecipeCategoryId;
+  managedRecipeEditId = recipe.id;
+  if (elements.addRecipeDialogTitle) {
+    elements.addRecipeDialogTitle.textContent = "レシピ編集";
+  }
+  if (elements.saveRecipeButton) {
+    elements.saveRecipeButton.textContent = "保存";
+  }
+  renderAddRecipeFields(config, recipe);
+  renderAddRecipeItems(config, cloneConfigItems(recipe.items || config.items));
+  elements.addRecipeDialog.showModal();
+}
+
+function renderAddRecipeFields(config, recipe = null) {
   const categories = getRecipeCategoryOptions(config);
   const traits = getTraits(config);
   elements.addRecipeFields.replaceChildren();
 
-  elements.addRecipeFields.append(createTextField("addRecipeName", config.recipeLabel || "制作物", ""));
+  elements.addRecipeFields.append(createTextField("addRecipeName", config.recipeLabel || "制作物", recipe?.name || ""));
   if (categories.length > 0) {
     const label = document.createElement("label");
     label.textContent = config.recipeCategoryLabel || "大項目";
@@ -2147,7 +2178,7 @@ function renderAddRecipeFields(config) {
       option.textContent = category.label;
       select.append(option);
     });
-    select.value = normalizeRecipeCategoryId(config, managedRecipeCategoryId);
+    select.value = normalizeRecipeCategoryId(config, recipe?.categoryId || managedRecipeCategoryId);
     select.addEventListener("change", () => {
       managedRecipeCategoryId = select.value;
       renderAddRecipeItems(config);
@@ -2166,7 +2197,7 @@ function renderAddRecipeFields(config) {
       option.textContent = trait.label;
       select.append(option);
     });
-    select.value = config.defaultTraitId || traits[0]?.id || "";
+    select.value = normalizeTraitId(config, recipe?.traitId || recipe?.specialEventId || config.defaultTraitId || traits[0]?.id || "");
     label.append(select);
     elements.addRecipeFields.append(label);
   }
@@ -2214,8 +2245,7 @@ function getRecipeCategoryTemplateItems(config, categoryId) {
   return Array.isArray(category?.templateItems) ? cloneConfigItems(category.templateItems) : [];
 }
 
-function renderAddRecipeItems(config) {
-  const seedItems = getAddRecipeSeedItems(config);
+function renderAddRecipeItems(config, seedItems = getAddRecipeSeedItems(config)) {
   elements.addRecipeItems.replaceChildren();
 
   seedItems.forEach((item, index) => {
@@ -2306,6 +2336,10 @@ function createRecipeItemNumber(field, labelText, value, min, max) {
 }
 
 function addManagedRecipe(event) {
+  saveManagedRecipe(event);
+}
+
+function saveManagedRecipe(event) {
   event.preventDefault();
   const config = getManagedRecipeConfig();
   const name = elements.addRecipeFields.querySelector("#addRecipeName")?.value.trim();
@@ -2316,8 +2350,12 @@ function addManagedRecipe(event) {
 
   const categoryId = elements.addRecipeFields.querySelector("#addRecipeCategory")?.value || "";
   const traitId = elements.addRecipeFields.querySelector("#addRecipeTrait")?.value || "";
+  const existingRecipe = managedRecipeEditId
+    ? getAllCraftRecipes(config.id).find((candidate) => candidate.id === managedRecipeEditId)
+    : null;
   const recipe = {
-    id: `user-${config.id}-${Date.now()}`,
+    ...(existingRecipe || {}),
+    id: managedRecipeEditId || `user-${config.id}-${Date.now()}`,
     name,
     category: getRecipeCategoryLabel(config, categoryId),
     categoryId,
@@ -2328,11 +2366,15 @@ function addManagedRecipe(event) {
   }
 
   const store = loadUserRecipeStore();
-  store.recipes[config.id] = [...(store.recipes[config.id] || []), recipe];
+  store.recipes[config.id] = [
+    ...(store.recipes[config.id] || []).filter((candidate) => candidate.id !== recipe.id),
+    recipe,
+  ];
   store.deletedIds[config.id] = (store.deletedIds[config.id] || []).filter((id) => id !== recipe.id);
   saveUserRecipeStore(store);
 
   managedRecipeCategoryId = categoryId || managedRecipeCategoryId;
+  managedRecipeEditId = "";
   elements.addRecipeDialog.close();
   renderRecipeManager();
   if (state.craftType === config.id) {
