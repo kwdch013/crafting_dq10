@@ -62,3 +62,24 @@ assert.deepEqual(
 );
 assert.equal(context.DQ10CraftConfigs["tool-smithing"].recipeCategoryLabel, "大項目");
 assert.equal(context.DQ10CraftConfigs["tool-smithing"].recipeSubcategoryLabel, "小項目");
+
+{
+	const categories = Object.fromEntries(
+		context.DQ10CraftConfigs["tool-smithing"].recipeCategoryOptions.map((category) => [category.id, category]),
+	);
+	assert.deepEqual(
+		JSON.parse(JSON.stringify(categories["alchemy-pot"].templateItems.map((item) => item.gridCell))),
+		[
+			{ row: 1, column: 1 },
+			{ row: 1, column: 2 },
+			{ row: 2, column: 1 },
+			{ row: 2, column: 2 },
+			{ row: 3, column: 1 },
+			{ row: 3, column: 2 },
+		],
+		"ツボは参照画像に合わせて縦3×横2の6マスにしてください",
+	);
+	assert.equal(categories["frying-pan"].templateItems.length, 8);
+	assert.equal(categories["woodworking-knife"].templateItems.length, 3);
+	assert.equal(categories["sewing-needle"].templateItems.length, 2);
+}

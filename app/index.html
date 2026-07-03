@@ -14,12 +14,8 @@
           <h1>DQ10 職人ダメージ計算</h1>
         </div>
         <div class="topbar-actions">
-          <button class="button secondary" id="exportButton" type="button" title="設定を書き出す">Export</button>
+          <button class="button secondary" id="recipeListButton" type="button" title="レシピを追加・削除する">レシピリスト</button>
           <button class="button secondary" id="resetButton" type="button" title="数値と配置を初期化する">Reset</button>
-          <label class="button secondary file-button" title="設定を読み込む">
-            Import
-            <input id="importInput" type="file" accept="application/json" />
-          </label>
         </div>
       </header>
 
@@ -265,6 +261,49 @@
         </div>
       </article>
     </template>
+
+    <dialog class="recipe-dialog" id="recipeListDialog">
+      <form class="dialog-panel" method="dialog">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">Recipes</p>
+            <h2>レシピリスト</h2>
+          </div>
+          <button class="icon-button" id="recipeListCloseButton" type="submit" value="close" aria-label="閉じる">×</button>
+        </div>
+        <div class="recipe-manager">
+          <label>
+            職人を選択
+            <select id="recipeManagerCraftSelect"></select>
+          </label>
+          <div class="recipe-manager-categories" id="recipeManagerCategories"></div>
+          <div class="recipe-manager-list" id="recipeManagerList"></div>
+          <button class="button primary" id="openAddRecipeButton" type="button">新規追加</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="recipe-dialog" id="addRecipeDialog">
+      <form class="dialog-panel recipe-form" id="addRecipeForm" method="dialog">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">New Recipe</p>
+            <h2>レシピ追加</h2>
+          </div>
+          <button class="icon-button" id="addRecipeCloseButton" type="button" aria-label="閉じる">×</button>
+        </div>
+        <div class="field-grid two" id="addRecipeFields"></div>
+        <div>
+          <h3 class="form-subheading">マス設定</h3>
+          <div class="recipe-item-editor" id="addRecipeItems"></div>
+          <button class="button secondary recipe-item-add-button" id="addRecipeItemButton" type="button">マスを追加</button>
+        </div>
+        <div class="dialog-actions">
+          <button class="button secondary" id="cancelAddRecipeButton" type="button">キャンセル</button>
+          <button class="button primary" type="submit">追加</button>
+        </div>
+      </form>
+    </dialog>
 
     <script src="./config.js"></script>
     <script src="./crafts/registry.js"></script>

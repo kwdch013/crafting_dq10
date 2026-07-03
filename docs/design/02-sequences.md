@@ -96,37 +96,36 @@ sequenceDiagram
   UI-->>User: 表示ラベルと入力欄を更新
 ```
 
-## 設定Export
+## レシピ追加
 
 ```mermaid
 sequenceDiagram
   participant User as ユーザー
   participant UI as UI層
-  participant Browser as ブラウザ
-
-  User->>UI: Exportを押す
-  UI->>UI: 現在状態をJSON化
-  UI->>Browser: Blob URLを作成
-  Browser-->>User: JSONファイルをダウンロード
-  UI->>Browser: Blob URLを解放
-```
-
-## 設定Import
-
-```mermaid
-sequenceDiagram
-  participant User as ユーザー
-  participant UI as UI層
-  participant Engine as 共通計算エンジン
   participant Storage as localStorage
 
-  User->>UI: JSONファイルを選択
-  UI->>UI: JSONを読み込む
-  UI->>UI: 状態を正規化
-  UI->>Engine: analyzeState(state)
-  Engine-->>UI: 判定結果を返す
-  UI->>Storage: 状態を保存
-  UI-->>User: 読み込んだ状態を表示
+  User->>UI: レシピリストを押す
+  UI-->>User: 職人選択と大項目ごとのレシピ一覧を表示
+  User->>UI: 新規追加を押す
+  UI-->>User: 職人設定に応じた入力ウィンドウを表示
+  User->>UI: レシピ名、特性、マス設定を入力
+  UI->>Storage: 追加レシピを保存
+  UI-->>User: 追加したレシピを選択状態で表示
+```
+
+## レシピ削除
+
+```mermaid
+sequenceDiagram
+  participant User as ユーザー
+  participant UI as UI層
+  participant Storage as localStorage
+
+  User->>UI: レシピリストを押す
+  UI-->>User: 職人選択と大項目ごとのレシピ一覧を表示
+  User->>UI: 対象レシピの削除を押す
+  UI->>Storage: 削除済みレシピIDを保存
+  UI-->>User: レシピ一覧と通常のレシピ選択から除外
 ```
 
 ## 将来の画面認識
