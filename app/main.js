@@ -7,6 +7,10 @@ const elements = {
   craftType: document.querySelector("#craftType"),
   focusLabel: document.querySelector("#focusLabel span"),
   stateLabel: document.querySelector("#stateLabel span"),
+  recipeCategoryLabel: document.querySelector("#recipeCategoryLabel"),
+  recipeCategorySelect: document.querySelector("#recipeCategorySelect"),
+  recipeSelectLabel: document.querySelector("#recipeSelectLabel"),
+  recipeSelectTitle: document.querySelector("#recipeSelectTitle"),
   recipeSelect: document.querySelector("#recipeSelect"),
   recipeTraitLabel: document.querySelector("#recipeTraitLabel"),
   recipeTraitInput: document.querySelector("#recipeTraitInput"),
@@ -133,6 +137,12 @@ function normalizeState(value) {
     ? value.recipeId
     : defaultRecipe?.id || "custom";
   const selectedRecipe = getSelectedRecipe(config, recipeId);
+  const recipeCategoryOptions = getRecipeCategoryOptions(config);
+  const recipeCategoryId = normalizeRecipeCategoryId(
+    config,
+    value.recipeCategoryId || selectedRecipe?.categoryId || recipeCategoryOptions[0]?.id || "",
+  );
+  const recipeCategory = getRecipeCategoryLabel(config, recipeCategoryId) || selectedRecipe?.category || "";
   const layoutSignature = createLayoutSignature(config);
   const shouldResetFixedLayout = config.layout?.fixed && value.layoutSignature !== layoutSignature;
   const defaultItems = getRecipeItems(config, recipeId);
@@ -173,8 +183,8 @@ function normalizeState(value) {
   return {
     recipeId,
     recipeName: value.recipeName || getRecipeLabel(config, recipeId),
-    recipeCategory: value.recipeCategory || selectedRecipe?.category || "",
-    recipeCategoryId: value.recipeCategoryId || selectedRecipe?.categoryId || "",
+    recipeCategory,
+    recipeCategoryId,
     traitId,
     cookingEffectMode: normalizeSavedCookingEffectMode(traitId, value.cookingEffectMode),
     craftType: config.id,
@@ -240,6 +250,25 @@ function getCraftRecipes(craftId) {
   const recipes = window.DQ10CraftRecipes?.[craftId] || [];
   return window.DQ10RecipeArchive?.getVisibleRecipes(recipes) ||
     recipes.filter((recipe) => recipe?.archived !== true);
+}
+
+function getRecipeCategoryOptions(config) {
+  return Array.isArray(config.recipeCategoryOptions) ? config.recipeCategoryOptions : [];
+}
+
+function normalizeRecipeCategoryId(config, categoryId) {
+  const options = getRecipeCategoryOptions(config);
+  if (options.length === 0) {
+    return categoryId || "";
+  }
+
+  return options.some((option) => option.id === categoryId)
+    ? categoryId
+    : options[0].id;
+}
+
+function getRecipeCategoryLabel(config, categoryId) {
+  return getRecipeCategoryOptions(config).find((option) => option.id === categoryId)?.label || "";
 }
 
 function getSelectedRecipe(config, recipeId) {
@@ -503,6 +532,7 @@ function render() {
   renderCraftOptions();
   renderCraftLabels();
   syncStaticInputs();
+  renderRecipeCategoryOptions();
   renderRecipeOptions();
   renderTraitOptions();
   renderFocusOptions();
@@ -519,6 +549,9 @@ function render() {
 
 function syncStaticInputs() {
   elements.craftType.value = state.craftType;
+  if (elements.recipeCategorySelect) {
+    elements.recipeCategorySelect.value = state.recipeCategoryId;
+  }
   elements.recipeSelect.value = state.recipeId;
   elements.recipeTraitInput.value = state.traitId;
   elements.levelSelect.value = state.level;
@@ -530,9 +563,14 @@ function syncStaticInputs() {
 
 function renderRecipeOptions() {
   const config = getCurrentCraftConfig();
-  const recipes = getCraftRecipes(config.id);
+  const hasCategoryOptions = getRecipeCategoryOptions(config).length > 0;
+  const recipes = getCraftRecipes(config.id)
+    .filter((recipe) => !hasCategoryOptions || recipe.categoryId === state.recipeCategoryId);
   const showCustomRecipeOption = shouldShowCustomRecipeOption(config);
   elements.recipeSelect.replaceChildren();
+  if (elements.recipeSelectTitle) {
+    elements.recipeSelectTitle.textContent = config.recipeSubcategoryLabel || config.recipeLabel || "制作物";
+  }
 
   recipes.forEach((recipe) => {
     const option = document.createElement("option");
@@ -541,19 +579,54 @@ function renderRecipeOptions() {
     elements.recipeSelect.append(option);
   });
 
-  if (showCustomRecipeOption) {
+  if (hasCategoryOptions && recipes.length === 0) {
+    const emptyOption = document.createElement("option");
+    emptyOption.value = "custom";
+    emptyOption.textContent = "未登録";
+    elements.recipeSelect.append(emptyOption);
+  } else if (showCustomRecipeOption) {
     const customOption = document.createElement("option");
     customOption.value = "custom";
     customOption.textContent = "手入力";
     elements.recipeSelect.append(customOption);
   }
 
-  elements.recipeSelect.disabled = recipes.length === 0 && !showCustomRecipeOption;
+  elements.recipeSelect.disabled = hasCategoryOptions && recipes.length === 0
+    ? true
+    : recipes.length === 0 && !showCustomRecipeOption;
   elements.recipeSelect.value = recipes.some((recipe) => recipe.id === state.recipeId)
     ? state.recipeId
-    : showCustomRecipeOption
+    : showCustomRecipeOption || hasCategoryOptions
       ? "custom"
       : "";
+}
+
+function renderRecipeCategoryOptions() {
+  const config = getCurrentCraftConfig();
+  const options = getRecipeCategoryOptions(config);
+
+  if (!elements.recipeCategoryLabel || !elements.recipeCategorySelect) {
+    return;
+  }
+
+  elements.recipeCategoryLabel.hidden = options.length === 0;
+  elements.recipeCategorySelect.replaceChildren();
+  if (options.length === 0) {
+    state.recipeCategoryId = "";
+    state.recipeCategory = "";
+    return;
+  }
+
+  elements.recipeCategoryLabel.querySelector("span").textContent = config.recipeCategoryLabel || "大項目";
+  state.recipeCategoryId = normalizeRecipeCategoryId(config, state.recipeCategoryId);
+  state.recipeCategory = getRecipeCategoryLabel(config, state.recipeCategoryId);
+  options.forEach((category) => {
+    const option = document.createElement("option");
+    option.value = category.id;
+    option.textContent = category.label;
+    elements.recipeCategorySelect.append(option);
+  });
+  elements.recipeCategorySelect.value = state.recipeCategoryId;
 }
 
 function renderTraitOptions() {
@@ -1751,6 +1824,23 @@ function applyRecipe(recipeId) {
   render();
 }
 
+function applyRecipeCategory(categoryId) {
+  const config = getCurrentCraftConfig();
+  const normalizedCategoryId = normalizeRecipeCategoryId(config, categoryId);
+  clearBoardHistory();
+  state.recipeCategoryId = normalizedCategoryId;
+  state.recipeCategory = getRecipeCategoryLabel(config, normalizedCategoryId);
+  state.recipeId = "custom";
+  state.recipeName = config.defaultRecipeName;
+  state.ingredients = cloneConfigItems(config.items);
+  state.cookingCellEffects = [];
+  state.miracleGrillUsed = false;
+  state.miracleGrillResult = "";
+  state.specialChargeState = "uncharged";
+  state.layoutSignature = createLayoutSignature(config);
+  render();
+}
+
 function markCustomRecipe() {
   state.recipeId = "custom";
   if (elements.recipeSelect) {
@@ -1895,6 +1985,9 @@ elements.recipeTraitInput.addEventListener("change", () => {
 });
 elements.recipeSelect.addEventListener("change", () => {
   applyRecipe(elements.recipeSelect.value);
+});
+elements.recipeCategorySelect?.addEventListener("change", () => {
+  applyRecipeCategory(elements.recipeCategorySelect.value);
 });
 elements.craftType.addEventListener("change", () => {
   clearBoardHistory();

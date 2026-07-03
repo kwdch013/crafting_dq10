@@ -2,6 +2,7 @@ registerDQ10CraftRecipes("tool-smithing", [
   {
     id: "tool-vertical-3",
     name: "道具 3マステンプレート",
+    archived: true,
     items: [
       { id: "part-1", name: "上", gridCell: { row: 1, column: 1 }, current: 0, successMin: 70, successMax: 86 },
       { id: "part-2", name: "中", gridCell: { row: 2, column: 1 }, current: 0, successMin: 70, successMax: 86 },
@@ -11,6 +12,7 @@ registerDQ10CraftRecipes("tool-smithing", [
   {
     id: "tool-2x2",
     name: "道具 2×2テンプレート",
+    archived: true,
     items: [
       { id: "part-1", name: "左上", gridCell: { row: 1, column: 1 }, current: 0, successMin: 70, successMax: 86 },
       { id: "part-2", name: "右上", gridCell: { row: 1, column: 2 }, current: 0, successMin: 70, successMax: 86 },
