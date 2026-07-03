@@ -31,6 +31,12 @@ vm.createContext(context);
 	assert.equal(config.layout.label, "鍛冶配置");
 	assert.equal(config.heatStates, context.DQ10SmithingDamage.heatStates);
 	assert.ok(context.DQ10CraftComponents[craftId], `${craftId} のコンポーネントを登録してください`);
+
+	const lightHammer = config.focus.tools.find((tool) => tool.id === "light-smithing-hammer");
+	assert.equal(lightHammer?.label, "光の鍛冶ハンマー");
+	[0, 1, 2, 3].forEach((star) => {
+		assert.equal(lightHammer?.focusBonusByStars[star], 45);
+	});
 });
 
 assert.equal(context.DQ10CraftConfigs["weapon-smithing"].techniques[0].name, "たたく");
