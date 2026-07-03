@@ -98,6 +98,7 @@ app/crafts/
 ```
 
 各 `config.js` では、職人名、入力ラベル、レベル別集中力、道具種類と★数ごとの補正、火力状態、特技ごとの消費集中力・通常範囲・会心範囲、初期マスを管理します。
+道具鍛冶の大項目は `app/crafts/tool-smithing/config.js` の `recipeCategoryOptions` に定義し、小項目の具体的な制作物はレシピJSONに追加します。
 
 鍛冶BOARD下の特技表に表示する消費集中、特技名、倍率、範囲は `app/crafts/shared/smithing-techniques.json` に登録します。
 

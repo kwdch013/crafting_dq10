@@ -37,6 +37,9 @@ app/crafts/
 - `label`: UI表示名
 - `modeLabel`: 画面上部の補足表示
 - `recipeLabel`: 品目名ラベル
+- `recipeCategoryLabel`: 制作物を大項目で分ける場合の大項目ラベル
+- `recipeSubcategoryLabel`: 制作物を大項目で分ける場合の小項目ラベル
+- `recipeCategoryOptions`: 大項目の選択肢
 - `itemNameLabel`: 手入力データ補完時のマス名ラベル
 - `resourceLabel`: 集中力などのリソース名
 - `defaultRecipeName`: 初期品目名
@@ -46,6 +49,9 @@ app/crafts/
 - `techniques`: 特技一覧
 - `itemOptions`: マスや具材ごとの種別選択肢
 - `items`: 初期マス一覧
+
+道具鍛冶の大項目は `refarence/tool` の画像種別と合わせ、ツボ、ハンマー、フライパン、ランプ、ルアー、木工刀、素材、針の8種類を `tool-smithing/config.js` に定義します。
+具体的な制作物名は小項目としてレシピJSONに登録しますが、現時点では未登録のためテンプレートレシピは `archived: true` として表示対象外にします。
 
 調理の位置別ダメージは `shared/cooking-damage.js` に分離します。
 鍛冶系の温度別ダメージは `shared/smithing-damage.js` に分離します。

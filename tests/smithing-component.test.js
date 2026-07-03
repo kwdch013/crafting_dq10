@@ -55,3 +55,10 @@ vm.createContext(context);
 assert.equal(context.DQ10CraftConfigs["weapon-smithing"].techniques[0].name, "たたく");
 assert.equal(context.DQ10CraftConfigs["armor-smithing"].techniques[1].name, "上下打ち");
 assert.equal(context.DQ10CraftConfigs["tool-smithing"].techniques[2].name, "火力上げ");
+
+assert.deepEqual(
+	Array.from(context.DQ10CraftConfigs["tool-smithing"].recipeCategoryOptions, (category) => category.label),
+	["ツボ", "ハンマー", "フライパン", "ランプ", "ルアー", "木工刀", "素材", "針"],
+);
+assert.equal(context.DQ10CraftConfigs["tool-smithing"].recipeCategoryLabel, "大項目");
+assert.equal(context.DQ10CraftConfigs["tool-smithing"].recipeSubcategoryLabel, "小項目");

@@ -3,6 +3,7 @@ const fs = require("node:fs");
 const vm = require("node:vm");
 const recipeArchive = require("../app/recipe-archive.js");
 const cookingRecipes = require("../api/data/crafts/cooking/recipes.json");
+const toolSmithingRecipes = require("../api/data/crafts/tool-smithing/recipes.json");
 
 const visibleCookingRecipeNames = [
   "きようさにくまん",
@@ -34,6 +35,24 @@ function loadFallbackCookingRecipes() {
   vm.createContext(context);
   vm.runInContext(
     fs.readFileSync("app/crafts/cooking/recipes.js", "utf8"),
+    context,
+  );
+  return context.recipes;
+}
+
+function loadFallbackToolSmithingRecipes() {
+  const context = {
+    recipes: null,
+  };
+  context.registerDQ10CraftRecipes = (craftId, recipes) => {
+    if (craftId === "tool-smithing") {
+      context.recipes = recipes;
+    }
+  };
+
+  vm.createContext(context);
+  vm.runInContext(
+    fs.readFileSync("app/crafts/tool-smithing/recipes.js", "utf8"),
     context,
   );
   return context.recipes;
@@ -128,4 +147,9 @@ function assertBattlePazzaRecipe(recipe) {
 {
   assertBattlePazzaRecipe(getRecipeByName(cookingRecipes, "バトルパッツァ"));
   assertBattlePazzaRecipe(getRecipeByName(loadFallbackCookingRecipes(), "バトルパッツァ"));
+}
+
+{
+  assert.equal(recipeArchive.getVisibleRecipes(toolSmithingRecipes).length, 0);
+  assert.equal(recipeArchive.getVisibleRecipes(loadFallbackToolSmithingRecipes()).length, 0);
 }
