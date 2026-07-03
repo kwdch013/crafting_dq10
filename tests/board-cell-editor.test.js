@@ -63,3 +63,48 @@ const editor = require("../app/board-cell-editor.js");
 	assert.equal(result.current, 12);
 	assert.equal(result.locked, false);
 }
+
+{
+	const result = editor.normalizeEditValue(
+		{ current: 12, successMin: 20, successMax: 30 },
+		{ current: "19", locked: true },
+	);
+
+	assert.equal(result.current, 19);
+	assert.equal(result.locked, false);
+}
+
+{
+	const result = editor.normalizeEditValue(
+		{ current: 12, successMin: 20, successMax: 30 },
+		{ current: "20", locked: true },
+	);
+
+	assert.equal(result.current, 20);
+	assert.equal(result.locked, true);
+}
+
+{
+	const result = editor.normalizeEditValue(
+		{ current: 12, successMin: 30, successMax: 20 },
+		{ current: "30", locked: true },
+	);
+
+	assert.equal(result.current, 30);
+	assert.equal(result.locked, true);
+}
+
+{
+	assert.equal(
+		editor.resolvePointerDownAction({ isOpen: true, containsTarget: false }),
+		"apply",
+	);
+	assert.equal(
+		editor.resolvePointerDownAction({ isOpen: true, containsTarget: true }),
+		"none",
+	);
+	assert.equal(
+		editor.resolvePointerDownAction({ isOpen: false, containsTarget: false }),
+		"none",
+	);
+}

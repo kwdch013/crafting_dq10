@@ -490,3 +490,9 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/45
 現在値0、基準範囲180-210、強火の回帰条件では、ミラクルグリルを通常判定に混ぜず `不足` と表示されることを確認します。
 
 URL: https://github.com/kwdch013/crafting_dq10/issues/50
+
+### #53 調理職人: 右クリック編集の固定条件と枠外更新を修正する
+
+固定は基準範囲内だけ許可し、右クリック編集の枠外クリックでも入力内容を反映します。
+
+URL: https://github.com/kwdch013/crafting_dq10/issues/53

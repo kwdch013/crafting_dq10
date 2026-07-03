@@ -1423,6 +1423,7 @@ function getBoardCellEditorElement() {
     event.preventDefault();
     applyBoardCellEditor(editor);
   });
+  editor.querySelector(".editor-current").addEventListener("input", () => syncBoardCellEditorLock(editor));
   editor.querySelector(".editor-cancel").addEventListener("click", closeBoardCellEditor);
   document.body.append(editor);
   boardCellEditorElement = editor;
@@ -1440,6 +1441,7 @@ function openBoardCellEditor(event, item) {
   editor.querySelector(".editor-glowing").checked = item.isGlowing === true;
   editor.querySelector(".editor-locked").checked = item.locked === true;
   syncBoardCellEditorTrait(editor);
+  syncBoardCellEditorLock(editor);
   editor.hidden = false;
   positionBoardCellEditor(editor, event.clientX, event.clientY);
   editor.querySelector(".editor-current").focus();
@@ -1455,6 +1457,29 @@ function syncBoardCellEditorTrait(editor) {
   effectModeField.querySelectorAll("input").forEach((input) => {
     input.checked = input.value === state.cookingEffectMode;
   });
+}
+
+function syncBoardCellEditorLock(editor) {
+  const ingredient = state.ingredients.find((item) => item.id === editor.dataset.id);
+  const lockInput = editor.querySelector(".editor-locked");
+
+  if (!ingredient) {
+    lockInput.disabled = true;
+    lockInput.checked = false;
+    return;
+  }
+
+  const normalized = DQ10BoardCellEditor.normalizeEditValue(ingredient, {
+    current: editor.querySelector(".editor-current").value,
+    locked: false,
+  });
+  const canLock = DQ10BoardCellEditor.isCurrentInSuccessRange(normalized.current, ingredient);
+  lockInput.disabled = !canLock;
+  lockInput.title = canLock ? "" : "基準範囲内の値だけ固定できます";
+
+  if (!canLock) {
+    lockInput.checked = false;
+  }
 }
 
 function positionBoardCellEditor(editor, x, y) {
@@ -1921,8 +1946,13 @@ elements.resetButton.addEventListener("click", resetState);
 elements.importInput.addEventListener("change", importState);
 elements.captureButton.addEventListener("click", startCapturePreview);
 document.addEventListener("pointerdown", (event) => {
-  if (boardCellEditorElement && !boardCellEditorElement.hidden && !boardCellEditorElement.contains(event.target)) {
-    closeBoardCellEditor();
+  const action = DQ10BoardCellEditor.resolvePointerDownAction({
+    isOpen: Boolean(boardCellEditorElement && !boardCellEditorElement.hidden),
+    containsTarget: Boolean(boardCellEditorElement?.contains(event.target)),
+  });
+
+  if (action === "apply") {
+    applyBoardCellEditor(boardCellEditorElement);
   }
 });
 document.addEventListener("keydown", (event) => {

@@ -8,18 +8,48 @@
 		return Number.isFinite(parsed) ? parsed : fallback;
 	}
 
+	function normalizeRange(min, max) {
+		const parsedMin = Number(min);
+		const parsedMax = Number(max);
+
+		if (!Number.isFinite(parsedMin) || !Number.isFinite(parsedMax)) {
+			return null;
+		}
+
+		return parsedMin <= parsedMax
+			? [parsedMin, parsedMax]
+			: [parsedMax, parsedMin];
+	}
+
+	function isCurrentInSuccessRange(current, item) {
+		const range = normalizeRange(item?.successMin, item?.successMax);
+
+		if (!range) {
+			return true;
+		}
+
+		const parsedCurrent = Number(current);
+		return Number.isFinite(parsedCurrent) && parsedCurrent >= range[0] && parsedCurrent <= range[1];
+	}
+
 	function normalizeEditValue(currentValue, inputValue) {
 		const current = toFiniteNumber(inputValue.current, toFiniteNumber(currentValue.current, 0));
 		return {
 			current,
 			isGlowing: inputValue.isGlowing === true,
 			cookingEffectMode: inputValue.cookingEffectMode || "none",
-			locked: inputValue.locked === true,
+			locked: inputValue.locked === true && isCurrentInSuccessRange(current, currentValue),
 		};
 	}
 
+	function resolvePointerDownAction({ isOpen, containsTarget }) {
+		return isOpen === true && containsTarget !== true ? "apply" : "none";
+	}
+
 	global.DQ10BoardCellEditor = {
+		isCurrentInSuccessRange,
 		normalizeEditValue,
+		resolvePointerDownAction,
 	};
 
 	if (typeof module !== "undefined") {
