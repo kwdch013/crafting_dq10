@@ -31,7 +31,6 @@ const elements = {
   boardActions: document.querySelector("#boardActions"),
   undoBoardButton: document.querySelector("#undoBoardButton"),
   redoBoardButton: document.querySelector("#redoBoardButton"),
-  shiftBoardUpButton: document.querySelector("#shiftBoardUpButton"),
   miracleGrillButton: document.querySelector("#miracleGrillButton"),
   miracleGrillResult: document.querySelector("#miracleGrillResult"),
   normalHeatButton: document.querySelector("#normalHeatButton"),
@@ -41,10 +40,6 @@ const elements = {
   clearCookingEffectButton: document.querySelector("#clearCookingEffectButton"),
   crossGlowButton: document.querySelector("#crossGlowButton"),
   cornerReturnButton: document.querySelector("#cornerReturnButton"),
-  swapBoardUpButton: document.querySelector("#swapBoardUpButton"),
-  swapBoardDownButton: document.querySelector("#swapBoardDownButton"),
-  swapBoardLeftButton: document.querySelector("#swapBoardLeftButton"),
-  swapBoardRightButton: document.querySelector("#swapBoardRightButton"),
   layoutBoard: document.querySelector("#layoutBoard"),
   ingredientBody: document.querySelector("#ingredientBody"),
   ingredientRowTemplate: document.querySelector("#ingredientRowTemplate"),
@@ -887,12 +882,7 @@ function syncBoardActionButtons() {
   elements.boardActions.hidden = !canRearrange;
   elements.undoBoardButton.disabled = !canRearrange || undoStack.length === 0;
   elements.redoBoardButton.disabled = !canRearrange || redoStack.length === 0;
-  elements.shiftBoardUpButton.disabled = !canRearrange || state.ingredients.length === 0;
   syncMiracleGrillButton(canRearrange, selectedIngredient);
-  elements.swapBoardUpButton.disabled = !selectedIngredient || !canSwapBoardDirection("up");
-  elements.swapBoardDownButton.disabled = !selectedIngredient || !canSwapBoardDirection("down");
-  elements.swapBoardLeftButton.disabled = !selectedIngredient || !canSwapBoardDirection("left");
-  elements.swapBoardRightButton.disabled = !selectedIngredient || !canSwapBoardDirection("right");
   syncCookingEffectButtons();
 }
 
@@ -926,6 +916,10 @@ function syncCookingEffectButtons() {
 }
 
 function syncCookingEffectButton(button, buttonState) {
+  if (!button) {
+    return;
+  }
+
   button.hidden = buttonState.hidden;
   button.disabled = buttonState.disabled;
   button.classList.toggle("active", buttonState.active);
@@ -1056,30 +1050,6 @@ function canApplyGroupMoves(moves, ignoredIds) {
   );
 }
 
-function getBoardDirectionSwap(direction) {
-  const selectedIngredient = state.ingredients.find((ingredient) => ingredient.id === selectedBoardIngredientId);
-  if (!selectedIngredient) {
-    return null;
-  }
-
-  const selectedGroup = getIngredientGroupMembers(selectedIngredient);
-  const moves = createDirectionalSwapMoves(selectedGroup, direction);
-  if (!moves) {
-    return null;
-  }
-
-  const ignoredIds = new Set(moves.map((move) => move.ingredient.id));
-  if (!canApplyGroupMoves(moves, ignoredIds)) {
-    return null;
-  }
-
-  return { moves, ignoredIds };
-}
-
-function canSwapBoardDirection(direction) {
-  return Boolean(getBoardDirectionSwap(direction));
-}
-
 function applyGroupMoves(moves) {
   moves.forEach((move) => {
     move.ingredient.gridCell = move.gridCell;
@@ -1127,26 +1097,6 @@ function formatMiracleGrillResult(targets, result) {
   }
 
   return `${targetLabel}: ミラクルグリル成功 / ${lockLabels.join("・") || "固定"}`;
-}
-
-function swapBoardDirection(direction) {
-  if (!canRearrangeBoard()) {
-    return;
-  }
-
-  const swap = getBoardDirectionSwap(direction);
-  if (!swap) {
-    return;
-  }
-
-  pushBoardHistory();
-  applyGroupMoves(swap.moves);
-  markCustomRecipe();
-  renderIngredients();
-  renderLayoutBoard();
-  renderCraftReference();
-  renderAnalysis();
-  saveState();
 }
 
 function clearCookingLight() {
@@ -1244,33 +1194,6 @@ function toggleCookingLight(ingredientId) {
 // 職人コンポーネントに盤面位置から種別の同期を委譲します。
 function updateIngredientPositionOption(ingredient) {
   getCurrentCraftComponent().updateIngredientPositionOption?.(ingredient);
-}
-
-function shiftBoardUp() {
-  if (!canRearrangeBoard()) {
-    return;
-  }
-
-  const layout = getCurrentCraftConfig().layout;
-  const rows = Math.max(1, numberOr(layout?.rows, 1));
-  pushBoardHistory();
-  state.ingredients.forEach((ingredient) => {
-    const row = numberOr(ingredient.gridCell?.row, 1);
-    const column = numberOr(ingredient.gridCell?.column, 1);
-    ingredient.gridCell = {
-      ...ingredient.gridCell,
-      row: row <= 1 ? rows : row - 1,
-      column,
-    };
-    updateIngredientPositionOption(ingredient);
-  });
-  selectedBoardIngredientId = null;
-  markCustomRecipe();
-  renderIngredients();
-  renderLayoutBoard();
-  renderCraftReference();
-  renderAnalysis();
-  saveState();
 }
 
 function undoBoardAction() {
@@ -2021,19 +1944,14 @@ elements.heatInput.addEventListener("change", () => {
 elements.addIngredientButton.addEventListener("click", addIngredient);
 elements.undoBoardButton.addEventListener("click", undoBoardAction);
 elements.redoBoardButton.addEventListener("click", redoBoardAction);
-elements.shiftBoardUpButton.addEventListener("click", shiftBoardUp);
-elements.miracleGrillButton.addEventListener("click", applyMiracleGrillToSelected);
-elements.normalHeatButton.addEventListener("click", () => setCookingHeatMode("normal"));
-elements.strongHeatButton.addEventListener("click", () => setCookingHeatMode("strong"));
-elements.halfHeatButton.addEventListener("click", () => setCookingHeatMode("half"));
-elements.clearCookingLightButton.addEventListener("click", clearCookingLight);
-elements.clearCookingEffectButton.addEventListener("click", () => setCookingEffectMode("none"));
-elements.crossGlowButton.addEventListener("click", () => setCookingEffectMode("cross-glow"));
-elements.cornerReturnButton.addEventListener("click", () => setCookingEffectMode("corner-return"));
-elements.swapBoardUpButton.addEventListener("click", () => swapBoardDirection("up"));
-elements.swapBoardDownButton.addEventListener("click", () => swapBoardDirection("down"));
-elements.swapBoardLeftButton.addEventListener("click", () => swapBoardDirection("left"));
-elements.swapBoardRightButton.addEventListener("click", () => swapBoardDirection("right"));
+elements.miracleGrillButton?.addEventListener("click", applyMiracleGrillToSelected);
+elements.normalHeatButton?.addEventListener("click", () => setCookingHeatMode("normal"));
+elements.strongHeatButton?.addEventListener("click", () => setCookingHeatMode("strong"));
+elements.halfHeatButton?.addEventListener("click", () => setCookingHeatMode("half"));
+elements.clearCookingLightButton?.addEventListener("click", clearCookingLight);
+elements.clearCookingEffectButton?.addEventListener("click", () => setCookingEffectMode("none"));
+elements.crossGlowButton?.addEventListener("click", () => setCookingEffectMode("cross-glow"));
+elements.cornerReturnButton?.addEventListener("click", () => setCookingEffectMode("corner-return"));
 elements.exportButton.addEventListener("click", exportState);
 elements.resetButton.addEventListener("click", resetState);
 elements.importInput.addEventListener("change", importState);
