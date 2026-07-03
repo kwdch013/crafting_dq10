@@ -179,7 +179,7 @@
       { id: "silver-smithing-hammer", label: "銀の鍛冶ハンマー", focusBonus: 15 },
       { id: "platinum-smithing-hammer", label: "プラチナ鍛冶ハンマー", focusBonus: 25 },
       { id: "super-smithing-hammer", label: "超鍛冶ハンマー", focusBonus: 35 },
-      { id: "miracle-smithing-hammer", label: "奇跡の鍛冶ハンマー", focusBonus: 40 },
+      { id: "miracle-smithing-hammer", label: "奇跡の鍛冶ハンマー", focusBonus: 50 },
       { id: "light-smithing-hammer", label: "光の鍛冶ハンマー", focusBonus: 45 },
     ],
     fryingPan: [
@@ -188,7 +188,7 @@
       { id: "silver-frying-pan", label: "銀のフライパン", focusBonus: 15 },
       { id: "platinum-frying-pan", label: "プラチナフライパン", focusBonus: 25 },
       { id: "super-frying-pan", label: "超フライパン", focusBonus: 35 },
-      { id: "miracle-frying-pan", label: "奇跡のフライパン", focusBonus: 40 },
+      { id: "miracle-frying-pan", label: "奇跡のフライパン", focusBonus: 50 },
       { id: "light-frying-pan", label: "光のフライパン", focusBonus: 45 },
     ],
   };
