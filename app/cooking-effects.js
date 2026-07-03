@@ -1,4 +1,25 @@
 (function (global) {
+	const cookingBlockEffects = [
+		{
+			id: "half-seal",
+			label: "半熟封じ",
+			description: "4ターン、対象1マスの焼きダメージを半減します。小数点以下は繰り上げます。",
+		},
+		{
+			id: "full-seal",
+			label: "完熟封じ",
+			description: "4ターン、対象1マスのダメージと回復を無効化します。",
+		},
+	];
+	const cookingCellEffects = [
+		{
+			id: "heat-return",
+			label: "焼き戻し",
+			description: "4ターン、対象位置を焼かずに回復します。食材が移動しても位置に残ります。",
+		},
+	];
+	const defaultEffectTurns = 4;
+
 	function normalizeCookingEffectMode(traitId, value) {
 		if (traitId !== "light-return") {
 			return "none";
@@ -17,6 +38,47 @@
 
 	function normalizeSavedCookingEffectMode() {
 		return "none";
+	}
+
+	function normalizeCookingBlockEffect(value) {
+		return cookingBlockEffects.some((effect) => effect.id === value) ? value : "none";
+	}
+
+	function normalizeCookingCellEffect(value) {
+		return cookingCellEffects.some((effect) => effect.id === value) ? value : "none";
+	}
+
+	function normalizeCookingCellEffects(value, layout = {}) {
+		if (!Array.isArray(value)) {
+			return [];
+		}
+
+		const rows = Number.isFinite(Number(layout.rows)) ? Number(layout.rows) : 3;
+		const columns = Number.isFinite(Number(layout.columns)) ? Number(layout.columns) : 3;
+		const byCell = new Map();
+
+		value.forEach((entry) => {
+			const row = Number(entry?.row);
+			const column = Number(entry?.column);
+			const effectId = normalizeCookingCellEffect(entry?.effectId);
+
+			if (!Number.isInteger(row) || !Number.isInteger(column) || effectId === "none") {
+				return;
+			}
+
+			if (row < 1 || row > rows || column < 1 || column > columns) {
+				return;
+			}
+
+			byCell.set(`${row}:${column}`, {
+				row,
+				column,
+				effectId,
+				remainingTurns: Math.max(1, Number(entry?.remainingTurns) || defaultEffectTurns),
+			});
+		});
+
+		return Array.from(byCell.values());
 	}
 
 	function toggleCookingLight(ingredients, ingredientId) {
@@ -96,10 +158,16 @@
 	}
 
 	const api = {
+		cookingBlockEffects,
+		cookingCellEffects,
 		clearCookingLight,
+		defaultEffectTurns,
 		getInitialCookingEffectMode,
 		getCookingEffectButtonState,
 		getCookingHeatButtonState,
+		normalizeCookingBlockEffect,
+		normalizeCookingCellEffect,
+		normalizeCookingCellEffects,
 		normalizeCookingEffectMode,
 		normalizeSavedCookingEffectMode,
 		toggleCookingLight,

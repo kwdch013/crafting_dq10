@@ -27,6 +27,108 @@ const engine = require("../app/engine.js");
 	const result = engine.resolveTechnique(
 		{ heat: "normal", traitId: "light" },
 		{
+			id: "basic",
+			damageModel: "cooking-fixed",
+			conditionId: null,
+			criticalMultiplier: 2,
+		},
+		{ optionId: "corner", cookingBlockEffect: "half-seal" },
+	);
+
+	assert.equal(result.normalMin, 2);
+	assert.equal(result.normalMax, 3);
+	assert.equal(result.criticalMin, 3);
+	assert.equal(result.criticalMax, 5);
+}
+
+{
+	const result = engine.resolveTechnique(
+		{ heat: "strong", traitId: "light" },
+		{
+			id: "basic",
+			damageModel: "cooking-fixed",
+			conditionId: null,
+			criticalMultiplier: 2,
+		},
+		{ optionId: "center", cookingBlockEffect: "full-seal" },
+	);
+
+	assert.equal(result.normalMin, 0);
+	assert.equal(result.normalMax, 0);
+	assert.equal(result.criticalMin, 0);
+	assert.equal(result.criticalMax, 0);
+}
+
+{
+	const result = engine.resolveTechnique(
+		{
+			heat: "normal",
+			traitId: "light",
+			cookingCellEffects: [{ row: 1, column: 1, effectId: "heat-return", remainingTurns: 4 }],
+		},
+		{
+			id: "basic",
+			damageModel: "cooking-fixed",
+			conditionId: null,
+			criticalMultiplier: 2,
+		},
+		{ optionId: "corner", gridCell: { row: 1, column: 1 } },
+	);
+
+	assert.equal(result.normalMin, -5);
+	assert.equal(result.normalMax, -3);
+	assert.equal(result.criticalMin, -10);
+	assert.equal(result.criticalMax, -6);
+}
+
+{
+	const result = engine.resolveTechnique(
+		{
+			heat: "normal",
+			traitId: "light",
+			cookingCellEffects: [{ row: 1, column: 1, effectId: "heat-return", remainingTurns: 4 }],
+		},
+		{
+			id: "basic",
+			damageModel: "cooking-fixed",
+			conditionId: null,
+			criticalMultiplier: 2,
+		},
+		{ optionId: "center", gridCell: { row: 2, column: 2 } },
+	);
+
+	assert.equal(result.normalMin, 12);
+	assert.equal(result.normalMax, 18);
+	assert.equal(result.criticalMin, 24);
+	assert.equal(result.criticalMax, 36);
+}
+
+{
+	const result = engine.resolveTechnique(
+		{
+			heat: "normal",
+			traitId: "light",
+			cookingCellEffects: [{ row: 1, column: 1, effectId: "heat-return", remainingTurns: 4 }],
+		},
+		{
+			id: "basic",
+			damageModel: "cooking-fixed",
+			conditionId: null,
+			criticalMultiplier: 2,
+		},
+		{ optionId: "corner", gridCell: { row: 1, column: 1 }, cookingBlockEffect: "full-seal" },
+	);
+
+	assert.equal(result.normalMin, 0);
+	assert.equal(result.normalMax, 0);
+	assert.equal(result.criticalMin, 0);
+	assert.equal(result.criticalMax, 0);
+}
+
+{
+	const result = engine.resolveTechnique(
+		{ heat: "normal", traitId: "light" },
+		{
 			id: "weak",
 			damageModel: "cooking-fixed",
 			conditionId: "half",
