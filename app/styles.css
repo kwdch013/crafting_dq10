@@ -205,6 +205,139 @@ button:disabled {
   display: none;
 }
 
+.recipe-dialog {
+  width: min(920px, calc(100% - 28px));
+  max-height: calc(100dvh - 28px);
+  border: 0;
+  border-radius: var(--radius);
+  padding: 0;
+  background: transparent;
+}
+
+.recipe-dialog::backdrop {
+  background: rgba(23, 32, 51, 0.42);
+}
+
+.dialog-panel {
+  display: grid;
+  gap: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  max-height: calc(100dvh - 28px);
+  overflow: auto;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 18px;
+}
+
+.dialog-heading,
+.dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dialog-heading h2 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.recipe-manager,
+.recipe-form {
+  display: grid;
+  gap: 14px;
+}
+
+.recipe-manager-categories {
+  display: grid;
+  gap: 8px;
+}
+
+.recipe-category-group {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-soft);
+  overflow: hidden;
+}
+
+.recipe-category-group summary {
+  cursor: pointer;
+  padding: 10px 12px;
+  font-weight: 900;
+}
+
+.recipe-manager-list {
+  display: grid;
+  gap: 8px;
+}
+
+.recipe-category-group .recipe-manager-list {
+  border-top: 1px solid var(--line);
+  padding: 10px;
+}
+
+.recipe-manager-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(120px, auto) auto;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #ffffff;
+  padding: 9px;
+}
+
+.recipe-manager-name {
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+.recipe-manager-row span,
+.recipe-empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.form-subheading {
+  margin: 0 0 8px;
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.recipe-item-editor {
+  display: grid;
+  gap: 10px;
+}
+
+.recipe-item-add-button {
+  margin-top: 10px;
+}
+
+.recipe-item-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-soft);
+  padding: 10px;
+}
+
+.recipe-item-row legend {
+  padding: 0 4px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
 label {
   display: grid;
   gap: 6px;

@@ -1,5 +1,6 @@
 const storageKey = "dq10-craft-support-mvp";
 const legacyStorageKey = "dq10-cooking-craft-mvp";
+const userRecipesStorageKey = "dq10-craft-user-recipes";
 const apiBaseUrl = window.DQ10_API_BASE_URL || "http://localhost:8000";
 
 const elements = {
@@ -50,9 +51,21 @@ const elements = {
   cornerReturnButton: document.querySelector("#cornerReturnButton"),
   layoutBoard: document.querySelector("#layoutBoard"),
   techniqueTemplate: document.querySelector("#techniqueTemplate"),
-  exportButton: document.querySelector("#exportButton"),
+  recipeListButton: document.querySelector("#recipeListButton"),
+  recipeListDialog: document.querySelector("#recipeListDialog"),
+  recipeListCloseButton: document.querySelector("#recipeListCloseButton"),
+  recipeManagerCraftSelect: document.querySelector("#recipeManagerCraftSelect"),
+  recipeManagerCategories: document.querySelector("#recipeManagerCategories"),
+  recipeManagerList: document.querySelector("#recipeManagerList"),
+  openAddRecipeButton: document.querySelector("#openAddRecipeButton"),
+  addRecipeDialog: document.querySelector("#addRecipeDialog"),
+  addRecipeForm: document.querySelector("#addRecipeForm"),
+  addRecipeCloseButton: document.querySelector("#addRecipeCloseButton"),
+  cancelAddRecipeButton: document.querySelector("#cancelAddRecipeButton"),
+  addRecipeFields: document.querySelector("#addRecipeFields"),
+  addRecipeItems: document.querySelector("#addRecipeItems"),
+  addRecipeItemButton: document.querySelector("#addRecipeItemButton"),
   resetButton: document.querySelector("#resetButton"),
-  importInput: document.querySelector("#importInput"),
   captureButton: document.querySelector("#captureButton"),
   capturePreview: document.querySelector("#capturePreview"),
   guaranteedCount: document.querySelector("#guaranteedCount"),
@@ -67,6 +80,8 @@ let boardCellEditorElement;
 let undoStack = [];
 let redoStack = [];
 let smithingTechniqueReference = { techniques: [] };
+let managedRecipeCraftId = "";
+let managedRecipeCategoryId = "";
 const maxHistoryEntries = 50;
 const specialChargeStates = ["uncharged", "charging", "active"];
 const specialChargeLabels = {
@@ -246,8 +261,43 @@ function createId() {
   return globalThis.crypto?.randomUUID?.() || `id-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
+// ブラウザ上で追加・削除したレシピをAPI由来データへ重ねるための保存領域を読み込みます。
+function loadUserRecipeStore() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(userRecipesStorageKey) || "{}");
+    return {
+      recipes: parsed?.recipes && typeof parsed.recipes === "object" ? parsed.recipes : {},
+      deletedIds: parsed?.deletedIds && typeof parsed.deletedIds === "object" ? parsed.deletedIds : {},
+    };
+  } catch {
+    localStorage.removeItem(userRecipesStorageKey);
+    return { recipes: {}, deletedIds: {} };
+  }
+}
+
+// 追加レシピと削除済みIDをブラウザに保存します。
+function saveUserRecipeStore(store) {
+  localStorage.setItem(userRecipesStorageKey, JSON.stringify(store));
+}
+
+function getDeletedRecipeIds(craftId) {
+  const ids = loadUserRecipeStore().deletedIds?.[craftId];
+  return Array.isArray(ids) ? ids : [];
+}
+
+function getUserRecipes(craftId) {
+  const recipes = loadUserRecipeStore().recipes?.[craftId];
+  return Array.isArray(recipes) ? recipes : [];
+}
+
+function getAllCraftRecipes(craftId) {
+  const deletedIds = new Set(getDeletedRecipeIds(craftId));
+  const baseRecipes = (window.DQ10CraftRecipes?.[craftId] || []).filter((recipe) => !deletedIds.has(recipe.id));
+  return [...baseRecipes, ...getUserRecipes(craftId).filter((recipe) => !deletedIds.has(recipe.id))];
+}
+
 function getCraftRecipes(craftId) {
-  const recipes = window.DQ10CraftRecipes?.[craftId] || [];
+  const recipes = getAllCraftRecipes(craftId);
   return window.DQ10RecipeArchive?.getVisibleRecipes(recipes) ||
     recipes.filter((recipe) => recipe?.archived !== true);
 }
@@ -1915,38 +1965,411 @@ function findNextGridCell(config, index) {
   return null;
 }
 
-function exportState() {
-  const blob = new Blob([JSON.stringify(state, null, 2)], {
-    type: "application/json",
-  });
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.download = `dq10-${state.craftType}-settings-${new Date().toISOString().slice(0, 10)}.json`;
-  anchor.click();
-  URL.revokeObjectURL(url);
+function openRecipeListDialog() {
+  managedRecipeCraftId = state.craftType;
+  managedRecipeCategoryId = state.recipeCategoryId || "";
+  renderRecipeManager();
+  elements.recipeListDialog.showModal();
 }
 
-function importState(event) {
-  const [file] = event.target.files;
+function getManagedRecipeConfig() {
+  return getCraftConfig(managedRecipeCraftId || state.craftType);
+}
 
-  if (!file) {
+function renderRecipeManager() {
+  renderRecipeManagerCraftOptions();
+  renderRecipeManagerCategories();
+}
+
+function renderRecipeManagerCraftOptions() {
+  const configs = Object.values(window.DQ10CraftConfigs || {});
+  elements.recipeManagerCraftSelect.replaceChildren();
+  configs.forEach((config) => {
+    const option = document.createElement("option");
+    option.value = config.id;
+    option.textContent = config.label;
+    elements.recipeManagerCraftSelect.append(option);
+  });
+  managedRecipeCraftId = configs.some((config) => config.id === managedRecipeCraftId)
+    ? managedRecipeCraftId
+    : configs[0]?.id || "";
+  elements.recipeManagerCraftSelect.value = managedRecipeCraftId;
+}
+
+function renderRecipeManagerCategories() {
+  const config = getManagedRecipeConfig();
+  const categories = getRecipeCategoryOptions(config);
+  elements.recipeManagerCategories.replaceChildren();
+  elements.recipeManagerList.replaceChildren();
+
+  if (categories.length === 0) {
+    renderRecipeManagerList(config, "", elements.recipeManagerList);
     return;
   }
 
-  const reader = new FileReader();
-  reader.addEventListener("load", () => {
-    try {
-      state = normalizeState(JSON.parse(String(reader.result)));
-      clearBoardHistory();
-      render();
-    } catch {
-      alert("設定ファイルの読み込みに失敗しました。ExportしたJSONを指定してください。");
-    } finally {
-      elements.importInput.value = "";
-    }
+  managedRecipeCategoryId = normalizeRecipeCategoryId(config, managedRecipeCategoryId);
+  categories.forEach((category) => {
+    const details = document.createElement("details");
+    details.className = "recipe-category-group";
+    details.open = category.id === managedRecipeCategoryId;
+    details.dataset.categoryId = category.id;
+
+    const summary = document.createElement("summary");
+    summary.textContent = category.label;
+    details.append(summary);
+
+    const list = document.createElement("div");
+    list.className = "recipe-manager-list";
+    renderRecipeManagerList(config, category.id, list);
+    details.append(list);
+
+    details.addEventListener("toggle", () => {
+      if (details.open) {
+        managedRecipeCategoryId = category.id;
+      }
+    });
+    elements.recipeManagerCategories.append(details);
   });
-  reader.readAsText(file);
+}
+
+function renderRecipeManagerList(config, categoryId, container) {
+  const hasCategoryOptions = getRecipeCategoryOptions(config).length > 0;
+  const recipes = getCraftRecipes(config.id)
+    .filter((recipe) => !hasCategoryOptions || recipe.categoryId === categoryId);
+
+  container.replaceChildren();
+  if (recipes.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "recipe-empty";
+    empty.textContent = "登録レシピはありません。";
+    container.append(empty);
+    return;
+  }
+
+  recipes.forEach((recipe) => {
+    const row = document.createElement("div");
+    row.className = "recipe-manager-row";
+    row.dataset.recipeId = recipe.id;
+    const meta = getRecipeManagerMeta(config, recipe);
+    row.innerHTML = `
+      <button class="recipe-manager-name" type="button">${escapeHtml(recipe.name)}</button>
+      <span>${escapeHtml(meta)}</span>
+      <button class="button secondary recipe-delete-button" type="button">削除</button>
+    `;
+    row.querySelector(".recipe-manager-name").addEventListener("click", () => {
+      selectManagedRecipe(config, recipe);
+    });
+    row.querySelector(".recipe-delete-button").addEventListener("click", () => {
+      deleteManagedRecipe(config.id, recipe.id, recipe.name);
+    });
+    container.append(row);
+  });
+}
+
+function getRecipeManagerMeta(config, recipe) {
+  const parts = [];
+  const category = recipe.category || getRecipeCategoryLabel(config, recipe.categoryId);
+  const trait = getTrait(config, recipe.traitId || recipe.specialEventId);
+  if (category) {
+    parts.push(category);
+  }
+  if (trait) {
+    parts.push(trait.label);
+  }
+  parts.push(`${recipe.items?.length || 0}マス`);
+  return parts.join(" / ");
+}
+
+function selectManagedRecipe(config, recipe) {
+  if (config.id !== state.craftType) {
+    clearBoardHistory();
+    state = createDefaultState(config.id);
+  }
+  elements.recipeListDialog.close();
+  applyRecipe(recipe.id);
+}
+
+function deleteManagedRecipe(craftId, recipeId, recipeName) {
+  if (!confirm(`${recipeName} をレシピリストから削除します。`)) {
+    return;
+  }
+
+  const store = loadUserRecipeStore();
+  store.recipes[craftId] = (store.recipes[craftId] || []).filter((recipe) => recipe.id !== recipeId);
+  store.deletedIds[craftId] = Array.from(new Set([...(store.deletedIds[craftId] || []), recipeId]));
+  saveUserRecipeStore(store);
+
+  if (state.craftType === craftId && state.recipeId === recipeId) {
+    clearBoardHistory();
+    state = createDefaultState(craftId);
+  }
+  renderRecipeManager();
+  render();
+}
+
+function openAddRecipeDialog() {
+  const config = getManagedRecipeConfig();
+  renderAddRecipeFields(config);
+  renderAddRecipeItems(config);
+  elements.addRecipeDialog.showModal();
+}
+
+function renderAddRecipeFields(config) {
+  const categories = getRecipeCategoryOptions(config);
+  const traits = getTraits(config);
+  elements.addRecipeFields.replaceChildren();
+
+  elements.addRecipeFields.append(createTextField("addRecipeName", config.recipeLabel || "制作物", ""));
+  if (categories.length > 0) {
+    const label = document.createElement("label");
+    label.textContent = config.recipeCategoryLabel || "大項目";
+    const select = document.createElement("select");
+    select.id = "addRecipeCategory";
+    categories.forEach((category) => {
+      const option = document.createElement("option");
+      option.value = category.id;
+      option.textContent = category.label;
+      select.append(option);
+    });
+    select.value = normalizeRecipeCategoryId(config, managedRecipeCategoryId);
+    select.addEventListener("change", () => {
+      managedRecipeCategoryId = select.value;
+      renderAddRecipeItems(config);
+    });
+    label.append(select);
+    elements.addRecipeFields.append(label);
+  }
+  if (traits.length > 0) {
+    const label = document.createElement("label");
+    label.textContent = "特性";
+    const select = document.createElement("select");
+    select.id = "addRecipeTrait";
+    traits.forEach((trait) => {
+      const option = document.createElement("option");
+      option.value = trait.id;
+      option.textContent = trait.label;
+      select.append(option);
+    });
+    select.value = config.defaultTraitId || traits[0]?.id || "";
+    label.append(select);
+    elements.addRecipeFields.append(label);
+  }
+}
+
+function createTextField(id, labelText, value) {
+  const label = document.createElement("label");
+  label.textContent = labelText;
+  const input = document.createElement("input");
+  input.id = id;
+  input.type = "text";
+  input.value = value;
+  input.required = true;
+  label.append(input);
+  return label;
+}
+
+function getAddRecipeSeedItems(config) {
+  const categoryId = getAddRecipeCategoryId(config);
+  const categoryTemplateItems = getRecipeCategoryTemplateItems(config, categoryId);
+  if (categoryTemplateItems.length > 0) {
+    return categoryTemplateItems;
+  }
+
+  if (
+    state.craftType === config.id &&
+    (!categoryId || categoryId === state.recipeCategoryId) &&
+    Array.isArray(state.ingredients) &&
+    state.ingredients.length > 0
+  ) {
+    return state.ingredients;
+  }
+  return getCraftRecipes(config.id)[0]?.items || config.items;
+}
+
+function getAddRecipeCategoryId(config) {
+  const selectedCategoryId = elements.addRecipeFields.querySelector("#addRecipeCategory")?.value ||
+    managedRecipeCategoryId ||
+    "";
+  return normalizeRecipeCategoryId(config, selectedCategoryId);
+}
+
+function getRecipeCategoryTemplateItems(config, categoryId) {
+  const category = getRecipeCategoryOptions(config).find((option) => option.id === categoryId);
+  return Array.isArray(category?.templateItems) ? cloneConfigItems(category.templateItems) : [];
+}
+
+function renderAddRecipeItems(config) {
+  const seedItems = getAddRecipeSeedItems(config);
+  elements.addRecipeItems.replaceChildren();
+
+  seedItems.forEach((item, index) => {
+    appendAddRecipeItemRow(config, item, index);
+  });
+}
+
+function appendAddRecipeItemRow(config, item = {}, index = elements.addRecipeItems.querySelectorAll(".recipe-item-row").length) {
+  const itemOptions = Array.isArray(config.itemOptions) ? config.itemOptions : [];
+  const craftFamily = getCraftComponent(config.id).craftFamily;
+  const row = document.createElement("fieldset");
+  row.className = "recipe-item-row";
+  row.dataset.index = String(index);
+  row.innerHTML = `<legend>${escapeHtml(item.name || `${config.itemNameLabel || "マス"} ${index + 1}`)}</legend>`;
+  row.append(createRecipeItemInput("name", config.itemNameLabel || "マス名", item.name || ""));
+  if (itemOptions.length > 0) {
+    row.append(createRecipeItemSelect("optionId", "位置", item.optionId || itemOptions[0]?.id || "", itemOptions));
+  }
+  if (config.layout) {
+    row.append(createRecipeItemNumber("row", "行", item.gridCell?.row || 1, 1, config.layout.rows || 9));
+    row.append(createRecipeItemNumber("column", "列", item.gridCell?.column || index + 1, 1, config.layout.columns || 9));
+  }
+  row.append(createRecipeItemNumber("target", "基準値", item.target ?? Math.round((numberOr(item.successMin, 60) + numberOr(item.successMax, 75)) / 2), 0, 9999));
+  row.append(createRecipeItemNumber("successMin", "下限", item.successMin ?? 60, 0, 9999));
+  row.append(createRecipeItemNumber("successMax", "上限", item.successMax ?? 75, 0, 9999));
+  if (craftFamily === "cooking") {
+    row.append(createRecipeItemInput("ingredientGroupLabel", "食材分類", item.ingredientGroupLabel || ""));
+  }
+  const removeButton = document.createElement("button");
+  removeButton.className = "button secondary";
+  removeButton.type = "button";
+  removeButton.textContent = "マス削除";
+  removeButton.addEventListener("click", () => {
+    row.remove();
+    refreshAddRecipeItemLegends(config);
+  });
+  row.append(removeButton);
+  elements.addRecipeItems.append(row);
+}
+
+function refreshAddRecipeItemLegends(config) {
+  elements.addRecipeItems.querySelectorAll(".recipe-item-row").forEach((row, index) => {
+    row.dataset.index = String(index);
+    const name = row.querySelector('[data-field="name"]')?.value || `${config.itemNameLabel || "マス"} ${index + 1}`;
+    row.querySelector("legend").textContent = name;
+  });
+}
+
+function createRecipeItemInput(field, labelText, value) {
+  const label = document.createElement("label");
+  label.textContent = labelText;
+  const input = document.createElement("input");
+  input.dataset.field = field;
+  input.type = "text";
+  input.value = value;
+  label.append(input);
+  return label;
+}
+
+function createRecipeItemSelect(field, labelText, value, options) {
+  const label = document.createElement("label");
+  label.textContent = labelText;
+  const select = document.createElement("select");
+  select.dataset.field = field;
+  options.forEach((itemOption) => {
+    const option = document.createElement("option");
+    option.value = itemOption.id;
+    option.textContent = itemOption.label || itemOption.name || itemOption.id;
+    select.append(option);
+  });
+  select.value = value;
+  label.append(select);
+  return label;
+}
+
+function createRecipeItemNumber(field, labelText, value, min, max) {
+  const label = document.createElement("label");
+  label.textContent = labelText;
+  const input = document.createElement("input");
+  input.dataset.field = field;
+  input.type = "number";
+  input.min = min;
+  input.max = max;
+  input.value = value;
+  input.required = true;
+  label.append(input);
+  return label;
+}
+
+function addManagedRecipe(event) {
+  event.preventDefault();
+  const config = getManagedRecipeConfig();
+  const name = elements.addRecipeFields.querySelector("#addRecipeName")?.value.trim();
+  if (!name) {
+    alert("レシピ名を入力してください。");
+    return;
+  }
+
+  const categoryId = elements.addRecipeFields.querySelector("#addRecipeCategory")?.value || "";
+  const traitId = elements.addRecipeFields.querySelector("#addRecipeTrait")?.value || "";
+  const recipe = {
+    id: `user-${config.id}-${Date.now()}`,
+    name,
+    category: getRecipeCategoryLabel(config, categoryId),
+    categoryId,
+    items: collectAddRecipeItems(config),
+  };
+  if (traitId) {
+    recipe.traitId = normalizeTraitId(config, traitId);
+  }
+
+  const store = loadUserRecipeStore();
+  store.recipes[config.id] = [...(store.recipes[config.id] || []), recipe];
+  store.deletedIds[config.id] = (store.deletedIds[config.id] || []).filter((id) => id !== recipe.id);
+  saveUserRecipeStore(store);
+
+  managedRecipeCategoryId = categoryId || managedRecipeCategoryId;
+  elements.addRecipeDialog.close();
+  renderRecipeManager();
+  if (state.craftType === config.id) {
+    applyRecipe(recipe.id);
+  }
+}
+
+function collectAddRecipeItems(config) {
+  return Array.from(elements.addRecipeItems.querySelectorAll(".recipe-item-row"), (row, index) => {
+    const valueOf = (field) => row.querySelector(`[data-field="${field}"]`)?.value;
+    const successMin = numberOr(valueOf("successMin"), 60);
+    const successMax = numberOr(valueOf("successMax"), 75);
+    const item = {
+      id: `item-${index + 1}`,
+      name: valueOf("name") || `${config.itemNameLabel || "マス"} ${index + 1}`,
+      current: 0,
+      target: numberOr(valueOf("target"), Math.round((successMin + successMax) / 2)),
+      successMin,
+      successMax,
+    };
+    const optionId = valueOf("optionId");
+    if (optionId) {
+      item.optionId = optionId;
+    }
+    if (config.layout) {
+      item.gridCell = {
+        row: numberOr(valueOf("row"), 1),
+        column: numberOr(valueOf("column"), index + 1),
+      };
+    }
+    const ingredientGroupLabel = valueOf("ingredientGroupLabel");
+    if (ingredientGroupLabel) {
+      item.ingredientGroupLabel = ingredientGroupLabel;
+    }
+    return item;
+  });
+}
+
+function addRecipeItemRow() {
+  const config = getManagedRecipeConfig();
+  const index = elements.addRecipeItems.querySelectorAll(".recipe-item-row").length;
+  const layout = config.layout || {};
+  appendAddRecipeItemRow(config, {
+    name: `${config.itemNameLabel || "マス"} ${index + 1}`,
+    optionId: config.itemOptions?.[0]?.id || "",
+    gridCell: {
+      row: Math.min(numberOr(layout.rows, 1), Math.floor(index / Math.max(1, numberOr(layout.columns, 1))) + 1),
+      column: (index % Math.max(1, numberOr(layout.columns, 1))) + 1,
+    },
+    current: 0,
+    successMin: 60,
+    successMax: 75,
+  }, index);
 }
 
 async function startCapturePreview() {
@@ -2032,9 +2455,18 @@ elements.clearCookingLightButton?.addEventListener("click", clearCookingLight);
 elements.clearCookingEffectButton?.addEventListener("click", () => setCookingEffectMode("none"));
 elements.crossGlowButton?.addEventListener("click", () => setCookingEffectMode("cross-glow"));
 elements.cornerReturnButton?.addEventListener("click", () => setCookingEffectMode("corner-return"));
-elements.exportButton.addEventListener("click", exportState);
+elements.recipeListButton.addEventListener("click", openRecipeListDialog);
+elements.recipeManagerCraftSelect.addEventListener("change", () => {
+  managedRecipeCraftId = elements.recipeManagerCraftSelect.value;
+  managedRecipeCategoryId = "";
+  renderRecipeManagerCategories();
+});
+elements.openAddRecipeButton.addEventListener("click", openAddRecipeDialog);
+elements.addRecipeForm.addEventListener("submit", addManagedRecipe);
+elements.addRecipeCloseButton.addEventListener("click", () => elements.addRecipeDialog.close());
+elements.cancelAddRecipeButton.addEventListener("click", () => elements.addRecipeDialog.close());
+elements.addRecipeItemButton.addEventListener("click", addRecipeItemRow);
 elements.resetButton.addEventListener("click", resetState);
-elements.importInput.addEventListener("change", importState);
 elements.captureButton.addEventListener("click", startCapturePreview);
 document.addEventListener("pointerdown", (event) => {
   const action = DQ10BoardCellEditor.resolvePointerDownAction({
