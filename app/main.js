@@ -2241,10 +2241,63 @@ function getRecipeCategoryTemplateItems(config, categoryId) {
 
 function renderAddRecipeItems(config, seedItems = getAddRecipeSeedItems(config)) {
   elements.addRecipeItems.replaceChildren();
+  elements.addRecipeItems.classList.toggle("recipe-layout-editor", isSmithingRecipeEditor(config));
+
+  if (isSmithingRecipeEditor(config)) {
+    renderSmithingAddRecipeItems(config, seedItems);
+    if (elements.addRecipeItemButton) {
+      elements.addRecipeItemButton.hidden = true;
+    }
+    return;
+  }
+
+  if (elements.addRecipeItemButton) {
+    elements.addRecipeItemButton.hidden = false;
+  }
+  elements.addRecipeItems.style.gridTemplateColumns = "";
+  elements.addRecipeItems.style.gridTemplateRows = "";
 
   seedItems.forEach((item, index) => {
     appendAddRecipeItemRow(config, item, index);
   });
+}
+
+// 鍛冶レシピは実際の鍛冶配置で、基準範囲の下限と上限だけを入力します。
+function isSmithingRecipeEditor(config) {
+  return getCraftComponent(config.id).craftFamily === "smithing" && Boolean(config.layout);
+}
+
+function getVisibleSmithingRecipeItems(items) {
+  return (items || []).filter((item) => item?.gridCell);
+}
+
+function renderSmithingAddRecipeItems(config, seedItems) {
+  const rows = Math.max(1, numberOr(config.layout?.rows, 1));
+  const columns = Math.max(1, numberOr(config.layout?.columns, 1));
+  const visibleItems = getVisibleSmithingRecipeItems(seedItems);
+  elements.addRecipeItems.style.gridTemplateColumns = `repeat(${columns}, minmax(112px, 1fr))`;
+  elements.addRecipeItems.style.gridTemplateRows = `repeat(${rows}, minmax(0, auto))`;
+
+  visibleItems.forEach((item) => {
+    appendSmithingAddRecipeCell(
+      numberOr(item.gridCell?.row, 1),
+      numberOr(item.gridCell?.column, 1),
+      item,
+    );
+  });
+}
+
+function appendSmithingAddRecipeCell(rowIndex, columnIndex, item = null) {
+  const cell = document.createElement("fieldset");
+  cell.className = "recipe-layout-cell";
+  cell.dataset.row = String(rowIndex);
+  cell.dataset.column = String(columnIndex);
+  cell.style.gridRow = String(rowIndex);
+  cell.style.gridColumn = String(columnIndex);
+  cell.innerHTML = `<legend>${rowIndex}行${columnIndex}列</legend>`;
+  cell.append(createRecipeItemNumber("successMin", "下限", item?.successMin ?? "", 0, 9999, false));
+  cell.append(createRecipeItemNumber("successMax", "上限", item?.successMax ?? "", 0, 9999, false));
+  elements.addRecipeItems.append(cell);
 }
 
 function appendAddRecipeItemRow(config, item = {}, index = elements.addRecipeItems.querySelectorAll(".recipe-item-row").length) {
@@ -2315,7 +2368,7 @@ function createRecipeItemSelect(field, labelText, value, options) {
   return label;
 }
 
-function createRecipeItemNumber(field, labelText, value, min, max) {
+function createRecipeItemNumber(field, labelText, value, min, max, required = true) {
   const label = document.createElement("label");
   label.textContent = labelText;
   const input = document.createElement("input");
@@ -2324,7 +2377,7 @@ function createRecipeItemNumber(field, labelText, value, min, max) {
   input.min = min;
   input.max = max;
   input.value = value;
-  input.required = true;
+  input.required = required;
   label.append(input);
   return label;
 }
@@ -2377,6 +2430,10 @@ function saveManagedRecipe(event) {
 }
 
 function collectAddRecipeItems(config) {
+  if (isSmithingRecipeEditor(config)) {
+    return collectSmithingAddRecipeItems(config);
+  }
+
   return Array.from(elements.addRecipeItems.querySelectorAll(".recipe-item-row"), (row, index) => {
     const valueOf = (field) => row.querySelector(`[data-field="${field}"]`)?.value;
     const successMin = numberOr(valueOf("successMin"), 60);
@@ -2407,8 +2464,40 @@ function collectAddRecipeItems(config) {
   });
 }
 
+function collectSmithingAddRecipeItems(config) {
+  return Array.from(elements.addRecipeItems.querySelectorAll(".recipe-layout-cell"))
+    .map((cell) => {
+      const successMinValue = cell.querySelector('[data-field="successMin"]')?.value;
+      const successMaxValue = cell.querySelector('[data-field="successMax"]')?.value;
+      if (successMinValue === "" && successMaxValue === "") {
+        return null;
+      }
+
+      const successMin = numberOr(successMinValue, 60);
+      const successMax = numberOr(successMaxValue, successMin);
+      const row = numberOr(cell.dataset.row, 1);
+      const column = numberOr(cell.dataset.column, 1);
+      const index = ((row - 1) * Math.max(1, numberOr(config.layout?.columns, 1))) + column;
+
+      return {
+        id: `item-${index}`,
+        name: `${row}行${column}列`,
+        current: 0,
+        target: Math.round((successMin + successMax) / 2),
+        successMin,
+        successMax,
+        gridCell: { row, column },
+      };
+    })
+    .filter(Boolean);
+}
+
 function addRecipeItemRow() {
   const config = getManagedRecipeConfig();
+  if (isSmithingRecipeEditor(config)) {
+    return;
+  }
+
   const index = elements.addRecipeItems.querySelectorAll(".recipe-item-row").length;
   const layout = config.layout || {};
   appendAddRecipeItemRow(config, {

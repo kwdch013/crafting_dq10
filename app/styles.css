@@ -318,6 +318,11 @@ button:disabled {
   gap: 10px;
 }
 
+.recipe-layout-editor {
+  align-items: stretch;
+  gap: 8px;
+}
+
 .recipe-item-add-button {
   margin-top: 10px;
 }
@@ -336,6 +341,28 @@ button:disabled {
   padding: 0 4px;
   font-size: 12px;
   font-weight: 900;
+}
+
+.recipe-layout-cell {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  min-height: 122px;
+  background: var(--surface-soft);
+  padding: 10px;
+}
+
+.recipe-layout-cell legend {
+  padding: 0 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.recipe-layout-cell input {
+  min-height: 36px;
 }
 
 label {

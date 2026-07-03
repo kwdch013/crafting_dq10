@@ -34,3 +34,17 @@ assert.match(mainJs, /openEditRecipeDialog\(config, recipe\)/, "レシピ名ク�
 assert.match(mainJs, /managedRecipeEditId/, "編集中レシピIDを保持してください");
 assert.match(mainJs, /userRecipeMap/, "既存レシピをユーザー編集内容で上書きできるようにしてください");
 assert.match(mainJs, /config\.id === "cooking"/, "調理職人だけ大項目表示を抑止してください");
+assert.match(mainJs, /function isSmithingRecipeEditor\(config\)/, "鍛冶職人のレシピ追加は専用の配置入力にしてください");
+assert.match(mainJs, /function renderSmithingAddRecipeItems\(config, seedItems\)/, "鍛冶職人の配置どおりに基準範囲入力を表示してください");
+assert.match(mainJs, /function collectSmithingAddRecipeItems\(config\)/, "鍛冶職人は入力済みセルだけをレシピマスとして保存してください");
+assert.match(mainJs, /recipe-layout-cell/, "鍛冶職人のレシピ追加は配置セルで入力してください");
+assert.match(mainJs, /elements\.addRecipeItemButton\.hidden = true/, "鍛冶職人ではマス追加ボタンを非表示にしてください");
+assert.match(mainJs, /getVisibleSmithingRecipeItems\(seedItems\)/, "鍛冶職人ではレシピに含まれるマスだけを表示してください");
+assert.match(mainJs, /cell\.style\.gridRow = String\(rowIndex\)/, "鍛冶職人の入力セルは実際の行位置へ配置してください");
+assert.match(mainJs, /cell\.style\.gridColumn = String\(columnIndex\)/, "鍛冶職人の入力セルは実際の列位置へ配置してください");
+const smithingCellStart = mainJs.indexOf("function appendSmithingAddRecipeCell");
+const smithingCellEnd = mainJs.indexOf("function appendAddRecipeItemRow", smithingCellStart);
+const smithingCellFunction = mainJs.slice(smithingCellStart, smithingCellEnd);
+assert.match(smithingCellFunction, /createRecipeItemNumber\("successMin"/, "鍛冶職人の配置セルに下限入力を出してください");
+assert.match(smithingCellFunction, /createRecipeItemNumber\("successMax"/, "鍛冶職人の配置セルに上限入力を出してください");
+assert.doesNotMatch(smithingCellFunction, /createRecipeItemInput\("name"/, "鍛冶職人の配置セルにマス名入力を出さないでください");
