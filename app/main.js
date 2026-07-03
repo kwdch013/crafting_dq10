@@ -27,6 +27,8 @@ const elements = {
   craftReferencePanel: document.querySelector("#craftReferencePanel"),
   recipeTraitReference: document.querySelector("#recipeTraitReference"),
   cookingDamageRanges: document.querySelector("#cookingDamageRanges"),
+  boardSpecialToggle: document.querySelector("#boardSpecialToggle"),
+  boardSpecialStateLabel: document.querySelector("#boardSpecialStateLabel"),
   layoutSectionTitle: document.querySelector("#layoutSectionTitle"),
   boardActions: document.querySelector("#boardActions"),
   cookingCommandPanel: document.querySelector("#cookingCommandPanel"),
@@ -63,6 +65,12 @@ let boardCellEditorElement;
 let undoStack = [];
 let redoStack = [];
 const maxHistoryEntries = 50;
+const specialChargeStates = ["uncharged", "charging", "active"];
+const specialChargeLabels = {
+  uncharged: "未チャージ",
+  charging: "チャージ中",
+  active: "使用中",
+};
 
 async function hydrateRecipesFromApi() {
   try {
@@ -189,9 +197,15 @@ function normalizeState(value) {
     })),
     ingredients,
     cookingCellEffects: normalizeCookingCellEffects(value.cookingCellEffects, config.layout),
+    specialChargeState: normalizeSpecialChargeState(value.specialChargeState),
     miracleGrillUsed: value.miracleGrillUsed === true,
     miracleGrillResult: typeof value.miracleGrillResult === "string" ? value.miracleGrillResult : "",
   };
+}
+
+// 必殺チャージ表示はBOARD見出しで切り替えるため、保存値を3状態に正規化します。
+function normalizeSpecialChargeState(value) {
+  return specialChargeStates.includes(value) ? value : "uncharged";
 }
 
 function createLayoutSignature(config) {
@@ -404,6 +418,7 @@ function createDefaultState(craftType) {
     techniques: cloneConfigItems(config.techniques),
     ingredients: cloneConfigItems(defaultRecipe?.items || config.items),
     cookingCellEffects: [],
+    specialChargeState: "uncharged",
     miracleGrillUsed: false,
     miracleGrillResult: "",
   });
@@ -427,6 +442,7 @@ function createBoardSnapshot() {
     })),
     cookingEffectMode: state.cookingEffectMode,
     cookingCellEffects: state.cookingCellEffects.map((effect) => ({ ...effect })),
+    specialChargeState: state.specialChargeState,
     miracleGrillUsed: state.miracleGrillUsed,
     miracleGrillResult: state.miracleGrillResult,
   };
@@ -439,6 +455,7 @@ function restoreBoardSnapshot(snapshot) {
   }));
   state.cookingEffectMode = normalizeCookingEffectMode(state.traitId, snapshot.cookingEffectMode);
   state.cookingCellEffects = normalizeCookingCellEffects(snapshot.cookingCellEffects, getCurrentCraftConfig().layout);
+  state.specialChargeState = normalizeSpecialChargeState(snapshot.specialChargeState);
   state.miracleGrillUsed = snapshot.miracleGrillUsed === true;
   state.miracleGrillResult = snapshot.miracleGrillResult || "";
   selectedBoardIngredientId = null;
@@ -747,6 +764,10 @@ function renderLayoutBoard() {
 
   elements.layoutBoard.replaceChildren();
   elements.layoutBoard.classList.remove("square-board");
+  elements.layoutBoard.classList.toggle(
+    "special-active-board",
+    isCurrentCraftFamily("cooking") && state.specialChargeState === "active",
+  );
   elements.layoutBoard.style.gridTemplateColumns = `repeat(${columns}, minmax(110px, 1fr))`;
   elements.layoutBoard.style.gridTemplateRows = `repeat(${rows}, minmax(0, 1fr))`;
 
@@ -887,8 +908,37 @@ function syncBoardActionButtons() {
   }
   elements.undoBoardButton.disabled = !canRearrange || undoStack.length === 0;
   elements.redoBoardButton.disabled = !canRearrange || redoStack.length === 0;
+  syncBoardSpecialState();
   syncMiracleGrillButton(canRearrange, selectedIngredient);
   syncCookingEffectButtons();
+}
+
+function syncBoardSpecialState() {
+  const isCooking = isCurrentCraftFamily("cooking");
+  const stateId = normalizeSpecialChargeState(state?.specialChargeState);
+
+  if (elements.boardSpecialToggle) {
+    elements.boardSpecialToggle.disabled = !isCooking;
+    elements.boardSpecialToggle.classList.toggle("active", isCooking && stateId === "active");
+  }
+  if (elements.boardSpecialStateLabel) {
+    elements.boardSpecialStateLabel.hidden = !isCooking;
+    elements.boardSpecialStateLabel.textContent = specialChargeLabels[stateId];
+    elements.boardSpecialStateLabel.dataset.state = stateId;
+  }
+}
+
+function toggleBoardSpecialState() {
+  if (!isCurrentCraftFamily("cooking")) {
+    return;
+  }
+
+  const currentIndex = specialChargeStates.indexOf(normalizeSpecialChargeState(state.specialChargeState));
+  const nextIndex = (currentIndex + 1) % specialChargeStates.length;
+  state.specialChargeState = specialChargeStates[nextIndex];
+  syncBoardSpecialState();
+  renderLayoutBoard();
+  saveState();
 }
 
 function syncMiracleGrillButton(canRearrange, selectedIngredient) {
@@ -1768,6 +1818,7 @@ function applyRecipe(recipeId) {
   state.cookingCellEffects = [];
   state.miracleGrillUsed = false;
   state.miracleGrillResult = "";
+  state.specialChargeState = "uncharged";
   state.layoutSignature = createLayoutSignature(config);
   render();
 }
@@ -1809,6 +1860,7 @@ function createResetStateForCurrentSelection() {
     techniques: cloneConfigItems(config.techniques),
     ingredients: cloneConfigItems(resetRecipe?.items || config.items),
     cookingCellEffects: [],
+    specialChargeState: "uncharged",
     miracleGrillUsed: false,
     miracleGrillResult: "",
   });
@@ -1949,6 +2001,7 @@ elements.heatInput.addEventListener("change", () => {
 elements.addIngredientButton.addEventListener("click", addIngredient);
 elements.undoBoardButton.addEventListener("click", undoBoardAction);
 elements.redoBoardButton.addEventListener("click", redoBoardAction);
+elements.boardSpecialToggle.addEventListener("click", toggleBoardSpecialState);
 elements.miracleGrillButton?.addEventListener("click", applyMiracleGrillToSelected);
 elements.normalHeatButton?.addEventListener("click", () => setCookingHeatMode("normal"));
 elements.strongHeatButton?.addEventListener("click", () => setCookingHeatMode("strong"));
