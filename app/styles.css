@@ -379,6 +379,57 @@ select:focus {
   grid-template-columns: 76px minmax(0, 1fr);
 }
 
+.smithing-damage-panel {
+  padding-top: 14px;
+}
+
+.smithing-heat-controls {
+  display: grid;
+  grid-template-columns: auto minmax(72px, auto) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.smithing-heat-controls strong {
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.smithing-damage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+}
+
+.smithing-damage-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 8px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-soft);
+  padding: 9px;
+}
+
+.smithing-damage-row strong,
+.smithing-damage-row span {
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.smithing-damage-row span {
+  font-weight: 900;
+}
+
+.smithing-damage-row small {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .trait-reference {
   grid-template-columns: 76px minmax(0, 1fr);
 }
@@ -970,7 +1021,8 @@ td input {
 
   .reference-grid,
   .reference-row,
-  .damage-reference .reference-row {
+  .damage-reference .reference-row,
+  .smithing-heat-controls {
     grid-template-columns: 1fr;
   }
 

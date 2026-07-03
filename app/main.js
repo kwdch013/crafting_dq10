@@ -27,6 +27,11 @@ const elements = {
   craftReferencePanel: document.querySelector("#craftReferencePanel"),
   recipeTraitReference: document.querySelector("#recipeTraitReference"),
   cookingDamageRanges: document.querySelector("#cookingDamageRanges"),
+  smithingDamagePanel: document.querySelector("#smithingDamagePanel"),
+  smithingTemperatureDamageLabel: document.querySelector("#smithingTemperatureDamageLabel"),
+  smithingHeatDownButton: document.querySelector("#smithingHeatDownButton"),
+  smithingHeatUpButton: document.querySelector("#smithingHeatUpButton"),
+  smithingDamageRanges: document.querySelector("#smithingDamageRanges"),
   specialChargeToggle: document.querySelector("#specialChargeToggle"),
   boardSpecialStateLabel: document.querySelector("#boardSpecialStateLabel"),
   layoutSectionTitle: document.querySelector("#layoutSectionTitle"),
@@ -461,6 +466,7 @@ function restoreBoardSnapshot(snapshot) {
   selectedBoardIngredientId = null;
   renderIngredients();
   renderLayoutBoard();
+  renderSmithingDamageReference();
   renderCraftReference();
   renderAnalysis();
   saveState();
@@ -492,6 +498,7 @@ function render() {
   renderHeatOptions();
   renderTechniqueEditor();
   renderCraftReference();
+  renderSmithingDamageReference();
   renderIngredients();
   renderLayoutBoard();
   renderAnalysis();
@@ -704,6 +711,60 @@ function renderCraftReference() {
     elements,
     escapeHtml,
     getTrait,
+  });
+}
+
+// 鍛冶BOARD下に現在温度の威力別ダメージ表を描画します。
+function renderSmithingDamageReference() {
+  const isSmithing = isCurrentCraftFamily("smithing");
+  const rangeSet = window.DQ10SmithingDamage?.ranges?.[state.heat];
+  const powers = window.DQ10SmithingDamage?.powers || {};
+  const heatStates = getCurrentCraftConfig().heatStates || [];
+  const currentHeat = numberOr(state.heat, 0);
+  const heatValues = heatStates.map((heatState) => numberOr(heatState.id, currentHeat));
+  const minHeat = Math.min(...heatValues);
+  const maxHeat = Math.max(...heatValues);
+
+  if (!elements.smithingDamagePanel || !elements.smithingDamageRanges) {
+    return;
+  }
+
+  elements.smithingDamagePanel.hidden = !isSmithing;
+  if (!isSmithing) {
+    elements.smithingDamageRanges.replaceChildren();
+    return;
+  }
+
+  if (elements.smithingTemperatureDamageLabel) {
+    elements.smithingTemperatureDamageLabel.textContent = `${state.heat}℃`;
+  }
+  if (elements.smithingHeatDownButton) {
+    elements.smithingHeatDownButton.disabled = currentHeat <= minHeat;
+  }
+  if (elements.smithingHeatUpButton) {
+    elements.smithingHeatUpButton.disabled = currentHeat >= maxHeat;
+  }
+
+  elements.smithingDamageRanges.replaceChildren();
+  Object.entries(powers).forEach(([powerId, power]) => {
+    const range = rangeSet?.[powerId];
+    const row = document.createElement("div");
+    row.className = "smithing-damage-row";
+
+    if (!range) {
+      row.innerHTML = `
+        <strong>${escapeHtml(power.label)}</strong>
+        <span>-</span>
+        <small>未設定</small>
+      `;
+    } else {
+      row.innerHTML = `
+        <strong>${escapeHtml(power.label)}</strong>
+        <span class="numeric">${range[0]} - ${range[1]}</span>
+        <small class="numeric">最大 ${range[1]}</small>
+      `;
+    }
+    elements.smithingDamageRanges.append(row);
   });
 }
 
@@ -1221,6 +1282,31 @@ function setCookingHeatMode(mode) {
   state.heat = mode;
   elements.heatInput.value = mode;
   renderTechniqueEditor();
+  renderSmithingDamageReference();
+  renderIngredients();
+  renderLayoutBoard();
+  renderCraftReference();
+  renderAnalysis();
+  syncBoardActionButtons();
+  saveState();
+}
+
+// 鍛冶BOARD内の温度操作を50℃刻みの温度状態へ同期します。
+function adjustSmithingHeat(delta) {
+  if (!isCurrentCraftFamily("smithing")) {
+    return;
+  }
+
+  const config = getCurrentCraftConfig();
+  const nextHeat = String(numberOr(state.heat, 0) + delta);
+  if (!config.heatStates.some((heatState) => heatState.id === nextHeat)) {
+    return;
+  }
+
+  state.heat = nextHeat;
+  elements.heatInput.value = state.heat;
+  renderTechniqueEditor();
+  renderSmithingDamageReference();
   renderIngredients();
   renderLayoutBoard();
   renderCraftReference();
@@ -1991,6 +2077,7 @@ elements.toolStarsSelect.addEventListener("change", updateFocusFromSelection);
 elements.heatInput.addEventListener("change", () => {
   state.heat = elements.heatInput.value;
   renderTechniqueEditor();
+  renderSmithingDamageReference();
   renderIngredients();
   renderLayoutBoard();
   renderCraftReference();
@@ -2001,6 +2088,8 @@ elements.heatInput.addEventListener("change", () => {
 elements.addIngredientButton.addEventListener("click", addIngredient);
 elements.undoBoardButton.addEventListener("click", undoBoardAction);
 elements.redoBoardButton.addEventListener("click", redoBoardAction);
+elements.smithingHeatDownButton?.addEventListener("click", () => adjustSmithingHeat(-50));
+elements.smithingHeatUpButton?.addEventListener("click", () => adjustSmithingHeat(50));
 elements.specialChargeToggle.addEventListener("click", toggleBoardSpecialState);
 elements.miracleGrillButton?.addEventListener("click", applyMiracleGrillToSelected);
 elements.normalHeatButton?.addEventListener("click", () => setCookingHeatMode("normal"));
