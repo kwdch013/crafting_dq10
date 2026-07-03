@@ -51,7 +51,7 @@ function assertBattlePazzaRecipe(recipe) {
   assert.ok(recipe, "バトルパッツァのレシピが登録されていません");
   assert.equal(recipe.category, "魚料理");
   assert.equal(recipe.categoryId, "fish-dishes");
-  assert.equal(recipe.traitId, "light");
+  assert.equal(recipe.traitId, "light-return");
   assert.equal(recipe.archived, undefined);
   assert.deepEqual(Array.from(recipe.items, (item) => item.id), [
     "slot-1-2",

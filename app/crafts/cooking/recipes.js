@@ -542,7 +542,7 @@ registerDQ10CraftRecipes("cooking", [
         "ingredientGroupLabel": "野菜"
       }
     ],
-    "traitId": "light"
+    "traitId": "light-return"
   },
   {
     "id": "cooking-008",
