@@ -38,6 +38,12 @@ vm.createContext(context);
 		assert.equal(lightHammer?.focusBonusByStars[star], 45);
 	});
 
+	const miracleHammer = config.focus.tools.find((tool) => tool.id === "miracle-smithing-hammer");
+	assert.equal(miracleHammer?.label, "奇跡の鍛冶ハンマー");
+	[0, 1, 2, 3].forEach((star) => {
+		assert.equal(miracleHammer?.focusBonusByStars[star], 50);
+	});
+
 	const focusByLevel = Object.fromEntries(config.focus.levels.map((entry) => [entry.level, entry.focus]));
 	assert.equal(focusByLevel[76], 199);
 	assert.equal(focusByLevel[77], 201);
