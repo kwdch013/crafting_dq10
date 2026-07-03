@@ -108,9 +108,9 @@ button:disabled {
 }
 
 .board-special-state[data-state="charging"] {
-  border-color: rgba(37, 99, 235, 0.35);
-  background: #dbeafe;
-  color: #1d4ed8;
+  border-color: rgba(96, 165, 250, 0.45);
+  background: #eff6ff;
+  color: #2563eb;
 }
 
 .board-special-state[data-state="active"] {
