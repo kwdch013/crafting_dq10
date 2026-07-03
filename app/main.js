@@ -1048,10 +1048,11 @@ function renderLayoutBoard() {
       if (ingredientVisual) {
         cell.classList.add("has-ingredient-visual", `ingredient-${ingredientVisual.id}`);
       }
+      const boardCellTitle = formatBoardCellTitle(item);
 
       cell.innerHTML = `
         <div class="board-cell-head">
-          <strong>${escapeHtml(item.name)}</strong>
+          ${boardCellTitle}
           <div class="board-cell-badges">
             ${special.isGlowing ? '<span class="glow-badge">光</span>' : ""}
             ${special.isReturning ? '<span class="return-badge">戻</span>' : ""}
@@ -1554,6 +1555,16 @@ function formatCookingCellEffectBadge(effect) {
 
 function formatBoardBadge(label) {
   return label ? `<span>${escapeHtml(label)}</span>` : "";
+}
+
+// 職人別にBOARDセル左上の見出しを整形します。
+function formatBoardCellTitle(item) {
+  const componentTitle = getCurrentCraftComponent().formatBoardCellTitle?.(item, escapeHtml);
+  if (componentTitle !== undefined) {
+    return componentTitle;
+  }
+
+  return `<strong>${escapeHtml(item.name)}</strong>`;
 }
 
 function formatLockBadge(item) {

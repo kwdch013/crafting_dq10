@@ -13,6 +13,7 @@
       canRearrangeBoard,
       formatBlockEffectBadge,
       formatCellEffectBadge,
+      formatBoardCellTitle,
       formatIngredientVisual,
       formatLightToggle,
       getBlockEffectLabel: getCookingBlockEffectLabel,
@@ -25,6 +26,11 @@
       renderReference,
       updateIngredientPositionOption,
     };
+  }
+
+  // 調理BOARDでは食材名が初期位置名のため、ノード左上には表示しません。
+  function formatBoardCellTitle() {
+    return "";
   }
 
   // フライパン固定配置の調理だけ盤面入れ替えを許可します。
