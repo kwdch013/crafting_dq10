@@ -8,9 +8,7 @@
   function createDQ10SmithingCraftConfig(options) {
     return {
       recipeLabel: options.recipeLabel || "装備名",
-      itemSectionTitle: "鍛冶マス入力",
       itemNameLabel: "マス名",
-      addItemLabel: "マスを追加",
       resourceLabel: "集中力",
       stateLabel: "温度",
       targetMode: "random-in-range",

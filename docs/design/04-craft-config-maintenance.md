@@ -37,9 +37,7 @@ app/crafts/
 - `label`: UI表示名
 - `modeLabel`: 画面上部の補足表示
 - `recipeLabel`: 品目名ラベル
-- `itemSectionTitle`: 入力表の見出し
-- `itemNameLabel`: マス名のラベル
-- `addItemLabel`: 追加ボタンの文言
+- `itemNameLabel`: 手入力データ補完時のマス名ラベル
 - `resourceLabel`: 集中力などのリソース名
 - `defaultRecipeName`: 初期品目名
 - `defaultFocus`: 初期集中力

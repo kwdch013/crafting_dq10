@@ -66,7 +66,7 @@ layout: {
 
 ## 鍛冶BOARD
 
-鍛冶系では、BOARDの鍛冶配置と鍛冶マス入力の間に温度別ダメージ表を表示します。
+鍛冶系では、BOARDの鍛冶配置の後に温度別ダメージ表を表示します。
 
 - 現在温度は `-50℃`、`+50℃` のBOARD内操作で変更できます。
 - 表示するダメージ表は、現在温度に対応する威力別の最小値、最大値、最大ダメージです。
@@ -101,13 +101,11 @@ sequenceDiagram
   participant Config as 職人設定
   participant Engine as 計算エンジン
   participant Board as 盤面表示
-  participant Table as 入力表
 
   UI->>Config: layoutとitemsを取得
   UI->>Engine: 全特技で各マスを評価
   Engine-->>UI: 判定済みマス一覧
   UI->>Board: gridCell順に配置
-  UI->>Table: 同じマスを一覧表示
 ```
 
 ## 画面上の役割

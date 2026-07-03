@@ -19,7 +19,6 @@ function extractHeatInputHandlerBody() {
 	const body = extractFunctionBody("setCookingHeatMode");
 
 	assert.match(body, /renderTechniqueEditor\(\);/);
-	assert.match(body, /renderIngredients\(\);/);
 	assert.match(body, /renderLayoutBoard\(\);/);
 	assert.match(body, /renderAnalysis\(\);/);
 }
@@ -28,7 +27,6 @@ function extractHeatInputHandlerBody() {
 	const body = extractHeatInputHandlerBody();
 
 	assert.match(body, /renderTechniqueEditor\(\);/);
-	assert.match(body, /renderIngredients\(\);/);
 	assert.match(body, /renderLayoutBoard\(\);/);
 	assert.match(body, /renderAnalysis\(\);/);
 }
