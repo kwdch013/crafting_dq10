@@ -174,6 +174,11 @@ function normalizeState(value) {
       name: ingredient.name || defaultItem?.name || `${config.itemNameLabel.replace("名", "")} ${index + 1}`,
       optionId: ingredient.optionId || defaultItem?.optionId || config.itemOptions?.[0]?.id || "",
       gridCell: normalizeGridCell(ingredient.gridCell || defaultItem?.gridCell, index, config.layout),
+      initialGridCell: normalizeGridCell(
+        ingredient.initialGridCell || defaultItem?.initialGridCell || defaultItem?.gridCell || ingredient.gridCell,
+        index,
+        config.layout,
+      ),
       current: numberOr(ingredient.current, defaultItem?.current ?? 0),
       locked: ingredient.locked === true,
       lockJudgement: ingredient.lockJudgement || "",
@@ -481,6 +486,12 @@ function cloneConfigItems(items) {
   return items.map((item) => ({
     ...item,
     gridCell: item.gridCell ? { ...item.gridCell } : undefined,
+    // 画面取得時の対応確認用に、移動しても変わらない初期座標を保持します。
+    initialGridCell: item.initialGridCell
+      ? { ...item.initialGridCell }
+      : item.gridCell
+        ? { ...item.gridCell }
+        : undefined,
     locked: item.locked === true,
     lockJudgement: item.lockJudgement || "",
     lockJudgementLabel: item.lockJudgementLabel || "",
@@ -534,6 +545,7 @@ function createBoardSnapshot() {
     ingredients: state.ingredients.map((ingredient) => ({
       ...ingredient,
       gridCell: ingredient.gridCell ? { ...ingredient.gridCell } : undefined,
+      initialGridCell: ingredient.initialGridCell ? { ...ingredient.initialGridCell } : undefined,
     })),
     cookingEffectMode: state.cookingEffectMode,
     cookingCellEffects: state.cookingCellEffects.map((effect) => ({ ...effect })),
@@ -547,6 +559,7 @@ function restoreBoardSnapshot(snapshot) {
   state.ingredients = snapshot.ingredients.map((ingredient) => ({
     ...ingredient,
     gridCell: ingredient.gridCell ? { ...ingredient.gridCell } : undefined,
+    initialGridCell: ingredient.initialGridCell ? { ...ingredient.initialGridCell } : undefined,
   }));
   state.cookingEffectMode = normalizeCookingEffectMode(state.traitId, snapshot.cookingEffectMode);
   state.cookingCellEffects = normalizeCookingCellEffects(snapshot.cookingCellEffects, getCurrentCraftConfig().layout);
@@ -1025,6 +1038,10 @@ function renderLayoutBoard() {
       cell.style.gridRow = `span ${rowSpan}`;
       cell.style.gridColumn = `span ${columnSpan}`;
       cell.dataset.id = item.id;
+      cell.dataset.initialRow = String(item.initialGridCell?.row || "");
+      cell.dataset.initialColumn = String(item.initialGridCell?.column || "");
+      cell.dataset.currentRow = String(item.gridCell?.row || "");
+      cell.dataset.currentColumn = String(item.gridCell?.column || "");
       if (item.id === selectedBoardIngredientId || isSameIngredientGroup(item, selectedGroupId)) {
         cell.classList.add("selected");
       }
@@ -1051,7 +1068,6 @@ function renderLayoutBoard() {
             ${formatLockBadge(item)}
             ${formatBoardBadge(item.ingredientGroupLabel)}
             ${ingredientVisual?.isInferred ? formatBoardBadge("推定") : ""}
-            ${formatBoardBadge(getItemOptionLabel(config, item.optionId))}
           </div>
         </div>
         ${formatCookingIngredientVisual(ingredientVisual)}
