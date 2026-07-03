@@ -16,6 +16,7 @@ flowchart LR
   UI --> API[API<br>api/main.py]
   UI --> Engine[共通計算エンジン<br>app/engine.js]
   UI --> Config[職人設定<br>app/crafts/*/config.js]
+  UI --> Component[職人別コンポーネント<br>app/crafts/*/component.js]
   API --> Recipes[レシピJSON<br>api/data/crafts/*/recipes.json]
   Config --> Layout[盤面設定<br>layout / gridCell]
   Engine --> Damage[共有ダメージ表<br>app/crafts/shared/*.js]
@@ -35,6 +36,7 @@ flowchart LR
 - 表示ラベル切替
 - 職人ごとの盤面表示
 - 職人ごとのレシピ選択
+- 職人別コンポーネントへの描画差分委譲
 - 結果表示
 - Import / Export
 - localStorage保存
@@ -92,6 +94,16 @@ flowchart LR
 - 職人固有の入力種別
 - 共有ダメージ表への参照
 
+主なファイル:
+
+- `app/crafts/registry.js`
+- `app/crafts/shared/smithing-component.js`
+- `app/crafts/<職人>/component.js`
+- `app/crafts/<職人>/config.js`
+
+武器鍛冶、防具鍛冶、道具鍛冶は `shared/smithing-component.js` を共用し、レシピと職人固有の特技・初期マスを各職人配下に置きます。
+調理、裁縫、木工は職人別の `component.js` を持ち、盤面表示や職人固有操作を必要に応じて分離します。
+
 ### レシピ設定層
 
 担当:
@@ -106,15 +118,6 @@ flowchart LR
 - `app/crafts/<職人>/recipes.js`
 
 `app/crafts/<職人>/recipes.js` はAPIが使えない場合のフォールバックです。
-
-主なファイル:
-
-- `app/crafts/registry.js`
-- `app/crafts/shared/cooking-damage.js`
-- `app/crafts/shared/smithing-damage.js`
-- `app/crafts/shared/sewing-damage.js`
-- `app/crafts/shared/woodworking-damage.js`
-- `app/crafts/<職人>/config.js`
 
 ### 共有ダメージ表
 
@@ -135,13 +138,13 @@ flowchart LR
 ## データの流れ
 
 1. ブラウザが `frontend` から静的ファイルを読み込みます。
-2. 起動時に職人設定ファイルを読み込みます。
+2. 起動時に職人設定ファイルと職人別コンポーネントを読み込みます。
 3. `main.js` がAPIから料理データを取得します。
 4. APIが使えない場合はローカルの `recipes.js` を使います。
 5. `main.js` が選択中の職人設定から初期状態を作ります。
 6. ユーザー入力を状態に反映します。
 7. 料理名選択時はAPI由来の `items` でマス一覧を置き換えます。
-8. `main.js` が `layout` と `gridCell` から盤面を描画します。
+8. `main.js` が `layout` と `gridCell` から盤面を描画し、職人固有の表示差分をコンポーネントへ委譲します。
 9. `engine.js` が職人設定と共有ダメージ表から特技範囲を解決します。
 10. `engine.js` が状態を評価します。
 11. UIへ判定結果と候補手を表示します。
@@ -165,6 +168,8 @@ flowchart TB
 - 調理の位置別ダメージは `app/crafts/shared/cooking-damage.js` に閉じ込めます。
 - 鍛冶系の温度別ダメージは `app/crafts/shared/smithing-damage.js` に閉じ込めます。
 - 裁縫と木工の基礎ダメージも `app/crafts/shared/` に閉じ込めます。
+- 職人固有の画面差分は `app/crafts/<職人>/component.js` に閉じ込めます。
+- 武器鍛冶、防具鍛冶、道具鍛冶の共通画面差分は `app/crafts/shared/smithing-component.js` に閉じ込めます。
 - 共通判定は `app/engine.js` に集約します。
 - UI文言はできるだけ職人設定から渡します。
 - 盤面サイズとマス位置は職人設定から渡します。

@@ -84,7 +84,7 @@ async function hydrateRecipesFromApi() {
       };
     }
   } catch {
-    // The local recipe files remain available when the API is offline.
+    // API停止時はローカルのレシピファイルを引き続き使用します。
   }
 }
 
@@ -355,6 +355,21 @@ function getCraftConfig(craftType) {
 
 function getCurrentCraftConfig() {
   return getCraftConfig(state.craftType);
+}
+
+// 現在選択中の職人コンポーネントを取得します。
+function getCurrentCraftComponent() {
+  return window.getDQ10CraftComponent?.(state?.craftType) || {};
+}
+
+// 指定した職人IDのコンポーネントを取得します。
+function getCraftComponent(craftId) {
+  return window.getDQ10CraftComponent?.(craftId) || {};
+}
+
+// 現在選択中の職人が指定ファミリに属するかを判定します。
+function isCurrentCraftFamily(craftFamily) {
+  return getCurrentCraftComponent().craftFamily === craftFamily;
 }
 
 function cloneConfigItems(items) {
@@ -640,7 +655,7 @@ function renderTechniqueEditor() {
       card.dataset.id = technique.id;
       card.querySelector(".technique-title").textContent = technique.name;
       card.querySelector(".tech-focus").textContent = resolvedTechnique.focusCost;
-      if (config.id === "cooking" && multiplierRow) {
+      if (getCraftComponent(config.id).craftFamily === "cooking" && multiplierRow) {
         multiplierRow.hidden = true;
       }
       if (technique.specialAction === "miracle-grill") {
@@ -660,69 +675,23 @@ function renderTechniqueEditor() {
     });
 }
 
+// 選択中の職人コンポーネントに参照欄の描画を委譲します。
 function renderCraftReference() {
   const config = getCurrentCraftConfig();
-  const cookingDamage = window.DQ10CookingDamage;
-  const shouldShow = config.id === "cooking" && cookingDamage;
-  elements.craftReferencePanel.hidden = !shouldShow;
+  const component = getCurrentCraftComponent();
 
-  if (!shouldShow) {
+  if (!component.renderReference) {
+    elements.craftReferencePanel.hidden = true;
     return;
   }
 
-  renderRecipeTraitReference(config);
-  renderCookingDamageRanges(cookingDamage);
-}
-
-function renderRecipeTraitReference(config) {
-  const trait = getTrait(config, state.traitId);
-  elements.recipeTraitReference.innerHTML = `
-    <div class="reference-row trait-reference">
-      <strong>${escapeHtml(trait?.label || "-")}</strong>
-      <span>${escapeHtml(trait?.description || "-")}</span>
-    </div>
-  `;
-}
-
-function renderCookingDamageRanges(cookingDamage) {
-  const heatLabels = {
-    normal: "通常",
-    strong: "強火焼き",
-    half: "弱火焼き",
-  };
-  const positionRows = cookingDamage.positions.map((position) => {
-    const ranges = ["normal", "strong", "half"].map((conditionId) => {
-      const range = cookingDamage.getRange(position.id, conditionId);
-      const values = cookingDamage.distributions?.[position.id]?.[conditionId] || range;
-      return `${heatLabels[conditionId]} ${values ? values.join("/") : "-"}`;
-    }).join(" / ");
-
-    return `
-      <div class="reference-row">
-        <strong>${escapeHtml(position.label)}</strong>
-        <span class="numeric">${escapeHtml(ranges)}</span>
-      </div>
-    `;
+  component.renderReference({
+    config,
+    state,
+    elements,
+    escapeHtml,
+    getTrait,
   });
-  const specialRows = (cookingDamage.specialRanges || []).map((specialRange) => {
-    const ranges = ["normal", "strong", "half"].map((conditionId) => {
-      const values = cookingDamage.getSpecialValues?.(specialRange.id, conditionId);
-      const range = cookingDamage.getSpecialRange
-        ? cookingDamage.getSpecialRange(specialRange.id, conditionId)
-        : specialRange.ranges?.[conditionId] || specialRange.range;
-      return `${heatLabels[conditionId]} ${values ? values.join("/") : range ? `${range[0]}-${range[1]}` : "-"}`;
-    }).join(" / ");
-
-    return `
-      <div class="reference-row">
-        <strong>${escapeHtml(specialRange.label)}</strong>
-        <span class="numeric">${escapeHtml(ranges)}</span>
-        <small>光マスの火力別ダメージ幅</small>
-      </div>
-    `;
-  });
-
-  elements.cookingDamageRanges.innerHTML = [...positionRows, ...specialRows].join("");
 }
 
 function getTechniquePreviewIngredient(config) {
@@ -768,6 +737,7 @@ function renderIngredients() {
 
 function renderLayoutBoard() {
   const config = getCurrentCraftConfig();
+  const component = getCurrentCraftComponent();
   const layout = config.layout || { rows: 1, columns: state.ingredients.length };
   const rows = Math.max(1, numberOr(layout.rows, 1));
   const columns = Math.max(1, numberOr(layout.columns, state.ingredients.length || 1));
@@ -795,7 +765,7 @@ function renderLayoutBoard() {
       const item = analysis.ingredients.find((ingredient) =>
         ingredient.gridCell?.row === rowIndex && ingredient.gridCell?.column === columnIndex,
       );
-      const cellEffect = getCookingCellEffect(rowIndex, columnIndex);
+      const cellEffect = component.getCellEffect?.(state, rowIndex, columnIndex) || null;
       const cell = document.createElement("article");
       cell.className = "board-cell";
 
@@ -812,7 +782,7 @@ function renderLayoutBoard() {
           cell.classList.add("interactive");
           cell.addEventListener("click", () => handleBoardCellClick(null, { row: rowIndex, column: columnIndex }));
         }
-        if (state.craftType === "cooking") {
+        if (component.isBoardCellEditable?.(state)) {
           cell.addEventListener("contextmenu", (event) => openBoardCellEditor(event, null, { row: rowIndex, column: columnIndex }));
         }
         elements.layoutBoard.append(cell);
@@ -894,7 +864,7 @@ function renderLayoutBoard() {
 
         focusIngredientRow(item.id);
       });
-      if (state.craftType === "cooking") {
+      if (component.isBoardCellEditable?.(state)) {
         cell.addEventListener("contextmenu", (event) => openBoardCellEditor(event, item, { row: rowIndex, column: columnIndex }));
       }
       elements.layoutBoard.append(cell);
@@ -903,8 +873,10 @@ function renderLayoutBoard() {
   syncBoardActionButtons();
 }
 
+// 選択中の職人コンポーネントが盤面移動に対応しているかを判定します。
 function canRearrangeBoard(config = getCurrentCraftConfig()) {
-  return config.id === "cooking" && Boolean(config.layout?.fixed);
+  const component = getCraftComponent(config.id);
+  return component.canRearrangeBoard?.(config, state) === true;
 }
 
 function syncBoardActionButtons() {
@@ -929,7 +901,7 @@ function syncMiracleGrillButton(canRearrange, selectedIngredient) {
     return;
   }
 
-  const isCooking = state?.craftType === "cooking";
+  const isCooking = isCurrentCraftFamily("cooking");
   elements.miracleGrillButton.hidden = !isCooking;
   elements.miracleGrillButton.disabled = !canRearrange || !selectedIngredient || state.miracleGrillUsed === true;
   elements.miracleGrillButton.classList.toggle("active", state.miracleGrillUsed === true);
@@ -1116,7 +1088,7 @@ function applyGroupMoves(moves) {
 }
 
 function applyMiracleGrillToSelected() {
-  if (state.craftType !== "cooking" || state.miracleGrillUsed === true) {
+  if (!isCurrentCraftFamily("cooking") || state.miracleGrillUsed === true) {
     return;
   }
 
@@ -1231,7 +1203,7 @@ function updateCookingCellEffect(row, column, effectId) {
 }
 
 function setCookingHeatMode(mode) {
-  if (state.craftType !== "cooking") {
+  if (!isCurrentCraftFamily("cooking")) {
     return;
   }
 
@@ -1269,23 +1241,9 @@ function toggleCookingLight(ingredientId) {
   saveState();
 }
 
+// 職人コンポーネントに盤面位置から種別の同期を委譲します。
 function updateIngredientPositionOption(ingredient) {
-  const optionId = getBoardOptionId(ingredient.gridCell?.row, ingredient.gridCell?.column);
-  if (optionId) {
-    ingredient.optionId = optionId;
-  }
-}
-
-function getBoardOptionId(row, column) {
-  if (row === 2 && column === 2) {
-    return "center";
-  }
-
-  if ((row === 2 && (column === 1 || column === 3)) || (column === 2 && (row === 1 || row === 3))) {
-    return "cross";
-  }
-
-  return row && column ? "corner" : "";
+  getCurrentCraftComponent().updateIngredientPositionOption?.(ingredient);
 }
 
 function shiftBoardUp() {
@@ -1356,51 +1314,37 @@ function getItemOptionLabel(config, optionId) {
   return option?.label || "";
 }
 
+// 職人コンポーネントから盤面上の特殊状態を取得します。
 function getIngredientSpecialState(ingredient) {
-  if (state.traitId === "light") {
-    return {
-      isGlowing: ingredient.isGlowing === true,
-      isReturning: false,
-    };
-  }
-
-  if (state.traitId === "light-return") {
-    return {
-      isGlowing: state.cookingEffectMode === "cross-glow" && ingredient.optionId === "cross",
-      isReturning: state.cookingEffectMode === "corner-return" && ingredient.optionId === "corner",
-    };
-  }
-
-  return {
+  return getCurrentCraftComponent().getIngredientSpecialState?.(state, ingredient) || {
     isGlowing: false,
     isReturning: false,
   };
 }
 
+// 職人コンポーネントから封じ効果ラベルを取得します。
 function getCookingBlockEffectLabel(effectId) {
-  const effect = DQ10CookingEffects.cookingBlockEffects.find((candidate) => candidate.id === effectId);
-  return effect?.label || "";
+  return getCurrentCraftComponent().getBlockEffectLabel?.(effectId) || "";
 }
 
+// 職人コンポーネントからマス効果ラベルを取得します。
 function getCookingCellEffectLabel(effectId) {
-  const effect = DQ10CookingEffects.cookingCellEffects.find((candidate) => candidate.id === effectId);
-  return effect?.label || "";
+  return getCurrentCraftComponent().getCellEffectLabel?.(effectId) || "";
 }
 
+// 職人コンポーネントから指定マスの効果を取得します。
 function getCookingCellEffect(row, column) {
-  return (state.cookingCellEffects || []).find((effect) =>
-    effect.row === row && effect.column === column,
-  ) || null;
+  return getCurrentCraftComponent().getCellEffect?.(state, row, column) || null;
 }
 
+// 職人コンポーネントに封じ効果バッジの整形を委譲します。
 function formatCookingBlockEffectBadge(effectId) {
-  const label = getCookingBlockEffectLabel(effectId);
-  return label ? `<span class="skill-effect-badge">${escapeHtml(label)}</span>` : "";
+  return getCurrentCraftComponent().formatBlockEffectBadge?.(effectId, escapeHtml) || "";
 }
 
+// 職人コンポーネントにマス効果バッジの整形を委譲します。
 function formatCookingCellEffectBadge(effect) {
-  const label = getCookingCellEffectLabel(effect?.effectId);
-  return label ? `<span class="skill-effect-badge">${escapeHtml(label)}</span>` : "";
+  return getCurrentCraftComponent().formatCellEffectBadge?.(effect, escapeHtml) || "";
 }
 
 function formatBoardBadge(label) {
@@ -1415,45 +1359,24 @@ function formatLockBadge(item) {
   return `<span class="locked-badge">${escapeHtml(item.lockJudgementLabel || "固定")}</span>`;
 }
 
+// 職人コンポーネントに盤面上の光切替ボタン整形を委譲します。
 function formatCookingLightToggle(item, special) {
-  if (state.craftType !== "cooking" || state.traitId !== "light") {
-    return "";
-  }
-
-  const label = special.isGlowing ? `${item.name}の光を解除` : `${item.name}を光らせる`;
-  const activeClass = special.isGlowing ? " active" : "";
-
-  return `
-    <button class="board-light-toggle${activeClass}" type="button" aria-label="${escapeHtml(label)}" title="${escapeHtml(label)}">
-      光
-    </button>
-  `;
+  return getCurrentCraftComponent().formatLightToggle?.(state, item, special, escapeHtml) || "";
 }
 
+// 職人コンポーネントから盤面用の食材画像情報を取得します。
 function getCookingIngredientVisual(ingredient, recipe) {
-  if (state.craftType !== "cooking") {
-    return null;
-  }
-
-  return window.DQ10CookingIngredients?.getCookingIngredientVisual(ingredient, recipe) || null;
+  return getCurrentCraftComponent().getIngredientVisual?.(ingredient, recipe, state) || null;
 }
 
+// 職人コンポーネントから食材画像の推定文脈を取得します。
 function getCookingIngredientVisualContext(recipe) {
-  return window.DQ10CookingIngredients?.getCookingIngredientVisualContext(recipe, state) || recipe || null;
+  return getCurrentCraftComponent().getIngredientVisualContext?.(recipe, state) || recipe || null;
 }
 
+// 職人コンポーネントに食材画像HTMLの整形を委譲します。
 function formatCookingIngredientVisual(visual) {
-  if (!visual) {
-    return "";
-  }
-
-  const label = visual.isInferred ? `${visual.label}（推定）` : visual.label;
-
-  return `
-    <div class="board-cell-visual" aria-label="${escapeHtml(label)}" title="${escapeHtml(label)}">
-      <img class="cooking-ingredient-image ${escapeHtml(visual.className)}" src="${escapeHtml(visual.src)}" alt="" />
-    </div>
-  `;
+  return getCurrentCraftComponent().formatIngredientVisual?.(visual, escapeHtml) || "";
 }
 
 function focusIngredientRow(id) {
@@ -1592,7 +1515,7 @@ function syncBoardCellEditorTrait(editor) {
   glowField.hidden = !hasIngredient || state.traitId !== "light";
   lockedField.hidden = !hasIngredient;
   blockEffectField.hidden = !hasIngredient;
-  cellEffectField.hidden = state.craftType !== "cooking";
+  cellEffectField.hidden = !isCurrentCraftFamily("cooking");
   effectModeField.hidden = !hasIngredient || state.traitId !== "light-return";
 
   effectModeField.querySelectorAll("input").forEach((input) => {
@@ -1867,6 +1790,7 @@ function removeIngredient(id) {
   render();
 }
 
+// 現在の職人設定に合わせて新しい入力項目を追加します。
 function addIngredient() {
   const config = getCurrentCraftConfig();
   const next = state.ingredients.length + 1;
@@ -1876,10 +1800,10 @@ function addIngredient() {
     return;
   }
 
-  state.ingredients.push({
+  const ingredient = {
     id: createId(),
     name: `${config.itemNameLabel.replace("名", "")} ${next}`,
-    optionId: getBoardOptionId(gridCell.row, gridCell.column) || config.itemOptions?.[0]?.id || "",
+    optionId: config.itemOptions?.[0]?.id || "",
     gridCell,
     current: 0,
     isGlowing: false,
@@ -1887,7 +1811,10 @@ function addIngredient() {
     target: Math.round(((config.items[0]?.successMin || 60) + (config.items[0]?.successMax || 75)) / 2),
     successMin: config.items[0]?.successMin || 60,
     successMax: config.items[0]?.successMax || 75,
-  });
+  };
+
+  updateIngredientPositionOption(ingredient);
+  state.ingredients.push(ingredient);
   markCustomRecipe();
   render();
 }

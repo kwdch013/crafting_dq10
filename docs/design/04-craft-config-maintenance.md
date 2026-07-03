@@ -12,14 +12,18 @@
 app/crafts/
   registry.js
   shared/cooking-damage.js
+  shared/smithing-component.js
   shared/smithing-damage.js
   shared/sewing-damage.js
   shared/woodworking-damage.js
+  cooking/component.js
   cooking/config.js
   weapon-smithing/config.js
   armor-smithing/config.js
   tool-smithing/config.js
+  sewing/component.js
   sewing/config.js
+  woodworking/component.js
   woodworking/config.js
 ```
 
@@ -49,6 +53,16 @@ app/crafts/
 鍛冶系の温度別ダメージは `shared/smithing-damage.js` に分離します。
 各職人の `config.js` には、特技が参照するIDだけを設定します。
 裁縫と木工の基礎データも `shared/` 配下に分離します。
+
+## コンポーネントファイルの役割
+
+職人固有の画面差分は `app/crafts/<職人>/component.js` に分離します。
+例として、調理の特性メモ、食材画像、光・戻り、封じ効果、盤面右クリック編集は `cooking/component.js` が担当します。
+
+武器鍛冶、防具鍛冶、道具鍛冶は同じ鍛冶系の画面構造を使うため、`shared/smithing-component.js` で共通化します。
+各鍛冶職人の `config.js` は `createDQ10SmithingCraftConfig()` に職人固有のラベル、特技、初期マスを渡します。
+
+関数、定数、設定定義を追加または変更する場合は、日本語コメントで目的を記載します。
 
 ## 特技設定
 

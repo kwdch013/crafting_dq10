@@ -1,7 +1,9 @@
 (function (global) {
   global.DQ10CraftConfigs = global.DQ10CraftConfigs || {};
   global.DQ10CraftRecipes = global.DQ10CraftRecipes || {};
+  global.DQ10CraftComponents = global.DQ10CraftComponents || {};
 
+  // 職人レベルごとの集中力基礎値を定義します。
   const focusLevelTables = {
     smithing: [
       { level: 1, focus: 50 },
@@ -169,6 +171,7 @@
     ],
   };
 
+  // 道具種別ごとの集中力加算値を定義します。
   const focusToolTypes = {
     smithingHammer: [
       { id: "copper-smithing-hammer", label: "銅の鍛冶ハンマー", focusBonus: 0 },
@@ -189,6 +192,7 @@
     ],
   };
 
+  // 職人設定をグローバルレジストリへ登録します。
   global.registerDQ10Craft = function registerDQ10Craft(config) {
     if (!config || !config.id) {
       throw new Error("Craft config requires an id.");
@@ -197,6 +201,7 @@
     global.DQ10CraftConfigs[config.id] = config;
   };
 
+  // API停止時フォールバック用のレシピ一覧を登録します。
   global.registerDQ10CraftRecipes = function registerDQ10CraftRecipes(craftId, recipes) {
     if (!craftId || !Array.isArray(recipes)) {
       throw new Error("Craft recipes require a craft id and recipe array.");
@@ -205,14 +210,31 @@
     global.DQ10CraftRecipes[craftId] = recipes;
   };
 
+  // 職人ごとの画面差分を扱うコンポーネントを登録します。
+  global.registerDQ10CraftComponent = function registerDQ10CraftComponent(craftId, component) {
+    if (!craftId || !component || typeof component !== "object") {
+      throw new Error("Craft component requires a craft id and component object.");
+    }
+
+    global.DQ10CraftComponents[craftId] = component;
+  };
+
+  // 未定義の職人では空の共通コンポーネントを返します。
+  global.getDQ10CraftComponent = function getDQ10CraftComponent(craftId) {
+    return global.DQ10CraftComponents[craftId] || {};
+  };
+
+  // 集中力テーブルを呼び出し元で変更できないよう複製して返します。
   global.getDQ10FocusLevels = function getDQ10FocusLevels(kind) {
     return (focusLevelTables[kind] || []).map((entry) => ({ ...entry }));
   };
 
+  // 道具種別テーブルを呼び出し元で変更できないよう複製して返します。
   global.getDQ10FocusToolTypes = function getDQ10FocusToolTypes(kind) {
     return (focusToolTypes[kind] || []).map((toolType) => ({ ...toolType }));
   };
 
+  // レベル、道具、星数から集中力設定を組み立てます。
   global.createDQ10FocusConfig = function createDQ10FocusConfig(options) {
     const stars = options.stars || [0, 1, 2, 3];
 

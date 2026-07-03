@@ -1,32 +1,10 @@
-registerDQ10Craft({
+// 道具鍛冶固有の表示名、特技、初期マスを定義します。
+registerDQ10Craft(createDQ10SmithingCraftConfig({
   id: "tool-smithing",
   label: "道具鍛冶",
   modeLabel: "Tool Smithing Settings",
   recipeLabel: "道具名",
-  itemSectionTitle: "鍛冶マス入力",
-  itemNameLabel: "マス名",
-  addItemLabel: "マスを追加",
-  resourceLabel: "集中力",
-  stateLabel: "温度",
   defaultRecipeName: "道具メモ",
-  targetMode: "random-in-range",
-  focusNote: "Lv76-80はLv75以降を各レベル+2として置いた暫定値です。",
-  defaultFocus: 247,
-  focus: createDQ10FocusConfig({
-    defaultFocus: 247,
-    defaultLevel: 80,
-    defaultToolId: "miracle-smithing-hammer",
-    defaultStars: 3,
-    levels: getDQ10FocusLevels("smithing"),
-    toolTypes: getDQ10FocusToolTypes("smithingHammer"),
-  }),
-  layout: {
-    label: "鍛冶配置",
-    columns: 2,
-    rows: 4,
-    fixed: false,
-  },
-  heatStates: DQ10SmithingDamage.heatStates,
   techniques: [
     { id: "hit", name: "たたく", focusCost: 5, damageModel: "smithing-temperature", powerId: "normal", multiplier: 1, criticalMultiplier: 2, criticalWeight: 1 },
     { id: "double", name: "2倍打ち", focusCost: 8, damageModel: "smithing-temperature", powerId: "power_2_0", multiplier: 2, criticalMultiplier: 2, criticalWeight: 0.9 },
@@ -38,4 +16,4 @@ registerDQ10Craft({
     { id: "part-2", name: "中", gridCell: { row: 2, column: 1 }, current: 0, successMin: 70, successMax: 86 },
     { id: "part-3", name: "下", gridCell: { row: 3, column: 1 }, current: 0, successMin: 70, successMax: 86 },
   ],
-});
+}));
