@@ -484,13 +484,9 @@ https://github.com/kwdch013/crafting_dq10/issues/43
 
 URL: https://github.com/kwdch013/crafting_dq10/issues/45
 
-## 完了済み
+### #50 調理職人: 火力変更後に盤面の会心判定表示が更新されない
 
-### GitHubリポジトリ連携を設定する
+強火焼きなど火力状態を変更した際、一覧と集計だけでなく盤面セルの判定表示も再描画します。
+現在値0、基準範囲180-210、強火の回帰条件では `不足` と表示されることを確認します。
 
-結果:
-
-- `origin` は `git@github.com:kwdch013/crafting_dq10.git` に設定済みです。
-- `main`、`dev`、`docs/agent-branch-workflow` はremoteへpush済みです。
-- `gh` CLIは導入済みで、`kwdch013` として認証済みです。
-- この文書の未完了タスクはGitHub issue #1-#12 として登録済みです。
+URL: https://github.com/kwdch013/crafting_dq10/issues/50
