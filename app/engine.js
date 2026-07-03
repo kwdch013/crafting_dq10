@@ -90,6 +90,59 @@
       : null;
   }
 
+  function normalizeCookingBlockEffect(value) {
+    return global.DQ10CookingEffects?.normalizeCookingBlockEffect?.(value) ||
+      (value === "half-seal" || value === "full-seal" ? value : "none");
+  }
+
+  function hasCookingCellEffect(state = {}, ingredient = {}, effectId) {
+    const row = toNumber(ingredient?.gridCell?.row, NaN);
+    const column = toNumber(ingredient?.gridCell?.column, NaN);
+
+    if (!Number.isFinite(row) || !Number.isFinite(column)) {
+      return false;
+    }
+
+    return Array.isArray(state.cookingCellEffects) &&
+      state.cookingCellEffects.some((entry) =>
+        toNumber(entry?.row, NaN) === row &&
+        toNumber(entry?.column, NaN) === column &&
+        entry?.effectId === effectId,
+      );
+  }
+
+  function halveDamageRange(range) {
+    return [
+      Math.ceil(toNumber(range[0]) / 2),
+      Math.ceil(toNumber(range[1]) / 2),
+    ];
+  }
+
+  function invertDamageRange(range) {
+    return [
+      -toNumber(range[1]),
+      -toNumber(range[0]),
+    ];
+  }
+
+  function applyCookingDamageEffects(state = {}, ingredient = {}, range) {
+    const blockEffect = normalizeCookingBlockEffect(ingredient?.cookingBlockEffect);
+
+    if (blockEffect === "full-seal") {
+      return [0, 0];
+    }
+
+    if (hasCookingCellEffect(state, ingredient, "heat-return")) {
+      return invertDamageRange(range);
+    }
+
+    if (blockEffect === "half-seal") {
+      return halveDamageRange(range);
+    }
+
+    return range;
+  }
+
   function resolveCriticalResult(current, criticalMin, criticalMax, targetMin, targetMax, targetMode) {
     const rawCriticalAfterMin = current + criticalMin;
     const rawCriticalAfterMax = current + criticalMax;
@@ -163,13 +216,18 @@
       }
 
       const criticalMultiplier = toNumber(technique.criticalMultiplier, 2);
+      const normalRange = applyCookingDamageEffects(state, ingredient, range);
+      const criticalRange = applyCookingDamageEffects(state, ingredient, [
+        Math.ceil(range[0] * criticalMultiplier),
+        Math.ceil(range[1] * criticalMultiplier),
+      ]);
 
       return {
         ...technique,
-        normalMin: range[0],
-        normalMax: range[1],
-        criticalMin: Math.ceil(range[0] * criticalMultiplier),
-        criticalMax: Math.ceil(range[1] * criticalMultiplier),
+        normalMin: normalRange[0],
+        normalMax: normalRange[1],
+        criticalMin: criticalRange[0],
+        criticalMax: criticalRange[1],
       };
     }
 

@@ -38,6 +38,7 @@
 			current,
 			isGlowing: inputValue.isGlowing === true,
 			cookingEffectMode: inputValue.cookingEffectMode || "none",
+			cookingBlockEffect: inputValue.cookingBlockEffect || "none",
 			locked: inputValue.locked === true && isCurrentInSuccessRange(current, currentValue),
 		};
 	}

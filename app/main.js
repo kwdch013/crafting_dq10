@@ -134,6 +134,7 @@ function normalizeState(value) {
       lockJudgement: ingredient.lockJudgement || "",
       lockJudgementLabel: ingredient.lockJudgementLabel || "",
       isGlowing: ingredient.isGlowing === true,
+      cookingBlockEffect: normalizeCookingBlockEffect(ingredient.cookingBlockEffect || defaultItem?.cookingBlockEffect),
       target: numberOr(ingredient.target, defaultItem?.target ?? Math.round((successMin + successMax) / 2)),
       successMin,
       successMax,
@@ -181,12 +182,17 @@ function normalizeState(value) {
       criticalMultiplier: technique.criticalMultiplier,
       conditionId: technique.conditionId,
       specialAction: technique.specialAction,
+      effectType: technique.effectType,
+      effectId: technique.effectId,
+      effectSummary: technique.effectSummary,
+      effectDurationLabel: technique.effectDurationLabel,
       showInTechniqueEditor: technique.showInTechniqueEditor,
       includeInAnalysis: technique.includeInAnalysis,
       recommendable: technique.recommendable,
       scoring: technique.scoring || undefined,
     })),
     ingredients,
+    cookingCellEffects: normalizeCookingCellEffects(value.cookingCellEffects, config.layout),
     miracleGrillUsed: value.miracleGrillUsed === true,
     miracleGrillResult: typeof value.miracleGrillResult === "string" ? value.miracleGrillResult : "",
   };
@@ -264,6 +270,18 @@ function getInitialCookingEffectMode(traitId) {
 
 function normalizeSavedCookingEffectMode(traitId, value) {
   return DQ10CookingEffects.normalizeSavedCookingEffectMode(traitId, value);
+}
+
+function normalizeCookingBlockEffect(value) {
+  return DQ10CookingEffects.normalizeCookingBlockEffect(value);
+}
+
+function normalizeCookingCellEffect(value) {
+  return DQ10CookingEffects.normalizeCookingCellEffect(value);
+}
+
+function normalizeCookingCellEffects(value, layout) {
+  return DQ10CookingEffects.normalizeCookingCellEffects(value, layout);
 }
 
 function findDefaultItem(config, ingredient, index) {
@@ -346,6 +364,7 @@ function cloneConfigItems(items) {
     locked: item.locked === true,
     lockJudgement: item.lockJudgement || "",
     lockJudgementLabel: item.lockJudgementLabel || "",
+    cookingBlockEffect: normalizeCookingBlockEffect(item.cookingBlockEffect),
   }));
 }
 
@@ -373,6 +392,7 @@ function createDefaultState(craftType) {
     targetMode: config.targetMode || "fixed",
     techniques: cloneConfigItems(config.techniques),
     ingredients: cloneConfigItems(defaultRecipe?.items || config.items),
+    cookingCellEffects: [],
     miracleGrillUsed: false,
     miracleGrillResult: "",
   });
@@ -395,6 +415,7 @@ function createBoardSnapshot() {
       gridCell: ingredient.gridCell ? { ...ingredient.gridCell } : undefined,
     })),
     cookingEffectMode: state.cookingEffectMode,
+    cookingCellEffects: state.cookingCellEffects.map((effect) => ({ ...effect })),
     miracleGrillUsed: state.miracleGrillUsed,
     miracleGrillResult: state.miracleGrillResult,
   };
@@ -406,6 +427,7 @@ function restoreBoardSnapshot(snapshot) {
     gridCell: ingredient.gridCell ? { ...ingredient.gridCell } : undefined,
   }));
   state.cookingEffectMode = normalizeCookingEffectMode(state.traitId, snapshot.cookingEffectMode);
+  state.cookingCellEffects = normalizeCookingCellEffects(snapshot.cookingCellEffects, getCurrentCraftConfig().layout);
   state.miracleGrillUsed = snapshot.miracleGrillUsed === true;
   state.miracleGrillResult = snapshot.miracleGrillResult || "";
   selectedBoardIngredientId = null;
@@ -625,6 +647,10 @@ function renderTechniqueEditor() {
         card.querySelector(".tech-normal-range").textContent = "理想値";
         card.querySelector(".tech-critical-range").textContent = "確定";
         card.querySelector(".tech-multiplier").textContent = "必殺";
+      } else if (technique.damageModel === "cooking-effect") {
+        card.querySelector(".tech-normal-range").textContent = technique.effectSummary || "効果";
+        card.querySelector(".tech-critical-range").textContent = technique.effectDurationLabel || "4ターン";
+        card.querySelector(".tech-multiplier").textContent = "封じ";
       } else {
         card.querySelector(".tech-normal-range").textContent = `${resolvedTechnique.normalMin} - ${resolvedTechnique.normalMax}`;
         card.querySelector(".tech-critical-range").textContent = `${resolvedTechnique.criticalMin} - ${resolvedTechnique.criticalMax}`;
@@ -769,15 +795,25 @@ function renderLayoutBoard() {
       const item = analysis.ingredients.find((ingredient) =>
         ingredient.gridCell?.row === rowIndex && ingredient.gridCell?.column === columnIndex,
       );
+      const cellEffect = getCookingCellEffect(rowIndex, columnIndex);
       const cell = document.createElement("article");
       cell.className = "board-cell";
 
       if (!item) {
         cell.classList.add("empty");
-        cell.textContent = "空";
+        if (cellEffect?.effectId === "heat-return") {
+          cell.classList.add("heat-return");
+        }
+        cell.innerHTML = `
+          <span>空</span>
+          ${formatCookingCellEffectBadge(cellEffect)}
+        `;
         if (canRearrange) {
           cell.classList.add("interactive");
           cell.addEventListener("click", () => handleBoardCellClick(null, { row: rowIndex, column: columnIndex }));
+        }
+        if (state.craftType === "cooking") {
+          cell.addEventListener("contextmenu", (event) => openBoardCellEditor(event, null, { row: rowIndex, column: columnIndex }));
         }
         elements.layoutBoard.append(cell);
         continue;
@@ -790,6 +826,15 @@ function renderLayoutBoard() {
       }
       if (special.isReturning) {
         cell.classList.add("returning");
+      }
+      if (item.cookingBlockEffect === "half-seal") {
+        cell.classList.add("half-seal");
+      }
+      if (item.cookingBlockEffect === "full-seal") {
+        cell.classList.add("full-seal");
+      }
+      if (cellEffect?.effectId === "heat-return") {
+        cell.classList.add("heat-return");
       }
 
       const rowSpan = Math.max(1, numberOr(item.gridCell?.rowSpan, 1));
@@ -818,6 +863,8 @@ function renderLayoutBoard() {
           <div class="board-cell-badges">
             ${special.isGlowing ? '<span class="glow-badge">光</span>' : ""}
             ${special.isReturning ? '<span class="return-badge">戻</span>' : ""}
+            ${formatCookingBlockEffectBadge(item.cookingBlockEffect)}
+            ${formatCookingCellEffectBadge(cellEffect)}
             ${formatLockBadge(item)}
             ${formatBoardBadge(item.ingredientGroupLabel)}
             ${ingredientVisual?.isInferred ? formatBoardBadge("推定") : ""}
@@ -848,7 +895,7 @@ function renderLayoutBoard() {
         focusIngredientRow(item.id);
       });
       if (state.craftType === "cooking") {
-        cell.addEventListener("contextmenu", (event) => openBoardCellEditor(event, item));
+        cell.addEventListener("contextmenu", (event) => openBoardCellEditor(event, item, { row: rowIndex, column: columnIndex }));
       }
       elements.layoutBoard.append(cell);
     }
@@ -1165,6 +1212,24 @@ function setCookingEffectMode(mode) {
   saveState();
 }
 
+function updateCookingCellEffect(row, column, effectId) {
+  const normalizedEffectId = normalizeCookingCellEffect(effectId);
+  const nextEffects = state.cookingCellEffects.filter((effect) =>
+    effect.row !== row || effect.column !== column,
+  );
+
+  if (normalizedEffectId !== "none") {
+    nextEffects.push({
+      row,
+      column,
+      effectId: normalizedEffectId,
+      remainingTurns: DQ10CookingEffects.defaultEffectTurns,
+    });
+  }
+
+  state.cookingCellEffects = normalizeCookingCellEffects(nextEffects, getCurrentCraftConfig().layout);
+}
+
 function setCookingHeatMode(mode) {
   if (state.craftType !== "cooking") {
     return;
@@ -1312,6 +1377,32 @@ function getIngredientSpecialState(ingredient) {
   };
 }
 
+function getCookingBlockEffectLabel(effectId) {
+  const effect = DQ10CookingEffects.cookingBlockEffects.find((candidate) => candidate.id === effectId);
+  return effect?.label || "";
+}
+
+function getCookingCellEffectLabel(effectId) {
+  const effect = DQ10CookingEffects.cookingCellEffects.find((candidate) => candidate.id === effectId);
+  return effect?.label || "";
+}
+
+function getCookingCellEffect(row, column) {
+  return (state.cookingCellEffects || []).find((effect) =>
+    effect.row === row && effect.column === column,
+  ) || null;
+}
+
+function formatCookingBlockEffectBadge(effectId) {
+  const label = getCookingBlockEffectLabel(effectId);
+  return label ? `<span class="skill-effect-badge">${escapeHtml(label)}</span>` : "";
+}
+
+function formatCookingCellEffectBadge(effect) {
+  const label = getCookingCellEffectLabel(effect?.effectId);
+  return label ? `<span class="skill-effect-badge">${escapeHtml(label)}</span>` : "";
+}
+
 function formatBoardBadge(label) {
   return label ? `<span>${escapeHtml(label)}</span>` : "";
 }
@@ -1385,18 +1476,44 @@ function getBoardCellEditorElement() {
   editor.innerHTML = `
     <form>
       <strong class="editor-title"></strong>
-      <label>
+      <label class="editor-current-field">
         現在値
         <input class="editor-current numeric" type="number" />
       </label>
-      <label class="checkbox-field">
+      <label class="checkbox-field editor-glowing-field">
         <input class="editor-glowing" type="checkbox" />
         <span>光っている</span>
       </label>
-      <label class="checkbox-field">
+      <label class="checkbox-field editor-locked-field">
         <input class="editor-locked" type="checkbox" />
         <span>固定する</span>
       </label>
+      <fieldset class="editor-block-effect">
+        <legend>封じ</legend>
+        <label class="checkbox-field">
+          <input name="editorBlockEffect" type="radio" value="none" />
+          <span>効果なし</span>
+        </label>
+        <label class="checkbox-field">
+          <input name="editorBlockEffect" type="radio" value="half-seal" />
+          <span>半熟封じ</span>
+        </label>
+        <label class="checkbox-field">
+          <input name="editorBlockEffect" type="radio" value="full-seal" />
+          <span>完熟封じ</span>
+        </label>
+      </fieldset>
+      <fieldset class="editor-cell-effect">
+        <legend>マス効果</legend>
+        <label class="checkbox-field">
+          <input name="editorCellEffect" type="radio" value="none" />
+          <span>効果なし</span>
+        </label>
+        <label class="checkbox-field">
+          <input name="editorCellEffect" type="radio" value="heat-return" />
+          <span>焼き戻し</span>
+        </label>
+      </fieldset>
       <fieldset class="editor-effect-mode">
         <legend>光・戻り</legend>
         <label class="checkbox-field">
@@ -1430,29 +1547,53 @@ function getBoardCellEditorElement() {
   return editor;
 }
 
-function openBoardCellEditor(event, item) {
+function openBoardCellEditor(event, item, cell = item?.gridCell) {
   event.preventDefault();
   event.stopPropagation();
 
   const editor = getBoardCellEditorElement();
-  editor.dataset.id = item.id;
-  editor.querySelector(".editor-title").textContent = `${item.name}を編集`;
-  editor.querySelector(".editor-current").value = item.current;
-  editor.querySelector(".editor-glowing").checked = item.isGlowing === true;
-  editor.querySelector(".editor-locked").checked = item.locked === true;
+  editor.dataset.id = item?.id || "";
+  editor.dataset.row = cell?.row || "";
+  editor.dataset.column = cell?.column || "";
+  editor.querySelector(".editor-title").textContent = item
+    ? `${item.name}を編集`
+    : `空マス(${cell?.row || "-"}, ${cell?.column || "-"})を編集`;
+  editor.querySelector(".editor-current").value = item?.current ?? "";
+  editor.querySelector(".editor-glowing").checked = item?.isGlowing === true;
+  editor.querySelector(".editor-locked").checked = item?.locked === true;
+  editor.querySelectorAll("[name='editorBlockEffect']").forEach((input) => {
+    input.checked = input.value === normalizeCookingBlockEffect(item?.cookingBlockEffect);
+  });
+  const cellEffect = getCookingCellEffect(numberOr(cell?.row, 0), numberOr(cell?.column, 0));
+  editor.querySelectorAll("[name='editorCellEffect']").forEach((input) => {
+    input.checked = input.value === normalizeCookingCellEffect(cellEffect?.effectId);
+  });
   syncBoardCellEditorTrait(editor);
   syncBoardCellEditorLock(editor);
   editor.hidden = false;
   positionBoardCellEditor(editor, event.clientX, event.clientY);
-  editor.querySelector(".editor-current").focus();
-  editor.querySelector(".editor-current").select();
+  if (item) {
+    editor.querySelector(".editor-current").focus();
+    editor.querySelector(".editor-current").select();
+  } else {
+    editor.querySelector("[name='editorCellEffect']").focus();
+  }
 }
 
 function syncBoardCellEditorTrait(editor) {
-  const glowField = editor.querySelector(".checkbox-field");
+  const hasIngredient = Boolean(editor.dataset.id);
+  const currentField = editor.querySelector(".editor-current-field");
+  const glowField = editor.querySelector(".editor-glowing-field");
+  const lockedField = editor.querySelector(".editor-locked-field");
+  const blockEffectField = editor.querySelector(".editor-block-effect");
+  const cellEffectField = editor.querySelector(".editor-cell-effect");
   const effectModeField = editor.querySelector(".editor-effect-mode");
-  glowField.hidden = state.traitId !== "light";
-  effectModeField.hidden = state.traitId !== "light-return";
+  currentField.hidden = !hasIngredient;
+  glowField.hidden = !hasIngredient || state.traitId !== "light";
+  lockedField.hidden = !hasIngredient;
+  blockEffectField.hidden = !hasIngredient;
+  cellEffectField.hidden = state.craftType !== "cooking";
+  effectModeField.hidden = !hasIngredient || state.traitId !== "light-return";
 
   effectModeField.querySelectorAll("input").forEach((input) => {
     input.checked = input.value === state.cookingEffectMode;
@@ -1499,8 +1640,25 @@ function closeBoardCellEditor() {
 
 function applyBoardCellEditor(editor) {
   const ingredient = state.ingredients.find((item) => item.id === editor.dataset.id);
+  const row = numberOr(editor.dataset.row, 0);
+  const column = numberOr(editor.dataset.column, 0);
+  const currentCellEffect = getCookingCellEffect(row, column);
+  const nextCellEffectId = normalizeCookingCellEffect(editor.querySelector("[name='editorCellEffect']:checked")?.value);
+  const cellEffectChanged = normalizeCookingCellEffect(currentCellEffect?.effectId) !== nextCellEffectId;
+
+  if (!ingredient && (!row || !column)) {
+    closeBoardCellEditor();
+    return;
+  }
 
   if (!ingredient) {
+    if (cellEffectChanged) {
+      pushBoardHistory();
+      updateCookingCellEffect(row, column, nextCellEffectId);
+      renderLayoutBoard();
+      renderAnalysis();
+      saveState();
+    }
     closeBoardCellEditor();
     return;
   }
@@ -1510,10 +1668,13 @@ function applyBoardCellEditor(editor) {
     isGlowing: state.traitId === "light" && editor.querySelector(".editor-glowing").checked,
     cookingEffectMode: editor.querySelector("[name='editorEffectMode']:checked")?.value,
     locked: editor.querySelector(".editor-locked").checked,
+    cookingBlockEffect: normalizeCookingBlockEffect(editor.querySelector("[name='editorBlockEffect']:checked")?.value),
   });
   const willChangeEffect =
     (state.traitId === "light" && ingredient.isGlowing !== normalized.isGlowing) ||
-    (state.traitId === "light-return" && state.cookingEffectMode !== normalizeCookingEffectMode(state.traitId, normalized.cookingEffectMode));
+    (state.traitId === "light-return" && state.cookingEffectMode !== normalizeCookingEffectMode(state.traitId, normalized.cookingEffectMode)) ||
+    ingredient.cookingBlockEffect !== normalized.cookingBlockEffect ||
+    cellEffectChanged;
 
   if (willChangeEffect) {
     pushBoardHistory();
@@ -1529,7 +1690,9 @@ function applyBoardCellEditor(editor) {
   }
   ingredient.current = normalized.current;
   ingredient.isGlowing = normalized.isGlowing;
+  ingredient.cookingBlockEffect = normalized.cookingBlockEffect;
   state.cookingEffectMode = normalizeCookingEffectMode(state.traitId, normalized.cookingEffectMode);
+  updateCookingCellEffect(row, column, nextCellEffectId);
   refreshIngredientRow(ingredient.id);
   renderLayoutBoard();
   renderCraftReference();
@@ -1720,6 +1883,7 @@ function addIngredient() {
     gridCell,
     current: 0,
     isGlowing: false,
+    cookingBlockEffect: "none",
     target: Math.round(((config.items[0]?.successMin || 60) + (config.items[0]?.successMax || 75)) / 2),
     successMin: config.items[0]?.successMin || 60,
     successMax: config.items[0]?.successMax || 75,
@@ -1746,6 +1910,7 @@ function applyRecipe(recipeId) {
   state.traitId = normalizeTraitId(config, recipe.traitId || recipe.specialEventId || config.defaultTraitId || "none");
   state.cookingEffectMode = getInitialCookingEffectMode(state.traitId);
   state.ingredients = cloneConfigItems(recipe.items);
+  state.cookingCellEffects = [];
   state.miracleGrillUsed = false;
   state.miracleGrillResult = "";
   state.layoutSignature = createLayoutSignature(config);
@@ -1788,6 +1953,7 @@ function createResetStateForCurrentSelection() {
     targetMode: config.targetMode || "fixed",
     techniques: cloneConfigItems(config.techniques),
     ingredients: cloneConfigItems(resetRecipe?.items || config.items),
+    cookingCellEffects: [],
     miracleGrillUsed: false,
     miracleGrillResult: "",
   });

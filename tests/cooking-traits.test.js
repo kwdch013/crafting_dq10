@@ -30,17 +30,26 @@ assert.equal(
 );
 assert.equal(registeredConfig.defaultTraitId, "light");
 assert.equal(
-  JSON.stringify(registeredConfig.techniques.map((technique) => [technique.id, technique.name, technique.specialAction || ""])),
+  JSON.stringify(registeredConfig.techniques.map((technique) => [
+    technique.id,
+    technique.name,
+    technique.specialAction || "",
+    technique.damageModel || "",
+    technique.effectId || "",
+  ])),
   JSON.stringify([
-    ["current-heat", "現在火力", ""],
-    ["miracle-grill", "ミラクルグリル", "miracle-grill"],
+    ["current-heat", "現在火力", "", "cooking-fixed", ""],
+    ["miracle-grill", "ミラクルグリル", "miracle-grill", "", ""],
+    ["half-seal", "半熟封じ", "", "cooking-effect", "half-seal"],
+    ["full-seal", "完熟封じ", "", "cooking-effect", "full-seal"],
+    ["heat-return", "焼き戻し", "", "cooking-effect", "heat-return"],
   ]),
 );
 assert.equal(
   JSON.stringify(registeredConfig.techniques
     .filter((technique) => technique.showInTechniqueEditor !== false)
     .map((technique) => technique.id)),
-  JSON.stringify(["miracle-grill"]),
+  JSON.stringify(["miracle-grill", "half-seal", "full-seal", "heat-return"]),
 );
 assert.equal(
   JSON.stringify(registeredConfig.techniques

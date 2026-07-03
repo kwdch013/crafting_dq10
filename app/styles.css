@@ -443,12 +443,34 @@ select:focus {
   box-shadow: inset 0 0 0 2px rgba(37, 99, 235, 0.2);
 }
 
+.board-cell.half-seal {
+  border-color: #8b5cf6;
+}
+
+.board-cell.full-seal {
+  border-color: #475569;
+}
+
+.board-cell.heat-return {
+  box-shadow: inset 0 0 0 2px rgba(20, 184, 166, 0.24);
+}
+
 .board-cell.empty {
   place-items: center;
   border-style: dashed;
   color: var(--muted);
   font-size: 13px;
   font-weight: 800;
+}
+
+.skill-effect-badge {
+  border: 1px solid rgba(20, 184, 166, 0.35);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.12);
+  color: #0f766e;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-weight: 900;
 }
 
 .board-cell.empty.interactive {
@@ -612,7 +634,9 @@ select:focus {
   gap: 8px;
 }
 
-.editor-effect-mode {
+.editor-effect-mode,
+.editor-block-effect,
+.editor-cell-effect {
   display: grid;
   gap: 8px;
   border: 1px solid var(--line);
@@ -621,11 +645,15 @@ select:focus {
   padding: 10px;
 }
 
-.editor-effect-mode[hidden] {
+.editor-effect-mode[hidden],
+.editor-block-effect[hidden],
+.editor-cell-effect[hidden] {
   display: none;
 }
 
-.editor-effect-mode legend {
+.editor-effect-mode legend,
+.editor-block-effect legend,
+.editor-cell-effect legend {
   color: var(--muted);
   font-size: 12px;
   font-weight: 900;

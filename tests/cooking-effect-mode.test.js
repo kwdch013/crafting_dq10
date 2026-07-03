@@ -9,6 +9,33 @@ const effects = require("../app/cooking-effects.js");
 }
 
 {
+	assert.equal(effects.normalizeCookingBlockEffect("half-seal"), "half-seal");
+	assert.equal(effects.normalizeCookingBlockEffect("full-seal"), "full-seal");
+	assert.equal(effects.normalizeCookingBlockEffect("missing"), "none");
+	assert.equal(effects.normalizeCookingBlockEffect("none"), "none");
+}
+
+{
+	assert.equal(effects.normalizeCookingCellEffect("heat-return"), "heat-return");
+	assert.equal(effects.normalizeCookingCellEffect("full-seal"), "none");
+	assert.equal(effects.normalizeCookingCellEffect("none"), "none");
+}
+
+{
+	assert.deepEqual(
+		effects.normalizeCookingCellEffects(
+			[
+				{ row: 1, column: 1, effectId: "heat-return", remainingTurns: 2 },
+				{ row: 0, column: 2, effectId: "heat-return" },
+				{ row: 2, column: 2, effectId: "missing" },
+			],
+			{ rows: 3, columns: 3 },
+		),
+		[{ row: 1, column: 1, effectId: "heat-return", remainingTurns: 2 }],
+	);
+}
+
+{
 	assert.equal(effects.getInitialCookingEffectMode("light-return"), "none");
 	assert.equal(effects.getInitialCookingEffectMode("light"), "none");
 	assert.equal(effects.getInitialCookingEffectMode("recovery"), "none");
