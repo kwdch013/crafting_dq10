@@ -180,6 +180,7 @@
       { id: "platinum-smithing-hammer", label: "プラチナ鍛冶ハンマー", focusBonus: 25 },
       { id: "super-smithing-hammer", label: "超鍛冶ハンマー", focusBonus: 35 },
       { id: "miracle-smithing-hammer", label: "奇跡の鍛冶ハンマー", focusBonus: 40 },
+      { id: "light-smithing-hammer", label: "光の鍛冶ハンマー", focusBonus: 45 },
     ],
     fryingPan: [
       { id: "copper-frying-pan", label: "銅のフライパン", focusBonus: 0 },
