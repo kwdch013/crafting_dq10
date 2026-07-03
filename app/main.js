@@ -1177,6 +1177,8 @@ function setCookingHeatMode(mode) {
   elements.heatInput.value = mode;
   renderTechniqueEditor();
   renderIngredients();
+  renderLayoutBoard();
+  renderCraftReference();
   renderAnalysis();
   syncBoardActionButtons();
   saveState();
@@ -1889,6 +1891,8 @@ elements.heatInput.addEventListener("change", () => {
   state.heat = elements.heatInput.value;
   renderTechniqueEditor();
   renderIngredients();
+  renderLayoutBoard();
+  renderCraftReference();
   renderAnalysis();
   syncBoardActionButtons();
   saveState();

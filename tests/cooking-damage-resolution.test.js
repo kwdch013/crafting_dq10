@@ -153,3 +153,38 @@ const engine = require("../app/engine.js");
 	assert.equal(result.criticalMin, 36);
 	assert.equal(result.criticalMax, 54);
 }
+
+{
+	const result = engine.analyzeIngredientAcrossTechniques(
+		{
+			heat: "strong",
+			traitId: "light",
+			targetMode: "random-in-range",
+			techniques: [
+				{
+					id: "current-heat",
+					name: "現在火力",
+					damageModel: "cooking-fixed",
+					conditionId: null,
+					criticalMultiplier: 2,
+					recommendable: false,
+				},
+			],
+		},
+		{
+			optionId: "cross",
+			isGlowing: true,
+			current: 0,
+			target: 195,
+			successMin: 180,
+			successMax: 210,
+		},
+	);
+
+	assert.equal(result.normalMin, 36);
+	assert.equal(result.normalMax, 56);
+	assert.equal(result.criticalMin, 72);
+	assert.equal(result.criticalMax, 112);
+	assert.equal(result.status, "shortage");
+	assert.equal(result.statusLabel, "不足");
+}
