@@ -29,6 +29,7 @@ const elements = {
   cookingDamageRanges: document.querySelector("#cookingDamageRanges"),
   layoutSectionTitle: document.querySelector("#layoutSectionTitle"),
   boardActions: document.querySelector("#boardActions"),
+  cookingCommandPanel: document.querySelector("#cookingCommandPanel"),
   undoBoardButton: document.querySelector("#undoBoardButton"),
   redoBoardButton: document.querySelector("#redoBoardButton"),
   miracleGrillButton: document.querySelector("#miracleGrillButton"),
@@ -876,10 +877,14 @@ function canRearrangeBoard(config = getCurrentCraftConfig()) {
 
 function syncBoardActionButtons() {
   const canRearrange = state ? canRearrangeBoard() : false;
+  const isCooking = isCurrentCraftFamily("cooking");
   const selectedIngredient = canRearrange
     ? state.ingredients.find((ingredient) => ingredient.id === selectedBoardIngredientId)
     : null;
   elements.boardActions.hidden = !canRearrange;
+  if (elements.cookingCommandPanel) {
+    elements.cookingCommandPanel.hidden = !isCooking;
+  }
   elements.undoBoardButton.disabled = !canRearrange || undoStack.length === 0;
   elements.redoBoardButton.disabled = !canRearrange || redoStack.length === 0;
   syncMiracleGrillButton(canRearrange, selectedIngredient);

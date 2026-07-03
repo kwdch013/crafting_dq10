@@ -424,6 +424,40 @@ select:focus {
   gap: 8px;
 }
 
+.cooking-command-panel {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.cooking-command-panel[hidden] {
+  display: none;
+}
+
+.command-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-soft);
+  padding: 10px;
+}
+
+.command-group > span {
+  min-width: 44px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.command-result {
+  color: var(--primary-dark);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
 .board-cell:not(.empty) {
   cursor: pointer;
 }
