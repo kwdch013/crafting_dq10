@@ -6,10 +6,10 @@ const mainJs = fs.readFileSync("app/main.js", "utf8");
 
 const boardIndex = html.indexOf('id="layoutBoard"');
 const referenceIndex = html.indexOf('id="smithingDamagePanel"');
-const itemSectionIndex = html.indexOf('id="itemSectionTitle"');
+const splitPanelIndex = html.indexOf('class="split-panel"');
 
 assert.ok(referenceIndex > boardIndex, "鍛冶ダメージ表は鍛冶配置の後に配置してください");
-assert.ok(referenceIndex < itemSectionIndex, "鍛冶ダメージ表は鍛冶マス入力の前に配置してください");
+assert.ok(referenceIndex < splitPanelIndex, "鍛冶ダメージ表は判定パネルの前に配置してください");
 assert.match(html, /id="smithingTemperatureDamageLabel"/, "現在温度の表示欄を追加してください");
 assert.match(html, /id="smithingHeatDownButton"/, "BOARD内の温度低下ボタンを追加してください");
 assert.match(html, /id="smithingHeatUpButton"/, "BOARD内の温度上昇ボタンを追加してください");
@@ -19,7 +19,7 @@ assert.match(mainJs, /smithingDamagePanel: document\.querySelector\("#smithingDa
 assert.match(mainJs, /function renderSmithingDamageReference\(\)/);
 assert.match(mainJs, /function adjustSmithingHeat\(delta\)/);
 assert.match(mainJs, /DQ10SmithingDamage\?\.ranges\?\.\[state\.heat\]/);
-assert.match(mainJs, /renderSmithingDamageReference\(\);[\s\S]*renderIngredients\(\);/);
+assert.match(mainJs, /renderSmithingDamageReference\(\);[\s\S]*renderLayoutBoard\(\);/);
 assert.match(mainJs, /smithingHeatDownButton\?\.addEventListener\("click", \(\) => adjustSmithingHeat\(-50\)\)/);
 assert.match(mainJs, /smithingHeatUpButton\?\.addEventListener\("click", \(\) => adjustSmithingHeat\(50\)\)/);
 

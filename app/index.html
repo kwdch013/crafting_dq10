@@ -188,39 +188,6 @@
             </div>
           </div>
 
-          <div class="panel-section">
-            <div class="section-heading">
-              <div>
-                <p class="eyebrow">Values</p>
-                <h2 id="itemSectionTitle">状態入力</h2>
-              </div>
-              <button class="button secondary" id="addIngredientButton" type="button">項目を追加</button>
-            </div>
-            <div class="table-scroll">
-              <table>
-                <thead>
-                  <tr>
-                    <th id="itemNameHeader">項目名</th>
-                    <th id="itemOptionHeader">種別</th>
-                    <th>現在値</th>
-                    <th>光</th>
-                    <th id="targetHeader">基準値</th>
-                    <th id="successMinHeader">成功下限</th>
-                    <th id="successMaxHeader">成功上限</th>
-                    <th>基準まで</th>
-                    <th>下限まで</th>
-                    <th>上限まで</th>
-                    <th>通常後（全倍率）</th>
-                    <th>会心後（全倍率）</th>
-                    <th>判定</th>
-                    <th>操作</th>
-                  </tr>
-                </thead>
-                <tbody id="ingredientBody"></tbody>
-              </table>
-            </div>
-          </div>
-
           <div class="split-panel">
             <section class="panel-section">
               <div class="section-heading">
@@ -262,25 +229,6 @@
         </section>
       </main>
     </div>
-
-    <template id="ingredientRowTemplate">
-      <tr>
-        <td><input class="ingredient-name" type="text" maxlength="30" /></td>
-        <td><select class="ingredient-option"></select></td>
-        <td><input class="ingredient-current numeric" type="number" /></td>
-        <td><input class="ingredient-glowing" type="checkbox" title="光っている" /></td>
-        <td><input class="ingredient-target numeric" type="number" /></td>
-        <td><input class="ingredient-min numeric" type="number" /></td>
-        <td><input class="ingredient-max numeric" type="number" /></td>
-        <td class="target-diff"></td>
-        <td class="lower-diff"></td>
-        <td class="upper-diff"></td>
-        <td class="normal-range"></td>
-        <td class="critical-range"></td>
-        <td><span class="status"></span></td>
-        <td><button class="icon-button danger remove-ingredient" type="button" title="削除">×</button></td>
-      </tr>
-    </template>
 
     <template id="techniqueTemplate">
       <article class="technique-card">
