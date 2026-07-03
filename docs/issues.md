@@ -213,11 +213,13 @@ https://github.com/kwdch013/crafting_dq10/issues/9
 - 既存の1マス食材レシピが従来通り動作する。
 - 未登録レシピの食材グループ情報を追加する。
 
-URL:
+URL: https://github.com/kwdch013/crafting_dq10/issues/10
 
-```text
-https://github.com/kwdch013/crafting_dq10/issues/10
-```
+### #66 鍛冶職人: 温度・特性・必殺を含む鍛冶基盤機能を整備する
+
+現状: 特技倍率表、配置作成、現在温度表示、地金特性、必殺、温度別最大ダメージ表が不足しています。
+完了条件: 各鍛冶職人で共通利用できる形で、対象機能を計算とUIから扱える。
+URL: https://github.com/kwdch013/crafting_dq10/issues/66
 
 ### #11 調理職人: レシピ特性の実データ割り当てを検証する
 
@@ -233,11 +235,7 @@ https://github.com/kwdch013/crafting_dq10/issues/10
 - 未確認レシピがある場合は暫定値であることを追跡できる。
 - 調理職人メモとレシピデータ設計が更新される。
 
-URL:
-
-```text
-https://github.com/kwdch013/crafting_dq10/issues/11
-```
+URL: https://github.com/kwdch013/crafting_dq10/issues/11
 
 ### #12 調理職人: 複数マス食材の方向入れ替えをブラウザ操作で検証する
 
