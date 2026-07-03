@@ -12,6 +12,7 @@ const buttonLabels = [...commandPanel.matchAll(/<button\b[^>]*>([^<]*)<\/button>
 
 assert.deepEqual(buttonLabels, [
 	"ミラクルグリル",
+	"適用",
 	"通常",
 	"強火焼き",
 	"弱火焼き",
