@@ -44,7 +44,7 @@
 
   const powers = {
     normal: { label: "通常", multiplier: 1 },
-    power_1_2: { label: "強め", multiplier: 1.2 },
+    power_1_2: { label: "1.2倍", multiplier: 1.2 },
     power_2_0: { label: "2倍", multiplier: 2 },
     power_2_5: { label: "2.5倍", multiplier: 2.5 },
     power_3_0: { label: "3倍", multiplier: 3 },

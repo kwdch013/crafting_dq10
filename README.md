@@ -99,6 +99,8 @@ app/crafts/
 
 各 `config.js` では、職人名、入力ラベル、レベル別集中力、道具種類と★数ごとの補正、火力状態、特技ごとの消費集中力・通常範囲・会心範囲、初期マスを管理します。
 
+鍛冶BOARD下の特技表に表示する消費集中、特技名、倍率、範囲は `app/crafts/shared/smithing-techniques.json` に登録します。
+
 調理の位置別ダメージは `app/crafts/shared/cooking-damage.js` に集約しています。
 鍛冶系の温度別ダメージは `app/crafts/shared/smithing-damage.js` に集約しています。
 このファイルでは、各温度と威力ごとの最小値・最大値だけを保持します。
