@@ -444,6 +444,107 @@ registerDQ10CraftRecipes("cooking", [
     "traitId": "light-return"
   },
   {
+    "id": "cooking-032",
+    "name": "バトルパッツァ",
+    "category": "魚料理",
+    "categoryId": "fish-dishes",
+    "items": [
+      {
+        "id": "slot-1-2",
+        "name": "上",
+        "optionId": "cross",
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        },
+        "current": 0,
+        "target": 155,
+        "successMin": 140,
+        "successMax": 170,
+        "ingredientGroupId": "battle-pazza-fish-top",
+        "ingredientGroupLabel": "魚の切り身",
+        "ingredientSize": 2
+      },
+      {
+        "id": "slot-2-1",
+        "name": "左",
+        "optionId": "cross",
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        },
+        "current": 0,
+        "target": 155,
+        "successMin": 140,
+        "successMax": 170,
+        "ingredientGroupId": "battle-pazza-fish-left",
+        "ingredientGroupLabel": "魚の切り身",
+        "ingredientSize": 2
+      },
+      {
+        "id": "slot-2-2",
+        "name": "中央",
+        "optionId": "center",
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        },
+        "current": 0,
+        "target": 155,
+        "successMin": 140,
+        "successMax": 170,
+        "ingredientGroupId": "battle-pazza-fish-top",
+        "ingredientGroupLabel": "魚の切り身",
+        "ingredientSize": 2
+      },
+      {
+        "id": "slot-2-3",
+        "name": "右",
+        "optionId": "cross",
+        "gridCell": {
+          "row": 2,
+          "column": 3
+        },
+        "current": 0,
+        "target": 175,
+        "successMin": 160,
+        "successMax": 190,
+        "ingredientGroupLabel": "野菜"
+      },
+      {
+        "id": "slot-3-1",
+        "name": "左下",
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        },
+        "current": 0,
+        "target": 155,
+        "successMin": 140,
+        "successMax": 170,
+        "ingredientGroupId": "battle-pazza-fish-left",
+        "ingredientGroupLabel": "魚の切り身",
+        "ingredientSize": 2
+      },
+      {
+        "id": "slot-3-3",
+        "name": "右下",
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 3
+        },
+        "current": 0,
+        "target": 175,
+        "successMin": 160,
+        "successMax": 190,
+        "ingredientGroupLabel": "野菜"
+      }
+    ],
+    "traitId": "light"
+  },
+  {
     "id": "cooking-008",
     "name": "いやしのスープ",
     "category": "魚料理",
