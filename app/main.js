@@ -27,7 +27,7 @@ const elements = {
   craftReferencePanel: document.querySelector("#craftReferencePanel"),
   recipeTraitReference: document.querySelector("#recipeTraitReference"),
   cookingDamageRanges: document.querySelector("#cookingDamageRanges"),
-  boardSpecialToggle: document.querySelector("#boardSpecialToggle"),
+  specialChargeToggle: document.querySelector("#specialChargeToggle"),
   boardSpecialStateLabel: document.querySelector("#boardSpecialStateLabel"),
   layoutSectionTitle: document.querySelector("#layoutSectionTitle"),
   boardActions: document.querySelector("#boardActions"),
@@ -917,9 +917,9 @@ function syncBoardSpecialState() {
   const isCooking = isCurrentCraftFamily("cooking");
   const stateId = normalizeSpecialChargeState(state?.specialChargeState);
 
-  if (elements.boardSpecialToggle) {
-    elements.boardSpecialToggle.disabled = !isCooking;
-    elements.boardSpecialToggle.classList.toggle("active", isCooking && stateId === "active");
+  if (elements.specialChargeToggle) {
+    elements.specialChargeToggle.disabled = !isCooking;
+    elements.specialChargeToggle.classList.toggle("active", isCooking && stateId === "active");
   }
   if (elements.boardSpecialStateLabel) {
     elements.boardSpecialStateLabel.hidden = !isCooking;
@@ -2001,7 +2001,7 @@ elements.heatInput.addEventListener("change", () => {
 elements.addIngredientButton.addEventListener("click", addIngredient);
 elements.undoBoardButton.addEventListener("click", undoBoardAction);
 elements.redoBoardButton.addEventListener("click", redoBoardAction);
-elements.boardSpecialToggle.addEventListener("click", toggleBoardSpecialState);
+elements.specialChargeToggle.addEventListener("click", toggleBoardSpecialState);
 elements.miracleGrillButton?.addEventListener("click", applyMiracleGrillToSelected);
 elements.normalHeatButton?.addEventListener("click", () => setCookingHeatMode("normal"));
 elements.strongHeatButton?.addEventListener("click", () => setCookingHeatMode("strong"));
