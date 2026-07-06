@@ -1488,26 +1488,10 @@ function adjustSmithingHeat(delta) {
   saveState();
 }
 
-// 鍛冶の温度変更時に、戻り地金など自動発動する特性を反映します。
+// 鍛冶の温度変更時に、温度表示と判定表示を同期します。
 function applySmithingHeatChange(nextHeat) {
-  const previousHeat = state.heat;
-  const shouldApplyReturn =
-    isCurrentCraftFamily("smithing") &&
-    state.traitId === "return" &&
-    previousHeat !== nextHeat &&
-    numberOr(nextHeat, 0) % 200 === 0 &&
-    Boolean(DQ10CraftEngine.resolveSmithingReturnTarget(state.ingredients));
-
-  if (shouldApplyReturn) {
-    pushBoardHistory();
-  }
-
   state.heat = nextHeat;
   elements.heatInput.value = state.heat;
-
-  if (shouldApplyReturn) {
-    DQ10CraftEngine.applySmithingReturn(state.ingredients);
-  }
 }
 
 function toggleCookingLight(ingredientId) {

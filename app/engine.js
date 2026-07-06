@@ -3,6 +3,7 @@
     locked: "固定",
     "locked-critical": "本会心固定",
     guaranteed: "会心時確定",
+    "gauge-entry": "ゲージ突入",
     "normal-over-risk": "通常時超過の可能性あり",
     over: "超過中",
     "fake-critical-risk": "偽会心の可能性あり",
@@ -15,6 +16,7 @@
     over: 5,
     guaranteed: 4,
     "normal-over-risk": 3,
+    "gauge-entry": 2.5,
     "fake-critical-risk": 2,
     "in-range": 1.5,
     shortage: 1,
@@ -114,45 +116,12 @@
     return 1;
   }
 
-  function resolveSmithingReturnTarget(ingredients = []) {
-    const candidates = ingredients.filter((ingredient) => Number.isFinite(toNumber(ingredient?.current, NaN)));
-    const overTargets = candidates
-      .map((ingredient) => ({
-        ingredient,
-        amount: toNumber(ingredient.current) - toNumber(ingredient.successMax),
-      }))
-      .filter((entry) => entry.amount > 0)
-      .sort((a, b) => b.amount - a.amount || toNumber(b.ingredient.current) - toNumber(a.ingredient.current));
-
-    if (overTargets.length > 0) {
-      return overTargets[0].ingredient;
-    }
-
-    return candidates
-      .filter((ingredient) => {
-        const current = toNumber(ingredient.current);
-        return current < toNumber(ingredient.successMin) || current > toNumber(ingredient.successMax);
-      })
-      .sort((a, b) => toNumber(b.current) - toNumber(a.current))[0] || null;
-  }
-
-  function applySmithingReturn(ingredients = [], amount = 10) {
-    const target = resolveSmithingReturnTarget(ingredients);
-    if (!target) {
-      return null;
-    }
-
-    const before = toNumber(target.current);
-    const normalizedAmount = Math.max(0, toNumber(amount, 10));
-    const after = Math.max(0, before - normalizedAmount);
-    target.current = after;
-
-    return {
-      targetId: target.id,
-      before,
-      after,
-      amount: normalizedAmount,
-    };
+  function isSmithingReturnNextTurn(state = {}) {
+    const heat = toNumber(state.heat, NaN);
+    return isSmithingCraftState(state) &&
+      state.traitId === "return" &&
+      Number.isFinite(heat) &&
+      heat % 200 === 50;
   }
 
   function resolveCookingDamageSource(state = {}, ingredient = {}, conditionId = "normal") {
@@ -560,6 +529,10 @@
       normalAfterMin >= successMin && normalAfterMax <= successMax;
     const normalCanHit =
       normalAfterMax >= successMin && normalAfterMin <= successMax;
+    const normalMaxCanEnterTargetRange =
+      current < successMin &&
+      normalAfterMax >= successMin &&
+      normalAfterMax <= successMax;
     const currentOver = current > successMax;
     const shortage = !currentOver && current + criticalMax < successMin;
     const normalOver = !currentOver && !shortage && normalAfterMax > successMax;
@@ -623,6 +596,7 @@
       criticalStopApplies,
       normalHits,
       normalCanHit,
+      normalMaxCanEnterTargetRange,
       guaranteedCritical,
       criticalCanHit,
       inTargetRangeUnlocked,
@@ -643,18 +617,26 @@
       : ingredient;
     const analysisTechniques = isSmithingCraftState(state)
       ? [{
-        id: "board-double",
-        name: "BOARD判定(2倍)",
+        id: "board-normal",
+        name: "BOARD判定(1倍)",
         damageModel: "smithing-temperature",
-        powerId: "power_2_0",
+        powerId: "normal",
         criticalMultiplier: global.DQ10SmithingDamage?.criticalMultiplier || 2,
         includeInAnalysis: true,
       }]
       : state.techniques.filter((technique) => technique.includeInAnalysis !== false);
     const techniqueAnalyses = analysisTechniques.map((technique) => {
       const resolvedTechnique = resolveTechnique(state, technique, normalizedIngredient);
+      const analysis = analyzeIngredient(normalizedIngredient, resolvedTechnique, state.targetMode);
+      const smithingStatus = isSmithingCraftState(state) && analysis.normalMaxCanEnterTargetRange
+        ? "gauge-entry"
+        : analysis.status;
       return {
-        ...analyzeIngredient(normalizedIngredient, resolvedTechnique, state.targetMode),
+        ...analysis,
+        status: smithingStatus,
+        statusLabel: isSmithingCraftState(state) && smithingStatus === "guaranteed"
+          ? "本会心！"
+          : statusLabels[smithingStatus],
         technique: resolvedTechnique,
       };
     });
@@ -743,7 +725,9 @@
       reasonParts.push("集中力不足");
     }
     if (guaranteed > 0) {
-      reasonParts.push(`会心時確定 ${guaranteed} 件`);
+      reasonParts.push(isSmithingCraftState(state)
+        ? `本会心！ ${guaranteed} 件`
+        : `会心時確定 ${guaranteed} 件`);
     }
     if (fakeCritical > 0) {
       reasonParts.push(`偽会心の可能性 ${fakeCritical} 件`);
@@ -774,8 +758,7 @@
   global.DQ10CraftEngine = {
     statusLabels,
     resolveTechnique,
-    resolveSmithingReturnTarget,
-    applySmithingReturn,
+    isSmithingReturnNextTurn,
     resolveIngredientTarget,
     resolveCriticalLockJudgement,
     applyMiracleGrill,

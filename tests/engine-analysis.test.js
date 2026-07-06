@@ -404,6 +404,7 @@ global.DQ10SmithingDamage = {
 
 	assert.deepEqual(Object.keys(engine.statusLabels).sort(), [
 		"fake-critical-risk",
+		"gauge-entry",
 		"guaranteed",
 		"in-range",
 		"locked",
@@ -413,6 +414,49 @@ global.DQ10SmithingDamage = {
 		"shortage",
 	]);
 	assert.equal(fakeCriticalLabels.length, 1);
+}
+
+{
+	const result = engine.analyzeIngredientAcrossTechniques(
+		{
+			craftType: "weapon-smithing",
+			heat: "1000",
+			traitId: "none",
+			targetMode: "random-in-range",
+			techniques: [],
+		},
+		{
+			current: 70,
+			target: 85,
+			successMin: 80,
+			successMax: 95,
+		},
+	);
+
+	assert.equal(result.status, "gauge-entry");
+	assert.equal(result.statusLabel, "ゲージ突入");
+	assert.equal(result.normalMaxCanEnterTargetRange, true);
+}
+
+{
+	const result = engine.analyzeIngredientAcrossTechniques(
+		{
+			craftType: "weapon-smithing",
+			heat: "1000",
+			traitId: "none",
+			targetMode: "random-in-range",
+			techniques: [],
+		},
+		{
+			current: 61,
+			target: 85,
+			successMin: 80,
+			successMax: 95,
+		},
+	);
+
+	assert.equal(result.status, "guaranteed");
+	assert.equal(result.statusLabel, "本会心！");
 }
 
 {
@@ -528,32 +572,10 @@ global.DQ10SmithingDamage = {
 	assert.equal(increased.criticalWeight, 1.5);
 }
 
-{
-	const ingredients = [
-		{ id: "part-1", current: 118, successMin: 80, successMax: 100 },
-		{ id: "part-2", current: 140, successMin: 100, successMax: 120 },
-		{ id: "part-3", current: 90, successMin: 100, successMax: 120 },
-	];
-	const target = engine.resolveSmithingReturnTarget(ingredients);
-
-	assert.equal(target.id, "part-2");
-}
-
-{
-	const ingredients = [
-		{ id: "part-1", current: 50, successMin: 80, successMax: 100 },
-		{ id: "part-2", current: 95, successMin: 100, successMax: 120 },
-		{ id: "part-3", current: 85, successMin: 80, successMax: 100 },
-	];
-	const target = engine.resolveSmithingReturnTarget(ingredients);
-	const result = engine.applySmithingReturn(ingredients);
-
-	assert.equal(target.id, "part-2");
-	assert.equal(result.targetId, "part-2");
-	assert.equal(result.before, 95);
-	assert.equal(result.after, 85);
-	assert.equal(result.amount, 10);
-}
+assert.equal(engine.isSmithingReturnNextTurn({ craftType: "weapon-smithing", traitId: "return", heat: "250" }), true);
+assert.equal(engine.isSmithingReturnNextTurn({ craftType: "weapon-smithing", traitId: "return", heat: "450" }), true);
+assert.equal(engine.isSmithingReturnNextTurn({ craftType: "weapon-smithing", traitId: "return", heat: "200" }), false);
+assert.equal(engine.isSmithingReturnNextTurn({ craftType: "weapon-smithing", traitId: "light", heat: "250" }), false);
 
 {
 	const result = engine.analyzeIngredientAcrossTechniques(
@@ -572,16 +594,16 @@ global.DQ10SmithingDamage = {
 			],
 		},
 		{
-			current: 62,
+			current: 78,
 			target: 85,
 			successMin: 80,
 			successMax: 95,
 		},
 	);
 
-	assert.equal(result.technique.id, "board-double");
-	assert.equal(result.normalMin, 24);
-	assert.equal(result.normalMax, 36);
+	assert.equal(result.technique.id, "board-normal");
+	assert.equal(result.normalMin, 12);
+	assert.equal(result.normalMax, 18);
 	assert.equal(result.status, "normal-over-risk");
 }
 
@@ -611,6 +633,6 @@ global.DQ10SmithingDamage = {
 	);
 
 	assert.notEqual(result.status, "locked");
-	assert.equal(result.normalMin, 24);
-	assert.equal(result.normalMax, 36);
+	assert.equal(result.normalMin, 12);
+	assert.equal(result.normalMax, 18);
 }

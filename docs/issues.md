@@ -490,7 +490,10 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/53
 素材のカテゴリテンプレートを、左列3マス、右列3マスの6マス配置に修正します。レシピ追加・編集画面では素材の3段目まで表示します。URL: https://github.com/kwdch013/crafting_dq10/issues/83
 
 ### #84 鍛冶職人: 温度別倍率順とBOARD判定を修正する
-温度別ダメージ表を倍率の低い順に表示し、鍛冶BOARD判定を2倍打ち基準に統一します。光地金の有効温度で光マスは威力2倍を反映し、鍛冶では固定判定を表示しません。URL: https://github.com/kwdch013/crafting_dq10/issues/84
+温度別ダメージ表を倍率の低い順に表示します。光地金の有効温度で光マスは威力2倍を反映し、鍛冶では固定判定を表示しません。URL: https://github.com/kwdch013/crafting_dq10/issues/84
 
 ### #86 鍛冶職人: 地金特性の倍半・戻り・集中変化を追加する
-鍛冶特性に倍半、戻り、集中変化を追加します。倍半は温度条件で威力2倍または半減、戻りは200℃の倍数で対象マスを自動選択して10戻し、集中変化は消費集中半減または1.5倍を反映します。URL: https://github.com/kwdch013/crafting_dq10/issues/86
+鍛冶特性に倍半、戻り、集中変化を追加します。倍半は温度条件で威力2倍または半減、集中変化は消費集中半減または1.5倍を反映します。URL: https://github.com/kwdch013/crafting_dq10/issues/86
+
+### #88 鍛冶職人: 戻り予告と光地金ノード操作を修正する
+戻りは200n+50℃の予告表示のみとし、光地金はBOARDノード上で直接切り替えます。BOARD代表判定は1倍基準へ変更し、本会心！とゲージ突入も表示します。URL: https://github.com/kwdch013/crafting_dq10/issues/88
