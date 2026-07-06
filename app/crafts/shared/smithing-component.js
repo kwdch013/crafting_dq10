@@ -14,8 +14,24 @@
           Number.isFinite(heat) &&
           heat % 200 === 0 &&
           ingredient?.isGlowing === true,
-        isReturning: false,
+        isReturning: global.DQ10CraftEngine?.isSmithingReturnNextTurn?.(state) === true,
       };
+    },
+    // 光地金は調理の光と同じくBOARDノード上で直接選択できます。
+    formatLightToggle(state, item, special, escapeHtml) {
+      if (state.traitId !== "light") {
+        return "";
+      }
+
+      const activeClass = item.isGlowing === true ? " active" : "";
+      const label = item.isGlowing === true ? `${item.name}の光を解除` : `${item.name}を光らせる`;
+      const heatNote = special.isGlowing ? "有効" : "選択";
+
+      return `
+        <button class="board-light-toggle${activeClass}" type="button" aria-label="${escapeHtml(label)}" title="${escapeHtml(label)}">
+          光${escapeHtml(heatNote)}
+        </button>
+      `;
     },
   };
 
@@ -32,7 +48,7 @@
         { id: "none", label: "なし", description: "通常の地金として扱います。" },
         { id: "light", label: "光地金", description: "温度が200の倍数の時だけ、選択したマスを光っている状態として扱います。" },
         { id: "double-half", label: "倍半", description: "400℃の倍数で威力2倍、200℃の倍数かつ400℃の倍数でない時は威力半減として扱います。" },
-        { id: "return", label: "戻り", description: "200℃の倍数になった時、条件に合う1マスを自動で10戻します。" },
+        { id: "return", label: "戻り", description: "200n+50℃の時に、次が戻りターンであることを表示します。戻り値は手動で入力します。" },
         { id: "focus-change", label: "集中変化", description: "400℃の倍数で消費集中半減、200℃の倍数かつ400℃の倍数でない時は消費集中1.5倍と会心率上昇として扱います。" },
       ],
       focusNote: "Lv76-80はLv75以降を各レベル+2として置いた暫定値です。",

@@ -1047,6 +1047,11 @@ select:focus {
   color: #1e40af;
 }
 
+.status-gauge-entry {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
 .status-normal-over-risk {
   background: #ffedd5;
   color: #9a3412;
