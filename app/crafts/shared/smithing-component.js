@@ -2,6 +2,21 @@
   // 鍛冶3職人で共有する画面コンポーネントを定義します。
   const smithingComponent = {
     craftFamily: "smithing",
+    // 鍛冶配置の各マスは右クリック編集で現在値と光地金状態を変更できます。
+    isBoardCellEditable() {
+      return true;
+    },
+    // 光地金の盤面表示は、現在温度が有効な時だけ光状態を返します。
+    getIngredientSpecialState(state, ingredient) {
+      const heat = Number(state?.heat);
+      return {
+        isGlowing: state?.traitId === "light" &&
+          Number.isFinite(heat) &&
+          heat % 200 === 0 &&
+          ingredient?.isGlowing === true,
+        isReturning: false,
+      };
+    },
   };
 
   // 鍛冶3職人で共通する設定を職人別差分と結合します。
@@ -34,21 +49,6 @@
         fixed: false,
       },
       heatStates: global.DQ10SmithingDamage.heatStates,
-      // 鍛冶配置の各マスは右クリック編集で現在値と光地金状態を変更できます。
-      isBoardCellEditable() {
-        return true;
-      },
-      // 光地金の盤面表示は、現在温度が有効な時だけ光状態を返します。
-      getIngredientSpecialState(state, ingredient) {
-        const heat = Number(state?.heat);
-        return {
-          isGlowing: state?.traitId === "light" &&
-            Number.isFinite(heat) &&
-            heat % 200 === 0 &&
-            ingredient?.isGlowing === true,
-          isReturning: false,
-        };
-      },
       ...options,
     };
   }
