@@ -965,7 +965,8 @@ select:focus {
 
 .editor-effect-mode,
 .editor-block-effect,
-.editor-cell-effect {
+.editor-cell-effect,
+.editor-smithing-judgements {
   display: grid;
   gap: 8px;
   border: 1px solid var(--line);
@@ -976,16 +977,49 @@ select:focus {
 
 .editor-effect-mode[hidden],
 .editor-block-effect[hidden],
-.editor-cell-effect[hidden] {
+.editor-cell-effect[hidden],
+.editor-smithing-judgements[hidden] {
   display: none;
 }
 
 .editor-effect-mode legend,
 .editor-block-effect legend,
-.editor-cell-effect legend {
+.editor-cell-effect legend,
+.editor-smithing-judgements legend {
   color: var(--muted);
   font-size: 12px;
   font-weight: 900;
+}
+
+.editor-smithing-judgement-rows {
+  display: grid;
+  gap: 6px;
+}
+
+.editor-smithing-judgement-row {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 4px 8px;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 6px;
+}
+
+.editor-smithing-judgement-row:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.editor-smithing-judgement-row strong,
+.editor-smithing-judgement-row span,
+.editor-smithing-judgement-row small {
+  font-size: 12px;
+}
+
+.editor-smithing-judgement-row small {
+  grid-column: 2;
+  color: var(--muted);
+  font-weight: 800;
 }
 
 .board-cell-values span {

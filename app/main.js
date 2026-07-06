@@ -486,6 +486,21 @@ function isCurrentCraftFamily(craftFamily) {
   return getCurrentCraftComponent().craftFamily === craftFamily;
 }
 
+// 光地金は、鍛冶の現在温度が200の倍数の時だけ有効にします。
+function isSmithingLightHeatActive() {
+  const heat = numberOr(state?.heat, NaN);
+  return isCurrentCraftFamily("smithing") &&
+    state?.traitId === "light" &&
+    Number.isFinite(heat) &&
+    heat % 200 === 0;
+}
+
+// 右クリック編集で光状態を操作できるかを職人別に判定します。
+function canEditLightState() {
+  return state?.traitId === "light" &&
+    (isCurrentCraftFamily("cooking") || isCurrentCraftFamily("smithing"));
+}
+
 function cloneConfigItems(items) {
   return items.map((item) => ({
     ...item,
@@ -1659,6 +1674,10 @@ function getBoardCellEditorElement() {
           <span>四隅が戻り</span>
         </label>
       </fieldset>
+      <fieldset class="editor-smithing-judgements">
+        <legend>鍛冶倍率判定</legend>
+        <div class="editor-smithing-judgement-rows"></div>
+      </fieldset>
       <div class="editor-actions">
         <button class="button primary" type="submit">更新</button>
         <button class="button secondary editor-cancel" type="button">閉じる</button>
@@ -1670,7 +1689,10 @@ function getBoardCellEditorElement() {
     event.preventDefault();
     applyBoardCellEditor(editor);
   });
-  editor.querySelector(".editor-current").addEventListener("input", () => syncBoardCellEditorLock(editor));
+  editor.querySelector(".editor-current").addEventListener("input", () => {
+    syncBoardCellEditorLock(editor);
+    renderSmithingCellJudgements(editor);
+  });
   editor.querySelector(".editor-cancel").addEventListener("click", closeBoardCellEditor);
   document.body.append(editor);
   boardCellEditorElement = editor;
@@ -1700,6 +1722,7 @@ function openBoardCellEditor(event, item, cell = item?.gridCell) {
   });
   syncBoardCellEditorTrait(editor);
   syncBoardCellEditorLock(editor);
+  renderSmithingCellJudgements(editor);
   editor.hidden = false;
   positionBoardCellEditor(editor, event.clientX, event.clientY);
   if (item) {
@@ -1718,12 +1741,19 @@ function syncBoardCellEditorTrait(editor) {
   const blockEffectField = editor.querySelector(".editor-block-effect");
   const cellEffectField = editor.querySelector(".editor-cell-effect");
   const effectModeField = editor.querySelector(".editor-effect-mode");
+  const smithingJudgementField = editor.querySelector(".editor-smithing-judgements");
+  const glowInput = editor.querySelector(".editor-glowing");
+  const canUseLight = canEditLightState();
+  const disabledByHeat = isCurrentCraftFamily("smithing") && state.traitId === "light" && !isSmithingLightHeatActive();
   currentField.hidden = !hasIngredient;
-  glowField.hidden = !hasIngredient || state.traitId !== "light";
+  glowField.hidden = !hasIngredient || !canUseLight;
+  glowInput.disabled = disabledByHeat;
+  glowInput.title = disabledByHeat ? "光地金は温度が200の倍数の時だけ有効です" : "";
   lockedField.hidden = !hasIngredient;
-  blockEffectField.hidden = !hasIngredient;
+  blockEffectField.hidden = !hasIngredient || !isCurrentCraftFamily("cooking");
   cellEffectField.hidden = !isCurrentCraftFamily("cooking");
   effectModeField.hidden = !hasIngredient || state.traitId !== "light-return";
+  smithingJudgementField.hidden = !hasIngredient || !isCurrentCraftFamily("smithing");
 
   effectModeField.querySelectorAll("input").forEach((input) => {
     input.checked = input.value === state.cookingEffectMode;
@@ -1751,6 +1781,63 @@ function syncBoardCellEditorLock(editor) {
   if (!canLock) {
     lockInput.checked = false;
   }
+}
+
+// 右クリック編集中の現在値を使い、鍛冶の倍率ごとの判定を表示します。
+function renderSmithingCellJudgements(editor) {
+  const field = editor.querySelector(".editor-smithing-judgements");
+  const rows = editor.querySelector(".editor-smithing-judgement-rows");
+  const ingredient = state.ingredients.find((item) => item.id === editor.dataset.id);
+
+  if (!field || !rows) {
+    return;
+  }
+
+  rows.replaceChildren();
+  if (!ingredient || !isCurrentCraftFamily("smithing")) {
+    field.hidden = true;
+    return;
+  }
+
+  field.hidden = false;
+  const smithingDamage = window.DQ10SmithingDamage || {};
+  const rangeSet = smithingDamage.ranges?.[state.heat];
+  const powers = smithingDamage.powers || {};
+  const criticalMultiplier = numberOr(smithingDamage.criticalMultiplier, 2);
+  const current = numberOr(editor.querySelector(".editor-current").value, ingredient.current);
+
+  Object.entries(powers).forEach(([powerId, power]) => {
+    const range = rangeSet?.[powerId];
+    const row = document.createElement("div");
+    row.className = "editor-smithing-judgement-row";
+
+    if (!range) {
+      row.innerHTML = `
+        <strong>${escapeHtml(power.label)}</strong>
+        <span>未設定</span>
+      `;
+      rows.append(row);
+      return;
+    }
+
+    const analysis = DQ10CraftEngine.analyzeIngredient(
+      { ...ingredient, current, locked: false },
+      {
+        normalMin: range[0],
+        normalMax: range[1],
+        criticalMin: Math.ceil(range[0] * criticalMultiplier),
+        criticalMax: Math.ceil(range[1] * criticalMultiplier),
+      },
+      state.targetMode,
+    );
+
+    row.innerHTML = `
+      <strong>${escapeHtml(power.label)}</strong>
+      <span class="numeric">${range[0]}-${range[1]} / 会心 ${analysis.criticalMin}-${analysis.criticalMax}</span>
+      <small>${escapeHtml(analysis.statusLabel)}</small>
+    `;
+    rows.append(row);
+  });
 }
 
 function positionBoardCellEditor(editor, x, y) {
@@ -1795,7 +1882,12 @@ function applyBoardCellEditor(editor) {
 
   const normalized = DQ10BoardCellEditor.normalizeEditValue(ingredient, {
     current: editor.querySelector(".editor-current").value,
-    isGlowing: state.traitId === "light" && editor.querySelector(".editor-glowing").checked,
+    isGlowing: state.traitId === "light" &&
+      (isCurrentCraftFamily("cooking")
+        ? editor.querySelector(".editor-glowing").checked
+        : isSmithingLightHeatActive()
+          ? editor.querySelector(".editor-glowing").checked
+          : ingredient.isGlowing === true),
     cookingEffectMode: editor.querySelector("[name='editorEffectMode']:checked")?.value,
     locked: editor.querySelector(".editor-locked").checked,
     cookingBlockEffect: normalizeCookingBlockEffect(editor.querySelector("[name='editorBlockEffect']:checked")?.value),
