@@ -15,7 +15,9 @@ const elements = {
   recipeSelect: document.querySelector("#recipeSelect"),
   recipeTraitLabel: document.querySelector("#recipeTraitLabel"),
   recipeTraitInput: document.querySelector("#recipeTraitInput"),
-  recipeTraitDescription: document.querySelector("#recipeTraitDescription"),
+  traitInfoPanel: document.querySelector("#traitInfoPanel"),
+  traitInfoName: document.querySelector("#traitInfoName"),
+  traitInfoDescription: document.querySelector("#traitInfoDescription"),
   levelSelect: document.querySelector("#levelSelect"),
   toolSelect: document.querySelector("#toolSelect"),
   toolStarsSelect: document.querySelector("#toolStarsSelect"),
@@ -757,6 +759,7 @@ function renderTraitOptions() {
   elements.recipeTraitLabel.hidden = !shouldShow;
 
   if (!shouldShow) {
+    renderTraitInfo();
     return;
   }
 
@@ -770,18 +773,21 @@ function renderTraitOptions() {
   });
 
   elements.recipeTraitInput.value = state.traitId;
-  renderTraitDescription();
+  renderTraitInfo();
 }
 
-function renderTraitDescription() {
+// 基本設定から分離した特性説明を左ペインの専用パネルへ描画します。
+function renderTraitInfo() {
   const config = getCurrentCraftConfig();
-  if (getCraftComponent(config.id).craftFamily === "cooking") {
-    elements.recipeTraitDescription.textContent = "";
+  const trait = getTrait(config, state.traitId);
+
+  if (!elements.traitInfoPanel || !elements.traitInfoName || !elements.traitInfoDescription) {
     return;
   }
 
-  const trait = getTrait(config, state.traitId);
-  elements.recipeTraitDescription.textContent = trait?.description || "";
+  elements.traitInfoPanel.hidden = !trait;
+  elements.traitInfoName.textContent = trait?.label || "-";
+  elements.traitInfoDescription.textContent = trait?.description || "-";
 }
 
 function renderFocusOptions() {
@@ -2809,7 +2815,7 @@ elements.recipeTraitInput.addEventListener("change", () => {
   renderSmithingDamageReference();
   renderSmithingTechniqueReference();
   renderLayoutBoard();
-  renderTraitDescription();
+  renderTraitInfo();
   renderCraftReference();
   renderAnalysis();
   saveState();

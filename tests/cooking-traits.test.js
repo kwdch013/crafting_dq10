@@ -37,8 +37,8 @@ assert.equal(
 );
 assert.match(
   mainJs,
-  /getCraftComponent\(config\.id\)\.craftFamily === "cooking"[\s\S]*recipeTraitDescription\.textContent = ""/,
-  "調理職人の特性説明は基本設定ではなく調理メモ側に表示してください",
+  /function renderTraitInfo\(\)/,
+  "調理職人の特性説明は基本設定ではなく特性情報パネルに表示してください",
 );
 assert.equal(
   JSON.stringify(registeredConfig.techniques.map((technique) => [

@@ -20,6 +20,11 @@
   box-sizing: border-box;
 }
 
+/* hidden属性を作者CSSのdisplay指定より優先して、職人別の表示切替を確実にします。 */
+[hidden] {
+  display: none !important;
+}
+
 body {
   margin: 0;
   min-width: 320px;
@@ -386,6 +391,28 @@ label {
   font-size: 12px;
   font-weight: 700;
   line-height: 1.35;
+}
+
+.trait-info {
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-soft);
+  padding: 10px;
+}
+
+.trait-info strong {
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.trait-info p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.45;
 }
 
 input,
