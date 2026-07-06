@@ -560,19 +560,13 @@ select:focus {
 
 .smithing-heat-controls {
   display: grid;
-  grid-template-columns: auto minmax(96px, 120px) auto auto;
+  grid-template-columns: auto minmax(96px, 120px) auto;
   gap: 8px;
   align-items: center;
 }
 
 .smithing-temperature-select {
   min-width: 96px;
-}
-
-.smithing-heat-controls strong {
-  text-align: center;
-  font-size: 15px;
-  line-height: 1.2;
 }
 
 .smithing-damage-grid {

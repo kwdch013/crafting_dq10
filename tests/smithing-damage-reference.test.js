@@ -15,7 +15,7 @@ assert.ok(referenceIndex > boardIndex, "鍛冶ダメージ表は鍛冶配置の�
 assert.ok(referenceIndex < splitPanelIndex, "鍛冶ダメージ表は判定パネルの前に配置してください");
 assert.ok(techniqueReferenceIndex > referenceIndex, "鍛冶特技表は温度別ダメージの下に配置してください");
 assert.ok(techniqueReferenceIndex < splitPanelIndex, "鍛冶特技表は判定パネルの前に配置してください");
-assert.match(html, /id="smithingTemperatureDamageLabel"/, "現在温度の表示欄を追加してください");
+assert.doesNotMatch(html, /id="smithingTemperatureDamageLabel"/, "温度プルダウン横の現在温度表示は不要です");
 assert.match(html, /id="smithingTemperatureSelect"/, "BOARD内の温度プルダウンを追加してください");
 assert.match(html, /id="smithingHeatDownButton"/, "BOARD内の温度低下ボタンを追加してください");
 assert.match(html, /id="smithingHeatUpButton"/, "BOARD内の温度上昇ボタンを追加してください");

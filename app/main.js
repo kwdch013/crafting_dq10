@@ -27,7 +27,6 @@ const elements = {
   recipeTraitReference: document.querySelector("#recipeTraitReference"),
   cookingDamageRanges: document.querySelector("#cookingDamageRanges"),
   smithingDamagePanel: document.querySelector("#smithingDamagePanel"),
-  smithingTemperatureDamageLabel: document.querySelector("#smithingTemperatureDamageLabel"),
   smithingTemperatureSelect: document.querySelector("#smithingTemperatureSelect"),
   smithingHeatDownButton: document.querySelector("#smithingHeatDownButton"),
   smithingHeatUpButton: document.querySelector("#smithingHeatUpButton"),
@@ -966,9 +965,6 @@ function renderSmithingDamageReference() {
     return;
   }
 
-  if (elements.smithingTemperatureDamageLabel) {
-    elements.smithingTemperatureDamageLabel.textContent = `${state.heat}℃`;
-  }
   if (elements.smithingTemperatureSelect) {
     elements.smithingTemperatureSelect.value = state.heat;
   }
