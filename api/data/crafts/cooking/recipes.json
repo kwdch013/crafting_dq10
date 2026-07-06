@@ -1,88 +1,5 @@
 [
   {
-    "id": "cooking-001",
-    "name": "きようさにくまん",
-    "category": "肉料理",
-    "categoryId": "meat-dishes",
-    "items": [
-      {
-        "id": "slot-3-2",
-        "name": "下",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 3,
-          "column": 2
-        },
-        "current": 0,
-        "target": 105,
-        "successMin": 90,
-        "successMax": 120
-      },
-      {
-        "id": "slot-3-3",
-        "name": "右下",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 3,
-          "column": 3
-        },
-        "current": 0,
-        "target": 105,
-        "successMin": 90,
-        "successMax": 120
-      }
-    ],
-    "traitId": "light"
-  },
-  {
-    "id": "cooking-002",
-    "name": "パワフルステーキ",
-    "category": "肉料理",
-    "categoryId": "meat-dishes",
-    "items": [
-      {
-        "id": "slot-1-2",
-        "name": "上",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 1,
-          "column": 2
-        },
-        "current": 0,
-        "target": 85,
-        "successMin": 70,
-        "successMax": 100
-      },
-      {
-        "id": "slot-3-1",
-        "name": "左下",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 3,
-          "column": 1
-        },
-        "current": 0,
-        "target": 125,
-        "successMin": 110,
-        "successMax": 140
-      },
-      {
-        "id": "slot-3-2",
-        "name": "下",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 3,
-          "column": 2
-        },
-        "current": 0,
-        "target": 125,
-        "successMin": 110,
-        "successMax": 140
-      }
-    ],
-    "traitId": "light"
-  },
-  {
     "id": "cooking-003",
     "name": "かいしんバーガー",
     "category": "肉料理",
@@ -267,80 +184,6 @@
     ],
     "traitId": "light",
     "archived": true
-  },
-  {
-    "id": "cooking-006",
-    "name": "あいじょうオムレツ",
-    "category": "肉料理",
-    "categoryId": "meat-dishes",
-    "items": [
-      {
-        "id": "slot-1-1",
-        "name": "左上",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 1,
-          "column": 1
-        },
-        "current": 0,
-        "target": 155,
-        "successMin": 140,
-        "successMax": 170
-      },
-      {
-        "id": "slot-2-1",
-        "name": "左",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 2,
-          "column": 1
-        },
-        "current": 0,
-        "target": 145,
-        "successMin": 130,
-        "successMax": 160
-      },
-      {
-        "id": "slot-3-1",
-        "name": "左下",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 3,
-          "column": 1
-        },
-        "current": 0,
-        "target": 145,
-        "successMin": 130,
-        "successMax": 160
-      },
-      {
-        "id": "slot-3-2",
-        "name": "下",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 3,
-          "column": 2
-        },
-        "current": 0,
-        "target": 175,
-        "successMin": 160,
-        "successMax": 190
-      },
-      {
-        "id": "slot-3-3",
-        "name": "右下",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 3,
-          "column": 3
-        },
-        "current": 0,
-        "target": 175,
-        "successMin": 160,
-        "successMax": 190
-      }
-    ],
-    "traitId": "light"
   },
   {
     "id": "cooking-007",
@@ -930,93 +773,6 @@
     "archived": true
   },
   {
-    "id": "cooking-014",
-    "name": "スマッシュポテト",
-    "category": "魚料理",
-    "categoryId": "fish-dishes",
-    "items": [
-      {
-        "id": "slot-1-1",
-        "name": "左上",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 1,
-          "column": 1
-        },
-        "current": 0,
-        "target": 145,
-        "successMin": 130,
-        "successMax": 160
-      },
-      {
-        "id": "slot-1-2",
-        "name": "上",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 1,
-          "column": 2
-        },
-        "current": 0,
-        "target": 145,
-        "successMin": 130,
-        "successMax": 160
-      },
-      {
-        "id": "slot-1-3",
-        "name": "右上",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 1,
-          "column": 3
-        },
-        "current": 0,
-        "target": 145,
-        "successMin": 130,
-        "successMax": 160
-      },
-      {
-        "id": "slot-3-1",
-        "name": "左下",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 3,
-          "column": 1
-        },
-        "current": 0,
-        "target": 210,
-        "successMin": 195,
-        "successMax": 225
-      },
-      {
-        "id": "slot-3-2",
-        "name": "下",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 3,
-          "column": 2
-        },
-        "current": 0,
-        "target": 210,
-        "successMin": 195,
-        "successMax": 225
-      },
-      {
-        "id": "slot-3-3",
-        "name": "右下",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 3,
-          "column": 3
-        },
-        "current": 0,
-        "target": 210,
-        "successMin": 195,
-        "successMax": 225
-      }
-    ],
-    "traitId": "light"
-  },
-  {
     "id": "cooking-015",
     "name": "グレイトグラタン",
     "category": "魚料理",
@@ -1239,80 +995,6 @@
     "archived": true
   },
   {
-    "id": "cooking-019",
-    "name": "バランスパスタ",
-    "category": "パスタ＆ライス",
-    "categoryId": "pasta-rice",
-    "items": [
-      {
-        "id": "slot-1-3",
-        "name": "右上",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 1,
-          "column": 3
-        },
-        "current": 0,
-        "target": 135,
-        "successMin": 120,
-        "successMax": 150
-      },
-      {
-        "id": "slot-2-3",
-        "name": "右",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 2,
-          "column": 3
-        },
-        "current": 0,
-        "target": 160,
-        "successMin": 145,
-        "successMax": 175
-      },
-      {
-        "id": "slot-3-1",
-        "name": "左下",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 3,
-          "column": 1
-        },
-        "current": 0,
-        "target": 186,
-        "successMin": 171,
-        "successMax": 201
-      },
-      {
-        "id": "slot-3-2",
-        "name": "下",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 3,
-          "column": 2
-        },
-        "current": 0,
-        "target": 160,
-        "successMin": 145,
-        "successMax": 175
-      },
-      {
-        "id": "slot-3-3",
-        "name": "右下",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 3,
-          "column": 3
-        },
-        "current": 0,
-        "target": 160,
-        "successMin": 145,
-        "successMax": 175
-      }
-    ],
-    "traitId": "light"
-  },
-  {
     "id": "cooking-020",
     "name": "スパイスカレー",
     "category": "パスタ＆ライス",
@@ -1489,28 +1171,6 @@
     "archived": true
   },
   {
-    "id": "cooking-022",
-    "name": "クイックケーキ",
-    "category": "スイーツ",
-    "categoryId": "sweets",
-    "items": [
-      {
-        "id": "slot-1-2",
-        "name": "上",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 1,
-          "column": 2
-        },
-        "current": 0,
-        "target": 75,
-        "successMin": 60,
-        "successMax": 90
-      }
-    ],
-    "traitId": "light"
-  },
-  {
     "id": "cooking-023",
     "name": "ゴージャスクッキー",
     "category": "スイーツ",
@@ -1545,311 +1205,6 @@
     ],
     "traitId": "light",
     "archived": true
-  },
-  {
-    "id": "cooking-024",
-    "name": "ファイアタルト",
-    "category": "スイーツ",
-    "categoryId": "sweets",
-    "items": [
-      {
-        "id": "slot-1-1",
-        "name": "左上",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 1,
-          "column": 1
-        },
-        "current": 0,
-        "target": 160,
-        "successMin": 145,
-        "successMax": 175
-      },
-      {
-        "id": "slot-1-2",
-        "name": "上",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 1,
-          "column": 2
-        },
-        "current": 0,
-        "target": 160,
-        "successMin": 145,
-        "successMax": 175
-      },
-      {
-        "id": "slot-3-2",
-        "name": "下",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 3,
-          "column": 2
-        },
-        "current": 0,
-        "target": 143,
-        "successMin": 128,
-        "successMax": 158
-      },
-      {
-        "id": "slot-3-3",
-        "name": "右下",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 3,
-          "column": 3
-        },
-        "current": 0,
-        "target": 125,
-        "successMin": 110,
-        "successMax": 140
-      }
-    ],
-    "traitId": "light"
-  },
-  {
-    "id": "cooking-025",
-    "name": "アイスタルト",
-    "category": "スイーツ",
-    "categoryId": "sweets",
-    "items": [
-      {
-        "id": "slot-1-1",
-        "name": "左上",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 1,
-          "column": 1
-        },
-        "current": 0,
-        "target": 135,
-        "successMin": 120,
-        "successMax": 150
-      },
-      {
-        "id": "slot-2-1",
-        "name": "左",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 2,
-          "column": 1
-        },
-        "current": 0,
-        "target": 135,
-        "successMin": 120,
-        "successMax": 150
-      },
-      {
-        "id": "slot-3-2",
-        "name": "下",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 3,
-          "column": 2
-        },
-        "current": 0,
-        "target": 115,
-        "successMin": 100,
-        "successMax": 130
-      },
-      {
-        "id": "slot-3-3",
-        "name": "右下",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 3,
-          "column": 3
-        },
-        "current": 0,
-        "target": 155,
-        "successMin": 140,
-        "successMax": 170
-      }
-    ],
-    "traitId": "light"
-  },
-  {
-    "id": "cooking-026",
-    "name": "ライトタルト",
-    "category": "スイーツ",
-    "categoryId": "sweets",
-    "items": [
-      {
-        "id": "slot-1-2",
-        "name": "上",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 1,
-          "column": 2
-        },
-        "current": 0,
-        "target": 125,
-        "successMin": 110,
-        "successMax": 140
-      },
-      {
-        "id": "slot-3-1",
-        "name": "左下",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 3,
-          "column": 1
-        },
-        "current": 0,
-        "target": 160,
-        "successMin": 145,
-        "successMax": 175
-      },
-      {
-        "id": "slot-3-2",
-        "name": "下",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 3,
-          "column": 2
-        },
-        "current": 0,
-        "target": 160,
-        "successMin": 145,
-        "successMax": 175
-      },
-      {
-        "id": "slot-3-3",
-        "name": "右下",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 3,
-          "column": 3
-        },
-        "current": 0,
-        "target": 145,
-        "successMin": 130,
-        "successMax": 160
-      }
-    ],
-    "traitId": "light"
-  },
-  {
-    "id": "cooking-027",
-    "name": "ダークタルト",
-    "category": "スイーツ",
-    "categoryId": "sweets",
-    "items": [
-      {
-        "id": "slot-1-2",
-        "name": "上",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 1,
-          "column": 2
-        },
-        "current": 0,
-        "target": 135,
-        "successMin": 120,
-        "successMax": 150
-      },
-      {
-        "id": "slot-1-3",
-        "name": "右上",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 1,
-          "column": 3
-        },
-        "current": 0,
-        "target": 135,
-        "successMin": 120,
-        "successMax": 150
-      },
-      {
-        "id": "slot-2-3",
-        "name": "右",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 2,
-          "column": 3
-        },
-        "current": 0,
-        "target": 165,
-        "successMin": 150,
-        "successMax": 180
-      },
-      {
-        "id": "slot-3-1",
-        "name": "左下",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 3,
-          "column": 1
-        },
-        "current": 0,
-        "target": 175,
-        "successMin": 160,
-        "successMax": 190
-      }
-    ],
-    "traitId": "light"
-  },
-  {
-    "id": "cooking-028",
-    "name": "ストームタルト",
-    "category": "スイーツ",
-    "categoryId": "sweets",
-    "items": [
-      {
-        "id": "slot-1-3",
-        "name": "右上",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 1,
-          "column": 3
-        },
-        "current": 0,
-        "target": 135,
-        "successMin": 120,
-        "successMax": 150
-      },
-      {
-        "id": "slot-2-3",
-        "name": "右",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 2,
-          "column": 3
-        },
-        "current": 0,
-        "target": 145,
-        "successMin": 130,
-        "successMax": 160
-      },
-      {
-        "id": "slot-3-2",
-        "name": "下",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 3,
-          "column": 2
-        },
-        "current": 0,
-        "target": 165,
-        "successMin": 150,
-        "successMax": 180
-      },
-      {
-        "id": "slot-3-3",
-        "name": "右下",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 3,
-          "column": 3
-        },
-        "current": 0,
-        "target": 165,
-        "successMin": 150,
-        "successMax": 180
-      }
-    ],
-    "traitId": "light"
   },
   {
     "id": "cooking-029",
@@ -2071,5 +1426,712 @@
       }
     ],
     "traitId": "recovery"
+  },
+  {
+    "id": "cooking-001",
+    "name": "きようさにくまん",
+    "category": "",
+    "categoryId": "",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "3行2列",
+        "current": 0,
+        "target": 105,
+        "successMin": 90,
+        "successMax": 120,
+        "optionId": "cross",
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        },
+        "ingredientGroupLabel": "肉",
+        "ingredientGroupId": "meat-3-2",
+        "ingredientSize": 2
+      },
+      {
+        "id": "item-2",
+        "name": "3行3列",
+        "current": 0,
+        "target": 105,
+        "successMin": 90,
+        "successMax": 120,
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 3
+        },
+        "ingredientGroupLabel": "肉",
+        "ingredientGroupId": "meat-3-2",
+        "ingredientSize": 2
+      }
+    ],
+    "traitId": "light"
+  },
+  {
+    "id": "cooking-002",
+    "name": "パワフルステーキ",
+    "category": "",
+    "categoryId": "",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "1行2列",
+        "current": 0,
+        "target": 85,
+        "successMin": 70,
+        "successMax": 100,
+        "optionId": "cross",
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        },
+        "ingredientGroupLabel": "野菜"
+      },
+      {
+        "id": "item-2",
+        "name": "3行1列",
+        "current": 0,
+        "target": 125,
+        "successMin": 110,
+        "successMax": 140,
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        },
+        "ingredientGroupLabel": "肉",
+        "ingredientGroupId": "meat-3-1",
+        "ingredientSize": 2
+      },
+      {
+        "id": "item-3",
+        "name": "3行2列",
+        "current": 0,
+        "target": 125,
+        "successMin": 110,
+        "successMax": 140,
+        "optionId": "cross",
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        },
+        "ingredientGroupLabel": "肉",
+        "ingredientGroupId": "meat-3-1",
+        "ingredientSize": 2
+      }
+    ],
+    "traitId": "light"
+  },
+  {
+    "id": "cooking-019",
+    "name": "バランスパスタ",
+    "category": "",
+    "categoryId": "",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "1行3列",
+        "current": 0,
+        "target": 135,
+        "successMin": 120,
+        "successMax": 150,
+        "optionId": "corner",
+        "gridCell": {
+          "row": 1,
+          "column": 3
+        },
+        "ingredientGroupLabel": "卵"
+      },
+      {
+        "id": "item-2",
+        "name": "2行3列",
+        "current": 0,
+        "target": 160,
+        "successMin": 145,
+        "successMax": 175,
+        "optionId": "cross",
+        "gridCell": {
+          "row": 2,
+          "column": 3
+        },
+        "ingredientGroupLabel": "麺"
+      },
+      {
+        "id": "item-3",
+        "name": "3行1列",
+        "current": 0,
+        "target": 186,
+        "successMin": 171,
+        "successMax": 201,
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        },
+        "ingredientGroupLabel": "野菜"
+      },
+      {
+        "id": "item-4",
+        "name": "3行2列",
+        "current": 0,
+        "target": 160,
+        "successMin": 145,
+        "successMax": 175,
+        "optionId": "cross",
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        },
+        "ingredientGroupLabel": "麺"
+      },
+      {
+        "id": "item-5",
+        "name": "3行3列",
+        "current": 0,
+        "target": 160,
+        "successMin": 145,
+        "successMax": 175,
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 3
+        },
+        "ingredientGroupLabel": "麺"
+      }
+    ],
+    "traitId": "light"
+  },
+  {
+    "id": "cooking-006",
+    "name": "あいじょうオムレツ",
+    "category": "",
+    "categoryId": "",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "1行1列",
+        "current": 0,
+        "target": 155,
+        "successMin": 140,
+        "successMax": 170,
+        "optionId": "corner",
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        },
+        "ingredientGroupLabel": "野菜"
+      },
+      {
+        "id": "item-2",
+        "name": "2行1列",
+        "current": 0,
+        "target": 145,
+        "successMin": 130,
+        "successMax": 160,
+        "optionId": "cross",
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        },
+        "ingredientGroupLabel": "卵"
+      },
+      {
+        "id": "item-3",
+        "name": "3行1列",
+        "current": 0,
+        "target": 145,
+        "successMin": 130,
+        "successMax": 160,
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        },
+        "ingredientGroupLabel": "卵"
+      },
+      {
+        "id": "item-4",
+        "name": "3行2列",
+        "current": 0,
+        "target": 175,
+        "successMin": 160,
+        "successMax": 190,
+        "optionId": "cross",
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        },
+        "ingredientGroupLabel": "肉",
+        "ingredientGroupId": "meat-3-2",
+        "ingredientSize": 2
+      },
+      {
+        "id": "item-5",
+        "name": "3行3列",
+        "current": 0,
+        "target": 175,
+        "successMin": 160,
+        "successMax": 190,
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 3
+        },
+        "ingredientGroupLabel": "肉",
+        "ingredientGroupId": "meat-3-2",
+        "ingredientSize": 2
+      }
+    ],
+    "traitId": "light"
+  },
+  {
+    "id": "cooking-024",
+    "name": "ファイアタルト",
+    "category": "",
+    "categoryId": "",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "1行1列",
+        "current": 0,
+        "target": 160,
+        "successMin": 145,
+        "successMax": 175,
+        "optionId": "corner",
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        },
+        "ingredientGroupLabel": "肉",
+        "ingredientGroupId": "meat-1-1",
+        "ingredientSize": 2
+      },
+      {
+        "id": "item-2",
+        "name": "1行2列",
+        "current": 0,
+        "target": 160,
+        "successMin": 145,
+        "successMax": 175,
+        "optionId": "cross",
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        },
+        "ingredientGroupLabel": "肉",
+        "ingredientGroupId": "meat-1-1",
+        "ingredientSize": 2
+      },
+      {
+        "id": "item-3",
+        "name": "3行2列",
+        "current": 0,
+        "target": 143,
+        "successMin": 128,
+        "successMax": 158,
+        "optionId": "cross",
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        },
+        "ingredientGroupLabel": "卵"
+      },
+      {
+        "id": "item-4",
+        "name": "3行3列",
+        "current": 0,
+        "target": 125,
+        "successMin": 110,
+        "successMax": 140,
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 3
+        },
+        "ingredientGroupLabel": "小麦"
+      }
+    ],
+    "traitId": "light"
+  },
+  {
+    "id": "cooking-027",
+    "name": "ダークタルト",
+    "category": "",
+    "categoryId": "",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "1行2列",
+        "current": 0,
+        "target": 135,
+        "successMin": 120,
+        "successMax": 150,
+        "optionId": "cross",
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        },
+        "ingredientGroupLabel": "小麦"
+      },
+      {
+        "id": "item-2",
+        "name": "1行3列",
+        "current": 0,
+        "target": 135,
+        "successMin": 120,
+        "successMax": 150,
+        "optionId": "corner",
+        "gridCell": {
+          "row": 1,
+          "column": 3
+        },
+        "ingredientGroupLabel": "小麦"
+      },
+      {
+        "id": "item-3",
+        "name": "2行3列",
+        "current": 0,
+        "target": 165,
+        "successMin": 150,
+        "successMax": 180,
+        "optionId": "cross",
+        "gridCell": {
+          "row": 2,
+          "column": 3
+        },
+        "ingredientGroupLabel": "卵"
+      },
+      {
+        "id": "item-4",
+        "name": "3行1列",
+        "current": 0,
+        "target": 175,
+        "successMin": 160,
+        "successMax": 190,
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        },
+        "ingredientGroupLabel": "野菜"
+      }
+    ],
+    "traitId": "light"
+  },
+  {
+    "id": "cooking-025",
+    "name": "アイスタルト",
+    "category": "",
+    "categoryId": "",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "1行1列",
+        "current": 0,
+        "target": 135,
+        "successMin": 120,
+        "successMax": 150,
+        "optionId": "corner",
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        },
+        "ingredientGroupLabel": "魚",
+        "ingredientGroupId": "fish-1-1",
+        "ingredientSize": 2
+      },
+      {
+        "id": "item-2",
+        "name": "2行1列",
+        "current": 0,
+        "target": 135,
+        "successMin": 120,
+        "successMax": 150,
+        "optionId": "cross",
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        },
+        "ingredientGroupLabel": "魚",
+        "ingredientGroupId": "fish-1-1",
+        "ingredientSize": 2
+      },
+      {
+        "id": "item-3",
+        "name": "3行2列",
+        "current": 0,
+        "target": 115,
+        "successMin": 100,
+        "successMax": 130,
+        "optionId": "cross",
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        },
+        "ingredientGroupLabel": "卵"
+      },
+      {
+        "id": "item-4",
+        "name": "3行3列",
+        "current": 0,
+        "target": 155,
+        "successMin": 140,
+        "successMax": 170,
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 3
+        },
+        "ingredientGroupLabel": "小麦"
+      }
+    ],
+    "traitId": "light"
+  },
+  {
+    "id": "cooking-028",
+    "name": "ストームタルト",
+    "category": "",
+    "categoryId": "",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "1行3列",
+        "current": 0,
+        "target": 135,
+        "successMin": 120,
+        "successMax": 150,
+        "optionId": "corner",
+        "gridCell": {
+          "row": 1,
+          "column": 3
+        },
+        "ingredientGroupLabel": "卵"
+      },
+      {
+        "id": "item-2",
+        "name": "2行3列",
+        "current": 0,
+        "target": 145,
+        "successMin": 130,
+        "successMax": 160,
+        "optionId": "cross",
+        "gridCell": {
+          "row": 2,
+          "column": 3
+        },
+        "ingredientGroupLabel": "小麦"
+      },
+      {
+        "id": "item-3",
+        "name": "3行2列",
+        "current": 0,
+        "target": 165,
+        "successMin": 150,
+        "successMax": 180,
+        "optionId": "cross",
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        },
+        "ingredientGroupLabel": "野菜"
+      },
+      {
+        "id": "item-4",
+        "name": "3行3列",
+        "current": 0,
+        "target": 165,
+        "successMin": 150,
+        "successMax": 180,
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 3
+        },
+        "ingredientGroupLabel": "野菜"
+      }
+    ],
+    "traitId": "light"
+  },
+  {
+    "id": "cooking-014",
+    "name": "スマッシュポテト",
+    "category": "",
+    "categoryId": "",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "1行1列",
+        "current": 0,
+        "target": 145,
+        "successMin": 130,
+        "successMax": 160,
+        "optionId": "corner",
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        },
+        "ingredientGroupLabel": "卵"
+      },
+      {
+        "id": "item-2",
+        "name": "1行2列",
+        "current": 0,
+        "target": 145,
+        "successMin": 130,
+        "successMax": 160,
+        "optionId": "cross",
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        },
+        "ingredientGroupLabel": "卵"
+      },
+      {
+        "id": "item-3",
+        "name": "1行3列",
+        "current": 0,
+        "target": 145,
+        "successMin": 130,
+        "successMax": 160,
+        "optionId": "corner",
+        "gridCell": {
+          "row": 1,
+          "column": 3
+        },
+        "ingredientGroupLabel": "卵"
+      },
+      {
+        "id": "item-4",
+        "name": "3行1列",
+        "current": 0,
+        "target": 210,
+        "successMin": 195,
+        "successMax": 225,
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        },
+        "ingredientGroupLabel": "野菜"
+      },
+      {
+        "id": "item-5",
+        "name": "3行2列",
+        "current": 0,
+        "target": 210,
+        "successMin": 195,
+        "successMax": 225,
+        "optionId": "cross",
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        },
+        "ingredientGroupLabel": "野菜"
+      },
+      {
+        "id": "item-6",
+        "name": "3行3列",
+        "current": 0,
+        "target": 210,
+        "successMin": 195,
+        "successMax": 225,
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 3
+        },
+        "ingredientGroupLabel": "野菜"
+      }
+    ],
+    "traitId": "light"
+  },
+  {
+    "id": "cooking-022",
+    "name": "クイックケーキ",
+    "category": "",
+    "categoryId": "",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "1行2列",
+        "current": 0,
+        "target": 75,
+        "successMin": 60,
+        "successMax": 90,
+        "optionId": "cross",
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        },
+        "ingredientGroupLabel": "小麦"
+      }
+    ],
+    "traitId": "light"
+  },
+  {
+    "id": "cooking-026",
+    "name": "ライトタルト",
+    "category": "",
+    "categoryId": "",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "1行2列",
+        "current": 0,
+        "target": 125,
+        "successMin": 110,
+        "successMax": 140,
+        "optionId": "cross",
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        },
+        "ingredientGroupLabel": "野菜"
+      },
+      {
+        "id": "item-2",
+        "name": "3行1列",
+        "current": 0,
+        "target": 160,
+        "successMin": 145,
+        "successMax": 175,
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        },
+        "ingredientGroupLabel": "卵"
+      },
+      {
+        "id": "item-3",
+        "name": "3行2列",
+        "current": 0,
+        "target": 160,
+        "successMin": 145,
+        "successMax": 175,
+        "optionId": "cross",
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        },
+        "ingredientGroupLabel": "卵"
+      },
+      {
+        "id": "item-4",
+        "name": "3行3列",
+        "current": 0,
+        "target": 145,
+        "successMin": 130,
+        "successMax": 160,
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 3
+        },
+        "ingredientGroupLabel": "小麦"
+      }
+    ],
+    "traitId": "light"
   }
 ]
