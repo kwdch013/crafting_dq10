@@ -107,6 +107,15 @@ assert.equal(context.DQ10CraftConfigs["tool-smithing"].recipeSubcategoryLabel, "
 	);
 	assert.equal(categories["frying-pan"].templateItems.length, 8);
 	assert.deepEqual(
+		JSON.parse(JSON.stringify(categories["lure"].templateItems.map((item) => item.gridCell))),
+		[
+			{ row: 1, column: 1 },
+			{ row: 2, column: 1 },
+			{ row: 1, column: 2 },
+		],
+		"ルアーは左縦2マス、右上1マスの3マスにしてください",
+	);
+	assert.deepEqual(
 		JSON.parse(JSON.stringify(categories["material"].templateItems.map((item) => item.gridCell))),
 		[
 			{ row: 1, column: 1 },

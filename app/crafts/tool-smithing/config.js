@@ -55,7 +55,11 @@ registerDQ10Craft(createDQ10SmithingCraftConfig({
     ]) },
     { id: "frying-pan", label: "フライパン", templateItems: createToolSmithingTemplateItems(4, 2) },
     { id: "alchemy-lamp", label: "ランプ", templateItems: createToolSmithingTemplateItems(2, 2) },
-    { id: "lure", label: "ルアー", templateItems: createToolSmithingTemplateItems(2, 2) },
+    { id: "lure", label: "ルアー", templateItems: createToolSmithingTemplateItems(2, 2, [
+      { row: 1, column: 1 },
+      { row: 2, column: 1 },
+      { row: 1, column: 2 },
+    ]) },
     { id: "woodworking-knife", label: "木工刀", templateItems: createToolSmithingTemplateItems(3, 1) },
     { id: "material", label: "素材", templateItems: createToolSmithingTemplateItems(3, 2) },
     { id: "sewing-needle", label: "針", templateItems: createToolSmithingTemplateItems(2, 1) },
