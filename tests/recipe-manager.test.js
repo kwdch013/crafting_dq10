@@ -20,6 +20,8 @@ assert.match(html, /id="saveRecipeButton"/, "追加・編集ウィンドウの�
 	"function openEditRecipeDialog(config, recipe)",
 	"function saveManagedRecipe(event)",
 	"function addManagedRecipe(event)",
+	"function persistRecipeToApi(craftId, recipe)",
+	"function deleteRecipeFromApi(craftId, recipeId)",
 	"function collectAddRecipeItems(config)",
 	"function getRecipeCategoryTemplateItems(config, categoryId)",
 	"elements.recipeListButton.addEventListener(\"click\", openRecipeListDialog)",
@@ -33,6 +35,8 @@ assert.match(mainJs, /config\.itemOptions/, "職人別の位置・部位入力�
 assert.match(mainJs, /openEditRecipeDialog\(config, recipe\)/, "レシピ名クリックで編集画面を開いてください");
 assert.match(mainJs, /managedRecipeEditId/, "編集中レシピIDを保持してください");
 assert.match(mainJs, /userRecipeMap/, "既存レシピをユーザー編集内容で上書きできるようにしてください");
+assert.match(mainJs, /method: "PUT"/, "レシピ保存時にAPI側のrecipes.jsonへ反映してください");
+assert.match(mainJs, /method: "DELETE"/, "レシピ削除時にAPI側のrecipes.jsonから除外してください");
 assert.match(mainJs, /config\.id === "cooking"/, "調理職人だけ大項目表示を抑止してください");
 assert.match(mainJs, /function isSmithingRecipeEditor\(config\)/, "鍛冶職人のレシピ追加は専用の配置入力にしてください");
 assert.match(mainJs, /function renderSmithingAddRecipeItems\(config, seedItems\)/, "鍛冶職人の配置どおりに基準範囲入力を表示してください");
