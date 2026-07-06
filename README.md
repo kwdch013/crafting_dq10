@@ -75,6 +75,7 @@ https://github.com/kwdch013/crafting_dq10
 
 API側のレシピJSONは `api/data/crafts/<職人>/recipes.json` に分離しています。
 調理職人の表示プリセットは主要レシピに絞り、表示対象外のレシピは `archived: true` で保持します。
+Docker起動時は `api/data` をAPIコンテナにマウントするため、画面で追加・編集・削除したレシピはAPI起動中に同JSONへ一時反映されます。
 
 ```text
 api/

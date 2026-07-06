@@ -289,6 +289,34 @@ function saveUserRecipeStore(store) {
   localStorage.setItem(userRecipesStorageKey, JSON.stringify(store));
 }
 
+// レシピ追加・編集内容をAPI側のrecipes.jsonへ一時反映します。
+async function persistRecipeToApi(craftId, recipe) {
+  const response = await fetch(
+    `${apiBaseUrl}/api/crafts/${encodeURIComponent(craftId)}/recipes/${encodeURIComponent(recipe.id)}`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(recipe),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`レシピJSONへの反映に失敗しました: ${response.status}`);
+  }
+}
+
+// レシピリストから削除したIDをAPI側のrecipes.jsonからも除外します。
+async function deleteRecipeFromApi(craftId, recipeId) {
+  const response = await fetch(
+    `${apiBaseUrl}/api/crafts/${encodeURIComponent(craftId)}/recipes/${encodeURIComponent(recipeId)}`,
+    { method: "DELETE" },
+  );
+
+  if (!response.ok) {
+    throw new Error(`レシピJSONからの削除に失敗しました: ${response.status}`);
+  }
+}
+
 function getDeletedRecipeIds(craftId) {
   const ids = loadUserRecipeStore().deletedIds?.[craftId];
   return Array.isArray(ids) ? ids : [];
@@ -2234,7 +2262,7 @@ function selectManagedRecipe(config, recipe) {
   applyRecipe(recipe.id);
 }
 
-function deleteManagedRecipe(craftId, recipeId, recipeName) {
+async function deleteManagedRecipe(craftId, recipeId, recipeName) {
   if (!confirm(`${recipeName} をレシピリストから削除します。`)) {
     return;
   }
@@ -2243,6 +2271,12 @@ function deleteManagedRecipe(craftId, recipeId, recipeName) {
   store.recipes[craftId] = (store.recipes[craftId] || []).filter((recipe) => recipe.id !== recipeId);
   store.deletedIds[craftId] = Array.from(new Set([...(store.deletedIds[craftId] || []), recipeId]));
   saveUserRecipeStore(store);
+  try {
+    await deleteRecipeFromApi(craftId, recipeId);
+  } catch (error) {
+    console.warn(error);
+    alert("ブラウザには保存しましたが、recipes.jsonからの削除に失敗しました。APIの起動状態を確認してください。");
+  }
 
   if (state.craftType === craftId && state.recipeId === recipeId) {
     clearBoardHistory();
@@ -2530,7 +2564,7 @@ function addManagedRecipe(event) {
   saveManagedRecipe(event);
 }
 
-function saveManagedRecipe(event) {
+async function saveManagedRecipe(event) {
   event.preventDefault();
   const config = getManagedRecipeConfig();
   const name = elements.addRecipeFields.querySelector("#addRecipeName")?.value.trim();
@@ -2568,6 +2602,12 @@ function saveManagedRecipe(event) {
   ];
   store.deletedIds[config.id] = (store.deletedIds[config.id] || []).filter((id) => id !== recipe.id);
   saveUserRecipeStore(store);
+  try {
+    await persistRecipeToApi(config.id, recipe);
+  } catch (error) {
+    console.warn(error);
+    alert("ブラウザには保存しましたが、recipes.jsonへの反映に失敗しました。APIの起動状態を確認してください。");
+  }
 
   managedRecipeCategoryId = categoryId || managedRecipeCategoryId;
   managedRecipeEditId = "";

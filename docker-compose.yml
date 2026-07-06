@@ -17,6 +17,8 @@ services:
       context: .
       dockerfile: api/Dockerfile
     container_name: dq10-api
+    volumes:
+      - ./api/data:/usr/src/app/data
     ports:
       - "8000:8000"
     restart: unless-stopped

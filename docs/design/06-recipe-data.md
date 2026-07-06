@@ -37,6 +37,8 @@ app/crafts/<職人>/recipes.js
 | `GET /api/crafts` | 職人一覧 |
 | `GET /api/recipes` | 全職人のレシピ一覧 |
 | `GET /api/crafts/{craftId}/recipes` | 指定職人のレシピ一覧 |
+| `PUT /api/crafts/{craftId}/recipes/{recipeId}` | レシピ追加・編集内容を `recipes.json` へ一時反映 |
+| `DELETE /api/crafts/{craftId}/recipes/{recipeId}` | レシピ削除内容を `recipes.json` へ一時反映 |
 
 ## JSON形式
 
@@ -252,3 +254,5 @@ sequenceDiagram
 - テンプレート値は、実レシピ値に置き換える前提で管理します。
 - 道具鍛冶の大項目は `tool-smithing/config.js` の `recipeCategoryOptions` で管理し、具体的な制作物は道具名としてレシピJSONに追加します。
 - 道具鍛冶のテンプレートレシピは `archived: true` として非表示にし、実レシピを道具名の選択肢に表示します。
+- レシピ追加・編集・削除はブラウザの `localStorage` に保存し、API起動時は `api/data/crafts/<職人>/recipes.json` にも一時反映します。
+- API停止時や反映失敗時はブラウザ保存を優先し、画面上では従来どおりユーザー追加レシピを利用します。
