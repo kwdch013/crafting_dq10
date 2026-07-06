@@ -20,6 +20,11 @@
   box-sizing: border-box;
 }
 
+/* hidden属性を作者CSSのdisplay指定より優先して、職人別の表示切替を確実にします。 */
+[hidden] {
+  display: none !important;
+}
+
 body {
   margin: 0;
   min-width: 320px;
