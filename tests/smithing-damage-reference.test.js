@@ -118,3 +118,4 @@ assert.match(heatInputHandler[1], /renderSmithingDamageReference\(\);/);
 
 const css = fs.readFileSync("app/styles.css", "utf8");
 assert.match(css, /\.status-gauge-entry/, "ゲージ突入のステータス色を定義してください");
+assert.match(css, /\.board-cell-editor \[hidden\][\s\S]*display: none;/, "右クリック編集内の非表示フィールドは確実に隠してください");

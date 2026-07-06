@@ -940,6 +940,11 @@ select:focus {
   display: none;
 }
 
+/* 右クリック編集内の職人別フィールドを、表示指定に負けず確実に隠します。 */
+.board-cell-editor [hidden] {
+  display: none;
+}
+
 .board-cell-editor form {
   display: grid;
   gap: 10px;
