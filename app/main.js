@@ -181,7 +181,7 @@ function normalizeState(value) {
       optionId: ingredient.optionId || defaultItem?.optionId || config.itemOptions?.[0]?.id || "",
       gridCell: normalizeGridCell(ingredient.gridCell || defaultItem?.gridCell, index, config.layout),
       current: numberOr(ingredient.current, defaultItem?.current ?? 0),
-      locked: !isSmithingConfig && ingredient.locked === true,
+      locked: ingredient.locked === true,
       lockJudgement: isSmithingConfig ? "" : ingredient.lockJudgement || "",
       lockJudgementLabel: isSmithingConfig ? "" : ingredient.lockJudgementLabel || "",
       isGlowing: ingredient.isGlowing === true,
@@ -1701,7 +1701,10 @@ function formatLockBadge(item) {
     return "";
   }
 
-  return `<span class="locked-badge">${escapeHtml(item.lockJudgementLabel || "固定")}</span>`;
+  const label = isCurrentCraftFamily("smithing")
+    ? "確定済み"
+    : item.lockJudgementLabel || "固定";
+  return `<span class="locked-badge">${escapeHtml(label)}</span>`;
 }
 
 // 職人コンポーネントに盤面上の光切替ボタン整形を委譲します。
@@ -1745,7 +1748,7 @@ function getBoardCellEditorElement() {
       </label>
       <label class="checkbox-field editor-locked-field">
         <input class="editor-locked" type="checkbox" />
-        <span>固定する</span>
+        <span class="editor-locked-label">固定する</span>
       </label>
       <fieldset class="editor-block-effect">
         <legend>封じ</legend>
@@ -1863,7 +1866,7 @@ function syncBoardCellEditorTrait(editor) {
   glowField.hidden = !hasIngredient || !canUseLight;
   glowInput.disabled = disabledByHeat;
   glowInput.title = disabledByHeat ? "光地金は温度が200の倍数の時だけ有効です" : "";
-  lockedField.hidden = !hasIngredient || isCurrentCraftFamily("smithing");
+  lockedField.hidden = !hasIngredient;
   blockEffectField.hidden = !hasIngredient || !isCurrentCraftFamily("cooking");
   cellEffectField.hidden = !isCurrentCraftFamily("cooking");
   effectModeField.hidden = !hasIngredient || state.traitId !== "light-return";
@@ -1877,12 +1880,16 @@ function syncBoardCellEditorTrait(editor) {
 function syncBoardCellEditorLock(editor) {
   const ingredient = state.ingredients.find((item) => item.id === editor.dataset.id);
   const lockInput = editor.querySelector(".editor-locked");
+  const lockLabel = editor.querySelector(".editor-locked-label");
 
   if (!ingredient) {
     lockInput.disabled = true;
     lockInput.checked = false;
     return;
   }
+
+  // 鍛冶では固定判定ではなく、作業済みマスを確定済みとして扱います。
+  lockLabel.textContent = isCurrentCraftFamily("smithing") ? "確定済み" : "固定する";
 
   const normalized = DQ10BoardCellEditor.normalizeEditValue(ingredient, {
     current: editor.querySelector(".editor-current").value,
@@ -2011,7 +2018,7 @@ function applyBoardCellEditor(editor) {
           ? editor.querySelector(".editor-glowing").checked
           : ingredient.isGlowing === true),
     cookingEffectMode: editor.querySelector("[name='editorEffectMode']:checked")?.value,
-    locked: !isCurrentCraftFamily("smithing") && editor.querySelector(".editor-locked").checked,
+    locked: editor.querySelector(".editor-locked").checked,
     cookingBlockEffect: normalizeCookingBlockEffect(editor.querySelector("[name='editorBlockEffect']:checked")?.value),
   });
   const willChangeEffect =

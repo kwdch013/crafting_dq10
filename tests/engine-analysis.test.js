@@ -632,7 +632,8 @@ assert.equal(engine.isSmithingReturnNextTurn({ craftType: "weapon-smithing", tra
 		},
 	);
 
-	assert.notEqual(result.status, "locked");
-	assert.equal(result.normalMin, 12);
-	assert.equal(result.normalMax, 18);
+	assert.equal(result.status, "locked");
+	assert.equal(result.statusLabel, "確定済み");
+	assert.equal(result.normalMin, 0);
+	assert.equal(result.normalMax, 0);
 }

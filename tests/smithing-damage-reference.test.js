@@ -37,7 +37,9 @@ assert.match(mainJs, /getDefaultHeatId\(config\)/, "初期温度は職人設定�
 assert.doesNotMatch(mainJs, /applySmithingReturn/, "戻り地金の戻り値は手動入力にしてください");
 assert.match(mainJs, /function isSmithingLightHeatActive\(\)/, "光地金は温度が200の倍数の時だけ有効にしてください");
 assert.match(mainJs, /editor-smithing-judgements/, "右クリック編集に鍛冶倍率判定欄を追加してください");
-assert.match(mainJs, /lockedField\.hidden = !hasIngredient \|\| isCurrentCraftFamily\("smithing"\)/, "鍛冶職人の右クリック編集では固定欄を非表示にしてください");
+assert.match(mainJs, /lockedField\.hidden = !hasIngredient/, "鍛冶職人の右クリック編集では確定済み欄を表示してください");
+assert.match(mainJs, /lockLabel\.textContent = isCurrentCraftFamily\("smithing"\) \? "確定済み" : "固定する"/, "鍛冶職人の右クリック編集では固定欄を確定済みとして表示してください");
+assert.match(mainJs, /isCurrentCraftFamily\("smithing"\)[\s\S]*\? "確定済み"[\s\S]*: item\.lockJudgementLabel \|\| "固定"/, "鍛冶BOARDの固定バッジは確定済みとして表示してください");
 assert.match(mainJs, /row\.classList\.add\(`status-\$\{analysis\.status\}`\)/, "鍛冶倍率判定行は判定ステータスと同じ色にしてください");
 assert.match(mainJs, /isSmithingLightHeatActive\(\)[\s\S]*editor\.querySelector\("\.editor-glowing"\)\.checked/, "光地金の光状態は有効温度でのみ保存してください");
 assert.match(mainJs, /hydrateSmithingTechniquesFromJson\(\)/);

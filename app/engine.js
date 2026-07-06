@@ -612,10 +612,11 @@
   }
 
   function analyzeIngredientAcrossTechniques(state, ingredient) {
-    const normalizedIngredient = isSmithingCraftState(state)
-      ? { ...ingredient, locked: false, lockJudgement: "", lockJudgementLabel: "" }
+    const isSmithingCraft = isSmithingCraftState(state);
+    const normalizedIngredient = isSmithingCraft
+      ? { ...ingredient, lockJudgement: "", lockJudgementLabel: "" }
       : ingredient;
-    const analysisTechniques = isSmithingCraftState(state)
+    const analysisTechniques = isSmithingCraft
       ? [{
         id: "board-normal",
         name: "BOARD判定(1倍)",
@@ -628,15 +629,17 @@
     const techniqueAnalyses = analysisTechniques.map((technique) => {
       const resolvedTechnique = resolveTechnique(state, technique, normalizedIngredient);
       const analysis = analyzeIngredient(normalizedIngredient, resolvedTechnique, state.targetMode);
-      const smithingStatus = isSmithingCraftState(state) && analysis.normalMaxCanEnterTargetRange
+      const smithingStatus = isSmithingCraft && analysis.normalMaxCanEnterTargetRange
         ? "gauge-entry"
         : analysis.status;
       return {
         ...analysis,
         status: smithingStatus,
-        statusLabel: isSmithingCraftState(state) && smithingStatus === "guaranteed"
-          ? "本会心！"
-          : statusLabels[smithingStatus],
+        statusLabel: isSmithingCraft && smithingStatus === "locked"
+          ? "確定済み"
+          : isSmithingCraft && smithingStatus === "guaranteed"
+            ? "本会心！"
+            : statusLabels[smithingStatus],
         technique: resolvedTechnique,
       };
     });
