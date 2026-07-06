@@ -41,7 +41,7 @@ registerDQ10Craft(createDQ10SmithingCraftConfig({
   modeLabel: "Tool Smithing Settings",
   recipeLabel: "道具名",
   recipeCategoryLabel: "大項目",
-  recipeSubcategoryLabel: "小項目",
+  recipeSubcategoryLabel: "道具名",
   defaultRecipeName: "道具メモ",
   // 道具鍛冶の大項目は参照画像ディレクトリの道具種別と同期します。
   recipeCategoryOptions: [

@@ -22,6 +22,27 @@ const visibleCookingRecipeNames = [
   "ヒールカルボナーラ",
 ];
 
+const visibleToolSmithingRecipeNames = [
+  "超鍛冶ハンマー",
+  "超木工刀",
+  "超さいほう針",
+  "超フライパン",
+  "超錬金ランプ",
+  "超錬金ツボ",
+  "奇跡の鍛冶ハンマー",
+  "奇跡の木工刀",
+  "奇跡のさいほう針",
+  "奇跡のフライパン",
+  "奇跡の錬金ランプ",
+  "奇跡の錬金ツボ",
+  "光の鍛冶ハンマー",
+  "光の木工刀",
+  "光のさいほう針",
+  "光のフライパン",
+  "光の錬金ランプ",
+  "光の錬金ツボ",
+];
+
 function loadFallbackCookingRecipes() {
   const context = {
     recipes: null,
@@ -106,6 +127,27 @@ function assertBattlePazzaRecipe(recipe) {
   }
 }
 
+function assertToolSmithingRecipe(recipe, expected) {
+  assert.ok(recipe, `${expected.name}のレシピが登録されていません`);
+  assert.equal(recipe.category, expected.category);
+  assert.equal(recipe.categoryId, expected.categoryId);
+  assert.equal(recipe.archived, undefined);
+  assert.deepEqual(
+    Array.from(recipe.items, (item) => ({
+      row: item.gridCell.row,
+      column: item.gridCell.column,
+    })),
+    expected.gridCells,
+  );
+
+  expected.ranges.forEach(([successMin, successMax], index) => {
+    const item = recipe.items[index];
+    assert.equal(item.current, 0);
+    assert.equal(item.successMin, successMin);
+    assert.equal(item.successMax, successMax);
+  });
+}
+
 {
   const recipes = [
     { id: "visible", name: "表示" },
@@ -150,6 +192,43 @@ function assertBattlePazzaRecipe(recipe) {
 }
 
 {
-  assert.equal(recipeArchive.getVisibleRecipes(toolSmithingRecipes).length, 0);
-  assert.equal(recipeArchive.getVisibleRecipes(loadFallbackToolSmithingRecipes()).length, 0);
+  assert.deepEqual(
+    recipeArchive.getVisibleRecipes(toolSmithingRecipes).map((recipe) => recipe.name),
+    visibleToolSmithingRecipeNames,
+  );
+  assert.deepEqual(
+    Array.from(recipeArchive.getVisibleRecipes(loadFallbackToolSmithingRecipes()), (recipe) => recipe.name),
+    visibleToolSmithingRecipeNames,
+  );
+}
+
+{
+  assertToolSmithingRecipe(getRecipeByName(toolSmithingRecipes, "超鍛冶ハンマー"), {
+    name: "超鍛冶ハンマー",
+    category: "ハンマー",
+    categoryId: "smithing-hammer",
+    gridCells: [
+      { row: 1, column: 1 },
+      { row: 1, column: 2 },
+      { row: 2, column: 1 },
+      { row: 2, column: 2 },
+      { row: 3, column: 1 },
+    ],
+    ranges: [[130, 140], [105, 111], [105, 113], [130, 140], [90, 96]],
+  });
+  assertToolSmithingRecipe(getRecipeByName(loadFallbackToolSmithingRecipes(), "光のフライパン"), {
+    name: "光のフライパン",
+    category: "フライパン",
+    categoryId: "frying-pan",
+    gridCells: [
+      { row: 1, column: 1 },
+      { row: 1, column: 2 },
+      { row: 2, column: 1 },
+      { row: 2, column: 2 },
+      { row: 3, column: 1 },
+      { row: 3, column: 2 },
+      { row: 4, column: 1 },
+    ],
+    ranges: [[92, 102], [110, 120], [134, 146], [158, 164], [158, 164], [92, 102], [92, 102]],
+  });
 }

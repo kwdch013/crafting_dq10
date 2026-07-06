@@ -247,5 +247,5 @@ sequenceDiagram
 - 実数値の出典がある場合は、対象JSONと同じディレクトリにメモを追加します。
 - 不明な実数値を断定しません。
 - テンプレート値は、実レシピ値に置き換える前提で管理します。
-- 道具鍛冶の大項目は `tool-smithing/config.js` の `recipeCategoryOptions` で管理し、小項目の具体的な制作物はレシピJSONに追加します。
-- 道具鍛冶の小項目が未登録の間は、テンプレートレシピを `archived: true` として非表示にします。
+- 道具鍛冶の大項目は `tool-smithing/config.js` の `recipeCategoryOptions` で管理し、具体的な制作物は道具名としてレシピJSONに追加します。
+- 道具鍛冶のテンプレートレシピは `archived: true` として非表示にし、実レシピを道具名の選択肢に表示します。
