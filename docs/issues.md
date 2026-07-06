@@ -39,11 +39,7 @@ issueには対象領域に応じてラベルを付与します。
 - 主要レシピ名、マス配置、基準値、成功下限、成功上限がJSONに入っている。
 - 出典または確認メモが残っている。
 
-URL:
-
-```text
-https://github.com/kwdch013/crafting_dq10/issues/1
-```
+URL: https://github.com/kwdch013/crafting_dq10/issues/1
 
 ### #2 集中力データを実値へ置き換える
 
@@ -497,3 +493,6 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/53
 
 ### #88 鍛冶職人: 戻り予告と光地金ノード操作を修正する
 戻りは200n+50℃の予告表示のみとし、光地金はBOARDノード上で直接切り替えます。BOARD代表判定は1倍基準へ変更し、本会心！とゲージ突入も表示します。URL: https://github.com/kwdch013/crafting_dq10/issues/88
+
+### #93 鍛冶職人: 右クリック編集の固定するを非表示にする
+鍛冶職人の右クリック編集では固定判定を扱わないため、`固定する` フィールドを確実に非表示にします。URL: https://github.com/kwdch013/crafting_dq10/issues/93
