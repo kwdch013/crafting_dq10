@@ -18,7 +18,7 @@
       return ingredient ? [ingredient] : [];
     }
 
-    if (!["肉", "魚の切り身"].includes(ingredient?.ingredientGroupLabel)) {
+    if (!["肉", "魚", "魚の切り身"].includes(ingredient?.ingredientGroupLabel)) {
       return ingredient ? [ingredient] : [];
     }
 

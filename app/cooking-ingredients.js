@@ -8,7 +8,7 @@
     },
     fish: {
       id: "fish",
-      label: "魚の切り身",
+      label: "魚",
       className: "cooking-ingredient-fish",
       src: "./assets/cooking/ingredient-fish.png",
     },
@@ -29,6 +29,12 @@
       label: "卵",
       className: "cooking-ingredient-egg",
       src: "./assets/cooking/ingredient-egg.png",
+    },
+    wheat: {
+      id: "wheat",
+      label: "小麦",
+      className: "cooking-ingredient-wheat",
+      src: "./assets/cooking/ingredient-wheat.png",
     },
   };
 
@@ -57,6 +63,10 @@
 
     if (label.includes("卵") || label.includes("たまご")) {
       return "egg";
+    }
+
+    if (label.includes("小麦")) {
+      return "wheat";
     }
 
     return "";

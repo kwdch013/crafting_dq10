@@ -149,6 +149,7 @@ function loadState() {
 function normalizeState(value) {
   const config = getCraftConfig(value.craftType);
   const isSmithingConfig = ["weapon-smithing", "armor-smithing", "tool-smithing"].includes(config.id);
+  const isCookingConfig = getCraftComponent(config.id).craftFamily === "cooking";
   const techniques = config.techniques;
   const recipes = getCraftRecipes(config.id);
   const defaultRecipe = recipes[0];
@@ -188,7 +189,11 @@ function normalizeState(value) {
       successMin,
       successMax,
       ingredientGroupId: ingredient.ingredientGroupId || defaultItem?.ingredientGroupId || "",
-      ingredientGroupLabel: ingredient.ingredientGroupLabel || defaultItem?.ingredientGroupLabel || "",
+      ingredientGroupLabel: isCookingConfig
+        ? DQ10CookingRecipeEditor.normalizeCookingIngredientLabel(
+          ingredient.ingredientGroupLabel || defaultItem?.ingredientGroupLabel || "",
+        )
+        : ingredient.ingredientGroupLabel || defaultItem?.ingredientGroupLabel || "",
       ingredientSize: numberOr(ingredient.ingredientSize, defaultItem?.ingredientSize ?? 1),
     };
   });
@@ -2424,11 +2429,14 @@ function appendSmithingAddRecipeCell(rowIndex, columnIndex, item = null) {
 function appendAddRecipeItemRow(config, item = {}, index = elements.addRecipeItems.querySelectorAll(".recipe-item-row").length) {
   const itemOptions = Array.isArray(config.itemOptions) ? config.itemOptions : [];
   const craftFamily = getCraftComponent(config.id).craftFamily;
+  const isCooking = craftFamily === "cooking";
   const row = document.createElement("fieldset");
   row.className = "recipe-item-row";
   row.dataset.index = String(index);
   row.innerHTML = `<legend>${escapeHtml(item.name || `${config.itemNameLabel || "マス"} ${index + 1}`)}</legend>`;
-  row.append(createRecipeItemInput("name", config.itemNameLabel || "マス名", item.name || ""));
+  if (!isCooking) {
+    row.append(createRecipeItemInput("name", config.itemNameLabel || "マス名", item.name || ""));
+  }
   if (itemOptions.length > 0) {
     row.append(createRecipeItemSelect("optionId", "位置", item.optionId || itemOptions[0]?.id || "", itemOptions));
   }
@@ -2439,8 +2447,13 @@ function appendAddRecipeItemRow(config, item = {}, index = elements.addRecipeIte
   row.append(createRecipeItemNumber("target", "基準値", item.target ?? Math.round((numberOr(item.successMin, 60) + numberOr(item.successMax, 75)) / 2), 0, 9999));
   row.append(createRecipeItemNumber("successMin", "下限", item.successMin ?? 60, 0, 9999));
   row.append(createRecipeItemNumber("successMax", "上限", item.successMax ?? 75, 0, 9999));
-  if (craftFamily === "cooking") {
-    row.append(createRecipeItemInput("ingredientGroupLabel", "食材分類", item.ingredientGroupLabel || ""));
+  if (isCooking) {
+    row.append(createRecipeItemSelect(
+      "ingredientGroupLabel",
+      "食材分類",
+      DQ10CookingRecipeEditor.normalizeCookingIngredientLabel(item.ingredientGroupLabel || ""),
+      DQ10CookingRecipeEditor.getCookingIngredientSelectOptions(),
+    ));
   }
   const removeButton = document.createElement("button");
   removeButton.className = "button secondary";
@@ -2457,9 +2470,19 @@ function appendAddRecipeItemRow(config, item = {}, index = elements.addRecipeIte
 function refreshAddRecipeItemLegends(config) {
   elements.addRecipeItems.querySelectorAll(".recipe-item-row").forEach((row, index) => {
     row.dataset.index = String(index);
-    const name = row.querySelector('[data-field="name"]')?.value || `${config.itemNameLabel || "マス"} ${index + 1}`;
+    const name = row.querySelector('[data-field="name"]')?.value || getDefaultRecipeItemName(config, row, index);
     row.querySelector("legend").textContent = name;
   });
+}
+
+function getDefaultRecipeItemName(config, row, index) {
+  if (getCraftComponent(config.id).craftFamily === "cooking") {
+    const rowIndex = row.querySelector('[data-field="row"]')?.value || "1";
+    const columnIndex = row.querySelector('[data-field="column"]')?.value || String(index + 1);
+    return `${rowIndex}行${columnIndex}列`;
+  }
+
+  return `${config.itemNameLabel || "マス"} ${index + 1}`;
 }
 
 function createRecipeItemInput(field, labelText, value) {
@@ -2521,13 +2544,18 @@ function saveManagedRecipe(event) {
   const existingRecipe = managedRecipeEditId
     ? getAllCraftRecipes(config.id).find((candidate) => candidate.id === managedRecipeEditId)
     : null;
+  const collectedItems = collectAddRecipeItems(config);
+  if (!collectedItems) {
+    return;
+  }
+
   const recipe = {
     ...(existingRecipe || {}),
     id: managedRecipeEditId || `user-${config.id}-${Date.now()}`,
     name,
     category: getRecipeCategoryLabel(config, categoryId),
     categoryId,
-    items: collectAddRecipeItems(config),
+    items: collectedItems,
   };
   if (traitId) {
     recipe.traitId = normalizeTraitId(config, traitId);
@@ -2555,13 +2583,13 @@ function collectAddRecipeItems(config) {
     return collectSmithingAddRecipeItems(config);
   }
 
-  return Array.from(elements.addRecipeItems.querySelectorAll(".recipe-item-row"), (row, index) => {
+  const items = Array.from(elements.addRecipeItems.querySelectorAll(".recipe-item-row"), (row, index) => {
     const valueOf = (field) => row.querySelector(`[data-field="${field}"]`)?.value;
     const successMin = numberOr(valueOf("successMin"), 60);
     const successMax = numberOr(valueOf("successMax"), 75);
     const item = {
       id: `item-${index + 1}`,
-      name: valueOf("name") || `${config.itemNameLabel || "マス"} ${index + 1}`,
+      name: valueOf("name") || getDefaultRecipeItemName(config, row, index),
       current: 0,
       target: numberOr(valueOf("target"), Math.round((successMin + successMax) / 2)),
       successMin,
@@ -2583,6 +2611,18 @@ function collectAddRecipeItems(config) {
     }
     return item;
   });
+
+  if (getCraftComponent(config.id).craftFamily !== "cooking") {
+    return items;
+  }
+
+  const normalized = DQ10CookingRecipeEditor.applyCookingIngredientGroups(items);
+  if (!normalized.valid) {
+    alert(normalized.message);
+    return null;
+  }
+
+  return normalized.items;
 }
 
 function collectSmithingAddRecipeItems(config) {
