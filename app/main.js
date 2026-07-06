@@ -28,6 +28,7 @@ const elements = {
   cookingDamageRanges: document.querySelector("#cookingDamageRanges"),
   smithingDamagePanel: document.querySelector("#smithingDamagePanel"),
   smithingTemperatureDamageLabel: document.querySelector("#smithingTemperatureDamageLabel"),
+  smithingTemperatureSelect: document.querySelector("#smithingTemperatureSelect"),
   smithingHeatDownButton: document.querySelector("#smithingHeatDownButton"),
   smithingHeatUpButton: document.querySelector("#smithingHeatUpButton"),
   smithingDamageRanges: document.querySelector("#smithingDamageRanges"),
@@ -197,9 +198,10 @@ function normalizeState(value) {
       ingredientSize: numberOr(ingredient.ingredientSize, defaultItem?.ingredientSize ?? 1),
     };
   });
+  const defaultHeatId = getDefaultHeatId(config);
   const heat = config.heatStates.some((candidate) => candidate.id === value.heat)
     ? value.heat
-    : config.heatStates[0].id;
+    : defaultHeatId;
   const focusSelection = normalizeFocusSelection(config, value);
   const recipeTraitId = getRecipeTraitId(config, recipeId);
   const traitId = normalizeTraitId(config, value.traitId || value.specialEventId || recipeTraitId);
@@ -499,6 +501,13 @@ function calculateFocus(config, selection) {
   return baseFocus + toolBonus;
 }
 
+// 職人ごとの初期温度を優先し、未定義時は先頭の火力状態を使います。
+function getDefaultHeatId(config) {
+  return config.heatStates.some((heatState) => heatState.id === config.defaultHeatId)
+    ? config.defaultHeatId
+    : config.heatStates[0].id;
+}
+
 function getCraftConfig(craftType) {
   const configs = window.DQ10CraftConfigs || {};
   return configs[craftType] || configs.cooking || Object.values(configs)[0];
@@ -569,7 +578,7 @@ function createDefaultState(craftType) {
     toolId: focusSelection.toolId,
     toolStars: focusSelection.toolStars,
     focus: calculateFocus(config, focusSelection),
-    heat: config.heatStates[0].id,
+    heat: getDefaultHeatId(config),
     targetMode: config.targetMode || "fixed",
     techniques: cloneConfigItems(config.techniques),
     ingredients: cloneConfigItems(defaultRecipe?.items || config.items),
@@ -648,6 +657,7 @@ function render() {
   renderTraitOptions();
   renderFocusOptions();
   renderHeatOptions();
+  renderSmithingTemperatureSelect();
   renderTechniqueEditor();
   renderSmithingDamageReference();
   renderSmithingTechniqueReference();
@@ -850,8 +860,28 @@ function renderHeatOptions() {
 
   elements.heatInput.value = config.heatStates.some((heatState) => heatState.id === currentValue)
     ? currentValue
-    : config.heatStates[0].id;
+    : getDefaultHeatId(config);
   state.heat = elements.heatInput.value;
+}
+
+// 鍛冶BOARD内の温度プルダウンを基本設定の温度選択と同じ候補で描画します。
+function renderSmithingTemperatureSelect() {
+  if (!elements.smithingTemperatureSelect) {
+    return;
+  }
+
+  elements.smithingTemperatureSelect.replaceChildren();
+  if (!isCurrentCraftFamily("smithing")) {
+    return;
+  }
+
+  getCurrentCraftConfig().heatStates.forEach((heatState) => {
+    const option = document.createElement("option");
+    option.value = heatState.id;
+    option.textContent = heatState.label;
+    elements.smithingTemperatureSelect.append(option);
+  });
+  elements.smithingTemperatureSelect.value = state.heat;
 }
 
 function renderTechniqueEditor() {
@@ -938,6 +968,9 @@ function renderSmithingDamageReference() {
 
   if (elements.smithingTemperatureDamageLabel) {
     elements.smithingTemperatureDamageLabel.textContent = `${state.heat}℃`;
+  }
+  if (elements.smithingTemperatureSelect) {
+    elements.smithingTemperatureSelect.value = state.heat;
   }
   if (elements.smithingHeatDownButton) {
     elements.smithingHeatDownButton.disabled = currentHeat <= minHeat;
@@ -1519,6 +1552,22 @@ function adjustSmithingHeat(delta) {
   }
 
   applySmithingHeatChange(nextHeat);
+  refreshAfterHeatChange();
+}
+
+// BOARD内プルダウンで選んだ温度を鍛冶の温度状態へ反映します。
+function changeSmithingHeatFromBoard() {
+  if (!isCurrentCraftFamily("smithing") || !elements.smithingTemperatureSelect) {
+    return;
+  }
+
+  applySmithingHeatChange(elements.smithingTemperatureSelect.value);
+  refreshAfterHeatChange();
+}
+
+// 温度変更後に依存表示をまとめて更新します。
+function refreshAfterHeatChange() {
+  renderSmithingTemperatureSelect();
   renderTechniqueEditor();
   renderSmithingDamageReference();
   renderSmithingTechniqueReference();
@@ -1533,6 +1582,9 @@ function adjustSmithingHeat(delta) {
 function applySmithingHeatChange(nextHeat) {
   state.heat = nextHeat;
   elements.heatInput.value = state.heat;
+  if (elements.smithingTemperatureSelect) {
+    elements.smithingTemperatureSelect.value = state.heat;
+  }
 }
 
 function toggleCookingLight(ingredientId) {
@@ -2104,7 +2156,7 @@ function createResetStateForCurrentSelection() {
     toolId: focusSelection.toolId,
     toolStars: focusSelection.toolStars,
     focus: calculateFocus(config, focusSelection),
-    heat: config.heatStates[0].id,
+    heat: getDefaultHeatId(config),
     targetMode: config.targetMode || "fixed",
     techniques: cloneConfigItems(config.techniques),
     ingredients: cloneConfigItems(resetRecipe?.items || config.items),
@@ -2786,19 +2838,13 @@ elements.toolSelect.addEventListener("change", updateFocusFromSelection);
 elements.toolStarsSelect.addEventListener("change", updateFocusFromSelection);
 elements.heatInput.addEventListener("change", () => {
   applySmithingHeatChange(elements.heatInput.value);
-  renderTechniqueEditor();
-  renderSmithingDamageReference();
-  renderSmithingTechniqueReference();
-  renderLayoutBoard();
-  renderCraftReference();
-  renderAnalysis();
-  syncBoardActionButtons();
-  saveState();
+  refreshAfterHeatChange();
 });
 elements.undoBoardButton.addEventListener("click", undoBoardAction);
 elements.redoBoardButton.addEventListener("click", redoBoardAction);
 elements.smithingHeatDownButton?.addEventListener("click", () => adjustSmithingHeat(-50));
 elements.smithingHeatUpButton?.addEventListener("click", () => adjustSmithingHeat(50));
+elements.smithingTemperatureSelect?.addEventListener("change", () => changeSmithingHeatFromBoard());
 elements.specialChargeToggle.addEventListener("click", toggleBoardSpecialState);
 elements.miracleGrillButton?.addEventListener("click", applyMiracleGrillToSelected);
 elements.normalHeatButton?.addEventListener("click", () => setCookingHeatMode("normal"));

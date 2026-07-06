@@ -44,6 +44,8 @@
       stateLabel: "温度",
       targetMode: "random-in-range",
       defaultTraitId: "none",
+      // 鍛冶の開始温度はゲーム内の初期温度に合わせます。
+      defaultHeatId: "1600",
       traits: [
         { id: "none", label: "なし", description: "通常の地金として扱います。" },
         { id: "light", label: "光地金", description: "温度が200の倍数の時だけ、選択したマスを光っている状態として扱います。" },
