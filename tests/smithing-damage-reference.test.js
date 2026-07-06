@@ -25,6 +25,10 @@ assert.match(mainJs, /smithingDamagePanel: document\.querySelector\("#smithingDa
 assert.match(mainJs, /smithingTechniquePanel: document\.querySelector\("#smithingTechniquePanel"\)/);
 assert.match(mainJs, /function renderSmithingDamageReference\(\)/);
 assert.match(mainJs, /function renderSmithingTechniqueReference\(\)/);
+assert.match(mainJs, /function renderSmithingCellJudgements\(editor\)/, "鍛冶セル右クリック編集に倍率別判定を表示してください");
+assert.match(mainJs, /function isSmithingLightHeatActive\(\)/, "光地金は温度が200の倍数の時だけ有効にしてください");
+assert.match(mainJs, /editor-smithing-judgements/, "右クリック編集に鍛冶倍率判定欄を追加してください");
+assert.match(mainJs, /isSmithingLightHeatActive\(\)[\s\S]*editor\.querySelector\("\.editor-glowing"\)\.checked/, "光地金の光状態は有効温度でのみ保存してください");
 assert.match(mainJs, /hydrateSmithingTechniquesFromJson\(\)/);
 assert.match(mainJs, /function adjustSmithingHeat\(delta\)/);
 assert.match(mainJs, /smithingDamage\.ranges\?\.\[state\.heat\]/);
@@ -35,6 +39,11 @@ assert.match(mainJs, /smithingHeatDownButton\?\.addEventListener\("click", \(\) 
 assert.match(mainJs, /smithingHeatUpButton\?\.addEventListener\("click", \(\) => adjustSmithingHeat\(50\)\)/);
 assert.match(smithingDamageJs, /power_1_2: \{ label: "1\.2倍"/, "1.2倍威力は倍率表記にしてください");
 assert.doesNotMatch(smithingDamageJs, /label: "強め"/, "鍛冶ダメージ表に強め表記を残さないでください");
+assert.match(
+  fs.readFileSync("app/crafts/shared/smithing-component.js", "utf8"),
+  /label: "光地金"/,
+  "鍛冶職人の特性に光地金を追加してください",
+);
 
 assert.ok(Array.isArray(smithingTechniques.techniques), "鍛冶特技JSONはtechniques配列を持つこと");
 assert.ok(smithingTechniques.techniques.length >= 4, "鍛冶特技JSONに主要特技を登録してください");

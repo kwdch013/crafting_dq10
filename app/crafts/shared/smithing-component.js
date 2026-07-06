@@ -12,6 +12,11 @@
       resourceLabel: "集中力",
       stateLabel: "温度",
       targetMode: "random-in-range",
+      defaultTraitId: "none",
+      traits: [
+        { id: "none", label: "なし", description: "通常の地金として扱います。" },
+        { id: "light", label: "光地金", description: "温度が200の倍数の時だけ、選択したマスを光っている状態として扱います。" },
+      ],
       focusNote: "Lv76-80はLv75以降を各レベル+2として置いた暫定値です。",
       defaultFocus: 247,
       focus: global.createDQ10FocusConfig({
@@ -29,6 +34,21 @@
         fixed: false,
       },
       heatStates: global.DQ10SmithingDamage.heatStates,
+      // 鍛冶配置の各マスは右クリック編集で現在値と光地金状態を変更できます。
+      isBoardCellEditable() {
+        return true;
+      },
+      // 光地金の盤面表示は、現在温度が有効な時だけ光状態を返します。
+      getIngredientSpecialState(state, ingredient) {
+        const heat = Number(state?.heat);
+        return {
+          isGlowing: state?.traitId === "light" &&
+            Number.isFinite(heat) &&
+            heat % 200 === 0 &&
+            ingredient?.isGlowing === true,
+          isReturning: false,
+        };
+      },
       ...options,
     };
   }
