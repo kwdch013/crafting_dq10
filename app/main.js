@@ -1749,7 +1749,7 @@ function syncBoardCellEditorTrait(editor) {
   glowField.hidden = !hasIngredient || !canUseLight;
   glowInput.disabled = disabledByHeat;
   glowInput.title = disabledByHeat ? "光地金は温度が200の倍数の時だけ有効です" : "";
-  lockedField.hidden = !hasIngredient;
+  lockedField.hidden = !hasIngredient || isCurrentCraftFamily("smithing");
   blockEffectField.hidden = !hasIngredient || !isCurrentCraftFamily("cooking");
   cellEffectField.hidden = !isCurrentCraftFamily("cooking");
   effectModeField.hidden = !hasIngredient || state.traitId !== "light-return";
@@ -1831,6 +1831,7 @@ function renderSmithingCellJudgements(editor) {
       state.targetMode,
     );
 
+    row.classList.add(`status-${analysis.status}`);
     row.innerHTML = `
       <strong>${escapeHtml(power.label)}</strong>
       <span class="numeric">${range[0]}-${range[1]} / 会心 ${analysis.criticalMin}-${analysis.criticalMax}</span>
@@ -1889,7 +1890,7 @@ function applyBoardCellEditor(editor) {
           ? editor.querySelector(".editor-glowing").checked
           : ingredient.isGlowing === true),
     cookingEffectMode: editor.querySelector("[name='editorEffectMode']:checked")?.value,
-    locked: editor.querySelector(".editor-locked").checked,
+    locked: !isCurrentCraftFamily("smithing") && editor.querySelector(".editor-locked").checked,
     cookingBlockEffect: normalizeCookingBlockEffect(editor.querySelector("[name='editorBlockEffect']:checked")?.value),
   });
   const willChangeEffect =
