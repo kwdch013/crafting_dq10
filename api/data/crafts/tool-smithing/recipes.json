@@ -1403,5 +1403,50 @@
       }
     ],
     "traitId": "double-half"
+  },
+  {
+    "id": "user-tool-smithing-1783348805719",
+    "name": "トゲトゲルアー",
+    "category": "ルアー",
+    "categoryId": "lure",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "1行1列",
+        "current": 0,
+        "target": 185,
+        "successMin": 180,
+        "successMax": 190,
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-3",
+        "name": "2行1列",
+        "current": 0,
+        "target": 259,
+        "successMin": 256,
+        "successMax": 262,
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-2",
+        "name": "1行2列",
+        "current": 0,
+        "target": 185,
+        "successMin": 180,
+        "successMax": 190,
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        }
+      }
+    ],
+    "traitId": "double-half"
   }
 ]
