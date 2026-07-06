@@ -16,6 +16,7 @@ assert.ok(referenceIndex < splitPanelIndex, "鍛冶ダメージ表は判定パ�
 assert.ok(techniqueReferenceIndex > referenceIndex, "鍛冶特技表は温度別ダメージの下に配置してください");
 assert.ok(techniqueReferenceIndex < splitPanelIndex, "鍛冶特技表は判定パネルの前に配置してください");
 assert.match(html, /id="smithingTemperatureDamageLabel"/, "現在温度の表示欄を追加してください");
+assert.match(html, /id="smithingTemperatureSelect"/, "BOARD内の温度プルダウンを追加してください");
 assert.match(html, /id="smithingHeatDownButton"/, "BOARD内の温度低下ボタンを追加してください");
 assert.match(html, /id="smithingHeatUpButton"/, "BOARD内の温度上昇ボタンを追加してください");
 assert.match(html, /id="smithingDamageRanges"/, "温度別ダメージ表の描画先を追加してください");
@@ -30,6 +31,9 @@ assert.match(mainJs, /function renderSmithingCellJudgements\(editor\)/, "鍛冶�
 assert.match(mainJs, /function getSmithingDamagePowerEntries\(\)/, "鍛冶ダメージ表は倍率順を共通関数で整列してください");
 assert.match(mainJs, /function syncJudgementLegend\(\)/, "固定凡例は職人別に表示制御してください");
 assert.match(mainJs, /function applySmithingHeatChange\(nextHeat\)/, "鍛冶温度変更時に表示状態を更新してください");
+assert.match(mainJs, /smithingTemperatureSelect: document\.querySelector\("#smithingTemperatureSelect"\)/);
+assert.match(mainJs, /function renderSmithingTemperatureSelect\(\)/, "BOARD内の温度プルダウンを描画してください");
+assert.match(mainJs, /getDefaultHeatId\(config\)/, "初期温度は職人設定の既定値を優先してください");
 assert.doesNotMatch(mainJs, /applySmithingReturn/, "戻り地金の戻り値は手動入力にしてください");
 assert.match(mainJs, /function isSmithingLightHeatActive\(\)/, "光地金は温度が200の倍数の時だけ有効にしてください");
 assert.match(mainJs, /editor-smithing-judgements/, "右クリック編集に鍛冶倍率判定欄を追加してください");
@@ -45,6 +49,7 @@ assert.match(mainJs, /renderSmithingDamageReference\(\);[\s\S]*renderLayoutBoard
 assert.match(mainJs, /syncJudgementLegend\(\);[\s\S]*renderAnalysis\(\);/);
 assert.match(mainJs, /smithingHeatDownButton\?\.addEventListener\("click", \(\) => adjustSmithingHeat\(-50\)\)/);
 assert.match(mainJs, /smithingHeatUpButton\?\.addEventListener\("click", \(\) => adjustSmithingHeat\(50\)\)/);
+assert.match(mainJs, /smithingTemperatureSelect\?\.addEventListener\("change", \(\) => changeSmithingHeatFromBoard\(\)\)/);
 assert.match(smithingDamageJs, /power_1_2: \{ label: "1\.2倍"/, "1.2倍威力は倍率表記にしてください");
 const powersDefinition = smithingDamageJs.slice(smithingDamageJs.indexOf("const powers = {"));
 assert.ok(
@@ -114,7 +119,7 @@ for (const technique of smithingTechniques.techniques) {
 
 const heatInputHandler = mainJs.match(/elements\.heatInput\.addEventListener\("change", \(\) => \{([\s\S]*?)\n\}\);/);
 assert.ok(heatInputHandler, "温度変更ハンドラが見つかりません");
-assert.match(heatInputHandler[1], /renderSmithingDamageReference\(\);/);
+assert.match(heatInputHandler[1], /refreshAfterHeatChange\(\);/);
 
 const css = fs.readFileSync("app/styles.css", "utf8");
 assert.match(css, /\.status-gauge-entry/, "ゲージ突入のステータス色を定義してください");

@@ -29,6 +29,7 @@ vm.createContext(context);
 	assert.equal(config.defaultRecipeName, defaultRecipeName);
 	assert.equal(config.targetMode, "random-in-range");
 	assert.equal(config.layout.label, "鍛冶配置");
+	assert.equal(config.defaultHeatId, "1600");
 	assert.equal(config.heatStates, context.DQ10SmithingDamage.heatStates);
 	assert.ok(context.DQ10CraftComponents[craftId], `${craftId} のコンポーネントを登録してください`);
 	assert.equal(

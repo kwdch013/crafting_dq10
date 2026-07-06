@@ -26,7 +26,5 @@ function extractHeatInputHandlerBody() {
 {
 	const body = extractHeatInputHandlerBody();
 
-	assert.match(body, /renderTechniqueEditor\(\);/);
-	assert.match(body, /renderLayoutBoard\(\);/);
-	assert.match(body, /renderAnalysis\(\);/);
+	assert.match(body, /refreshAfterHeatChange\(\);/);
 }
