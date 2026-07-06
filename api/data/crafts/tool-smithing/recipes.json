@@ -219,132 +219,6 @@
     ]
   },
   {
-    "id": "super-alchemy-lamp",
-    "name": "超錬金ランプ",
-    "category": "ランプ",
-    "categoryId": "alchemy-lamp",
-    "items": [
-      {
-        "id": "part-1",
-        "name": "左上",
-        "gridCell": {
-          "row": 1,
-          "column": 1
-        },
-        "current": 0,
-        "successMin": 100,
-        "successMax": 106
-      },
-      {
-        "id": "part-2",
-        "name": "右上",
-        "gridCell": {
-          "row": 1,
-          "column": 2
-        },
-        "current": 0,
-        "successMin": 165,
-        "successMax": 175
-      },
-      {
-        "id": "part-3",
-        "name": "左下",
-        "gridCell": {
-          "row": 2,
-          "column": 1
-        },
-        "current": 0,
-        "successMin": 165,
-        "successMax": 173
-      },
-      {
-        "id": "part-4",
-        "name": "右下",
-        "gridCell": {
-          "row": 2,
-          "column": 2
-        },
-        "current": 0,
-        "successMin": 130,
-        "successMax": 140
-      }
-    ]
-  },
-  {
-    "id": "super-alchemy-pot",
-    "name": "超錬金ツボ",
-    "category": "ツボ",
-    "categoryId": "alchemy-pot",
-    "items": [
-      {
-        "id": "part-1",
-        "name": "左上",
-        "gridCell": {
-          "row": 1,
-          "column": 1
-        },
-        "current": 0,
-        "successMin": 90,
-        "successMax": 98
-      },
-      {
-        "id": "part-2",
-        "name": "右上",
-        "gridCell": {
-          "row": 1,
-          "column": 2
-        },
-        "current": 0,
-        "successMin": 90,
-        "successMax": 98
-      },
-      {
-        "id": "part-3",
-        "name": "左中",
-        "gridCell": {
-          "row": 2,
-          "column": 1
-        },
-        "current": 0,
-        "successMin": 114,
-        "successMax": 124
-      },
-      {
-        "id": "part-4",
-        "name": "右中",
-        "gridCell": {
-          "row": 2,
-          "column": 2
-        },
-        "current": 0,
-        "successMin": 114,
-        "successMax": 124
-      },
-      {
-        "id": "part-5",
-        "name": "左下",
-        "gridCell": {
-          "row": 3,
-          "column": 1
-        },
-        "current": 0,
-        "successMin": 76,
-        "successMax": 82
-      },
-      {
-        "id": "part-6",
-        "name": "右下",
-        "gridCell": {
-          "row": 3,
-          "column": 2
-        },
-        "current": 0,
-        "successMin": 76,
-        "successMax": 82
-      }
-    ]
-  },
-  {
     "id": "miracle-smithing-hammer",
     "name": "奇跡の鍛冶ハンマー",
     "category": "ハンマー",
@@ -564,195 +438,6 @@
     ]
   },
   {
-    "id": "miracle-alchemy-lamp",
-    "name": "奇跡の錬金ランプ",
-    "category": "ランプ",
-    "categoryId": "alchemy-lamp",
-    "items": [
-      {
-        "id": "part-1",
-        "name": "左上",
-        "gridCell": {
-          "row": 1,
-          "column": 1
-        },
-        "current": 0,
-        "successMin": 120,
-        "successMax": 132
-      },
-      {
-        "id": "part-2",
-        "name": "右上",
-        "gridCell": {
-          "row": 1,
-          "column": 2
-        },
-        "current": 0,
-        "successMin": 190,
-        "successMax": 198
-      },
-      {
-        "id": "part-3",
-        "name": "左下",
-        "gridCell": {
-          "row": 2,
-          "column": 1
-        },
-        "current": 0,
-        "successMin": 190,
-        "successMax": 198
-      },
-      {
-        "id": "part-4",
-        "name": "右下",
-        "gridCell": {
-          "row": 2,
-          "column": 2
-        },
-        "current": 0,
-        "successMin": 140,
-        "successMax": 146
-      }
-    ]
-  },
-  {
-    "id": "miracle-alchemy-pot",
-    "name": "奇跡の錬金ツボ",
-    "category": "ツボ",
-    "categoryId": "alchemy-pot",
-    "items": [
-      {
-        "id": "part-1",
-        "name": "左上",
-        "gridCell": {
-          "row": 1,
-          "column": 1
-        },
-        "current": 0,
-        "successMin": 70,
-        "successMax": 80
-      },
-      {
-        "id": "part-2",
-        "name": "右上",
-        "gridCell": {
-          "row": 1,
-          "column": 2
-        },
-        "current": 0,
-        "successMin": 150,
-        "successMax": 158
-      },
-      {
-        "id": "part-3",
-        "name": "左中",
-        "gridCell": {
-          "row": 2,
-          "column": 1
-        },
-        "current": 0,
-        "successMin": 150,
-        "successMax": 158
-      },
-      {
-        "id": "part-4",
-        "name": "右中",
-        "gridCell": {
-          "row": 2,
-          "column": 2
-        },
-        "current": 0,
-        "successMin": 100,
-        "successMax": 106
-      },
-      {
-        "id": "part-5",
-        "name": "左下",
-        "gridCell": {
-          "row": 3,
-          "column": 1
-        },
-        "current": 0,
-        "successMin": 100,
-        "successMax": 106
-      },
-      {
-        "id": "part-6",
-        "name": "右下",
-        "gridCell": {
-          "row": 3,
-          "column": 2
-        },
-        "current": 0,
-        "successMin": 70,
-        "successMax": 80
-      }
-    ]
-  },
-  {
-    "id": "light-smithing-hammer",
-    "name": "光の鍛冶ハンマー",
-    "category": "ハンマー",
-    "categoryId": "smithing-hammer",
-    "items": [
-      {
-        "id": "part-1",
-        "name": "左上",
-        "gridCell": {
-          "row": 1,
-          "column": 1
-        },
-        "current": 0,
-        "successMin": 120,
-        "successMax": 126
-      },
-      {
-        "id": "part-2",
-        "name": "右上",
-        "gridCell": {
-          "row": 1,
-          "column": 2
-        },
-        "current": 0,
-        "successMin": 180,
-        "successMax": 186
-      },
-      {
-        "id": "part-3",
-        "name": "左中",
-        "gridCell": {
-          "row": 2,
-          "column": 1
-        },
-        "current": 0,
-        "successMin": 236,
-        "successMax": 245
-      },
-      {
-        "id": "part-4",
-        "name": "右中",
-        "gridCell": {
-          "row": 2,
-          "column": 2
-        },
-        "current": 0,
-        "successMin": 140,
-        "successMax": 149
-      },
-      {
-        "id": "part-5",
-        "name": "左下",
-        "gridCell": {
-          "row": 3,
-          "column": 1
-        },
-        "current": 0,
-        "successMin": 160,
-        "successMax": 170
-      }
-    ]
-  },
-  {
     "id": "light-woodworking-knife",
     "name": "光の木工刀",
     "category": "木工刀",
@@ -909,132 +594,6 @@
     ]
   },
   {
-    "id": "light-alchemy-lamp",
-    "name": "光の錬金ランプ",
-    "category": "ランプ",
-    "categoryId": "alchemy-lamp",
-    "items": [
-      {
-        "id": "part-1",
-        "name": "左上",
-        "gridCell": {
-          "row": 1,
-          "column": 1
-        },
-        "current": 0,
-        "successMin": 205,
-        "successMax": 213
-      },
-      {
-        "id": "part-2",
-        "name": "右上",
-        "gridCell": {
-          "row": 1,
-          "column": 2
-        },
-        "current": 0,
-        "successMin": 306,
-        "successMax": 318
-      },
-      {
-        "id": "part-3",
-        "name": "左下",
-        "gridCell": {
-          "row": 2,
-          "column": 1
-        },
-        "current": 0,
-        "successMin": 205,
-        "successMax": 213
-      },
-      {
-        "id": "part-4",
-        "name": "右下",
-        "gridCell": {
-          "row": 2,
-          "column": 2
-        },
-        "current": 0,
-        "successMin": 120,
-        "successMax": 126
-      }
-    ]
-  },
-  {
-    "id": "light-alchemy-pot",
-    "name": "光の錬金ツボ",
-    "category": "ツボ",
-    "categoryId": "alchemy-pot",
-    "items": [
-      {
-        "id": "part-1",
-        "name": "左上",
-        "gridCell": {
-          "row": 1,
-          "column": 1
-        },
-        "current": 0,
-        "successMin": 100,
-        "successMax": 110
-      },
-      {
-        "id": "part-2",
-        "name": "右上",
-        "gridCell": {
-          "row": 1,
-          "column": 2
-        },
-        "current": 0,
-        "successMin": 140,
-        "successMax": 146
-      },
-      {
-        "id": "part-3",
-        "name": "左中",
-        "gridCell": {
-          "row": 2,
-          "column": 1
-        },
-        "current": 0,
-        "successMin": 140,
-        "successMax": 146
-      },
-      {
-        "id": "part-4",
-        "name": "右中",
-        "gridCell": {
-          "row": 2,
-          "column": 2
-        },
-        "current": 0,
-        "successMin": 196,
-        "successMax": 204
-      },
-      {
-        "id": "part-5",
-        "name": "左下",
-        "gridCell": {
-          "row": 3,
-          "column": 1
-        },
-        "current": 0,
-        "successMin": 160,
-        "successMax": 168
-      },
-      {
-        "id": "part-6",
-        "name": "右下",
-        "gridCell": {
-          "row": 3,
-          "column": 2
-        },
-        "current": 0,
-        "successMin": 100,
-        "successMax": 110
-      }
-    ]
-  },
-  {
     "id": "tool-vertical-3",
     "name": "道具 3マステンプレート",
     "archived": true,
@@ -1127,5 +686,731 @@
         "successMax": 86
       }
     ]
+  },
+  {
+    "id": "user-tool-smithing-1783340235618",
+    "name": "マデュライトルアー",
+    "category": "ルアー",
+    "categoryId": "lure",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "1行1列",
+        "current": 0,
+        "target": 151,
+        "successMin": 148,
+        "successMax": 154,
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-2",
+        "name": "1行2列",
+        "current": 0,
+        "target": 225,
+        "successMin": 220,
+        "successMax": 230,
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-3",
+        "name": "2行1列",
+        "current": 0,
+        "target": 220,
+        "successMin": 220,
+        "successMax": 220,
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-4",
+        "name": "2行2列",
+        "current": 0,
+        "target": 78,
+        "successMin": 70,
+        "successMax": 86,
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        }
+      }
+    ],
+    "traitId": "double-half"
+  },
+  {
+    "id": "user-tool-smithing-1783340490734",
+    "name": "超ようせいのひだね",
+    "category": "素材",
+    "categoryId": "material",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "1行1列",
+        "current": 0,
+        "target": 185,
+        "successMin": 180,
+        "successMax": 190,
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-2",
+        "name": "1行2列",
+        "current": 0,
+        "target": 254,
+        "successMin": 250,
+        "successMax": 258,
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-3",
+        "name": "2行1列",
+        "current": 0,
+        "target": 213,
+        "successMin": 210,
+        "successMax": 216,
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-4",
+        "name": "2行2列",
+        "current": 0,
+        "target": 254,
+        "successMin": 250,
+        "successMax": 258,
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-5",
+        "name": "3行1列",
+        "current": 0,
+        "target": 213,
+        "successMin": 210,
+        "successMax": 216,
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-6",
+        "name": "3行2列",
+        "current": 0,
+        "target": 150,
+        "successMin": 145,
+        "successMax": 155,
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        }
+      }
+    ],
+    "traitId": "light"
+  },
+  {
+    "id": "user-tool-smithing-1783340540763",
+    "name": "超あまつゆのいと",
+    "category": "素材",
+    "categoryId": "material",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "1行1列",
+        "current": 0,
+        "target": 185,
+        "successMin": 180,
+        "successMax": 190,
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-2",
+        "name": "1行2列",
+        "current": 0,
+        "target": 248,
+        "successMin": 245,
+        "successMax": 251,
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-3",
+        "name": "2行1列",
+        "current": 0,
+        "target": 153,
+        "successMin": 150,
+        "successMax": 156,
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-4",
+        "name": "2行2列",
+        "current": 0,
+        "target": 185,
+        "successMin": 180,
+        "successMax": 190,
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-5",
+        "name": "3行1列",
+        "current": 0,
+        "target": 185,
+        "successMin": 180,
+        "successMax": 190,
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-6",
+        "name": "3行2列",
+        "current": 0,
+        "target": 248,
+        "successMin": 245,
+        "successMax": 251,
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        }
+      }
+    ],
+    "traitId": "double-half"
+  },
+  {
+    "id": "user-tool-smithing-1783340641826",
+    "name": "超かがやきの樹液",
+    "category": "素材",
+    "categoryId": "material",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "1行1列",
+        "current": 0,
+        "target": 160,
+        "successMin": 155,
+        "successMax": 164,
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-2",
+        "name": "1行2列",
+        "current": 0,
+        "target": 225,
+        "successMin": 220,
+        "successMax": 230,
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-3",
+        "name": "2行1列",
+        "current": 0,
+        "target": 158,
+        "successMin": 155,
+        "successMax": 161,
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-4",
+        "name": "2行2列",
+        "current": 0,
+        "target": 225,
+        "successMin": 220,
+        "successMax": 230,
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-5",
+        "name": "3行1列",
+        "current": 0,
+        "target": 145,
+        "successMin": 140,
+        "successMax": 150,
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-6",
+        "name": "3行2列",
+        "current": 0,
+        "target": 145,
+        "successMin": 140,
+        "successMax": 150,
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        }
+      }
+    ],
+    "traitId": "focus-change"
+  },
+  {
+    "id": "user-tool-smithing-1783341110554",
+    "name": "あくまのツボ",
+    "category": "ツボ",
+    "categoryId": "alchemy-pot",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "1行1列",
+        "current": 0,
+        "target": 195,
+        "successMin": 190,
+        "successMax": 200,
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-2",
+        "name": "1行2列",
+        "current": 0,
+        "target": 133,
+        "successMin": 130,
+        "successMax": 136,
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-3",
+        "name": "2行1列",
+        "current": 0,
+        "target": 133,
+        "successMin": 130,
+        "successMax": 136,
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-4",
+        "name": "2行2列",
+        "current": 0,
+        "target": 195,
+        "successMin": 190,
+        "successMax": 200,
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-5",
+        "name": "3行1列",
+        "current": 0,
+        "target": 134,
+        "successMin": 130,
+        "successMax": 138,
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-6",
+        "name": "3行2列",
+        "current": 0,
+        "target": 134,
+        "successMin": 130,
+        "successMax": 138,
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        }
+      }
+    ],
+    "traitId": "double-half"
+  },
+  {
+    "id": "user-tool-smithing-1783340750206",
+    "name": "まおうのランプ",
+    "category": "ランプ",
+    "categoryId": "alchemy-lamp",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "1行1列",
+        "current": 0,
+        "target": 204,
+        "successMin": 200,
+        "successMax": 208,
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-2",
+        "name": "1行2列",
+        "current": 0,
+        "target": 253,
+        "successMin": 250,
+        "successMax": 256,
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-3",
+        "name": "2行1列",
+        "current": 0,
+        "target": 253,
+        "successMin": 250,
+        "successMax": 256,
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-4",
+        "name": "2行2列",
+        "current": 0,
+        "target": 204,
+        "successMin": 200,
+        "successMax": 208,
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        }
+      }
+    ],
+    "traitId": "focus-change"
+  },
+  {
+    "id": "light-alchemy-lamp",
+    "name": "光の錬金ランプ",
+    "category": "ランプ",
+    "categoryId": "alchemy-lamp",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "1行1列",
+        "current": 0,
+        "target": 209,
+        "successMin": 205,
+        "successMax": 213,
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-2",
+        "name": "1行2列",
+        "current": 0,
+        "target": 312,
+        "successMin": 306,
+        "successMax": 318,
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-3",
+        "name": "2行1列",
+        "current": 0,
+        "target": 209,
+        "successMin": 205,
+        "successMax": 213,
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-4",
+        "name": "2行2列",
+        "current": 0,
+        "target": 123,
+        "successMin": 120,
+        "successMax": 126,
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        }
+      }
+    ],
+    "traitId": "light"
+  },
+  {
+    "id": "user-tool-smithing-1783340296938",
+    "name": "虹色のオーブ",
+    "category": "素材",
+    "categoryId": "material",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "1行1列",
+        "current": 0,
+        "target": 91,
+        "successMin": 86,
+        "successMax": 95,
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-2",
+        "name": "1行2列",
+        "current": 0,
+        "target": 144,
+        "successMin": 140,
+        "successMax": 148,
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-3",
+        "name": "2行1列",
+        "current": 0,
+        "target": 118,
+        "successMin": 115,
+        "successMax": 121,
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-4",
+        "name": "2行2列",
+        "current": 0,
+        "target": 144,
+        "successMin": 140,
+        "successMax": 148,
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-5",
+        "name": "3行1列",
+        "current": 0,
+        "target": 118,
+        "successMin": 115,
+        "successMax": 121,
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-6",
+        "name": "3行2列",
+        "current": 0,
+        "target": 90,
+        "successMin": 85,
+        "successMax": 95,
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        }
+      }
+    ],
+    "traitId": "none"
+  },
+  {
+    "id": "light-smithing-hammer",
+    "name": "光の鍛冶ハンマー",
+    "category": "ハンマー",
+    "categoryId": "smithing-hammer",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "1行1列",
+        "current": 0,
+        "target": 123,
+        "successMin": 120,
+        "successMax": 126,
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-2",
+        "name": "1行2列",
+        "current": 0,
+        "target": 183,
+        "successMin": 180,
+        "successMax": 186,
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-3",
+        "name": "2行1列",
+        "current": 0,
+        "target": 241,
+        "successMin": 236,
+        "successMax": 245,
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-4",
+        "name": "2行2列",
+        "current": 0,
+        "target": 145,
+        "successMin": 140,
+        "successMax": 149,
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-5",
+        "name": "3行1列",
+        "current": 0,
+        "target": 165,
+        "successMin": 160,
+        "successMax": 170,
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        }
+      }
+    ],
+    "traitId": "light"
+  },
+  {
+    "id": "light-alchemy-pot",
+    "name": "光の錬金ツボ",
+    "category": "ツボ",
+    "categoryId": "alchemy-pot",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "1行1列",
+        "current": 0,
+        "target": 105,
+        "successMin": 100,
+        "successMax": 110,
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-2",
+        "name": "1行2列",
+        "current": 0,
+        "target": 143,
+        "successMin": 140,
+        "successMax": 146,
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-3",
+        "name": "2行1列",
+        "current": 0,
+        "target": 143,
+        "successMin": 140,
+        "successMax": 146,
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-4",
+        "name": "2行2列",
+        "current": 0,
+        "target": 200,
+        "successMin": 196,
+        "successMax": 204,
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-5",
+        "name": "3行1列",
+        "current": 0,
+        "target": 164,
+        "successMin": 160,
+        "successMax": 168,
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-6",
+        "name": "3行2列",
+        "current": 0,
+        "target": 105,
+        "successMin": 100,
+        "successMax": 110,
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        }
+      }
+    ],
+    "traitId": "light"
   }
 ]
