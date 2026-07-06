@@ -5,43 +5,7 @@ const recipeArchive = require("../app/recipe-archive.js");
 const cookingRecipes = require("../api/data/crafts/cooking/recipes.json");
 const toolSmithingRecipes = require("../api/data/crafts/tool-smithing/recipes.json");
 
-const visibleCookingRecipeNames = [
-  "きようさにくまん",
-  "パワフルステーキ",
-  "あいじょうオムレツ",
-  "バトルステーキ",
-  "バトルパッツァ",
-  "スマッシュポテト",
-  "バランスパスタ",
-  "クイックケーキ",
-  "ファイアタルト",
-  "アイスタルト",
-  "ライトタルト",
-  "ダークタルト",
-  "ストームタルト",
-  "ヒールカルボナーラ",
-];
-
-const visibleToolSmithingRecipeNames = [
-  "超鍛冶ハンマー",
-  "超木工刀",
-  "超さいほう針",
-  "超フライパン",
-  "超錬金ランプ",
-  "超錬金ツボ",
-  "奇跡の鍛冶ハンマー",
-  "奇跡の木工刀",
-  "奇跡のさいほう針",
-  "奇跡のフライパン",
-  "奇跡の錬金ランプ",
-  "奇跡の錬金ツボ",
-  "光の鍛冶ハンマー",
-  "光の木工刀",
-  "光のさいほう針",
-  "光のフライパン",
-  "光の錬金ランプ",
-  "光の錬金ツボ",
-];
+const japaneseCollator = new Intl.Collator("ja-JP", { numeric: true, sensitivity: "base" });
 
 function loadFallbackCookingRecipes() {
   const context = {
@@ -85,6 +49,38 @@ function getRecipeByName(recipes, name) {
 
 function getItemById(recipe, id) {
   return recipe.items.find((item) => item.id === id);
+}
+
+function compareRecipeOrder(left, right) {
+  const leftCategory = left.category || left.categoryId || "";
+  const rightCategory = right.category || right.categoryId || "";
+  if (leftCategory && !rightCategory) {
+    return -1;
+  }
+  if (!leftCategory && rightCategory) {
+    return 1;
+  }
+
+  const categoryOrder = japaneseCollator.compare(leftCategory, rightCategory);
+  if (categoryOrder !== 0) {
+    return categoryOrder;
+  }
+
+  return japaneseCollator.compare(left.name || "", right.name || "");
+}
+
+function assertSortedByCategoryThenName(recipes) {
+  const expected = recipes
+    .filter((recipe) => recipe.archived !== true)
+    .slice()
+    .sort(compareRecipeOrder)
+    .map((recipe) => recipe.name);
+
+  assert.deepEqual(
+    recipeArchive.getVisibleRecipes(recipes).map((recipe) => recipe.name),
+    expected,
+    "レシピはカテゴリごとに分類し、同じカテゴリ内は五十音順にしてください",
+  );
 }
 
 function assertBattlePazzaRecipe(recipe) {
@@ -162,6 +158,24 @@ function assertToolSmithingRecipe(recipe, expected) {
 }
 
 {
+  const recipes = [
+    { id: "hidden", name: "あ", category: "肉料理", categoryId: "meat", archived: true },
+    { id: "sweets-2", name: "クイックケーキ", category: "スイーツ", categoryId: "sweets" },
+    { id: "meat-2", name: "きようさにくまん", category: "肉料理", categoryId: "meat" },
+    { id: "fish-1", name: "バトルパッツァ", category: "魚料理", categoryId: "fish" },
+    { id: "meat-1", name: "あいじょうオムレツ", category: "肉料理", categoryId: "meat" },
+    { id: "sweets-1", name: "アイスタルト", category: "スイーツ", categoryId: "sweets" },
+    { id: "uncategorized", name: "未分類", category: "", categoryId: "" },
+  ];
+
+  assert.deepEqual(
+    recipeArchive.getVisibleRecipes(recipes).map((recipe) => recipe.id),
+    ["sweets-1", "sweets-2", "fish-1", "meat-1", "meat-2", "uncategorized"],
+    "レシピはカテゴリごとに分類し、同じカテゴリ内は五十音順にしてください",
+  );
+}
+
+{
   assert.equal(
     recipeArchive.shouldShowCustomRecipeOption({ id: "cooking", allowCustomRecipes: false }),
     false,
@@ -173,17 +187,11 @@ function assertToolSmithingRecipe(recipe, expected) {
 }
 
 {
-  assert.deepEqual(
-    recipeArchive.getVisibleRecipes(cookingRecipes).map((recipe) => recipe.name),
-    visibleCookingRecipeNames,
-  );
+  assertSortedByCategoryThenName(cookingRecipes);
 }
 
 {
-  assert.deepEqual(
-    Array.from(recipeArchive.getVisibleRecipes(loadFallbackCookingRecipes()), (recipe) => recipe.name),
-    visibleCookingRecipeNames,
-  );
+  assertSortedByCategoryThenName(loadFallbackCookingRecipes());
 }
 
 {
@@ -192,14 +200,8 @@ function assertToolSmithingRecipe(recipe, expected) {
 }
 
 {
-  assert.deepEqual(
-    recipeArchive.getVisibleRecipes(toolSmithingRecipes).map((recipe) => recipe.name),
-    visibleToolSmithingRecipeNames,
-  );
-  assert.deepEqual(
-    Array.from(recipeArchive.getVisibleRecipes(loadFallbackToolSmithingRecipes()), (recipe) => recipe.name),
-    visibleToolSmithingRecipeNames,
-  );
+  assertSortedByCategoryThenName(toolSmithingRecipes);
+  assertSortedByCategoryThenName(loadFallbackToolSmithingRecipes());
 }
 
 {
