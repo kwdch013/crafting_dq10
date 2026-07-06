@@ -479,36 +479,6 @@
     ]
   },
   {
-    "id": "light-sewing-needle",
-    "name": "光のさいほう針",
-    "category": "針",
-    "categoryId": "sewing-needle",
-    "items": [
-      {
-        "id": "part-1",
-        "name": "上",
-        "gridCell": {
-          "row": 1,
-          "column": 1
-        },
-        "current": 0,
-        "successMin": 460,
-        "successMax": 474
-      },
-      {
-        "id": "part-2",
-        "name": "下",
-        "gridCell": {
-          "row": 2,
-          "column": 1
-        },
-        "current": 0,
-        "successMin": 376,
-        "successMax": 382
-      }
-    ]
-  },
-  {
     "id": "light-frying-pan",
     "name": "光のフライパン",
     "category": "フライパン",
@@ -1400,5 +1370,38 @@
       }
     ],
     "traitId": "light"
+  },
+  {
+    "id": "light-sewing-needle",
+    "name": "光のさいほう針",
+    "category": "針",
+    "categoryId": "sewing-needle",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "1行1列",
+        "current": 0,
+        "target": 467,
+        "successMin": 460,
+        "successMax": 474,
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-3",
+        "name": "2行1列",
+        "current": 0,
+        "target": 379,
+        "successMin": 376,
+        "successMax": 382,
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        }
+      }
+    ],
+    "traitId": "double-half"
   }
 ]
