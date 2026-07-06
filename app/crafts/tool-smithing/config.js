@@ -57,7 +57,7 @@ registerDQ10Craft(createDQ10SmithingCraftConfig({
     { id: "alchemy-lamp", label: "ランプ", templateItems: createToolSmithingTemplateItems(2, 2) },
     { id: "lure", label: "ルアー", templateItems: createToolSmithingTemplateItems(2, 2) },
     { id: "woodworking-knife", label: "木工刀", templateItems: createToolSmithingTemplateItems(3, 1) },
-    { id: "material", label: "素材", templateItems: createToolSmithingTemplateItems(2, 2) },
+    { id: "material", label: "素材", templateItems: createToolSmithingTemplateItems(3, 2) },
     { id: "sewing-needle", label: "針", templateItems: createToolSmithingTemplateItems(2, 1) },
   ],
   techniques: [

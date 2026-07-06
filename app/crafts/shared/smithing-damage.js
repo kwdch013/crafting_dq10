@@ -43,13 +43,13 @@
   };
 
   const powers = {
+    power_0_5: { label: "0.5倍", multiplier: 0.5 },
+    power_0_8: { label: "0.8倍", multiplier: 0.8 },
     normal: { label: "通常", multiplier: 1 },
     power_1_2: { label: "1.2倍", multiplier: 1.2 },
     power_2_0: { label: "2倍", multiplier: 2 },
     power_2_5: { label: "2.5倍", multiplier: 2.5 },
     power_3_0: { label: "3倍", multiplier: 3 },
-    power_0_5: { label: "0.5倍", multiplier: 0.5 },
-    power_0_8: { label: "0.8倍", multiplier: 0.8 },
   };
 
   const temperatures = Object.keys(ranges).map(Number).sort((a, b) => b - a);

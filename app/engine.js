@@ -56,6 +56,19 @@
       ingredient.optionId === "cross";
   }
 
+  function isSmithingCraftState(state = {}) {
+    return ["weapon-smithing", "armor-smithing", "tool-smithing"].includes(state.craftType);
+  }
+
+  function isSmithingLightActive(state = {}, ingredient = {}) {
+    const heat = toNumber(state.heat, NaN);
+    return isSmithingCraftState(state) &&
+      state.traitId === "light" &&
+      ingredient.isGlowing === true &&
+      Number.isFinite(heat) &&
+      heat % 200 === 0;
+  }
+
   function resolveCookingDamageSource(state = {}, ingredient = {}, conditionId = "normal") {
     const cookingDamage = global.DQ10CookingDamage;
 
@@ -241,13 +254,16 @@
       }
 
       const criticalMultiplier = toNumber(technique.criticalMultiplier, smithingDamage.criticalMultiplier);
+      const smithingLightMultiplier = isSmithingLightActive(state, ingredient) ? 2 : 1;
+      const normalMin = Math.ceil(range[0] * smithingLightMultiplier);
+      const normalMax = Math.ceil(range[1] * smithingLightMultiplier);
 
       return {
         ...technique,
-        normalMin: range[0],
-        normalMax: range[1],
-        criticalMin: Math.ceil(range[0] * criticalMultiplier),
-        criticalMax: Math.ceil(range[1] * criticalMultiplier),
+        normalMin,
+        normalMax,
+        criticalMin: Math.ceil(normalMin * criticalMultiplier),
+        criticalMax: Math.ceil(normalMax * criticalMultiplier),
       };
     }
 
@@ -531,11 +547,23 @@
   }
 
   function analyzeIngredientAcrossTechniques(state, ingredient) {
-    const analysisTechniques = state.techniques.filter((technique) => technique.includeInAnalysis !== false);
+    const normalizedIngredient = isSmithingCraftState(state)
+      ? { ...ingredient, locked: false, lockJudgement: "", lockJudgementLabel: "" }
+      : ingredient;
+    const analysisTechniques = isSmithingCraftState(state)
+      ? [{
+        id: "board-double",
+        name: "BOARD判定(2倍)",
+        damageModel: "smithing-temperature",
+        powerId: "power_2_0",
+        criticalMultiplier: global.DQ10SmithingDamage?.criticalMultiplier || 2,
+        includeInAnalysis: true,
+      }]
+      : state.techniques.filter((technique) => technique.includeInAnalysis !== false);
     const techniqueAnalyses = analysisTechniques.map((technique) => {
-      const resolvedTechnique = resolveTechnique(state, technique, ingredient);
+      const resolvedTechnique = resolveTechnique(state, technique, normalizedIngredient);
       return {
-        ...analyzeIngredient(ingredient, resolvedTechnique, state.targetMode),
+        ...analyzeIngredient(normalizedIngredient, resolvedTechnique, state.targetMode),
         technique: resolvedTechnique,
       };
     });
