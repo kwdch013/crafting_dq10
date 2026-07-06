@@ -79,6 +79,17 @@ assert.equal(context.DQ10CraftConfigs["tool-smithing"].recipeSubcategoryLabel, "
 		],
 		"ツボは参照画像に合わせて縦3×横2の6マスにしてください",
 	);
+	assert.deepEqual(
+		JSON.parse(JSON.stringify(categories["smithing-hammer"].templateItems.map((item) => item.gridCell))),
+		[
+			{ row: 1, column: 1 },
+			{ row: 2, column: 1 },
+			{ row: 3, column: 1 },
+			{ row: 1, column: 2 },
+			{ row: 2, column: 2 },
+		],
+		"ハンマーは左縦3マス、右縦2マスの5マスにしてください",
+	);
 	assert.equal(categories["frying-pan"].templateItems.length, 8);
 	assert.equal(categories["woodworking-knife"].templateItems.length, 3);
 	assert.equal(categories["sewing-needle"].templateItems.length, 2);
