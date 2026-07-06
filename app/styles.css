@@ -745,6 +745,11 @@ select:focus {
   grid-template-rows: auto minmax(0, 1fr) 24px auto;
 }
 
+/* 鍛冶の光地金バッジ表示でBOARDノードの高さが変わらないよう、ヘッダー側の領域も固定します。 */
+.craft-board.smithing-board .board-cell-badges {
+  min-height: 20px;
+}
+
 .board-actions {
   display: flex;
   flex-wrap: wrap;
@@ -948,6 +953,7 @@ select:focus {
 
 .board-light-toggle {
   justify-self: stretch;
+  height: 24px;
   min-height: 24px;
   border: 1px solid #f59e0b;
   border-radius: 6px;

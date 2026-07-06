@@ -21,3 +21,9 @@ assert.match(
 	/\.craft-board\.smithing-board \.board-cell:not\(\.empty\)\s*{[\s\S]*?grid-template-rows:\s*auto minmax\(0, 1fr\) 24px auto;/,
 	"鍛冶セルは光スロット行を固定して、光地金の有効化でノード高さが変わらないようにしてください",
 );
+
+assert.match(
+	styleSource,
+	/\.craft-board\.smithing-board \.board-cell-badges\s*{[\s\S]*?min-height:\s*20px;/,
+	"鍛冶セルは光バッジ表示でヘッダー高さが変わらないよう、バッジ領域を確保してください",
+);
