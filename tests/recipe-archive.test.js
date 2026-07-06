@@ -107,7 +107,7 @@ function assertBattlePazzaRecipe(recipe) {
     assert.equal(item.target, 155);
     assert.equal(item.successMin, 140);
     assert.equal(item.successMax, 170);
-    assert.equal(item.ingredientGroupLabel, "魚の切り身");
+    assert.equal(item.ingredientGroupLabel, "魚");
     assert.equal(item.ingredientSize, 2);
   }
 

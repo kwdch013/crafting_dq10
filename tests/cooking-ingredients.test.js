@@ -4,9 +4,11 @@ const cookingIngredients = require("../app/cooking-ingredients.js");
 {
   assert.equal(cookingIngredients.normalizeCookingIngredientKind("肉"), "meat");
   assert.equal(cookingIngredients.normalizeCookingIngredientKind("魚の切り身"), "fish");
+  assert.equal(cookingIngredients.normalizeCookingIngredientKind("魚"), "fish");
   assert.equal(cookingIngredients.normalizeCookingIngredientKind("野菜"), "vegetable");
   assert.equal(cookingIngredients.normalizeCookingIngredientKind("麺"), "noodle");
   assert.equal(cookingIngredients.normalizeCookingIngredientKind("卵"), "egg");
+  assert.equal(cookingIngredients.normalizeCookingIngredientKind("小麦"), "wheat");
 }
 
 {
@@ -17,6 +19,17 @@ const cookingIngredients = require("../app/cooking-ingredients.js");
   assert.equal(visual.id, "egg");
   assert.equal(visual.label, "卵");
   assert.equal(visual.src, "./assets/cooking/ingredient-egg.png");
+  assert.equal(visual.isInferred, false);
+}
+
+{
+  const visual = cookingIngredients.getCookingIngredientVisual({
+    ingredientGroupLabel: "小麦",
+  });
+
+  assert.equal(visual.id, "wheat");
+  assert.equal(visual.label, "小麦");
+  assert.equal(visual.src, "./assets/cooking/ingredient-wheat.png");
   assert.equal(visual.isInferred, false);
 }
 

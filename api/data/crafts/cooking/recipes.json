@@ -462,7 +462,7 @@
         "successMin": 140,
         "successMax": 170,
         "ingredientGroupId": "battle-pazza-fish-top",
-        "ingredientGroupLabel": "魚の切り身",
+        "ingredientGroupLabel": "魚",
         "ingredientSize": 2
       },
       {
@@ -478,7 +478,7 @@
         "successMin": 140,
         "successMax": 170,
         "ingredientGroupId": "battle-pazza-fish-left",
-        "ingredientGroupLabel": "魚の切り身",
+        "ingredientGroupLabel": "魚",
         "ingredientSize": 2
       },
       {
@@ -494,7 +494,7 @@
         "successMin": 140,
         "successMax": 170,
         "ingredientGroupId": "battle-pazza-fish-top",
-        "ingredientGroupLabel": "魚の切り身",
+        "ingredientGroupLabel": "魚",
         "ingredientSize": 2
       },
       {
@@ -524,7 +524,7 @@
         "successMin": 140,
         "successMax": 170,
         "ingredientGroupId": "battle-pazza-fish-left",
-        "ingredientGroupLabel": "魚の切り身",
+        "ingredientGroupLabel": "魚",
         "ingredientSize": 2
       },
       {
