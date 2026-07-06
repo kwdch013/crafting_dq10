@@ -1013,12 +1013,12 @@ select:focus {
 .editor-smithing-judgement-row strong,
 .editor-smithing-judgement-row span,
 .editor-smithing-judgement-row small {
+  color: inherit;
   font-size: 12px;
 }
 
 .editor-smithing-judgement-row small {
   grid-column: 2;
-  color: var(--muted);
   font-weight: 800;
 }
 

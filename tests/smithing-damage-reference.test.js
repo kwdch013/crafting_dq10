@@ -28,6 +28,8 @@ assert.match(mainJs, /function renderSmithingTechniqueReference\(\)/);
 assert.match(mainJs, /function renderSmithingCellJudgements\(editor\)/, "鍛冶セル右クリック編集に倍率別判定を表示してください");
 assert.match(mainJs, /function isSmithingLightHeatActive\(\)/, "光地金は温度が200の倍数の時だけ有効にしてください");
 assert.match(mainJs, /editor-smithing-judgements/, "右クリック編集に鍛冶倍率判定欄を追加してください");
+assert.match(mainJs, /lockedField\.hidden = !hasIngredient \|\| isCurrentCraftFamily\("smithing"\)/, "鍛冶職人の右クリック編集では固定欄を非表示にしてください");
+assert.match(mainJs, /row\.classList\.add\(`status-\$\{analysis\.status\}`\)/, "鍛冶倍率判定行は判定ステータスと同じ色にしてください");
 assert.match(mainJs, /isSmithingLightHeatActive\(\)[\s\S]*editor\.querySelector\("\.editor-glowing"\)\.checked/, "光地金の光状態は有効温度でのみ保存してください");
 assert.match(mainJs, /hydrateSmithingTechniquesFromJson\(\)/);
 assert.match(mainJs, /function adjustSmithingHeat\(delta\)/);
