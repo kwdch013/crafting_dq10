@@ -1071,7 +1071,8 @@ function renderLayoutBoard() {
   const selectedGroupId = getIngredientGroupId(selectedIngredient);
 
   elements.layoutBoard.replaceChildren();
-  elements.layoutBoard.classList.remove("square-board");
+  elements.layoutBoard.classList.remove("square-board", "smithing-board");
+  elements.layoutBoard.classList.toggle("smithing-board", component.craftFamily === "smithing");
   elements.layoutBoard.classList.toggle(
     "special-active-board",
     isCurrentCraftFamily("cooking") && state.specialChargeState === "active",
@@ -1171,7 +1172,9 @@ function renderLayoutBoard() {
           <span class="numeric">${item.current}</span>
           <small class="numeric">${escapeHtml(formatBoardTargetSummary(item, state.targetMode))}</small>
         </div>
-        ${formatCookingLightToggle(item, special)}
+        <div class="board-light-slot">
+          ${formatCookingLightToggle(item, special)}
+        </div>
         <span class="status status-${item.status}">${escapeHtml(item.statusLabel)}</span>
       `;
       const lightToggle = cell.querySelector(".board-light-toggle");
