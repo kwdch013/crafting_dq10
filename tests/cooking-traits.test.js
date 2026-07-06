@@ -2,6 +2,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const vm = require("node:vm");
 
+const mainJs = fs.readFileSync("app/main.js", "utf8");
 let registeredConfig = null;
 
 const context = {
@@ -29,6 +30,16 @@ assert.equal(
   ]),
 );
 assert.equal(registeredConfig.defaultTraitId, "light");
+assert.equal(
+  Array.isArray(registeredConfig.recipeCategoryOptions),
+  false,
+  "調理職人は基本設定の大項目を表示しないでください",
+);
+assert.match(
+  mainJs,
+  /getCraftComponent\(config\.id\)\.craftFamily === "cooking"[\s\S]*recipeTraitDescription\.textContent = ""/,
+  "調理職人の特性説明は基本設定ではなく調理メモ側に表示してください",
+);
 assert.equal(
   JSON.stringify(registeredConfig.techniques.map((technique) => [
     technique.id,

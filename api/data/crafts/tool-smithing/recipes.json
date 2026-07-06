@@ -707,18 +707,6 @@
       },
       {
         "id": "item-2",
-        "name": "1行2列",
-        "current": 0,
-        "target": 225,
-        "successMin": 220,
-        "successMax": 230,
-        "gridCell": {
-          "row": 1,
-          "column": 2
-        }
-      },
-      {
-        "id": "item-3",
         "name": "2行1列",
         "current": 0,
         "target": 220,
@@ -730,14 +718,14 @@
         }
       },
       {
-        "id": "item-4",
-        "name": "2行2列",
+        "id": "item-3",
+        "name": "1行2列",
         "current": 0,
-        "target": 78,
-        "successMin": 70,
-        "successMax": 86,
+        "target": 225,
+        "successMin": 220,
+        "successMax": 230,
         "gridCell": {
-          "row": 2,
+          "row": 1,
           "column": 2
         }
       }

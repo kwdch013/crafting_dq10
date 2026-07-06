@@ -390,17 +390,20 @@ function getTraits(config) {
 }
 
 function normalizeTraitId(config, traitId) {
-  const traits = getTraits(config);
-  const fallback = config.defaultTraitId || traits[0]?.id || "";
-  const aliases = {
-    glow: "light",
-    "glow-return": "light-return",
-    "light-recovery": "light-return",
-    none: fallback,
-    return: "recovery",
-  };
-  const normalized = aliases[traitId] || traitId;
-  return traits.some((trait) => trait.id === normalized) ? normalized : fallback;
+	const traits = getTraits(config);
+	const fallback = config.defaultTraitId || traits[0]?.id || "";
+	const isCookingConfig = getCraftComponent(config.id).craftFamily === "cooking";
+	const aliases = {
+		glow: "light",
+		...(isCookingConfig ? {
+			"glow-return": "light-return",
+			"light-recovery": "light-return",
+			return: "recovery",
+		} : {}),
+		none: fallback,
+	};
+	const normalized = aliases[traitId] || traitId;
+	return traits.some((trait) => trait.id === normalized) ? normalized : fallback;
 }
 
 function getTrait(config, traitId) {
@@ -763,6 +766,11 @@ function renderTraitOptions() {
 
 function renderTraitDescription() {
   const config = getCurrentCraftConfig();
+  if (getCraftComponent(config.id).craftFamily === "cooking") {
+    elements.recipeTraitDescription.textContent = "";
+    return;
+  }
+
   const trait = getTrait(config, state.traitId);
   elements.recipeTraitDescription.textContent = trait?.description || "";
 }
