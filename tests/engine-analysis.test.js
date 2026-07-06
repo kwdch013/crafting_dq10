@@ -1,6 +1,19 @@
 const assert = require("node:assert/strict");
 const engine = require("../app/engine.js");
 
+global.DQ10SmithingDamage = {
+	criticalMultiplier: 2,
+	ranges: {
+		1000: {
+			normal: [12, 18],
+			power_2_0: [24, 36],
+		},
+		1200: {
+			power_2_0: [27, 40],
+		},
+	},
+};
+
 {
 	const result = engine.analyzeIngredient(
 		{
@@ -388,4 +401,112 @@ const engine = require("../app/engine.js");
 		"shortage",
 	]);
 	assert.equal(fakeCriticalLabels.length, 1);
+}
+
+{
+	const result = engine.resolveTechnique(
+		{
+			craftType: "weapon-smithing",
+			heat: "1000",
+			traitId: "light",
+		},
+		{
+			id: "double",
+			damageModel: "smithing-temperature",
+			powerId: "power_2_0",
+			criticalMultiplier: 2,
+		},
+		{
+			isGlowing: true,
+		},
+	);
+
+	assert.equal(result.normalMin, 48);
+	assert.equal(result.normalMax, 72);
+	assert.equal(result.criticalMin, 96);
+	assert.equal(result.criticalMax, 144);
+}
+
+{
+	const result = engine.resolveTechnique(
+		{
+			craftType: "weapon-smithing",
+			heat: "1000",
+			traitId: "light",
+		},
+		{
+			id: "double",
+			damageModel: "smithing-temperature",
+			powerId: "power_2_0",
+			criticalMultiplier: 2,
+		},
+		{
+			isGlowing: false,
+		},
+	);
+
+	assert.equal(result.normalMin, 24);
+	assert.equal(result.normalMax, 36);
+	assert.equal(result.criticalMin, 48);
+	assert.equal(result.criticalMax, 72);
+}
+
+{
+	const result = engine.analyzeIngredientAcrossTechniques(
+		{
+			craftType: "weapon-smithing",
+			heat: "1000",
+			traitId: "none",
+			targetMode: "random-in-range",
+			techniques: [
+				{
+					id: "hit",
+					damageModel: "smithing-temperature",
+					powerId: "normal",
+					criticalMultiplier: 2,
+				},
+			],
+		},
+		{
+			current: 62,
+			target: 85,
+			successMin: 80,
+			successMax: 95,
+		},
+	);
+
+	assert.equal(result.technique.id, "board-double");
+	assert.equal(result.normalMin, 24);
+	assert.equal(result.normalMax, 36);
+	assert.equal(result.status, "normal-over-risk");
+}
+
+{
+	const result = engine.analyzeIngredientAcrossTechniques(
+		{
+			craftType: "weapon-smithing",
+			heat: "1000",
+			traitId: "none",
+			targetMode: "random-in-range",
+			techniques: [
+				{
+					id: "hit",
+					damageModel: "smithing-temperature",
+					powerId: "normal",
+					criticalMultiplier: 2,
+				},
+			],
+		},
+		{
+			current: 85,
+			target: 85,
+			successMin: 80,
+			successMax: 95,
+			locked: true,
+		},
+	);
+
+	assert.notEqual(result.status, "locked");
+	assert.equal(result.normalMin, 24);
+	assert.equal(result.normalMax, 36);
 }

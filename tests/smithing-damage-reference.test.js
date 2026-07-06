@@ -26,6 +26,8 @@ assert.match(mainJs, /smithingTechniquePanel: document\.querySelector\("#smithin
 assert.match(mainJs, /function renderSmithingDamageReference\(\)/);
 assert.match(mainJs, /function renderSmithingTechniqueReference\(\)/);
 assert.match(mainJs, /function renderSmithingCellJudgements\(editor\)/, "鍛冶セル右クリック編集に倍率別判定を表示してください");
+assert.match(mainJs, /function getSmithingDamagePowerEntries\(\)/, "鍛冶ダメージ表は倍率順を共通関数で整列してください");
+assert.match(mainJs, /function syncJudgementLegend\(\)/, "固定凡例は職人別に表示制御してください");
 assert.match(mainJs, /function isSmithingLightHeatActive\(\)/, "光地金は温度が200の倍数の時だけ有効にしてください");
 assert.match(mainJs, /editor-smithing-judgements/, "右クリック編集に鍛冶倍率判定欄を追加してください");
 assert.match(mainJs, /lockedField\.hidden = !hasIngredient \|\| isCurrentCraftFamily\("smithing"\)/, "鍛冶職人の右クリック編集では固定欄を非表示にしてください");
@@ -37,9 +39,20 @@ assert.match(mainJs, /smithingDamage\.ranges\?\.\[state\.heat\]/);
 assert.match(mainJs, /会心最小 \$\{range\[0\] \* criticalMultiplier\}/);
 assert.match(mainJs, /renderSmithingTechniqueReference\(\);[\s\S]*renderCraftReference\(\);/);
 assert.match(mainJs, /renderSmithingDamageReference\(\);[\s\S]*renderLayoutBoard\(\);/);
+assert.match(mainJs, /syncJudgementLegend\(\);[\s\S]*renderAnalysis\(\);/);
 assert.match(mainJs, /smithingHeatDownButton\?\.addEventListener\("click", \(\) => adjustSmithingHeat\(-50\)\)/);
 assert.match(mainJs, /smithingHeatUpButton\?\.addEventListener\("click", \(\) => adjustSmithingHeat\(50\)\)/);
 assert.match(smithingDamageJs, /power_1_2: \{ label: "1\.2倍"/, "1.2倍威力は倍率表記にしてください");
+const powersDefinition = smithingDamageJs.slice(smithingDamageJs.indexOf("const powers = {"));
+assert.ok(
+  powersDefinition.indexOf("power_0_5") < powersDefinition.indexOf("power_0_8") &&
+    powersDefinition.indexOf("power_0_8") < powersDefinition.indexOf("normal:") &&
+    powersDefinition.indexOf("normal:") < powersDefinition.indexOf("power_1_2") &&
+    powersDefinition.indexOf("power_1_2") < powersDefinition.indexOf("power_2_0") &&
+    powersDefinition.indexOf("power_2_0") < powersDefinition.indexOf("power_2_5") &&
+    powersDefinition.indexOf("power_2_5") < powersDefinition.indexOf("power_3_0"),
+  "鍛冶ダメージ倍率は低い順に定義してください",
+);
 assert.doesNotMatch(smithingDamageJs, /label: "強め"/, "鍛冶ダメージ表に強め表記を残さないでください");
 assert.match(
   fs.readFileSync("app/crafts/shared/smithing-component.js", "utf8"),

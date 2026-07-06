@@ -427,11 +427,7 @@ https://github.com/kwdch013/crafting_dq10/issues/36
 - 通常時超過、超過中、不足、固定、本会心固定、基準内の分類を維持する。
 - 回帰テストと関連ドキュメントを更新する。
 
-URL:
-
-```text
-https://github.com/kwdch013/crafting_dq10/issues/38
-```
+URL: https://github.com/kwdch013/crafting_dq10/issues/38
 
 ### #40 調理職人: 調理の偽会心表示分類を整理する
 
@@ -447,11 +443,7 @@ https://github.com/kwdch013/crafting_dq10/issues/38
 - 固定後か未固定予測かの原因は内部フラグとして維持する。
 - 回帰テストと関連ドキュメントを更新する。
 
-URL:
-
-```text
-https://github.com/kwdch013/crafting_dq10/issues/40
-```
+URL: https://github.com/kwdch013/crafting_dq10/issues/40
 
 ### #43 調理職人: 調理ダメージを位置と火力の表参照に統一する
 
@@ -469,11 +461,7 @@ https://github.com/kwdch013/crafting_dq10/issues/40
 - 位置と火力は別軸として扱い、位置行にデフォルト火力ラベルを表示しない。
 - 回帰テストと関連ドキュメントを更新する。
 
-URL:
-
-```text
-https://github.com/kwdch013/crafting_dq10/issues/43
-```
+URL: https://github.com/kwdch013/crafting_dq10/issues/43
 
 ### #45 調理職人: 調理の特技データ表示を必殺のみにする
 
@@ -497,3 +485,9 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/53
 
 ### #77 道具鍛冶: ハンマーのレシピ配置を修正する
 ハンマーのカテゴリテンプレートを、左列3マス、右列2マスの5マス配置に修正します。レシピ追加・編集画面では不要な右下セルを表示しません。URL: https://github.com/kwdch013/crafting_dq10/issues/77
+
+### #83 道具鍛冶: 素材テンプレートを左右縦3マスに修正する
+素材のカテゴリテンプレートを、左列3マス、右列3マスの6マス配置に修正します。レシピ追加・編集画面では素材の3段目まで表示します。URL: https://github.com/kwdch013/crafting_dq10/issues/83
+
+### #84 鍛冶職人: 温度別倍率順とBOARD判定を修正する
+温度別ダメージ表を倍率の低い順に表示し、鍛冶BOARD判定を2倍打ち基準に統一します。光地金の有効温度で光マスは威力2倍を反映し、鍛冶では固定判定を表示しません。URL: https://github.com/kwdch013/crafting_dq10/issues/84

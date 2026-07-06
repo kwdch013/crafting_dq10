@@ -148,6 +148,7 @@ function loadState() {
 
 function normalizeState(value) {
   const config = getCraftConfig(value.craftType);
+  const isSmithingConfig = ["weapon-smithing", "armor-smithing", "tool-smithing"].includes(config.id);
   const techniques = config.techniques;
   const recipes = getCraftRecipes(config.id);
   const defaultRecipe = recipes[0];
@@ -178,9 +179,9 @@ function normalizeState(value) {
       optionId: ingredient.optionId || defaultItem?.optionId || config.itemOptions?.[0]?.id || "",
       gridCell: normalizeGridCell(ingredient.gridCell || defaultItem?.gridCell, index, config.layout),
       current: numberOr(ingredient.current, defaultItem?.current ?? 0),
-      locked: ingredient.locked === true,
-      lockJudgement: ingredient.lockJudgement || "",
-      lockJudgementLabel: ingredient.lockJudgementLabel || "",
+      locked: !isSmithingConfig && ingredient.locked === true,
+      lockJudgement: isSmithingConfig ? "" : ingredient.lockJudgement || "",
+      lockJudgementLabel: isSmithingConfig ? "" : ingredient.lockJudgementLabel || "",
       isGlowing: ingredient.isGlowing === true,
       cookingBlockEffect: normalizeCookingBlockEffect(ingredient.cookingBlockEffect || defaultItem?.cookingBlockEffect),
       target: numberOr(ingredient.target, defaultItem?.target ?? Math.round((successMin + successMax) / 2)),
@@ -616,6 +617,7 @@ function render() {
   renderSmithingTechniqueReference();
   renderCraftReference();
   renderLayoutBoard();
+  syncJudgementLegend();
   renderAnalysis();
   syncBoardActionButtons();
   saveState();
@@ -864,12 +866,18 @@ function renderCraftReference() {
   });
 }
 
+// 固定判定は調理固有のため、鍛冶などの職人では凡例から隠します。
+function syncJudgementLegend() {
+  document.querySelectorAll(".cooking-only-judgement").forEach((element) => {
+    element.hidden = !isCurrentCraftFamily("cooking");
+  });
+}
+
 // 鍛冶BOARD下に現在温度の威力別ダメージ表を描画します。
 function renderSmithingDamageReference() {
   const isSmithing = isCurrentCraftFamily("smithing");
   const smithingDamage = window.DQ10SmithingDamage || {};
   const rangeSet = smithingDamage.ranges?.[state.heat];
-  const powers = smithingDamage.powers || {};
   const criticalMultiplier = numberOr(smithingDamage.criticalMultiplier, 2);
   const heatStates = getCurrentCraftConfig().heatStates || [];
   const currentHeat = numberOr(state.heat, 0);
@@ -898,7 +906,7 @@ function renderSmithingDamageReference() {
   }
 
   elements.smithingDamageRanges.replaceChildren();
-  Object.entries(powers).forEach(([powerId, power]) => {
+  getSmithingDamagePowerEntries().forEach(([powerId, power]) => {
     const range = rangeSet?.[powerId];
     const row = document.createElement("div");
     row.className = "smithing-damage-row";
@@ -921,6 +929,14 @@ function renderSmithingDamageReference() {
     }
     elements.smithingDamageRanges.append(row);
   });
+}
+
+// 鍛冶ダメージ倍率を低い順で表示するため、定義値の倍率で整列します。
+function getSmithingDamagePowerEntries() {
+  const powers = window.DQ10SmithingDamage?.powers || {};
+  return Object.entries(powers).sort(([, a], [, b]) =>
+    numberOr(a.multiplier, 0) - numberOr(b.multiplier, 0),
+  );
 }
 
 // 鍛冶BOARD下の温度別ダメージ表に続けて、JSON登録した特技表を描画します。
@@ -1802,11 +1818,17 @@ function renderSmithingCellJudgements(editor) {
   field.hidden = false;
   const smithingDamage = window.DQ10SmithingDamage || {};
   const rangeSet = smithingDamage.ranges?.[state.heat];
-  const powers = smithingDamage.powers || {};
-  const criticalMultiplier = numberOr(smithingDamage.criticalMultiplier, 2);
   const current = numberOr(editor.querySelector(".editor-current").value, ingredient.current);
+  const editorIngredient = {
+    ...ingredient,
+    current,
+    locked: false,
+    isGlowing: state.traitId === "light" &&
+      isSmithingLightHeatActive() &&
+      editor.querySelector(".editor-glowing").checked,
+  };
 
-  Object.entries(powers).forEach(([powerId, power]) => {
+  getSmithingDamagePowerEntries().forEach(([powerId, power]) => {
     const range = rangeSet?.[powerId];
     const row = document.createElement("div");
     row.className = "editor-smithing-judgement-row";
@@ -1821,13 +1843,14 @@ function renderSmithingCellJudgements(editor) {
     }
 
     const analysis = DQ10CraftEngine.analyzeIngredient(
-      { ...ingredient, current, locked: false },
-      {
+      editorIngredient,
+      DQ10CraftEngine.resolveTechnique(state, {
         normalMin: range[0],
         normalMax: range[1],
-        criticalMin: Math.ceil(range[0] * criticalMultiplier),
-        criticalMax: Math.ceil(range[1] * criticalMultiplier),
-      },
+        damageModel: "smithing-temperature",
+        powerId,
+        criticalMultiplier: smithingDamage.criticalMultiplier || 2,
+      }, editorIngredient),
       state.targetMode,
     );
 
