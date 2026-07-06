@@ -741,6 +741,10 @@ select:focus {
   grid-template-rows: auto minmax(42px, 1fr) auto auto auto;
 }
 
+.craft-board.smithing-board .board-cell:not(.empty) {
+  grid-template-rows: auto minmax(0, 1fr) 24px auto;
+}
+
 .board-actions {
   display: flex;
   flex-wrap: wrap;
@@ -936,6 +940,10 @@ select:focus {
 
 .board-cell-values {
   align-self: center;
+}
+
+.board-light-slot {
+  display: grid;
 }
 
 .board-light-toggle {
