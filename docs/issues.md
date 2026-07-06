@@ -494,5 +494,5 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/53
 ### #88 鍛冶職人: 戻り予告と光地金ノード操作を修正する
 戻りは200n+50℃の予告表示のみとし、光地金はBOARDノード上で直接切り替えます。BOARD代表判定は1倍基準へ変更し、本会心！とゲージ突入も表示します。URL: https://github.com/kwdch013/crafting_dq10/issues/88
 
-### #93 鍛冶職人: 右クリック編集の固定するを非表示にする
-鍛冶職人の右クリック編集では固定判定を扱わないため、`固定する` フィールドを確実に非表示にします。URL: https://github.com/kwdch013/crafting_dq10/issues/93
+### #93 鍛冶職人: 右クリック編集の固定するを確定済みにする
+鍛冶職人の右クリック編集では調理向けの固定判定ではなく、成功範囲内のマスを `確定済み` として指定できるようにします。URL: https://github.com/kwdch013/crafting_dq10/issues/93
