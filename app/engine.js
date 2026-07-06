@@ -69,6 +69,92 @@
       heat % 200 === 0;
   }
 
+  function getSmithingHeatPhase(state = {}) {
+    const heat = toNumber(state.heat, NaN);
+    if (!isSmithingCraftState(state) || !Number.isFinite(heat) || heat % 200 !== 0) {
+      return "none";
+    }
+
+    return heat % 400 === 0 ? "high" : "low";
+  }
+
+  function getSmithingPowerMultiplier(state = {}, ingredient = {}) {
+    if (isSmithingLightActive(state, ingredient)) {
+      return 2;
+    }
+
+    if (state.traitId !== "double-half") {
+      return 1;
+    }
+
+    const phase = getSmithingHeatPhase(state);
+    if (phase === "high") {
+      return 2;
+    }
+    if (phase === "low") {
+      return 0.5;
+    }
+
+    return 1;
+  }
+
+  function getSmithingFocusCostMultiplier(state = {}) {
+    if (state.traitId !== "focus-change") {
+      return 1;
+    }
+
+    const phase = getSmithingHeatPhase(state);
+    if (phase === "high") {
+      return 0.5;
+    }
+    if (phase === "low") {
+      return 1.5;
+    }
+
+    return 1;
+  }
+
+  function resolveSmithingReturnTarget(ingredients = []) {
+    const candidates = ingredients.filter((ingredient) => Number.isFinite(toNumber(ingredient?.current, NaN)));
+    const overTargets = candidates
+      .map((ingredient) => ({
+        ingredient,
+        amount: toNumber(ingredient.current) - toNumber(ingredient.successMax),
+      }))
+      .filter((entry) => entry.amount > 0)
+      .sort((a, b) => b.amount - a.amount || toNumber(b.ingredient.current) - toNumber(a.ingredient.current));
+
+    if (overTargets.length > 0) {
+      return overTargets[0].ingredient;
+    }
+
+    return candidates
+      .filter((ingredient) => {
+        const current = toNumber(ingredient.current);
+        return current < toNumber(ingredient.successMin) || current > toNumber(ingredient.successMax);
+      })
+      .sort((a, b) => toNumber(b.current) - toNumber(a.current))[0] || null;
+  }
+
+  function applySmithingReturn(ingredients = [], amount = 10) {
+    const target = resolveSmithingReturnTarget(ingredients);
+    if (!target) {
+      return null;
+    }
+
+    const before = toNumber(target.current);
+    const normalizedAmount = Math.max(0, toNumber(amount, 10));
+    const after = Math.max(0, before - normalizedAmount);
+    target.current = after;
+
+    return {
+      targetId: target.id,
+      before,
+      after,
+      amount: normalizedAmount,
+    };
+  }
+
   function resolveCookingDamageSource(state = {}, ingredient = {}, conditionId = "normal") {
     const cookingDamage = global.DQ10CookingDamage;
 
@@ -254,12 +340,17 @@
       }
 
       const criticalMultiplier = toNumber(technique.criticalMultiplier, smithingDamage.criticalMultiplier);
-      const smithingLightMultiplier = isSmithingLightActive(state, ingredient) ? 2 : 1;
-      const normalMin = Math.ceil(range[0] * smithingLightMultiplier);
-      const normalMax = Math.ceil(range[1] * smithingLightMultiplier);
+      const smithingPowerMultiplier = getSmithingPowerMultiplier(state, ingredient);
+      const focusCostMultiplier = getSmithingFocusCostMultiplier(state);
+      const criticalRateBoost = state.traitId === "focus-change" && getSmithingHeatPhase(state) === "low";
+      const normalMin = Math.ceil(range[0] * smithingPowerMultiplier);
+      const normalMax = Math.ceil(range[1] * smithingPowerMultiplier);
 
       return {
         ...technique,
+        focusCost: Math.ceil(toNumber(technique.focusCost, 0) * focusCostMultiplier),
+        criticalWeight: toNumber(technique.criticalWeight, 1) * (criticalRateBoost ? 1.5 : 1),
+        criticalRateBoost,
         normalMin,
         normalMax,
         criticalMin: Math.ceil(normalMin * criticalMultiplier),
@@ -683,6 +774,8 @@
   global.DQ10CraftEngine = {
     statusLabels,
     resolveTechnique,
+    resolveSmithingReturnTarget,
+    applySmithingReturn,
     resolveIngredientTarget,
     resolveCriticalLockJudgement,
     applyMiracleGrill,

@@ -60,6 +60,16 @@ vm.createContext(context);
 assert.equal(context.DQ10CraftConfigs["weapon-smithing"].techniques[0].name, "たたく");
 assert.equal(context.DQ10CraftConfigs["armor-smithing"].techniques[1].name, "上下打ち");
 assert.equal(context.DQ10CraftConfigs["tool-smithing"].techniques[2].name, "火力上げ");
+assert.deepEqual(
+	JSON.parse(JSON.stringify(context.DQ10CraftConfigs["weapon-smithing"].traits.map((trait) => [trait.id, trait.label]))),
+	[
+		["none", "なし"],
+		["light", "光地金"],
+		["double-half", "倍半"],
+		["return", "戻り"],
+		["focus-change", "集中変化"],
+	],
+);
 
 assert.deepEqual(
 	Array.from(context.DQ10CraftConfigs["tool-smithing"].recipeCategoryOptions, (category) => category.label),

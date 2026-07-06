@@ -1477,8 +1477,7 @@ function adjustSmithingHeat(delta) {
     return;
   }
 
-  state.heat = nextHeat;
-  elements.heatInput.value = state.heat;
+  applySmithingHeatChange(nextHeat);
   renderTechniqueEditor();
   renderSmithingDamageReference();
   renderSmithingTechniqueReference();
@@ -1487,6 +1486,28 @@ function adjustSmithingHeat(delta) {
   renderAnalysis();
   syncBoardActionButtons();
   saveState();
+}
+
+// 鍛冶の温度変更時に、戻り地金など自動発動する特性を反映します。
+function applySmithingHeatChange(nextHeat) {
+  const previousHeat = state.heat;
+  const shouldApplyReturn =
+    isCurrentCraftFamily("smithing") &&
+    state.traitId === "return" &&
+    previousHeat !== nextHeat &&
+    numberOr(nextHeat, 0) % 200 === 0 &&
+    Boolean(DQ10CraftEngine.resolveSmithingReturnTarget(state.ingredients));
+
+  if (shouldApplyReturn) {
+    pushBoardHistory();
+  }
+
+  state.heat = nextHeat;
+  elements.heatInput.value = state.heat;
+
+  if (shouldApplyReturn) {
+    DQ10CraftEngine.applySmithingReturn(state.ingredients);
+  }
 }
 
 function toggleCookingLight(ingredientId) {
@@ -2657,6 +2678,9 @@ elements.recipeTraitInput.addEventListener("change", () => {
     });
   }
   markCustomRecipe();
+  renderTechniqueEditor();
+  renderSmithingDamageReference();
+  renderSmithingTechniqueReference();
   renderLayoutBoard();
   renderTraitDescription();
   renderCraftReference();
@@ -2689,7 +2713,7 @@ elements.levelSelect.addEventListener("change", updateFocusFromSelection);
 elements.toolSelect.addEventListener("change", updateFocusFromSelection);
 elements.toolStarsSelect.addEventListener("change", updateFocusFromSelection);
 elements.heatInput.addEventListener("change", () => {
-  state.heat = elements.heatInput.value;
+  applySmithingHeatChange(elements.heatInput.value);
   renderTechniqueEditor();
   renderSmithingDamageReference();
   renderSmithingTechniqueReference();
