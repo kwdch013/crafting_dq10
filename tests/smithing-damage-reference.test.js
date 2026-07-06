@@ -28,6 +28,8 @@ assert.match(mainJs, /function renderSmithingTechniqueReference\(\)/);
 assert.match(mainJs, /function renderSmithingCellJudgements\(editor\)/, "鍛冶セル右クリック編集に倍率別判定を表示してください");
 assert.match(mainJs, /function getSmithingDamagePowerEntries\(\)/, "鍛冶ダメージ表は倍率順を共通関数で整列してください");
 assert.match(mainJs, /function syncJudgementLegend\(\)/, "固定凡例は職人別に表示制御してください");
+assert.match(mainJs, /function applySmithingHeatChange\(nextHeat\)/, "鍛冶温度変更時に地金特性を自動反映してください");
+assert.match(mainJs, /DQ10CraftEngine\.applySmithingReturn\(state\.ingredients\)/, "戻り地金は対象マスを自動で戻してください");
 assert.match(mainJs, /function isSmithingLightHeatActive\(\)/, "光地金は温度が200の倍数の時だけ有効にしてください");
 assert.match(mainJs, /editor-smithing-judgements/, "右クリック編集に鍛冶倍率判定欄を追加してください");
 assert.match(mainJs, /lockedField\.hidden = !hasIngredient \|\| isCurrentCraftFamily\("smithing"\)/, "鍛冶職人の右クリック編集では固定欄を非表示にしてください");
@@ -58,6 +60,11 @@ assert.match(
   fs.readFileSync("app/crafts/shared/smithing-component.js", "utf8"),
   /label: "光地金"/,
   "鍛冶職人の特性に光地金を追加してください",
+);
+assert.match(
+  fs.readFileSync("app/crafts/shared/smithing-component.js", "utf8"),
+  /label: "倍半"[\s\S]*label: "戻り"[\s\S]*label: "集中変化"/,
+  "鍛冶職人の地金特性を追加してください",
 );
 
 assert.ok(Array.isArray(smithingTechniques.techniques), "鍛冶特技JSONはtechniques配列を持つこと");

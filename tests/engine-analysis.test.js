@@ -11,6 +11,18 @@ global.DQ10SmithingDamage = {
 		1200: {
 			power_2_0: [27, 40],
 		},
+		800: {
+			normal: [12, 18],
+			power_2_0: [24, 36],
+		},
+		650: {
+			normal: [12, 18],
+			power_2_0: [24, 36],
+		},
+		600: {
+			normal: [12, 18],
+			power_2_0: [24, 36],
+		},
 	},
 };
 
@@ -449,6 +461,98 @@ global.DQ10SmithingDamage = {
 	assert.equal(result.normalMax, 36);
 	assert.equal(result.criticalMin, 48);
 	assert.equal(result.criticalMax, 72);
+}
+
+{
+	const baseTechnique = {
+		id: "hit",
+		damageModel: "smithing-temperature",
+		powerId: "normal",
+		focusCost: 8,
+		criticalMultiplier: 2,
+		criticalWeight: 1,
+	};
+	const doubled = engine.resolveTechnique(
+		{ craftType: "weapon-smithing", heat: "800", traitId: "double-half" },
+		baseTechnique,
+		{},
+	);
+	const halved = engine.resolveTechnique(
+		{ craftType: "weapon-smithing", heat: "600", traitId: "double-half" },
+		baseTechnique,
+		{},
+	);
+	const normal = engine.resolveTechnique(
+		{ craftType: "weapon-smithing", heat: "650", traitId: "double-half" },
+		baseTechnique,
+		{},
+	);
+
+	assert.equal(doubled.normalMin, 24);
+	assert.equal(doubled.normalMax, 36);
+	assert.equal(doubled.focusCost, 8);
+	assert.equal(halved.normalMin, 6);
+	assert.equal(halved.normalMax, 9);
+	assert.equal(normal.normalMin, 12);
+	assert.equal(normal.normalMax, 18);
+}
+
+{
+	const baseTechnique = {
+		id: "double",
+		damageModel: "smithing-temperature",
+		powerId: "power_2_0",
+		focusCost: 8,
+		criticalMultiplier: 2,
+		criticalWeight: 1,
+	};
+	const reduced = engine.resolveTechnique(
+		{ craftType: "weapon-smithing", heat: "800", traitId: "focus-change" },
+		baseTechnique,
+		{},
+	);
+	const increased = engine.resolveTechnique(
+		{ craftType: "weapon-smithing", heat: "600", traitId: "focus-change" },
+		baseTechnique,
+		{},
+	);
+
+	assert.equal(reduced.focusCost, 4);
+	assert.equal(reduced.normalMin, 24);
+	assert.equal(reduced.normalMax, 36);
+	assert.equal(reduced.criticalRateBoost, false);
+	assert.equal(increased.focusCost, 12);
+	assert.equal(increased.normalMin, 24);
+	assert.equal(increased.normalMax, 36);
+	assert.equal(increased.criticalRateBoost, true);
+	assert.equal(increased.criticalWeight, 1.5);
+}
+
+{
+	const ingredients = [
+		{ id: "part-1", current: 118, successMin: 80, successMax: 100 },
+		{ id: "part-2", current: 140, successMin: 100, successMax: 120 },
+		{ id: "part-3", current: 90, successMin: 100, successMax: 120 },
+	];
+	const target = engine.resolveSmithingReturnTarget(ingredients);
+
+	assert.equal(target.id, "part-2");
+}
+
+{
+	const ingredients = [
+		{ id: "part-1", current: 50, successMin: 80, successMax: 100 },
+		{ id: "part-2", current: 95, successMin: 100, successMax: 120 },
+		{ id: "part-3", current: 85, successMin: 80, successMax: 100 },
+	];
+	const target = engine.resolveSmithingReturnTarget(ingredients);
+	const result = engine.applySmithingReturn(ingredients);
+
+	assert.equal(target.id, "part-2");
+	assert.equal(result.targetId, "part-2");
+	assert.equal(result.before, 95);
+	assert.equal(result.after, 85);
+	assert.equal(result.amount, 10);
 }
 
 {

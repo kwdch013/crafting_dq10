@@ -31,6 +31,9 @@
       traits: [
         { id: "none", label: "なし", description: "通常の地金として扱います。" },
         { id: "light", label: "光地金", description: "温度が200の倍数の時だけ、選択したマスを光っている状態として扱います。" },
+        { id: "double-half", label: "倍半", description: "400℃の倍数で威力2倍、200℃の倍数かつ400℃の倍数でない時は威力半減として扱います。" },
+        { id: "return", label: "戻り", description: "200℃の倍数になった時、条件に合う1マスを自動で10戻します。" },
+        { id: "focus-change", label: "集中変化", description: "400℃の倍数で消費集中半減、200℃の倍数かつ400℃の倍数でない時は消費集中1.5倍と会心率上昇として扱います。" },
       ],
       focusNote: "Lv76-80はLv75以降を各レベル+2として置いた暫定値です。",
       defaultFocus: 247,
