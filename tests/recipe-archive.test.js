@@ -182,7 +182,8 @@ function assertToolSmithingRecipe(recipe, expected) {
   );
   assert.equal(
     recipeArchive.shouldShowCustomRecipeOption({ id: "weapon-smithing" }),
-    true,
+    false,
+    "全職人でレシピ選択欄に手入力項目を表示しないでください",
   );
 }
 

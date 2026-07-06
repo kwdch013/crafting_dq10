@@ -30,8 +30,9 @@
       : [];
   }
 
+  // レシピ選択欄には全職人で手入力項目を表示しません。
   function shouldShowCustomRecipeOption(config) {
-    return config?.allowCustomRecipes !== false;
+    return false;
   }
 
   const api = {
