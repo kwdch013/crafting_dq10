@@ -37,6 +37,21 @@ vm.createContext(context);
 		true,
 		`${craftId} はBOARDセル右クリック編集を有効にしてください`,
 	);
+	assert.equal(typeof context.DQ10CraftComponents[craftId].renderBoardReference, "function");
+	assert.equal(typeof context.DQ10CraftComponents[craftId].renderTemperatureSelect, "function");
+	assert.equal(typeof context.DQ10CraftComponents[craftId].applyHeatChange, "function");
+	assert.equal(typeof context.DQ10CraftComponents[craftId].getNextHeat, "function");
+	assert.equal(typeof context.DQ10CraftComponents[craftId].getDamagePowerEntries, "function");
+	assert.equal(
+		context.DQ10CraftComponents[craftId].isLightHeatActive?.({ traitId: "light", heat: "1600" }),
+		true,
+		`${craftId} の光地金は200℃単位で有効にしてください`,
+	);
+	assert.equal(
+		context.DQ10CraftComponents[craftId].isLightHeatActive?.({ traitId: "light", heat: "1550" }),
+		false,
+		`${craftId} の光地金は200℃単位以外で無効にしてください`,
+	);
 
 	const lightHammer = config.focus.tools.find((tool) => tool.id === "light-smithing-hammer");
 	assert.equal(lightHammer?.label, "光の鍛冶ハンマー");
@@ -58,9 +73,9 @@ vm.createContext(context);
 	assert.equal(focusByLevel[80], 208);
 });
 
-assert.equal(context.DQ10CraftConfigs["weapon-smithing"].techniques[0].name, "たたく");
-assert.equal(context.DQ10CraftConfigs["armor-smithing"].techniques[1].name, "上下打ち");
-assert.equal(context.DQ10CraftConfigs["tool-smithing"].techniques[2].name, "火力上げ");
+assert.equal(context.DQ10CraftConfigs["weapon-smithing"].techniques[0].name, "半減打ち");
+assert.equal(context.DQ10CraftConfigs["armor-smithing"].techniques[2].name, "上下打ち");
+assert.equal(context.DQ10CraftConfigs["tool-smithing"].techniques[0].name, "火力上げ");
 assert.deepEqual(
 	JSON.parse(JSON.stringify(context.DQ10CraftConfigs["weapon-smithing"].traits.map((trait) => [trait.id, trait.label]))),
 	[
