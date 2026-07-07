@@ -20,9 +20,13 @@ assert.match(
 	"ミラクルグリルの横に必殺状態表示があること",
 );
 assert.match(mainJs, /const specialChargeStates = \["uncharged", "charging", "active"\];/);
+assert.match(mainJs, /const smithingSpecialChargeStates = \["uncharged", "charging", "using", "active"\];/);
 assert.match(mainJs, /charging: "チャージ済み"/);
+assert.match(mainJs, /using: "使用中"/);
 assert.match(mainJs, /active: "使用済み"/);
-assert.match(mainJs, /function normalizeSpecialChargeState\(value\)/);
+assert.match(mainJs, /ヘパイトスの火種/);
+assert.match(mainJs, /function normalizeSpecialChargeState\(value, craftId/);
+assert.match(mainJs, /function getSpecialChargeStates\(/);
 assert.match(mainJs, /function toggleBoardSpecialState\(\)/);
 assert.match(mainJs, /elements\.specialChargeToggle\.addEventListener\("click", toggleBoardSpecialState\);/);
 

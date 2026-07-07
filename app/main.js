@@ -40,6 +40,7 @@ const elements = {
   layoutSectionTitle: document.querySelector("#layoutSectionTitle"),
   boardActions: document.querySelector("#boardActions"),
   cookingCommandPanel: document.querySelector("#cookingCommandPanel"),
+  cookingOnlyCommandGroups: document.querySelectorAll(".cooking-only-command"),
   undoBoardButton: document.querySelector("#undoBoardButton"),
   redoBoardButton: document.querySelector("#redoBoardButton"),
   miracleGrillButton: document.querySelector("#miracleGrillButton"),
@@ -94,9 +95,11 @@ let managedRecipeEditId = "";
 let captureStream = null;
 const maxHistoryEntries = 50;
 const specialChargeStates = ["uncharged", "charging", "active"];
+const smithingSpecialChargeStates = ["uncharged", "charging", "using", "active"];
 const specialChargeLabels = {
   uncharged: "未チャージ",
   charging: "チャージ済み",
+  using: "使用中",
   active: "使用済み",
 };
 
@@ -238,15 +241,26 @@ function normalizeState(value) {
     })),
     ingredients,
     cookingCellEffects: normalizeCookingCellEffects(value.cookingCellEffects, config.layout),
-    specialChargeState: normalizeSpecialChargeState(value.specialChargeState),
+    specialChargeState: normalizeSpecialChargeState(value.specialChargeState, config.id),
     miracleGrillUsed: value.miracleGrillUsed === true,
     miracleGrillResult: typeof value.miracleGrillResult === "string" ? value.miracleGrillResult : "",
   };
 }
 
-// 必殺チャージ表示はBOARD見出しで切り替えるため、保存値を3状態に正規化します。
-function normalizeSpecialChargeState(value) {
-  return specialChargeStates.includes(value) ? value : "uncharged";
+// 必殺チャージ表示はBOARD見出しで切り替えるため、職人別の状態へ正規化します。
+function normalizeSpecialChargeState(value, craftId = state?.craftType) {
+  const states = getSpecialChargeStates(craftId);
+  return states.includes(value) ? value : "uncharged";
+}
+
+// 鍛冶の必殺は使用中を持つため、調理とは別の状態順で扱います。
+function getSpecialChargeStates(craftId = state?.craftType) {
+  return getCraftComponent(craftId)?.craftFamily === "smithing" ? smithingSpecialChargeStates : specialChargeStates;
+}
+
+// BOARD上部に表示する必殺名を職人別に返します。
+function getSpecialActionLabel(craftId = state?.craftType) {
+  return getCraftComponent(craftId)?.craftFamily === "smithing" ? "ヘパイトスの火種" : "ミラクルグリル";
 }
 
 function createLayoutSignature(config) {
@@ -609,7 +623,7 @@ function restoreBoardSnapshot(snapshot) {
   }));
   state.cookingEffectMode = normalizeCookingEffectMode(state.traitId, snapshot.cookingEffectMode);
   state.cookingCellEffects = normalizeCookingCellEffects(snapshot.cookingCellEffects, getCurrentCraftConfig().layout);
-  state.specialChargeState = normalizeSpecialChargeState(snapshot.specialChargeState);
+  state.specialChargeState = normalizeSpecialChargeState(snapshot.specialChargeState, state.craftType);
   state.miracleGrillUsed = snapshot.miracleGrillUsed === true;
   state.miracleGrillResult = snapshot.miracleGrillResult || "";
   selectedBoardIngredientId = null;
@@ -1129,13 +1143,18 @@ function canRearrangeBoard(config = getCurrentCraftConfig()) {
 function syncBoardActionButtons() {
   const canRearrange = state ? canRearrangeBoard() : false;
   const isCooking = isCurrentCraftFamily("cooking");
+  const isSmithing = isCurrentCraftFamily("smithing");
+  const showsCommandPanel = isCooking || isSmithing;
   const selectedIngredient = canRearrange
     ? state.ingredients.find((ingredient) => ingredient.id === selectedBoardIngredientId)
     : null;
   elements.boardActions.hidden = !canRearrange;
   if (elements.cookingCommandPanel) {
-    elements.cookingCommandPanel.hidden = !isCooking;
+    elements.cookingCommandPanel.hidden = !showsCommandPanel;
   }
+  elements.cookingOnlyCommandGroups.forEach((element) => {
+    element.hidden = !isCooking;
+  });
   elements.undoBoardButton.disabled = !canRearrange || undoStack.length === 0;
   elements.redoBoardButton.disabled = !canRearrange || redoStack.length === 0;
   syncBoardSpecialState();
@@ -1145,29 +1164,35 @@ function syncBoardActionButtons() {
 
 function syncBoardSpecialState() {
   const isCooking = isCurrentCraftFamily("cooking");
-  const stateId = normalizeSpecialChargeState(state?.specialChargeState);
+  const isSmithing = isCurrentCraftFamily("smithing");
+  const supportsSpecial = isCooking || isSmithing;
+  const stateId = normalizeSpecialChargeState(state?.specialChargeState, state?.craftType);
 
   if (elements.specialChargeToggle) {
-    elements.specialChargeToggle.disabled = !isCooking;
-    elements.specialChargeToggle.classList.toggle("active", isCooking && stateId === "active");
+    elements.specialChargeToggle.disabled = !supportsSpecial;
+    elements.specialChargeToggle.textContent = getSpecialActionLabel(state?.craftType);
+    elements.specialChargeToggle.classList.toggle("active", supportsSpecial && (stateId === "active" || stateId === "using"));
+    elements.specialChargeToggle.classList.toggle("using", isSmithing && state.specialChargeState === "using");
   }
   if (elements.boardSpecialStateLabel) {
-    elements.boardSpecialStateLabel.hidden = !isCooking;
+    elements.boardSpecialStateLabel.hidden = !supportsSpecial;
     elements.boardSpecialStateLabel.textContent = specialChargeLabels[stateId];
     elements.boardSpecialStateLabel.dataset.state = stateId;
   }
 }
 
 function toggleBoardSpecialState() {
-  if (!isCurrentCraftFamily("cooking")) {
+  if (!isCurrentCraftFamily("cooking") && !isCurrentCraftFamily("smithing")) {
     return;
   }
 
-  const currentIndex = specialChargeStates.indexOf(normalizeSpecialChargeState(state.specialChargeState));
-  const nextIndex = (currentIndex + 1) % specialChargeStates.length;
-  state.specialChargeState = specialChargeStates[nextIndex];
+  const states = getSpecialChargeStates(state.craftType);
+  const currentIndex = states.indexOf(normalizeSpecialChargeState(state.specialChargeState, state.craftType));
+  const nextIndex = (currentIndex + 1) % states.length;
+  state.specialChargeState = states[nextIndex];
   syncBoardSpecialState();
   renderLayoutBoard();
+  renderAnalysis();
   saveState();
 }
 

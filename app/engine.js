@@ -100,6 +100,23 @@
     return 1;
   }
 
+  function isSmithingHephaestusActive(state = {}) {
+    return isSmithingCraftState(state) && state.specialChargeState === "using";
+  }
+
+  function shouldPreventHephaestusDamage(state = {}, ingredient = {}, criticalMin = 0) {
+    if (!isSmithingHephaestusActive(state)) {
+      return false;
+    }
+
+    const current = toNumber(ingredient?.current);
+    const target = resolveIngredientTarget(ingredient);
+    const [successMin, successMax] = normalizeRange(ingredient?.successMin, ingredient?.successMax);
+    const inSuccessRange = current >= successMin && current <= successMax;
+
+    return current >= target || (inSuccessRange && current + criticalMin > target);
+  }
+
   function getSmithingFocusCostMultiplier(state = {}) {
     if (state.traitId !== "focus-change") {
       return 1;
@@ -312,18 +329,28 @@
       const smithingPowerMultiplier = getSmithingPowerMultiplier(state, ingredient);
       const focusCostMultiplier = getSmithingFocusCostMultiplier(state);
       const criticalRateBoost = state.traitId === "focus-change" && getSmithingHeatPhase(state) === "low";
-      const normalMin = Math.ceil(range[0] * smithingPowerMultiplier);
-      const normalMax = Math.ceil(range[1] * smithingPowerMultiplier);
+      const hephaestusActive = isSmithingHephaestusActive(state);
+      const hephaestusPowerMultiplier = hephaestusActive ? 2 : 1;
+      const normalMin = Math.ceil(range[0] * smithingPowerMultiplier * hephaestusPowerMultiplier);
+      const normalMax = Math.ceil(range[1] * smithingPowerMultiplier * hephaestusPowerMultiplier);
+      const criticalMin = Math.ceil(normalMin * criticalMultiplier);
+      const criticalMax = Math.ceil(normalMax * criticalMultiplier);
+      const hephaestusNoDamage = shouldPreventHephaestusDamage(state, ingredient, criticalMin);
+      const actualMin = hephaestusNoDamage ? 0 : hephaestusActive ? criticalMin : normalMin;
+      const actualMax = hephaestusNoDamage ? 0 : hephaestusActive ? criticalMax : normalMax;
 
       return {
         ...technique,
         focusCost: Math.ceil(toNumber(technique.focusCost, 0) * focusCostMultiplier),
         criticalWeight: toNumber(technique.criticalWeight, 1) * (criticalRateBoost ? 1.5 : 1),
         criticalRateBoost,
-        normalMin,
-        normalMax,
-        criticalMin: Math.ceil(normalMin * criticalMultiplier),
-        criticalMax: Math.ceil(normalMax * criticalMultiplier),
+        hephaestusActive,
+        hephaestusNoDamage,
+        forcedCritical: hephaestusActive,
+        normalMin: actualMin,
+        normalMax: actualMax,
+        criticalMin: hephaestusNoDamage ? 0 : criticalMin,
+        criticalMax: hephaestusNoDamage ? 0 : criticalMax,
       };
     }
 
@@ -521,9 +548,71 @@
       targetMode === "random-in-range" ? successMax : target,
       targetMode,
     );
+    const forcedCritical = technique.forcedCritical === true;
 
     const lowerDiff = successMin - current;
     const upperDiff = successMax - current;
+    if (forcedCritical) {
+      const forcedMin = criticalAfterMin - current;
+      const forcedMax = criticalAfterMax - current;
+      const currentOver = current > successMax;
+      const shortage = !currentOver && criticalAfterMax < successMin;
+      const forcedOver = !currentOver && criticalAfterMin > successMax;
+      const inTargetRangeUnlocked = current >= successMin && current <= successMax;
+      const criticalCanHit = criticalAfterMax >= successMin && criticalAfterMin <= successMax;
+      const guaranteedCritical = !currentOver && !shortage && !forcedOver && criticalCanHit && forcedMax > 0;
+      let status = "in-range";
+
+      if (currentOver) {
+        status = "over";
+      } else if (shortage) {
+        status = "shortage";
+      } else if (forcedOver) {
+        status = "normal-over-risk";
+      } else if (guaranteedCritical) {
+        status = "guaranteed";
+      }
+
+      return {
+        ...ingredient,
+        current,
+        target,
+        successMin,
+        successMax,
+        targetDiff,
+        lowerDiff,
+        upperDiff,
+        forcedCritical,
+        hephaestusActive: technique.hephaestusActive === true,
+        hephaestusNoDamage: technique.hephaestusNoDamage === true,
+        normalMin: forcedMin,
+        normalMax: forcedMax,
+        normalAfterMin: criticalAfterMin,
+        normalAfterMax: criticalAfterMax,
+        criticalMin,
+        criticalMax,
+        rawCriticalAfterMin,
+        rawCriticalAfterMax,
+        criticalAfterMin,
+        criticalAfterMax,
+        criticalStopApplies,
+        normalHits: criticalCanHit,
+        normalCanHit: criticalCanHit,
+        normalMaxCanEnterTargetRange: current < successMin && criticalAfterMax >= successMin && criticalAfterMax <= successMax,
+        guaranteedCritical,
+        criticalCanHit,
+        inTargetRangeUnlocked,
+        criticalCanEnterTargetRangeBeforeGuarantee: false,
+        possibleFakeCritical: false,
+        normalOver: forcedOver,
+        criticalOver: currentOver,
+        currentOver,
+        targetMode,
+        status,
+        statusLabel: statusLabels[status],
+      };
+    }
+
     const criticalCanReachTarget = current < successMin && current + criticalMax >= successMin;
     const normalHits =
       normalAfterMin >= successMin && normalAfterMax <= successMax;
@@ -629,7 +718,7 @@
     const techniqueAnalyses = analysisTechniques.map((technique) => {
       const resolvedTechnique = resolveTechnique(state, technique, normalizedIngredient);
       const analysis = analyzeIngredient(normalizedIngredient, resolvedTechnique, state.targetMode);
-      const smithingStatus = isSmithingCraft && analysis.normalMaxCanEnterTargetRange
+      const smithingStatus = isSmithingCraft && analysis.forcedCritical !== true && analysis.normalMaxCanEnterTargetRange
         ? "gauge-entry"
         : analysis.status;
       return {

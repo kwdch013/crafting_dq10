@@ -124,6 +124,12 @@ button:disabled {
   color: #92400e;
 }
 
+.board-special-state[data-state="using"] {
+  border-color: rgba(220, 38, 38, 0.36);
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
 .layout {
   display: grid;
   grid-template-columns: minmax(330px, 430px) minmax(0, 1fr);
