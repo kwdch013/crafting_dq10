@@ -788,6 +788,35 @@ select:focus {
   display: none;
 }
 
+.smithing-board-trait-state {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-bottom: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-soft);
+  padding: 10px;
+}
+
+.smithing-board-trait-state[hidden] {
+  display: none;
+}
+
+.smithing-board-trait-state strong {
+  color: var(--primary-dark);
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.smithing-board-trait-state span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
 .command-group {
   display: flex;
   flex-wrap: wrap;

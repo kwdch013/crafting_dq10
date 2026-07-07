@@ -34,6 +34,7 @@ const elements = {
   smithingHeatDownButton: document.querySelector("#smithingHeatDownButton"),
   smithingHeatUpButton: document.querySelector("#smithingHeatUpButton"),
   smithingDamageRanges: document.querySelector("#smithingDamageRanges"),
+  smithingBoardTraitState: document.querySelector("#smithingBoardTraitState"),
   specialChargeToggle: document.querySelector("#specialChargeToggle"),
   boardSpecialStateLabel: document.querySelector("#boardSpecialStateLabel"),
   layoutSectionTitle: document.querySelector("#layoutSectionTitle"),
@@ -947,6 +948,10 @@ function renderSmithingDamageReference() {
   elements.smithingDamagePanel.hidden = !component.renderBoardReference;
   if (!component.renderBoardReference) {
     elements.smithingDamageRanges.replaceChildren();
+    if (elements.smithingBoardTraitState) {
+      elements.smithingBoardTraitState.hidden = true;
+      elements.smithingBoardTraitState.replaceChildren();
+    }
     return;
   }
 

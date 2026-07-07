@@ -4,7 +4,9 @@
     craftFamily: "smithing",
     applyHeatChange,
     canEditLightState,
+    getAdjustedDamageRange,
     getDamagePowerEntries: getSmithingDamagePowerEntries,
+    getHeatTraitState,
     getNextHeat,
     // 鍛冶配置の各マスは右クリック編集で現在値と光地金状態を変更できます。
     isBoardCellEditable() {
@@ -12,6 +14,7 @@
     },
     isLightHeatActive,
     renderBoardReference,
+    renderHeatTraitState,
     renderTemperatureSelect,
     // 光地金の盤面表示は、現在温度が有効な時だけ光状態を返します。
     getIngredientSpecialState(state, ingredient) {
@@ -72,6 +75,7 @@
     const smithingDamage = global.DQ10SmithingDamage || {};
     const rangeSet = smithingDamage.ranges?.[state.heat];
     const criticalMultiplier = toNumber(smithingDamage.criticalMultiplier, 2);
+    const heatTraitState = getHeatTraitState(state);
     const heatStates = config.heatStates || [];
     const currentHeat = toNumber(state.heat, 0);
     const heatValues = heatStates.map((heatState) => toNumber(heatState.id, currentHeat));
@@ -106,17 +110,145 @@
           <small>未設定</small>
         `;
       } else {
+        const adjustedRange = getAdjustedDamageRange(range, state);
+        const traitNote = heatTraitState.damageMultiplier !== 1 ? `<span>${escapeHtml(heatTraitState.label)}反映</span>` : "";
         row.innerHTML = `
           <strong>${escapeHtml(power.label)}</strong>
-          <span class="numeric">${range[0]} - ${range[1]}</span>
+          <span class="numeric">${adjustedRange[0]} - ${adjustedRange[1]}</span>
           <small class="numeric">
-            <span>最大 ${range[1]}</span>
-            <span>会心最小 ${range[0] * criticalMultiplier}</span>
+            <span>最大 ${adjustedRange[1]}</span>
+            <span>会心最小 ${adjustedRange[0] * criticalMultiplier}</span>
+            ${traitNote}
           </small>
         `;
       }
       elements.smithingDamageRanges.append(row);
     });
+
+    renderHeatTraitState({ state, elements, escapeHtml });
+  }
+
+  // 鍛冶BOARD上部に、200℃単位で発動する地金特性の現在状態を描画します。
+  function renderHeatTraitState({ state, elements, escapeHtml }) {
+    if (!elements.smithingBoardTraitState) {
+      return;
+    }
+
+    const heatTraitState = getHeatTraitState(state);
+    const shouldShow = isSmithingCraftState(state) && heatTraitState.isActive;
+    elements.smithingBoardTraitState.hidden = !shouldShow;
+    elements.smithingBoardTraitState.replaceChildren();
+
+    if (!shouldShow) {
+      return;
+    }
+
+    elements.smithingBoardTraitState.innerHTML = `
+      <strong>${escapeHtml(state.heat)}℃ ${escapeHtml(heatTraitState.label)}</strong>
+      <span>${escapeHtml(heatTraitState.description)}</span>
+    `;
+  }
+
+  // 温度条件から、鍛冶地金特性の現在状態と威力補正を返します。
+  function getHeatTraitState(state) {
+    const heat = toNumber(state?.heat, NaN);
+    const phase = getSmithingHeatPhase(state);
+    const inactiveState = {
+      isActive: false,
+      label: "通常",
+      description: "特性発動なし",
+      damageMultiplier: 1,
+    };
+
+    if (!isSmithingCraftState(state) || !Number.isFinite(heat)) {
+      return inactiveState;
+    }
+
+    if (state.traitId === "light" && heat % 200 === 0) {
+      return {
+        isActive: true,
+        label: "光地金",
+        description: "選択したマスが光状態",
+        damageMultiplier: 1,
+      };
+    }
+
+    if (state.traitId === "double-half") {
+      if (phase === "high") {
+        return {
+          isActive: true,
+          label: "倍加",
+          description: "威力2倍",
+          damageMultiplier: 2,
+        };
+      }
+      if (phase === "low") {
+        return {
+          isActive: true,
+          label: "半減",
+          description: "威力0.5倍",
+          damageMultiplier: 0.5,
+        };
+      }
+    }
+
+    if (state.traitId === "focus-change") {
+      if (phase === "high") {
+        return {
+          isActive: true,
+          label: "集中半減",
+          description: "消費集中0.5倍",
+          damageMultiplier: 1,
+        };
+      }
+      if (phase === "low") {
+        return {
+          isActive: true,
+          label: "集中増加",
+          description: "消費集中1.5倍、会心率上昇",
+          damageMultiplier: 1,
+        };
+      }
+    }
+
+    if (global.DQ10CraftEngine?.isSmithingReturnNextTurn?.(state) === true) {
+      return {
+        isActive: true,
+        label: "戻り予告",
+        description: "次が戻りターン",
+        damageMultiplier: 1,
+      };
+    }
+
+    return inactiveState;
+  }
+
+  // 温度別ダメージ表に、倍半などの現在温度補正を反映します。
+  function getAdjustedDamageRange(range, state) {
+    if (!Array.isArray(range)) {
+      return null;
+    }
+
+    const multiplier = getHeatTraitState(state).damageMultiplier;
+    return [
+      Math.ceil(toNumber(range[0], 0) * multiplier),
+      Math.ceil(toNumber(range[1], 0) * multiplier),
+    ];
+  }
+
+  // 鍛冶職人かどうかをコンポーネント内の状態表示で判定します。
+  function isSmithingCraftState(state = {}) {
+    return ["weapon-smithing", "armor-smithing", "tool-smithing"].includes(state.craftType);
+  }
+
+  // 200℃単位の鍛冶特性が高温側か低温側かを返します。
+  function getSmithingHeatPhase(state = {}) {
+    const heat = toNumber(state.heat, NaN);
+    if (!isSmithingCraftState(state) || !Number.isFinite(heat) || heat % 200 !== 0) {
+      return "none";
+    }
+
+    return heat % 400 === 0 ? "high" : "low";
   }
 
   // 鍛冶ダメージ倍率を低い順で表示するため、定義値の倍率で整列します。

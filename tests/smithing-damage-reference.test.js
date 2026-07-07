@@ -17,6 +17,7 @@ assert.match(html, /id="smithingTemperatureSelect"/, "BOARD内の温度プルダ
 assert.match(html, /id="smithingHeatDownButton"/, "BOARD内の温度低下ボタンを追加してください");
 assert.match(html, /id="smithingHeatUpButton"/, "BOARD内の温度上昇ボタンを追加してください");
 assert.match(html, /id="smithingDamageRanges"/, "温度別ダメージ表の描画先を追加してください");
+assert.match(html, /id="smithingBoardTraitState"/, "BOARD上部に鍛冶の現在特性状態を表示してください");
 assert.match(html, /id="techniqueDataPanel"/, "特技データパネルは職人別に表示制御できるようにしてください");
 assert.match(html, /id="techniqueDataPanel"[\s\S]*<h2>特技データ<\/h2>/, "特技データパネル本体に表示制御IDを付けてください");
 assert.doesNotMatch(html, /id="smithingTechniquePanel"/, "鍛冶職人の追加特技データ表は表示しないでください");
@@ -24,6 +25,7 @@ assert.doesNotMatch(html, /id="smithingTechniqueRows"/, "鍛冶職人の追加�
 assert.match(html, /status-gauge-entry">ゲージ突入/, "鍛冶のゲージ突入判定を凡例に表示してください");
 
 assert.match(mainJs, /smithingDamagePanel: document\.querySelector\("#smithingDamagePanel"\)/);
+assert.match(mainJs, /smithingBoardTraitState: document\.querySelector\("#smithingBoardTraitState"\)/);
 assert.doesNotMatch(mainJs, /smithingTechniquePanel/, "鍛冶職人の追加特技データ表は参照しないでください");
 assert.match(mainJs, /function renderSmithingDamageReference\(\)[\s\S]*renderBoardReference/, "鍛冶ダメージ表の描画は職人コンポーネントへ委譲してください");
 assert.match(mainJs, /techniqueDataPanel\.hidden = hidesTechniqueData/, "鍛冶職人では特技データパネルを非表示にしてください");
@@ -49,7 +51,10 @@ assert.match(mainJs, /\$\{analysis\.normalMin\}-\$\{analysis\.normalMax\} \/ 会
 assert.doesNotMatch(mainJs, /hydrateSmithingTechniquesFromJson/, "鍛冶特技の追加JSONは読み込まないでください");
 assert.match(mainJs, /function adjustSmithingHeat\(delta\)[\s\S]*getNextHeat/, "鍛冶温度の次値計算は職人コンポーネントへ委譲してください");
 assert.match(smithingComponentJs, /smithingDamage\.ranges\?\.\[state\.heat\]/);
-assert.match(smithingComponentJs, /会心最小 \$\{range\[0\] \* criticalMultiplier\}/);
+assert.match(smithingComponentJs, /getAdjustedDamageRange\(range, state\)/, "温度別ダメージ表は鍛冶特性の威力補正後を表示してください");
+assert.match(smithingComponentJs, /会心最小 \$\{adjustedRange\[0\] \* criticalMultiplier\}/);
+assert.match(smithingComponentJs, /function renderHeatTraitState\(/, "鍛冶の現在特性状態をBOARD上部へ描画してください");
+assert.match(smithingComponentJs, /半減[\s\S]*威力0\.5倍/, "倍半の半減状態を表示してください");
 assert.match(mainJs, /renderSmithingDamageReference\(\);[\s\S]*renderLayoutBoard\(\);/);
 assert.match(mainJs, /syncJudgementLegend\(\);[\s\S]*renderAnalysis\(\);/);
 assert.match(mainJs, /smithingHeatDownButton\?\.addEventListener\("click", \(\) => adjustSmithingHeat\(-50\)\)/);
