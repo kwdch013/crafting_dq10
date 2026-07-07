@@ -637,3 +637,121 @@ assert.equal(engine.isSmithingReturnNextTurn({ craftType: "weapon-smithing", tra
 	assert.equal(result.normalMin, 0);
 	assert.equal(result.normalMax, 0);
 }
+
+{
+	const result = engine.resolveTechnique(
+		{
+			craftType: "weapon-smithing",
+			heat: "1000",
+			traitId: "none",
+			specialChargeState: "using",
+		},
+		{
+			id: "hit",
+			damageModel: "smithing-temperature",
+			powerId: "normal",
+			focusCost: 5,
+			criticalMultiplier: 2,
+		},
+		{
+			current: 40,
+			target: 100,
+			successMin: 90,
+			successMax: 110,
+		},
+	);
+
+	assert.equal(result.hephaestusActive, true);
+	assert.equal(result.forcedCritical, true);
+	assert.equal(result.normalMin, 48);
+	assert.equal(result.normalMax, 72);
+	assert.equal(result.criticalMin, 48);
+	assert.equal(result.criticalMax, 72);
+}
+
+{
+	const result = engine.analyzeIngredientAcrossTechniques(
+		{
+			craftType: "weapon-smithing",
+			heat: "1000",
+			traitId: "none",
+			specialChargeState: "using",
+			targetMode: "random-in-range",
+			techniques: [],
+		},
+		{
+			current: 40,
+			target: 100,
+			successMin: 90,
+			successMax: 110,
+		},
+	);
+
+	assert.equal(result.technique.id, "board-normal");
+	assert.equal(result.hephaestusActive, true);
+	assert.equal(result.forcedCritical, true);
+	assert.equal(result.normalMin, 48);
+	assert.equal(result.normalMax, 70);
+	assert.equal(result.criticalMin, 48);
+	assert.equal(result.criticalMax, 72);
+	assert.equal(result.guaranteedCritical, true);
+	assert.equal(result.statusLabel, "本会心！");
+}
+
+{
+	const result = engine.resolveTechnique(
+		{
+			craftType: "weapon-smithing",
+			heat: "1000",
+			traitId: "none",
+			specialChargeState: "using",
+		},
+		{
+			id: "hit",
+			damageModel: "smithing-temperature",
+			powerId: "normal",
+			focusCost: 5,
+			criticalMultiplier: 2,
+		},
+		{
+			current: 100,
+			target: 100,
+			successMin: 90,
+			successMax: 110,
+		},
+	);
+
+	assert.equal(result.hephaestusNoDamage, true);
+	assert.equal(result.normalMin, 0);
+	assert.equal(result.normalMax, 0);
+	assert.equal(result.criticalMin, 0);
+	assert.equal(result.criticalMax, 0);
+}
+
+{
+	const result = engine.resolveTechnique(
+		{
+			craftType: "weapon-smithing",
+			heat: "1000",
+			traitId: "none",
+			specialChargeState: "using",
+		},
+		{
+			id: "hit",
+			damageModel: "smithing-temperature",
+			powerId: "normal",
+			focusCost: 5,
+			criticalMultiplier: 2,
+		},
+		{
+			current: 95,
+			target: 100,
+			successMin: 90,
+			successMax: 110,
+		},
+	);
+
+	assert.equal(result.hephaestusNoDamage, true);
+	assert.equal(result.normalMin, 0);
+	assert.equal(result.normalMax, 0);
+}

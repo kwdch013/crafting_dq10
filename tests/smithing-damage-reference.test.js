@@ -29,6 +29,9 @@ assert.match(mainJs, /smithingDamagePanel: document\.querySelector\("#smithingDa
 assert.match(mainJs, /smithingBoardTraitState: document\.querySelector\("#smithingBoardTraitState"\)/);
 assert.doesNotMatch(mainJs, /smithingTechniquePanel/, "鍛冶職人の追加特技データ表は参照しないでください");
 assert.match(mainJs, /function renderSmithingDamageReference\(\)[\s\S]*renderBoardReference/, "鍛冶ダメージ表の描画は職人コンポーネントへ委譲してください");
+assert.match(mainJs, /cookingCommandPanel\.hidden = !showsCommandPanel/, "鍛冶職人でも必殺状態をBOARD上部で操作できるようにしてください");
+assert.match(mainJs, /specialChargeToggle\.textContent = getSpecialActionLabel/, "職人別の必殺名を表示してください");
+assert.match(mainJs, /state\.specialChargeState === "using"/, "鍛冶の使用中状態を判定に使ってください");
 assert.match(mainJs, /techniqueDataPanel\.hidden = hidesTechniqueData/, "鍛冶職人では特技データパネルを非表示にしてください");
 assert.match(mainJs, /craftFamily === "smithing"/, "鍛冶職人の特技データ非表示条件を追加してください");
 assert.doesNotMatch(mainJs, /function renderSmithingTechniqueReference\(\)/, "鍛冶職人の追加特技データ表は描画しないでください");
