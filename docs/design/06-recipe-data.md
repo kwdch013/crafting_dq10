@@ -253,6 +253,8 @@ sequenceDiagram
 - 不明な実数値を断定しません。
 - テンプレート値は、実レシピ値に置き換える前提で管理します。
 - 道具鍛冶の大項目は `tool-smithing/config.js` の `recipeCategoryOptions` で管理し、具体的な制作物は道具名としてレシピJSONに追加します。
+- 武器鍛冶の大項目は `weapon-smithing/config.js` の `recipeCategoryOptions` で管理し、具体的な制作物は武器名としてレシピJSONに追加します。
+- 防具鍛冶の大項目は `armor-smithing/config.js` の `recipeCategoryOptions` で管理し、具体的な制作物は防具名としてレシピJSONに追加します。
 - 道具鍛冶のテンプレートレシピは `archived: true` として非表示にし、実レシピを道具名の選択肢に表示します。
 - レシピ追加・編集・削除はブラウザの `localStorage` に保存し、API起動時は `api/data/crafts/<職人>/recipes.json` にも一時反映します。
 - API停止時や反映失敗時はブラウザ保存を優先し、画面上では従来どおりユーザー追加レシピを利用します。
