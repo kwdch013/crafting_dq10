@@ -475,7 +475,6 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/50
 ### #53 調理職人: 右クリック編集の固定条件と枠外更新を修正する
 
 固定は基準範囲内だけ許可し、右クリック編集の枠外クリックでも入力内容を反映します。
-
 URL: https://github.com/kwdch013/crafting_dq10/issues/53
 
 ### #77 道具鍛冶: ハンマーのレシピ配置を修正する
@@ -496,4 +495,5 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/53
 鍛冶職人で200℃単位の地金特性が発動している場合、BOARD上部に光地金、倍加、半減、集中半減、集中増加などの現在状態を表示します。倍半の半減・倍加は Smithing Damage の温度別ダメージにも反映します。URL: https://github.com/kwdch013/crafting_dq10/issues/105
 ### #107 鍛冶職人: 特性状態表示で温度変更時にレイアウトが上下しないようにする
 鍛冶BOARD上部の特性状態欄は温度変更で折りたたまず、未発動時も通常状態を表示してBOARDや操作ボタンの位置を安定させます。今後のUI修正でも、基本設定以外の状態変化による表示有無でレイアウトが収縮しないようAGENTS.mdへルールを追加します。URL: https://github.com/kwdch013/crafting_dq10/issues/107
-### #109 鍛冶職人: 必殺ヘパイトスの火種を実装する 鍛冶BOARD上部で `ヘパイトスの火種` を4状態で操作し、`使用中` は威力2倍かつ確定会心として判定します。基準値到達済みや基準範囲内からの基準値超過はダメージなしとして扱います。URL: https://github.com/kwdch013/crafting_dq10/issues/109
+### #109 鍛冶職人: 必殺ヘパイトスの火種を実装する 鍛冶BOARD上部で `ヘパイトスの火種` を4状態で操作し、`使用中` は会心範囲として判定します。基準値到達済みはダメージなしとして扱います。URL: https://github.com/kwdch013/crafting_dq10/issues/109
+### #111 鍛冶職人: ヘパイトスの火種を会心範囲判定へ修正する `ヘパイトスの火種` は威力2倍ではなく会心範囲で判定し、不足、偽会心、本会心の可能性を正しく残します。URL: https://github.com/kwdch013/crafting_dq10/issues/111

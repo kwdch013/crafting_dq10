@@ -663,10 +663,10 @@ assert.equal(engine.isSmithingReturnNextTurn({ craftType: "weapon-smithing", tra
 
 	assert.equal(result.hephaestusActive, true);
 	assert.equal(result.forcedCritical, true);
-	assert.equal(result.normalMin, 48);
-	assert.equal(result.normalMax, 72);
-	assert.equal(result.criticalMin, 48);
-	assert.equal(result.criticalMax, 72);
+	assert.equal(result.normalMin, 24);
+	assert.equal(result.normalMax, 36);
+	assert.equal(result.criticalMin, 24);
+	assert.equal(result.criticalMax, 36);
 }
 
 {
@@ -690,12 +690,35 @@ assert.equal(engine.isSmithingReturnNextTurn({ craftType: "weapon-smithing", tra
 	assert.equal(result.technique.id, "board-normal");
 	assert.equal(result.hephaestusActive, true);
 	assert.equal(result.forcedCritical, true);
-	assert.equal(result.normalMin, 48);
-	assert.equal(result.normalMax, 70);
-	assert.equal(result.criticalMin, 48);
-	assert.equal(result.criticalMax, 72);
-	assert.equal(result.guaranteedCritical, true);
-	assert.equal(result.statusLabel, "本会心！");
+	assert.equal(result.normalMin, 24);
+	assert.equal(result.normalMax, 36);
+	assert.equal(result.criticalMin, 24);
+	assert.equal(result.criticalMax, 36);
+	assert.equal(result.status, "shortage");
+	assert.equal(result.statusLabel, "不足");
+}
+
+{
+	const result = engine.analyzeIngredientAcrossTechniques(
+		{
+			craftType: "weapon-smithing",
+			heat: "1000",
+			traitId: "none",
+			specialChargeState: "using",
+			targetMode: "random-in-range",
+			techniques: [],
+		},
+		{
+			current: 70,
+			target: 100,
+			successMin: 90,
+			successMax: 110,
+		},
+	);
+
+	assert.equal(result.guaranteedCritical, false);
+	assert.equal(result.possibleFakeCritical, true);
+	assert.equal(result.statusLabel, "偽会心の可能性あり");
 }
 
 {
@@ -729,19 +752,14 @@ assert.equal(engine.isSmithingReturnNextTurn({ craftType: "weapon-smithing", tra
 }
 
 {
-	const result = engine.resolveTechnique(
+	const result = engine.analyzeIngredientAcrossTechniques(
 		{
 			craftType: "weapon-smithing",
 			heat: "1000",
 			traitId: "none",
 			specialChargeState: "using",
-		},
-		{
-			id: "hit",
-			damageModel: "smithing-temperature",
-			powerId: "normal",
-			focusCost: 5,
-			criticalMultiplier: 2,
+			targetMode: "random-in-range",
+			techniques: [],
 		},
 		{
 			current: 95,
@@ -751,7 +769,32 @@ assert.equal(engine.isSmithingReturnNextTurn({ craftType: "weapon-smithing", tra
 		},
 	);
 
-	assert.equal(result.hephaestusNoDamage, true);
-	assert.equal(result.normalMin, 0);
-	assert.equal(result.normalMax, 0);
+	assert.equal(result.hephaestusNoDamage, false);
+	assert.equal(result.normalMin, 5);
+	assert.equal(result.normalMax, 5);
+	assert.equal(result.normalOver, false);
+	assert.equal(result.statusLabel, "基準内");
+}
+
+{
+	const result = engine.analyzeIngredientAcrossTechniques(
+		{
+			craftType: "weapon-smithing",
+			heat: "1000",
+			traitId: "none",
+			specialChargeState: "using",
+			targetMode: "random-in-range",
+			techniques: [],
+		},
+		{
+			current: 86,
+			target: 100,
+			successMin: 90,
+			successMax: 110,
+		},
+	);
+
+	assert.equal(result.guaranteedCritical, true);
+	assert.equal(result.possibleFakeCritical, false);
+	assert.equal(result.statusLabel, "本会心！");
 }
