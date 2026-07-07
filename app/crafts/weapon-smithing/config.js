@@ -1,10 +1,75 @@
+// 武器鍛冶の種別ごとに、レシピ追加時の初期マスを定義します。
+function createWeaponSmithingTemplateItems(rows, columns, cells = null) {
+  const gridCells = Array.isArray(cells)
+    ? cells
+    : Array.from({ length: rows * columns }, (_, index) => ({
+      row: Math.floor(index / columns) + 1,
+      column: (index % columns) + 1,
+    }));
+  const verticalNames = {
+    2: ["上", "下"],
+    3: ["上", "中", "下"],
+    4: ["上", "中上", "中下", "下"],
+  };
+  const matrixNames = {
+    "1:1": "左上",
+    "1:2": "右上",
+    "2:1": rows === 2 ? "左下" : "左中",
+    "2:2": rows === 2 ? "右下" : "右中",
+    "3:1": rows === 3 ? "左下" : "左中下",
+    "3:2": rows === 3 ? "右下" : "右中下",
+    "4:1": "左下",
+    "4:2": "右下",
+  };
+
+  return gridCells.map(({ row, column }, index) => ({
+    id: `part-${index + 1}`,
+    name: columns === 1
+      ? verticalNames[rows]?.[row - 1] || `${row}行`
+      : matrixNames[`${row}:${column}`] || `${row}行${column}列`,
+    gridCell: { row, column },
+    current: 0,
+    successMin: 80,
+    successMax: 95,
+  }));
+}
+
 // 武器鍛冶固有の表示名、特技、初期マスを定義します。
 registerDQ10Craft(createDQ10SmithingCraftConfig({
   id: "weapon-smithing",
   label: "武器鍛冶",
   modeLabel: "Weapon Smithing Settings",
-  recipeLabel: "装備名",
+  recipeLabel: "武器名",
+  recipeCategoryLabel: "大項目",
+  recipeSubcategoryLabel: "武器名",
   defaultRecipeName: "武器メモ",
+  // 武器鍛冶の大項目は参照画像の武器種別と同期し、実レシピは手動追加します。
+  recipeCategoryOptions: [
+    { id: "one-handed-sword", label: "片手剣", templateItems: createWeaponSmithingTemplateItems(3, 1) },
+    { id: "two-handed-sword", label: "両手剣", templateItems: createWeaponSmithingTemplateItems(4, 2) },
+    { id: "dagger", label: "短剣", templateItems: createWeaponSmithingTemplateItems(2, 1) },
+    { id: "spear", label: "ヤリ", templateItems: createWeaponSmithingTemplateItems(4, 1) },
+    { id: "axe", label: "オノ", templateItems: createWeaponSmithingTemplateItems(3, 2) },
+    { id: "claw", label: "ツメ", templateItems: createWeaponSmithingTemplateItems(2, 2) },
+    { id: "whip", label: "ムチ", templateItems: createWeaponSmithingTemplateItems(4, 2, [
+      { row: 1, column: 1 },
+      { row: 1, column: 2 },
+      { row: 2, column: 1 },
+      { row: 2, column: 2 },
+      { row: 3, column: 1 },
+      { row: 3, column: 2 },
+      { row: 4, column: 1 },
+    ]) },
+    { id: "hammer", label: "ハンマー", templateItems: createWeaponSmithingTemplateItems(3, 2) },
+    { id: "boomerang", label: "ブーメラン", templateItems: createWeaponSmithingTemplateItems(3, 2, [
+      { row: 1, column: 1 },
+      { row: 1, column: 2 },
+      { row: 2, column: 1 },
+      { row: 2, column: 2 },
+      { row: 3, column: 1 },
+    ]) },
+    { id: "scythe", label: "鎌", templateItems: createWeaponSmithingTemplateItems(3, 2) },
+  ],
   // 鍛冶の特技一覧は、画面で比較しやすいように倍率の低い順で並べます。
   techniques: [
     { id: "half", name: "半減打ち", focusCost: 6, damageModel: "smithing-temperature", powerId: "power_0_5", multiplier: 0.5, criticalMultiplier: 2, criticalWeight: 0.8 },

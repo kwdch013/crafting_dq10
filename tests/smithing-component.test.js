@@ -135,6 +135,66 @@ assert.deepEqual(
 assert.equal(context.DQ10CraftConfigs["tool-smithing"].recipeCategoryLabel, "大項目");
 assert.equal(context.DQ10CraftConfigs["tool-smithing"].recipeSubcategoryLabel, "道具名");
 
+assert.deepEqual(
+	Array.from(context.DQ10CraftConfigs["weapon-smithing"].recipeCategoryOptions, (category) => category.label),
+	["片手剣", "両手剣", "短剣", "ヤリ", "オノ", "ツメ", "ムチ", "ハンマー", "ブーメラン", "鎌"],
+);
+assert.equal(context.DQ10CraftConfigs["weapon-smithing"].recipeCategoryLabel, "大項目");
+assert.equal(context.DQ10CraftConfigs["weapon-smithing"].recipeSubcategoryLabel, "武器名");
+
+{
+	const categories = Object.fromEntries(
+		context.DQ10CraftConfigs["weapon-smithing"].recipeCategoryOptions.map((category) => [category.id, category]),
+	);
+	assert.equal(categories["one-handed-sword"].templateItems.length, 3);
+	assert.equal(categories["dagger"].templateItems.length, 2);
+	assert.equal(categories["two-handed-sword"].templateItems.length, 8);
+	assert.equal(categories["whip"].templateItems.length, 7);
+	assert.deepEqual(
+		JSON.parse(JSON.stringify(categories["hammer"].templateItems.map((item) => item.gridCell))),
+		[
+			{ row: 1, column: 1 },
+			{ row: 1, column: 2 },
+			{ row: 2, column: 1 },
+			{ row: 2, column: 2 },
+			{ row: 3, column: 1 },
+			{ row: 3, column: 2 },
+		],
+		"武器ハンマーは縦3×横2の6マスにしてください",
+	);
+}
+
+assert.deepEqual(
+	Array.from(context.DQ10CraftConfigs["armor-smithing"].recipeCategoryOptions, (category) => category.label),
+	["盾", "アタマ", "からだ上", "からだ下", "ウデ", "足"],
+);
+assert.equal(context.DQ10CraftConfigs["armor-smithing"].recipeCategoryLabel, "大項目");
+assert.equal(context.DQ10CraftConfigs["armor-smithing"].recipeSubcategoryLabel, "防具名");
+
+{
+	const categories = Object.fromEntries(
+		context.DQ10CraftConfigs["armor-smithing"].recipeCategoryOptions.map((category) => [category.id, category]),
+	);
+	assert.equal(categories["shield"].templateItems.length, 4);
+	assert.equal(categories["head"].templateItems.length, 4);
+	assert.equal(categories["body-upper"].templateItems.length, 6);
+	assert.equal(categories["body-lower"].templateItems.length, 8);
+	assert.equal(categories["arm"].templateItems.length, 3);
+	assert.equal(categories["foot"].templateItems.length, 4);
+	assert.deepEqual(
+		JSON.parse(JSON.stringify(categories["body-upper"].templateItems.map((item) => item.gridCell))),
+		[
+			{ row: 1, column: 1 },
+			{ row: 1, column: 2 },
+			{ row: 2, column: 1 },
+			{ row: 2, column: 2 },
+			{ row: 3, column: 1 },
+			{ row: 3, column: 2 },
+		],
+		"からだ上は縦3×横2の6マスにしてください",
+	);
+}
+
 {
 	const categories = Object.fromEntries(
 		context.DQ10CraftConfigs["tool-smithing"].recipeCategoryOptions.map((category) => [category.id, category]),
