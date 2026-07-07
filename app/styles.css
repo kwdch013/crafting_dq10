@@ -752,9 +752,23 @@ select:focus {
   grid-template-rows: auto minmax(0, 1fr) 24px auto;
 }
 
+/* 鍛冶セルは光バッジの追加でタイトル幅が変わらないよう、ヘッダーを2行に固定します。 */
+.craft-board.smithing-board .board-cell-head {
+  display: grid;
+  grid-template-rows: auto 20px;
+  gap: 4px;
+}
+
+.craft-board.smithing-board .board-cell-head strong {
+  min-height: 18px;
+}
+
 /* 鍛冶の光地金バッジ表示でBOARDノードの高さが変わらないよう、ヘッダー側の領域も固定します。 */
 .craft-board.smithing-board .board-cell-badges {
   min-height: 20px;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: hidden;
 }
 
 .board-actions {
