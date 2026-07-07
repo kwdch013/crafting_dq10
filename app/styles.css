@@ -525,6 +525,12 @@ select:focus {
   gap: 12px;
 }
 
+.capture-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .capture-box strong,
 .capture-box span {
   display: block;
@@ -537,12 +543,53 @@ select:focus {
   line-height: 1.5;
 }
 
+.capture-status {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.capture-status div {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-soft);
+  padding: 8px;
+}
+
+.capture-status dt,
+.capture-status dd {
+  margin: 0;
+}
+
+.capture-status dt {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.capture-status dd {
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
 #capturePreview {
   width: 100%;
   max-height: 220px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: #000000;
+}
+
+#captureFrameCanvas {
+  width: 100%;
+  max-height: 220px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #000000;
+  object-fit: contain;
 }
 
 .reference-grid {

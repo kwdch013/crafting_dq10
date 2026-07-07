@@ -105,11 +105,29 @@
             </div>
             <div class="capture-box">
               <div>
-                <strong>ブラウザ版MVPでは手入力を使用</strong>
-                <span>DQ10ウィンドウ選択、範囲キャリブレーション、OCRは次フェーズで接続します。</span>
+                <strong>画面共有から映像フレームを取得</strong>
+                <span>現時点では取得フレームの表示までを行い、OCRと範囲キャリブレーションは後続で接続します。</span>
               </div>
-              <button class="button secondary" id="captureButton" type="button">画面共有プレビュー</button>
+              <div class="capture-actions">
+                <button class="button secondary" id="captureButton" type="button">画面共有を開始</button>
+                <button class="button secondary" id="captureFrameButton" type="button" disabled>フレーム取得</button>
+              </div>
+              <dl class="capture-status" id="captureStatus">
+                <div>
+                  <dt>状態</dt>
+                  <dd id="captureStatusLabel">未接続</dd>
+                </div>
+                <div>
+                  <dt>入力</dt>
+                  <dd id="captureSourceLabel">-</dd>
+                </div>
+                <div>
+                  <dt>解像度</dt>
+                  <dd id="captureSizeLabel">-</dd>
+                </div>
+              </dl>
               <video id="capturePreview" muted autoplay playsinline hidden></video>
+              <canvas id="captureFrameCanvas" hidden></canvas>
             </div>
           </div>
         </section>
@@ -348,6 +366,7 @@
     <script src="./cooking-effects.js"></script>
     <script src="./cooking-ingredients.js"></script>
     <script src="./cooking-recipe-editor.js"></script>
+    <script src="./capture-reader.js"></script>
     <script src="./engine.js"></script>
     <script src="./board-layout.js"></script>
     <script src="./main.js"></script>

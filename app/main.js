@@ -71,7 +71,12 @@ const elements = {
   saveRecipeButton: document.querySelector("#saveRecipeButton"),
   resetButton: document.querySelector("#resetButton"),
   captureButton: document.querySelector("#captureButton"),
+  captureFrameButton: document.querySelector("#captureFrameButton"),
   capturePreview: document.querySelector("#capturePreview"),
+  captureFrameCanvas: document.querySelector("#captureFrameCanvas"),
+  captureStatusLabel: document.querySelector("#captureStatusLabel"),
+  captureSourceLabel: document.querySelector("#captureSourceLabel"),
+  captureSizeLabel: document.querySelector("#captureSizeLabel"),
   guaranteedCount: document.querySelector("#guaranteedCount"),
   warningCount: document.querySelector("#warningCount"),
   dangerCount: document.querySelector("#dangerCount"),
@@ -87,6 +92,7 @@ let smithingTechniqueReference = { techniques: [] };
 let managedRecipeCraftId = "";
 let managedRecipeCategoryId = "";
 let managedRecipeEditId = "";
+let captureStream = null;
 const maxHistoryEntries = 50;
 const specialChargeStates = ["uncharged", "charging", "active"];
 const specialChargeLabels = {
@@ -2782,7 +2788,44 @@ function addRecipeItemRow() {
   }, index);
 }
 
+function renderCaptureInfo(info) {
+  const width = numberOr(info?.width, 0);
+  const height = numberOr(info?.height, 0);
+
+  if (elements.captureStatusLabel) {
+    elements.captureStatusLabel.textContent = info?.statusLabel || "未接続";
+  }
+  if (elements.captureSourceLabel) {
+    elements.captureSourceLabel.textContent = info?.sourceLabel || "-";
+  }
+  if (elements.captureSizeLabel) {
+    elements.captureSizeLabel.textContent = width > 0 && height > 0 ? `${width} x ${height}` : "-";
+  }
+  if (elements.captureFrameButton) {
+    elements.captureFrameButton.disabled = info?.status !== "connected" && info?.status !== "captured";
+  }
+}
+
+function refreshCaptureInfo() {
+  renderCaptureInfo(window.DQ10CaptureReader.createCaptureInfo(captureStream, elements.capturePreview));
+}
+
+function stopCapturePreview() {
+  window.DQ10CaptureReader.stopCaptureStream(captureStream);
+  captureStream = null;
+  elements.capturePreview.srcObject = null;
+  elements.capturePreview.hidden = true;
+  elements.captureFrameCanvas.hidden = true;
+  elements.captureButton.textContent = "画面共有を開始";
+  renderCaptureInfo({ status: "waiting", statusLabel: "未接続" });
+}
+
 async function startCapturePreview() {
+  if (captureStream) {
+    stopCapturePreview();
+    return;
+  }
+
   if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
     alert("このブラウザでは画面共有プレビューを利用できません。");
     return;
@@ -2793,11 +2836,27 @@ async function startCapturePreview() {
       video: true,
       audio: false,
     });
+    captureStream = stream;
     elements.capturePreview.srcObject = stream;
     elements.capturePreview.hidden = false;
+    elements.captureButton.textContent = "画面共有を停止";
+    stream.getVideoTracks().forEach((track) => {
+      track.addEventListener?.("ended", stopCapturePreview, { once: true });
+    });
+    elements.capturePreview.addEventListener("loadedmetadata", refreshCaptureInfo, { once: true });
+    refreshCaptureInfo();
   } catch {
     alert("画面共有がキャンセルされました。");
   }
+}
+
+function captureCurrentFrame() {
+  const info = window.DQ10CaptureReader.captureVideoFrame(elements.capturePreview, elements.captureFrameCanvas);
+  elements.captureFrameCanvas.hidden = info.status !== "captured";
+  renderCaptureInfo({
+    ...window.DQ10CaptureReader.createCaptureInfo(captureStream, elements.capturePreview),
+    ...info,
+  });
 }
 
 elements.recipeTraitInput.addEventListener("change", () => {
@@ -2875,6 +2934,7 @@ elements.cancelAddRecipeButton.addEventListener("click", () => elements.addRecip
 elements.addRecipeItemButton.addEventListener("click", addRecipeItemRow);
 elements.resetButton.addEventListener("click", resetState);
 elements.captureButton.addEventListener("click", startCapturePreview);
+elements.captureFrameButton?.addEventListener("click", captureCurrentFrame);
 document.addEventListener("pointerdown", (event) => {
   const action = DQ10BoardCellEditor.resolvePointerDownAction({
     isOpen: Boolean(boardCellEditorElement && !boardCellEditorElement.hidden),
