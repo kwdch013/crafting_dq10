@@ -797,6 +797,7 @@ select:focus {
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--surface-soft);
+  min-height: 42px;
   padding: 10px;
 }
 

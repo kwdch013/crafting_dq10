@@ -103,6 +103,11 @@ vm.createContext(context);
 		"200℃単位以外では鍛冶特性状態を通常扱いにしてください",
 	);
 	assert.equal(
+		component.getHeatTraitState({ craftType: "weapon-smithing", traitId: "double-half", heat: "650" }).label,
+		"通常",
+		"鍛冶特性未発動時もBOARD上部に通常状態を表示してください",
+	);
+	assert.equal(
 		component.getHeatTraitState({ craftType: "weapon-smithing", traitId: "focus-change", heat: "600" }).label,
 		"集中増加",
 		"集中変化の200℃ターンはBOARD上部に現在状態を表示してください",
