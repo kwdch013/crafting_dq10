@@ -64,11 +64,12 @@ registerDQ10Craft(createDQ10SmithingCraftConfig({
     { id: "material", label: "素材", templateItems: createToolSmithingTemplateItems(3, 2) },
     { id: "sewing-needle", label: "針", templateItems: createToolSmithingTemplateItems(2, 1) },
   ],
+  // 鍛冶の特技一覧は、画面で比較しやすいように倍率の低い順で並べます。
   techniques: [
+    { id: "heat-up", name: "火力上げ", focusCost: 10, normalMin: 0, normalMax: 0, criticalMin: 0, criticalMax: 0, multiplier: 0, criticalWeight: 0.4 },
     { id: "hit", name: "たたく", focusCost: 5, damageModel: "smithing-temperature", powerId: "normal", multiplier: 1, criticalMultiplier: 2, criticalWeight: 1 },
-    { id: "double", name: "2倍打ち", focusCost: 8, damageModel: "smithing-temperature", powerId: "power_2_0", multiplier: 2, criticalMultiplier: 2, criticalWeight: 0.9 },
-    { id: "heat-up", name: "火力上げ", focusCost: 10, normalMin: 0, normalMax: 0, criticalMin: 0, criticalMax: 0, criticalWeight: 0.4 },
     { id: "aim", name: "ねらい打ち", focusCost: 16, damageModel: "smithing-temperature", powerId: "normal", multiplier: 1, criticalMultiplier: 2, criticalWeight: 1.8 },
+    { id: "double", name: "2倍打ち", focusCost: 8, damageModel: "smithing-temperature", powerId: "power_2_0", multiplier: 2, criticalMultiplier: 2, criticalWeight: 0.9 },
   ],
   items: [
     { id: "part-1", name: "上", gridCell: { row: 1, column: 1 }, current: 0, successMin: 70, successMax: 86 },

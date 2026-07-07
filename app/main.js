@@ -24,6 +24,7 @@ const elements = {
   focusInput: document.querySelector("#focusInput"),
   focusNote: document.querySelector("#focusNote"),
   heatInput: document.querySelector("#heatInput"),
+  techniqueDataPanel: document.querySelector("#techniqueDataPanel"),
   techniqueEditor: document.querySelector("#techniqueEditor"),
   craftReferencePanel: document.querySelector("#craftReferencePanel"),
   recipeTraitReference: document.querySelector("#recipeTraitReference"),
@@ -33,8 +34,6 @@ const elements = {
   smithingHeatDownButton: document.querySelector("#smithingHeatDownButton"),
   smithingHeatUpButton: document.querySelector("#smithingHeatUpButton"),
   smithingDamageRanges: document.querySelector("#smithingDamageRanges"),
-  smithingTechniquePanel: document.querySelector("#smithingTechniquePanel"),
-  smithingTechniqueRows: document.querySelector("#smithingTechniqueRows"),
   specialChargeToggle: document.querySelector("#specialChargeToggle"),
   boardSpecialStateLabel: document.querySelector("#boardSpecialStateLabel"),
   layoutSectionTitle: document.querySelector("#layoutSectionTitle"),
@@ -71,7 +70,12 @@ const elements = {
   saveRecipeButton: document.querySelector("#saveRecipeButton"),
   resetButton: document.querySelector("#resetButton"),
   captureButton: document.querySelector("#captureButton"),
+  captureFrameButton: document.querySelector("#captureFrameButton"),
   capturePreview: document.querySelector("#capturePreview"),
+  captureFrameCanvas: document.querySelector("#captureFrameCanvas"),
+  captureStatusLabel: document.querySelector("#captureStatusLabel"),
+  captureSourceLabel: document.querySelector("#captureSourceLabel"),
+  captureSizeLabel: document.querySelector("#captureSizeLabel"),
   guaranteedCount: document.querySelector("#guaranteedCount"),
   warningCount: document.querySelector("#warningCount"),
   dangerCount: document.querySelector("#dangerCount"),
@@ -83,10 +87,10 @@ let selectedBoardIngredientId = null;
 let boardCellEditorElement;
 let undoStack = [];
 let redoStack = [];
-let smithingTechniqueReference = { techniques: [] };
 let managedRecipeCraftId = "";
 let managedRecipeCategoryId = "";
 let managedRecipeEditId = "";
+let captureStream = null;
 const maxHistoryEntries = 50;
 const specialChargeStates = ["uncharged", "charging", "active"];
 const specialChargeLabels = {
@@ -112,23 +116,6 @@ async function hydrateRecipesFromApi() {
     }
   } catch {
     // API停止時はローカルのレシピファイルを引き続き使用します。
-  }
-}
-
-async function hydrateSmithingTechniquesFromJson() {
-  try {
-    const response = await fetch("./crafts/shared/smithing-techniques.json", { cache: "no-store" });
-
-    if (!response.ok) {
-      return;
-    }
-
-    const payload = await response.json();
-    if (Array.isArray(payload?.techniques)) {
-      smithingTechniqueReference = payload;
-    }
-  } catch {
-    // 特技表JSONを読めない環境では、鍛冶特技パネルだけ空表示にします。
   }
 }
 
@@ -535,17 +522,17 @@ function isCurrentCraftFamily(craftFamily) {
 
 // 光地金は、鍛冶の現在温度が200の倍数の時だけ有効にします。
 function isSmithingLightHeatActive() {
-  const heat = numberOr(state?.heat, NaN);
-  return isCurrentCraftFamily("smithing") &&
-    state?.traitId === "light" &&
-    Number.isFinite(heat) &&
-    heat % 200 === 0;
+  return getCurrentCraftComponent().isLightHeatActive?.(state) === true;
 }
 
 // 右クリック編集で光状態を操作できるかを職人別に判定します。
 function canEditLightState() {
-  return state?.traitId === "light" &&
-    (isCurrentCraftFamily("cooking") || isCurrentCraftFamily("smithing"));
+  const component = getCurrentCraftComponent();
+  if (component.canEditLightState) {
+    return component.canEditLightState(state) === true;
+  }
+
+  return state?.traitId === "light" && isCurrentCraftFamily("cooking");
 }
 
 function cloneConfigItems(items) {
@@ -627,7 +614,6 @@ function restoreBoardSnapshot(snapshot) {
   selectedBoardIngredientId = null;
   renderLayoutBoard();
   renderSmithingDamageReference();
-  renderSmithingTechniqueReference();
   renderCraftReference();
   renderAnalysis();
   saveState();
@@ -661,7 +647,6 @@ function render() {
   renderSmithingTemperatureSelect();
   renderTechniqueEditor();
   renderSmithingDamageReference();
-  renderSmithingTechniqueReference();
   renderCraftReference();
   renderLayoutBoard();
   syncJudgementLegend();
@@ -872,22 +857,29 @@ function renderSmithingTemperatureSelect() {
   }
 
   elements.smithingTemperatureSelect.replaceChildren();
-  if (!isCurrentCraftFamily("smithing")) {
+  const component = getCurrentCraftComponent();
+  if (!component.renderTemperatureSelect) {
     return;
   }
 
-  getCurrentCraftConfig().heatStates.forEach((heatState) => {
-    const option = document.createElement("option");
-    option.value = heatState.id;
-    option.textContent = heatState.label;
-    elements.smithingTemperatureSelect.append(option);
+  component.renderTemperatureSelect({
+    config: getCurrentCraftConfig(),
+    state,
+    elements,
   });
-  elements.smithingTemperatureSelect.value = state.heat;
 }
 
 function renderTechniqueEditor() {
   elements.techniqueEditor.replaceChildren();
   const config = getCurrentCraftConfig();
+  const hidesTechniqueData = getCraftComponent(config.id).craftFamily === "smithing";
+  if (elements.techniqueDataPanel) {
+    elements.techniqueDataPanel.hidden = hidesTechniqueData;
+  }
+  if (hidesTechniqueData) {
+    return;
+  }
+
   const previewIngredient = getTechniquePreviewIngredient(config);
 
   state.techniques
@@ -947,108 +939,28 @@ function syncJudgementLegend() {
 
 // 鍛冶BOARD下に現在温度の威力別ダメージ表を描画します。
 function renderSmithingDamageReference() {
-  const isSmithing = isCurrentCraftFamily("smithing");
-  const smithingDamage = window.DQ10SmithingDamage || {};
-  const rangeSet = smithingDamage.ranges?.[state.heat];
-  const criticalMultiplier = numberOr(smithingDamage.criticalMultiplier, 2);
-  const heatStates = getCurrentCraftConfig().heatStates || [];
-  const currentHeat = numberOr(state.heat, 0);
-  const heatValues = heatStates.map((heatState) => numberOr(heatState.id, currentHeat));
-  const minHeat = Math.min(...heatValues);
-  const maxHeat = Math.max(...heatValues);
-
   if (!elements.smithingDamagePanel || !elements.smithingDamageRanges) {
     return;
   }
 
-  elements.smithingDamagePanel.hidden = !isSmithing;
-  if (!isSmithing) {
+  const component = getCurrentCraftComponent();
+  elements.smithingDamagePanel.hidden = !component.renderBoardReference;
+  if (!component.renderBoardReference) {
     elements.smithingDamageRanges.replaceChildren();
     return;
   }
 
-  if (elements.smithingTemperatureSelect) {
-    elements.smithingTemperatureSelect.value = state.heat;
-  }
-  if (elements.smithingHeatDownButton) {
-    elements.smithingHeatDownButton.disabled = currentHeat <= minHeat;
-  }
-  if (elements.smithingHeatUpButton) {
-    elements.smithingHeatUpButton.disabled = currentHeat >= maxHeat;
-  }
-
-  elements.smithingDamageRanges.replaceChildren();
-  getSmithingDamagePowerEntries().forEach(([powerId, power]) => {
-    const range = rangeSet?.[powerId];
-    const row = document.createElement("div");
-    row.className = "smithing-damage-row";
-
-    if (!range) {
-      row.innerHTML = `
-        <strong>${escapeHtml(power.label)}</strong>
-        <span>-</span>
-        <small>未設定</small>
-      `;
-    } else {
-      row.innerHTML = `
-        <strong>${escapeHtml(power.label)}</strong>
-        <span class="numeric">${range[0]} - ${range[1]}</span>
-        <small class="numeric">
-          <span>最大 ${range[1]}</span>
-          <span>会心最小 ${range[0] * criticalMultiplier}</span>
-        </small>
-      `;
-    }
-    elements.smithingDamageRanges.append(row);
+  component.renderBoardReference({
+    config: getCurrentCraftConfig(),
+    state,
+    elements,
+    escapeHtml,
   });
 }
 
-// 鍛冶ダメージ倍率を低い順で表示するため、定義値の倍率で整列します。
+// 鍛冶コンポーネントから倍率順のダメージ定義を取得します。
 function getSmithingDamagePowerEntries() {
-  const powers = window.DQ10SmithingDamage?.powers || {};
-  return Object.entries(powers).sort(([, a], [, b]) =>
-    numberOr(a.multiplier, 0) - numberOr(b.multiplier, 0),
-  );
-}
-
-// 鍛冶BOARD下の温度別ダメージ表に続けて、JSON登録した特技表を描画します。
-function renderSmithingTechniqueReference() {
-  const isSmithing = isCurrentCraftFamily("smithing");
-  const techniques = Array.isArray(smithingTechniqueReference.techniques)
-    ? smithingTechniqueReference.techniques
-    : [];
-
-  if (!elements.smithingTechniquePanel || !elements.smithingTechniqueRows) {
-    return;
-  }
-
-  elements.smithingTechniquePanel.hidden = !isSmithing;
-  elements.smithingTechniqueRows.replaceChildren();
-  if (!isSmithing) {
-    return;
-  }
-
-  const header = document.createElement("div");
-  header.className = "smithing-technique-row heading";
-  header.innerHTML = `
-    <strong>特技名</strong>
-    <strong>消費集中</strong>
-    <strong>倍率</strong>
-    <strong>範囲</strong>
-  `;
-  elements.smithingTechniqueRows.append(header);
-
-  techniques.forEach((technique) => {
-    const row = document.createElement("div");
-    row.className = "smithing-technique-row";
-    row.innerHTML = `
-      <span>${escapeHtml(technique.name || "")}</span>
-      <span class="numeric">${numberOr(technique.focusCost, 0)}</span>
-      <span class="numeric">${numberOr(technique.multiplier, 0)}倍</span>
-      <span>${escapeHtml(technique.range || "")}</span>
-    `;
-    elements.smithingTechniqueRows.append(row);
-  });
+  return getCurrentCraftComponent().getDamagePowerEntries?.() || [];
 }
 
 function getTechniquePreviewIngredient(config) {
@@ -1532,7 +1444,6 @@ function setCookingHeatMode(mode) {
   elements.heatInput.value = mode;
   renderTechniqueEditor();
   renderSmithingDamageReference();
-  renderSmithingTechniqueReference();
   renderLayoutBoard();
   renderCraftReference();
   renderAnalysis();
@@ -1542,13 +1453,13 @@ function setCookingHeatMode(mode) {
 
 // 鍛冶BOARD内の温度操作を50℃刻みの温度状態へ同期します。
 function adjustSmithingHeat(delta) {
-  if (!isCurrentCraftFamily("smithing")) {
+  const component = getCurrentCraftComponent();
+  if (!component.getNextHeat) {
     return;
   }
 
-  const config = getCurrentCraftConfig();
-  const nextHeat = String(numberOr(state.heat, 0) + delta);
-  if (!config.heatStates.some((heatState) => heatState.id === nextHeat)) {
+  const nextHeat = component.getNextHeat(getCurrentCraftConfig(), state, delta);
+  if (!nextHeat) {
     return;
   }
 
@@ -1558,7 +1469,7 @@ function adjustSmithingHeat(delta) {
 
 // BOARD内プルダウンで選んだ温度を鍛冶の温度状態へ反映します。
 function changeSmithingHeatFromBoard() {
-  if (!isCurrentCraftFamily("smithing") || !elements.smithingTemperatureSelect) {
+  if (!getCurrentCraftComponent().applyHeatChange || !elements.smithingTemperatureSelect) {
     return;
   }
 
@@ -1571,7 +1482,6 @@ function refreshAfterHeatChange() {
   renderSmithingTemperatureSelect();
   renderTechniqueEditor();
   renderSmithingDamageReference();
-  renderSmithingTechniqueReference();
   renderLayoutBoard();
   renderCraftReference();
   renderAnalysis();
@@ -1581,11 +1491,14 @@ function refreshAfterHeatChange() {
 
 // 鍛冶の温度変更時に、温度表示と判定表示を同期します。
 function applySmithingHeatChange(nextHeat) {
+  const component = getCurrentCraftComponent();
+  if (component.applyHeatChange) {
+    component.applyHeatChange({ state, elements }, nextHeat);
+    return;
+  }
+
   state.heat = nextHeat;
   elements.heatInput.value = state.heat;
-  if (elements.smithingTemperatureSelect) {
-    elements.smithingTemperatureSelect.value = state.heat;
-  }
 }
 
 function toggleCookingLight(ingredientId) {
@@ -1963,7 +1876,7 @@ function renderSmithingCellJudgements(editor) {
     row.classList.add(`status-${analysis.status}`);
     row.innerHTML = `
       <strong>${escapeHtml(power.label)}</strong>
-      <span class="numeric">${range[0]}-${range[1]} / 会心 ${analysis.criticalMin}-${analysis.criticalMax}</span>
+      <span class="numeric">${analysis.normalMin}-${analysis.normalMax} / 会心 ${analysis.criticalMin}-${analysis.criticalMax}</span>
       <small>${escapeHtml(analysis.statusLabel)}</small>
     `;
     rows.append(row);
@@ -2782,7 +2695,44 @@ function addRecipeItemRow() {
   }, index);
 }
 
+function renderCaptureInfo(info) {
+  const width = numberOr(info?.width, 0);
+  const height = numberOr(info?.height, 0);
+
+  if (elements.captureStatusLabel) {
+    elements.captureStatusLabel.textContent = info?.statusLabel || "未接続";
+  }
+  if (elements.captureSourceLabel) {
+    elements.captureSourceLabel.textContent = info?.sourceLabel || "-";
+  }
+  if (elements.captureSizeLabel) {
+    elements.captureSizeLabel.textContent = width > 0 && height > 0 ? `${width} x ${height}` : "-";
+  }
+  if (elements.captureFrameButton) {
+    elements.captureFrameButton.disabled = info?.status !== "connected" && info?.status !== "captured";
+  }
+}
+
+function refreshCaptureInfo() {
+  renderCaptureInfo(window.DQ10CaptureReader.createCaptureInfo(captureStream, elements.capturePreview));
+}
+
+function stopCapturePreview() {
+  window.DQ10CaptureReader.stopCaptureStream(captureStream);
+  captureStream = null;
+  elements.capturePreview.srcObject = null;
+  elements.capturePreview.hidden = true;
+  elements.captureFrameCanvas.hidden = true;
+  elements.captureButton.textContent = "画面共有を開始";
+  renderCaptureInfo({ status: "waiting", statusLabel: "未接続" });
+}
+
 async function startCapturePreview() {
+  if (captureStream) {
+    stopCapturePreview();
+    return;
+  }
+
   if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
     alert("このブラウザでは画面共有プレビューを利用できません。");
     return;
@@ -2793,11 +2743,27 @@ async function startCapturePreview() {
       video: true,
       audio: false,
     });
+    captureStream = stream;
     elements.capturePreview.srcObject = stream;
     elements.capturePreview.hidden = false;
+    elements.captureButton.textContent = "画面共有を停止";
+    stream.getVideoTracks().forEach((track) => {
+      track.addEventListener?.("ended", stopCapturePreview, { once: true });
+    });
+    elements.capturePreview.addEventListener("loadedmetadata", refreshCaptureInfo, { once: true });
+    refreshCaptureInfo();
   } catch {
     alert("画面共有がキャンセルされました。");
   }
+}
+
+function captureCurrentFrame() {
+  const info = window.DQ10CaptureReader.captureVideoFrame(elements.capturePreview, elements.captureFrameCanvas);
+  elements.captureFrameCanvas.hidden = info.status !== "captured";
+  renderCaptureInfo({
+    ...window.DQ10CaptureReader.createCaptureInfo(captureStream, elements.capturePreview),
+    ...info,
+  });
 }
 
 elements.recipeTraitInput.addEventListener("change", () => {
@@ -2812,7 +2778,6 @@ elements.recipeTraitInput.addEventListener("change", () => {
   markCustomRecipe();
   renderTechniqueEditor();
   renderSmithingDamageReference();
-  renderSmithingTechniqueReference();
   renderLayoutBoard();
   renderTraitInfo();
   renderCraftReference();
@@ -2875,6 +2840,7 @@ elements.cancelAddRecipeButton.addEventListener("click", () => elements.addRecip
 elements.addRecipeItemButton.addEventListener("click", addRecipeItemRow);
 elements.resetButton.addEventListener("click", resetState);
 elements.captureButton.addEventListener("click", startCapturePreview);
+elements.captureFrameButton?.addEventListener("click", captureCurrentFrame);
 document.addEventListener("pointerdown", (event) => {
   const action = DQ10BoardCellEditor.resolvePointerDownAction({
     isOpen: Boolean(boardCellEditorElement && !boardCellEditorElement.hidden),
@@ -2917,7 +2883,6 @@ document.addEventListener("keydown", (event) => {
 
 async function initialize() {
   await hydrateRecipesFromApi();
-  await hydrateSmithingTechniquesFromJson();
   state = loadState();
   render();
 }

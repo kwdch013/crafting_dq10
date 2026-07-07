@@ -142,7 +142,7 @@ center: {
 ```
 
 `powerId` は `shared/smithing-damage.js` の威力キーに対応します。
-鍛冶BOARD下の特技表に表示する消費集中、特技名、倍率、範囲は `shared/smithing-techniques.json` にJSONとして登録します。
+鍛冶職人の選択特技は各 `app/crafts/*-smithing/config.js` で倍率の低い順に管理します。
 
 ## 鍛冶ダメージ設定
 

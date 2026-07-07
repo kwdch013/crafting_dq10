@@ -35,7 +35,7 @@ docker compose down
 - 職人別設定ファイルによる特技ダメージと集中力の管理
 - 設定の `localStorage` 保存
 - JSON Import / Export
-- 画面共有プレビューの接続口
+- 画面共有プレビュー、接続状態表示、現在フレームのcanvas取得
 - frontend / api の2コンテナ構成
 - APIからのレシピ一覧取得
 - 会心発生時に基準値へ届く場合、超過せず誤差0で止まる判定
@@ -105,7 +105,7 @@ app/crafts/
 各 `config.js` では、職人名、入力ラベル、レベル別集中力、道具種類と★数ごとの補正、火力状態、特技ごとの消費集中力・通常範囲・会心範囲、初期マスを管理します。
 道具鍛冶の大項目は `app/crafts/tool-smithing/config.js` の `recipeCategoryOptions` に定義し、小項目の具体的な制作物はレシピJSONに追加します。
 
-鍛冶BOARD下の特技表に表示する消費集中、特技名、倍率、範囲は `app/crafts/shared/smithing-techniques.json` に登録します。
+鍛冶職人の選択特技は各 `app/crafts/*-smithing/config.js` で倍率の低い順に管理します。
 
 調理の位置別ダメージは `app/crafts/shared/cooking-damage.js` に集約しています。
 鍛冶系の温度別ダメージは `app/crafts/shared/smithing-damage.js` に集約しています。
@@ -120,6 +120,6 @@ BOARDの共通操作は配置変更の `戻る` と `進む` のみにしてい�
 
 - DQ10ウィンドウ選択
 - 職人UI範囲のキャリブレーション
-- OpenCV / OCR による値の自動認識
+- 取得フレームを使ったOpenCV / OCR による値の自動認識
 - 認識信頼度と手入力補正の統合
 - 他職人エンジンの追加
