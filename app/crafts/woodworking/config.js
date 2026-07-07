@@ -1,8 +1,11 @@
 // 木工の参照画像に合わせた固定基準値テンプレートを作成します。
 function createWoodworkingTemplateItems(cells) {
   const names = {
+    "1:1": "左上",
     "1:2": "上",
+    "2:1": "左",
     "2:2": "中央",
+    "3:1": "左下",
     "3:2": "下",
   };
 
@@ -49,7 +52,32 @@ registerDQ10Craft({
   ],
   // 木工の大項目は参照画像ファイル名と同期します。
   recipeCategoryOptions: [
-    { id: "woodworking-knife", label: "木工刀", templateItems: createWoodworkingTemplateItems([
+    { id: "stick", label: "スティック", templateItems: createWoodworkingTemplateItems([
+      { row: 1, column: 2 },
+      { row: 2, column: 2 },
+    ]) },
+    { id: "bow", label: "弓", templateItems: createWoodworkingTemplateItems([
+      { row: 1, column: 1 },
+      { row: 1, column: 2 },
+      { row: 2, column: 1 },
+      { row: 3, column: 1 },
+      { row: 3, column: 2 },
+    ]) },
+    { id: "fan", label: "扇", templateItems: createWoodworkingTemplateItems([
+      { row: 1, column: 1 },
+      { row: 1, column: 2 },
+      { row: 2, column: 1 },
+      { row: 2, column: 2 },
+    ]) },
+    { id: "kon", label: "昆", templateItems: createWoodworkingTemplateItems([
+      { row: 1, column: 1 },
+      { row: 1, column: 2 },
+      { row: 2, column: 1 },
+      { row: 2, column: 2 },
+      { row: 3, column: 1 },
+      { row: 3, column: 2 },
+    ]) },
+    { id: "staff", label: "杖", templateItems: createWoodworkingTemplateItems([
       { row: 1, column: 2 },
       { row: 2, column: 2 },
       { row: 3, column: 2 },
@@ -71,6 +99,5 @@ registerDQ10Craft({
   items: [
     { id: "part-1", name: "上", optionId: "parallel", gridCell: { row: 1, column: 2 }, current: 0, target: 74, successMin: 74, successMax: 74 },
     { id: "part-2", name: "中央", optionId: "parallel", gridCell: { row: 2, column: 2 }, current: 0, target: 74, successMin: 74, successMax: 74 },
-    { id: "part-3", name: "下", optionId: "parallel", gridCell: { row: 3, column: 2 }, current: 0, target: 74, successMin: 74, successMax: 74 },
   ],
 });
