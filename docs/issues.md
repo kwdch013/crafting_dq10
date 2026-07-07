@@ -496,4 +496,4 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/53
 ### #93 鍛冶職人: 右クリック編集の固定するを確定済みにする
 鍛冶職人の右クリック編集では調理向けの固定判定ではなく、成功範囲内のマスを `確定済み` として指定できるようにします。URL: https://github.com/kwdch013/crafting_dq10/issues/93
 ### #100 鍛冶職人: 光地金の切替でノードサイズが変わる
-光地金の有効化や解除でBOARDノード高さが変わらないよう、光切替行とヘッダーの光バッジ領域を固定します。URL: https://github.com/kwdch013/crafting_dq10/issues/100
+光地金の有効化や解除でBOARDノード高さが変わらないよう、光切替行を固定し、ヘッダーをタイトル行と光バッジ行に分けて固定します。URL: https://github.com/kwdch013/crafting_dq10/issues/100

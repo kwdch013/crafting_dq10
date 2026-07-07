@@ -27,3 +27,15 @@ assert.match(
 	/\.craft-board\.smithing-board \.board-cell-badges\s*{[\s\S]*?min-height:\s*20px;/,
 	"鍛冶セルは光バッジ表示でヘッダー高さが変わらないよう、バッジ領域を確保してください",
 );
+
+assert.match(
+	styleSource,
+	/\.craft-board\.smithing-board \.board-cell-head\s*{[\s\S]*?grid-template-rows:\s*auto 20px;/,
+	"鍛冶セルは光バッジ表示でタイトル幅が変わらないよう、ヘッダーをタイトル行とバッジ行に分けてください",
+);
+
+assert.match(
+	styleSource,
+	/\.craft-board\.smithing-board \.board-cell-head strong\s*{[\s\S]*?min-height:\s*18px;/,
+	"鍛冶セルはタイトル行の高さを確保し、光切替でノードサイズが変わらないようにしてください",
+);
