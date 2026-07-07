@@ -104,17 +104,15 @@
     return isSmithingCraftState(state) && state.specialChargeState === "using";
   }
 
-  function shouldPreventHephaestusDamage(state = {}, ingredient = {}, criticalMin = 0) {
+  function shouldPreventHephaestusDamage(state = {}, ingredient = {}) {
     if (!isSmithingHephaestusActive(state)) {
       return false;
     }
 
     const current = toNumber(ingredient?.current);
     const target = resolveIngredientTarget(ingredient);
-    const [successMin, successMax] = normalizeRange(ingredient?.successMin, ingredient?.successMax);
-    const inSuccessRange = current >= successMin && current <= successMax;
 
-    return current >= target || (inSuccessRange && current + criticalMin > target);
+    return current >= target;
   }
 
   function getSmithingFocusCostMultiplier(state = {}) {
@@ -330,12 +328,11 @@
       const focusCostMultiplier = getSmithingFocusCostMultiplier(state);
       const criticalRateBoost = state.traitId === "focus-change" && getSmithingHeatPhase(state) === "low";
       const hephaestusActive = isSmithingHephaestusActive(state);
-      const hephaestusPowerMultiplier = hephaestusActive ? 2 : 1;
-      const normalMin = Math.ceil(range[0] * smithingPowerMultiplier * hephaestusPowerMultiplier);
-      const normalMax = Math.ceil(range[1] * smithingPowerMultiplier * hephaestusPowerMultiplier);
+      const normalMin = Math.ceil(range[0] * smithingPowerMultiplier);
+      const normalMax = Math.ceil(range[1] * smithingPowerMultiplier);
       const criticalMin = Math.ceil(normalMin * criticalMultiplier);
       const criticalMax = Math.ceil(normalMax * criticalMultiplier);
-      const hephaestusNoDamage = shouldPreventHephaestusDamage(state, ingredient, criticalMin);
+      const hephaestusNoDamage = shouldPreventHephaestusDamage(state, ingredient);
       const actualMin = hephaestusNoDamage ? 0 : hephaestusActive ? criticalMin : normalMin;
       const actualMax = hephaestusNoDamage ? 0 : hephaestusActive ? criticalMax : normalMax;
 
@@ -553,24 +550,41 @@
     const lowerDiff = successMin - current;
     const upperDiff = successMax - current;
     if (forcedCritical) {
-      const forcedMin = criticalAfterMin - current;
-      const forcedMax = criticalAfterMax - current;
+      const currentToTarget = target - current;
+      const hephaestusStopsAtTarget = technique.hephaestusActive === true && currentToTarget > 0 && rawCriticalAfterMax >= target;
+      const hephaestusAfterMin = hephaestusStopsAtTarget && rawCriticalAfterMin >= target
+        ? target
+        : criticalAfterMin;
+      const hephaestusAfterMax = hephaestusStopsAtTarget
+        ? target
+        : criticalAfterMax;
+      const forcedMin = Math.max(0, hephaestusAfterMin - current);
+      const forcedMax = Math.max(0, hephaestusAfterMax - current);
       const currentOver = current > successMax;
-      const shortage = !currentOver && criticalAfterMax < successMin;
-      const forcedOver = !currentOver && criticalAfterMin > successMax;
+      const shortage = !currentOver && hephaestusAfterMax < successMin;
       const inTargetRangeUnlocked = current >= successMin && current <= successMax;
-      const criticalCanHit = criticalAfterMax >= successMin && criticalAfterMin <= successMax;
-      const guaranteedCritical = !currentOver && !shortage && !forcedOver && criticalCanHit && forcedMax > 0;
+      const criticalCanHit = hephaestusAfterMax >= successMin && hephaestusAfterMin <= successMax;
+      const guaranteedCritical =
+        !currentOver &&
+        !shortage &&
+        !inTargetRangeUnlocked &&
+        current + criticalMin >= successMax;
+      const possibleFakeCritical =
+        !currentOver &&
+        !shortage &&
+        !inTargetRangeUnlocked &&
+        !guaranteedCritical &&
+        criticalCanHit;
       let status = "in-range";
 
       if (currentOver) {
         status = "over";
       } else if (shortage) {
         status = "shortage";
-      } else if (forcedOver) {
-        status = "normal-over-risk";
       } else if (guaranteedCritical) {
         status = "guaranteed";
+      } else if (possibleFakeCritical) {
+        status = "fake-critical-risk";
       }
 
       return {
@@ -587,24 +601,24 @@
         hephaestusNoDamage: technique.hephaestusNoDamage === true,
         normalMin: forcedMin,
         normalMax: forcedMax,
-        normalAfterMin: criticalAfterMin,
-        normalAfterMax: criticalAfterMax,
+        normalAfterMin: hephaestusAfterMin,
+        normalAfterMax: hephaestusAfterMax,
         criticalMin,
         criticalMax,
         rawCriticalAfterMin,
         rawCriticalAfterMax,
-        criticalAfterMin,
-        criticalAfterMax,
-        criticalStopApplies,
+        criticalAfterMin: hephaestusAfterMin,
+        criticalAfterMax: hephaestusAfterMax,
+        criticalStopApplies: criticalStopApplies || hephaestusStopsAtTarget,
         normalHits: criticalCanHit,
         normalCanHit: criticalCanHit,
-        normalMaxCanEnterTargetRange: current < successMin && criticalAfterMax >= successMin && criticalAfterMax <= successMax,
+        normalMaxCanEnterTargetRange: current < successMin && hephaestusAfterMax >= successMin && hephaestusAfterMax <= successMax,
         guaranteedCritical,
         criticalCanHit,
         inTargetRangeUnlocked,
         criticalCanEnterTargetRangeBeforeGuarantee: false,
-        possibleFakeCritical: false,
-        normalOver: forcedOver,
+        possibleFakeCritical,
+        normalOver: false,
         criticalOver: currentOver,
         currentOver,
         targetMode,
