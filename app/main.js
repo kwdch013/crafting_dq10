@@ -2412,10 +2412,10 @@ function getRecipeCategoryTemplateItems(config, categoryId) {
 
 function renderAddRecipeItems(config, seedItems = getAddRecipeSeedItems(config)) {
   elements.addRecipeItems.replaceChildren();
-  elements.addRecipeItems.classList.toggle("recipe-layout-editor", isSmithingRecipeEditor(config));
+  elements.addRecipeItems.classList.toggle("recipe-layout-editor", isFixedLayoutRecipeEditor(config));
 
-  if (isSmithingRecipeEditor(config)) {
-    renderSmithingAddRecipeItems(config, seedItems);
+  if (isFixedLayoutRecipeEditor(config)) {
+    renderFixedLayoutAddRecipeItems(config, seedItems);
     if (elements.addRecipeItemButton) {
       elements.addRecipeItemButton.hidden = true;
     }
@@ -2433,7 +2433,19 @@ function renderAddRecipeItems(config, seedItems = getAddRecipeSeedItems(config))
   });
 }
 
-// 鍛冶レシピは実際の鍛冶配置で、基準範囲の下限と上限だけを入力します。
+// 固定マス職人のレシピは実配置どおりのセルで入力します。
+function isFixedLayoutRecipeEditor(config) {
+  const craftFamily = getCraftComponent(config.id).craftFamily;
+  return ["smithing", "woodworking", "sewing"].includes(craftFamily) && Boolean(config.layout);
+}
+
+// 固定基準値職人は基準範囲ではなく、各マスの基準値だけを入力します。
+function isFixedTargetRecipeEditor(config) {
+  const craftFamily = getCraftComponent(config.id).craftFamily;
+  return ["woodworking", "sewing"].includes(craftFamily);
+}
+
+// 鍛冶レシピ互換のため、既存の専用判定名も残します。
 function isSmithingRecipeEditor(config) {
   return getCraftComponent(config.id).craftFamily === "smithing" && Boolean(config.layout);
 }
@@ -2442,7 +2454,7 @@ function getVisibleSmithingRecipeItems(items) {
   return (items || []).filter((item) => item?.gridCell);
 }
 
-function renderSmithingAddRecipeItems(config, seedItems) {
+function renderFixedLayoutAddRecipeItems(config, seedItems) {
   const rows = Math.max(1, numberOr(config.layout?.rows, 1));
   const columns = Math.max(1, numberOr(config.layout?.columns, 1));
   const visibleItems = getVisibleSmithingRecipeItems(seedItems);
@@ -2450,12 +2462,39 @@ function renderSmithingAddRecipeItems(config, seedItems) {
   elements.addRecipeItems.style.gridTemplateRows = `repeat(${rows}, minmax(0, auto))`;
 
   visibleItems.forEach((item) => {
-    appendSmithingAddRecipeCell(
+    appendFixedLayoutAddRecipeCell(
+      config,
       numberOr(item.gridCell?.row, 1),
       numberOr(item.gridCell?.column, 1),
       item,
     );
   });
+}
+
+function renderSmithingAddRecipeItems(config, seedItems) {
+  renderFixedLayoutAddRecipeItems(config, seedItems);
+}
+
+function appendFixedLayoutAddRecipeCell(config, rowIndex, columnIndex, item = null) {
+  const cell = document.createElement("fieldset");
+  cell.className = "recipe-layout-cell";
+  cell.dataset.row = String(rowIndex);
+  cell.dataset.column = String(columnIndex);
+  cell.dataset.name = item?.name || `${rowIndex}行${columnIndex}列`;
+  cell.style.gridRow = String(rowIndex);
+  cell.style.gridColumn = String(columnIndex);
+  cell.innerHTML = `<legend>${escapeHtml(item?.name || `${rowIndex}行${columnIndex}列`)}</legend>`;
+
+  if (Array.isArray(config.itemOptions) && config.itemOptions.length > 0) {
+    cell.append(createRecipeItemSelect("optionId", "位置", item?.optionId || config.itemOptions[0]?.id || "", config.itemOptions));
+  }
+  if (isFixedTargetRecipeEditor(config)) {
+    cell.append(createRecipeItemNumber("target", "基準値", item?.target ?? item?.successMin ?? "", 0, 9999));
+  } else {
+    cell.append(createRecipeItemNumber("successMin", "下限", item?.successMin ?? "", 0, 9999, false));
+    cell.append(createRecipeItemNumber("successMax", "上限", item?.successMax ?? "", 0, 9999, false));
+  }
+  elements.addRecipeItems.append(cell);
 }
 
 function appendSmithingAddRecipeCell(rowIndex, columnIndex, item = null) {
@@ -2630,8 +2669,8 @@ async function saveManagedRecipe(event) {
 }
 
 function collectAddRecipeItems(config) {
-  if (isSmithingRecipeEditor(config)) {
-    return collectSmithingAddRecipeItems(config);
+  if (isFixedLayoutRecipeEditor(config)) {
+    return collectFixedLayoutAddRecipeItems(config);
   }
 
   const items = Array.from(elements.addRecipeItems.querySelectorAll(".recipe-item-row"), (row, index) => {
@@ -2676,9 +2715,31 @@ function collectAddRecipeItems(config) {
   return normalized.items;
 }
 
-function collectSmithingAddRecipeItems(config) {
+function collectFixedLayoutAddRecipeItems(config) {
   return Array.from(elements.addRecipeItems.querySelectorAll(".recipe-layout-cell"))
     .map((cell) => {
+      if (isFixedTargetRecipeEditor(config)) {
+        const targetValue = cell.querySelector('[data-field="target"]')?.value;
+        const target = numberOr(targetValue, 0);
+        const row = numberOr(cell.dataset.row, 1);
+        const column = numberOr(cell.dataset.column, 1);
+        const index = ((row - 1) * Math.max(1, numberOr(config.layout?.columns, 1))) + column;
+        const item = {
+          id: `item-${index}`,
+          name: cell.dataset.name || `${row}行${column}列`,
+          current: 0,
+          target,
+          successMin: target,
+          successMax: target,
+          gridCell: { row, column },
+        };
+        const optionId = cell.querySelector('[data-field="optionId"]')?.value;
+        if (optionId) {
+          item.optionId = optionId;
+        }
+        return item;
+      }
+
       const successMinValue = cell.querySelector('[data-field="successMin"]')?.value;
       const successMaxValue = cell.querySelector('[data-field="successMax"]')?.value;
       if (successMinValue === "" && successMaxValue === "") {
@@ -2704,9 +2765,13 @@ function collectSmithingAddRecipeItems(config) {
     .filter(Boolean);
 }
 
+function collectSmithingAddRecipeItems(config) {
+  return collectFixedLayoutAddRecipeItems(config);
+}
+
 function addRecipeItemRow() {
   const config = getManagedRecipeConfig();
-  if (isSmithingRecipeEditor(config)) {
+  if (isFixedLayoutRecipeEditor(config)) {
     return;
   }
 

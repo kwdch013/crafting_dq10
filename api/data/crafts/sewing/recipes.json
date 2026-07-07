@@ -1,14 +1,12 @@
 [
   {
-    "id": "sewing-2rows-6",
-    "name": "裁縫 6マステンプレート",
+    "id": "sewing-needle-template",
+    "name": "針テンプレート",
+    "category": "針",
+    "categoryId": "sewing-needle",
     "items": [
-      { "id": "part-1", "name": "左上", "gridCell": { "row": 1, "column": 1 }, "current": 0, "target": 78, "successMin": 70, "successMax": 85 },
-      { "id": "part-2", "name": "中央上", "gridCell": { "row": 1, "column": 2 }, "current": 0, "target": 78, "successMin": 70, "successMax": 85 },
-      { "id": "part-3", "name": "右上", "gridCell": { "row": 1, "column": 3 }, "current": 0, "target": 78, "successMin": 70, "successMax": 85 },
-      { "id": "part-4", "name": "左下", "gridCell": { "row": 3, "column": 1 }, "current": 0, "target": 78, "successMin": 70, "successMax": 85 },
-      { "id": "part-5", "name": "中央下", "gridCell": { "row": 3, "column": 2 }, "current": 0, "target": 78, "successMin": 70, "successMax": 85 },
-      { "id": "part-6", "name": "右下", "gridCell": { "row": 3, "column": 3 }, "current": 0, "target": 78, "successMin": 70, "successMax": 85 }
+      { "id": "part-1", "name": "上", "gridCell": { "row": 1, "column": 2 }, "current": 0, "target": 78, "successMin": 78, "successMax": 78 },
+      { "id": "part-2", "name": "下", "gridCell": { "row": 2, "column": 2 }, "current": 0, "target": 78, "successMin": 78, "successMax": 78 }
     ]
   }
 ]

@@ -1,17 +1,13 @@
 [
   {
-    "id": "wood-3x3-standard",
-    "name": "木工 9マステンプレート",
+    "id": "woodworking-knife-template",
+    "name": "木工刀テンプレート",
+    "category": "木工刀",
+    "categoryId": "woodworking-knife",
     "items": [
-      { "id": "part-1", "name": "左上", "optionId": "parallel", "gridCell": { "row": 1, "column": 1 }, "current": 0, "target": 74, "successMin": 65, "successMax": 82 },
-      { "id": "part-2", "name": "上", "optionId": "parallel", "gridCell": { "row": 1, "column": 2 }, "current": 0, "target": 74, "successMin": 65, "successMax": 82 },
-      { "id": "part-3", "name": "右上", "optionId": "parallel", "gridCell": { "row": 1, "column": 3 }, "current": 0, "target": 74, "successMin": 65, "successMax": 82 },
-      { "id": "part-4", "name": "左", "optionId": "vertical", "gridCell": { "row": 2, "column": 1 }, "current": 0, "target": 74, "successMin": 65, "successMax": 82 },
-      { "id": "part-5", "name": "中央", "optionId": "parallel", "gridCell": { "row": 2, "column": 2 }, "current": 0, "target": 74, "successMin": 65, "successMax": 82 },
-      { "id": "part-6", "name": "右", "optionId": "vertical", "gridCell": { "row": 2, "column": 3 }, "current": 0, "target": 74, "successMin": 65, "successMax": 82 },
-      { "id": "part-7", "name": "左下", "optionId": "parallel", "gridCell": { "row": 3, "column": 1 }, "current": 0, "target": 74, "successMin": 65, "successMax": 82 },
-      { "id": "part-8", "name": "下", "optionId": "parallel", "gridCell": { "row": 3, "column": 2 }, "current": 0, "target": 74, "successMin": 65, "successMax": 82 },
-      { "id": "part-9", "name": "右下", "optionId": "parallel", "gridCell": { "row": 3, "column": 3 }, "current": 0, "target": 74, "successMin": 65, "successMax": 82 }
+      { "id": "part-1", "name": "上", "optionId": "parallel", "gridCell": { "row": 1, "column": 2 }, "current": 0, "target": 74, "successMin": 74, "successMax": 74 },
+      { "id": "part-2", "name": "中央", "optionId": "parallel", "gridCell": { "row": 2, "column": 2 }, "current": 0, "target": 74, "successMin": 74, "successMax": 74 },
+      { "id": "part-3", "name": "下", "optionId": "parallel", "gridCell": { "row": 3, "column": 2 }, "current": 0, "target": 74, "successMin": 74, "successMax": 74 }
     ]
   }
 ]
