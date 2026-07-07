@@ -18,6 +18,7 @@ assert.match(html, /id="smithingHeatDownButton"/, "BOARD内の温度低下ボタ
 assert.match(html, /id="smithingHeatUpButton"/, "BOARD内の温度上昇ボタンを追加してください");
 assert.match(html, /id="smithingDamageRanges"/, "温度別ダメージ表の描画先を追加してください");
 assert.match(html, /id="smithingBoardTraitState"/, "BOARD上部に鍛冶の現在特性状態を表示してください");
+assert.doesNotMatch(html, /id="smithingBoardTraitState" hidden/, "鍛冶特性状態欄は温度変更でBOARD位置が動かないよう初期表示領域を確保してください");
 assert.match(html, /id="techniqueDataPanel"/, "特技データパネルは職人別に表示制御できるようにしてください");
 assert.match(html, /id="techniqueDataPanel"[\s\S]*<h2>特技データ<\/h2>/, "特技データパネル本体に表示制御IDを付けてください");
 assert.doesNotMatch(html, /id="smithingTechniquePanel"/, "鍛冶職人の追加特技データ表は表示しないでください");
@@ -54,6 +55,8 @@ assert.match(smithingComponentJs, /smithingDamage\.ranges\?\.\[state\.heat\]/);
 assert.match(smithingComponentJs, /getAdjustedDamageRange\(range, state\)/, "温度別ダメージ表は鍛冶特性の威力補正後を表示してください");
 assert.match(smithingComponentJs, /会心最小 \$\{adjustedRange\[0\] \* criticalMultiplier\}/);
 assert.match(smithingComponentJs, /function renderHeatTraitState\(/, "鍛冶の現在特性状態をBOARD上部へ描画してください");
+assert.doesNotMatch(smithingComponentJs, /smithingBoardTraitState\.hidden = !shouldShow/, "鍛冶特性状態欄は発動有無で非表示にしないでください");
+assert.match(smithingComponentJs, /特性発動なし/, "鍛冶特性が未発動でも通常状態を表示してください");
 assert.match(smithingComponentJs, /半減[\s\S]*威力0\.5倍/, "倍半の半減状態を表示してください");
 assert.match(mainJs, /renderSmithingDamageReference\(\);[\s\S]*renderLayoutBoard\(\);/);
 assert.match(mainJs, /syncJudgementLegend\(\);[\s\S]*renderAnalysis\(\);/);

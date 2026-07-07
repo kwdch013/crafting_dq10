@@ -135,11 +135,11 @@
     }
 
     const heatTraitState = getHeatTraitState(state);
-    const shouldShow = isSmithingCraftState(state) && heatTraitState.isActive;
-    elements.smithingBoardTraitState.hidden = !shouldShow;
+    const isSmithing = isSmithingCraftState(state);
+    elements.smithingBoardTraitState.hidden = !isSmithing;
     elements.smithingBoardTraitState.replaceChildren();
 
-    if (!shouldShow) {
+    if (!isSmithing) {
       return;
     }
 
