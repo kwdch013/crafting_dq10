@@ -497,3 +497,6 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/53
 鍛冶職人の右クリック編集では調理向けの固定判定ではなく、成功範囲内のマスを `確定済み` として指定できるようにします。URL: https://github.com/kwdch013/crafting_dq10/issues/93
 ### #100 鍛冶職人: 光地金の切替でノードサイズが変わる
 光地金の有効化や解除でBOARDノード高さが変わらないよう、光切替行を固定し、ヘッダーをタイトル行と光バッジ行に分けて固定します。URL: https://github.com/kwdch013/crafting_dq10/issues/100
+
+### #105 鍛冶職人: BOARDに地金特性の現在状態を表示しダメージ表へ反映する
+鍛冶職人で200℃単位の地金特性が発動している場合、BOARD上部に光地金、倍加、半減、集中半減、集中増加などの現在状態を表示します。倍半の半減・倍加は Smithing Damage の温度別ダメージにも反映します。URL: https://github.com/kwdch013/crafting_dq10/issues/105

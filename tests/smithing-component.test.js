@@ -42,6 +42,8 @@ vm.createContext(context);
 	assert.equal(typeof context.DQ10CraftComponents[craftId].applyHeatChange, "function");
 	assert.equal(typeof context.DQ10CraftComponents[craftId].getNextHeat, "function");
 	assert.equal(typeof context.DQ10CraftComponents[craftId].getDamagePowerEntries, "function");
+	assert.equal(typeof context.DQ10CraftComponents[craftId].getHeatTraitState, "function");
+	assert.equal(typeof context.DQ10CraftComponents[craftId].getAdjustedDamageRange, "function");
 	assert.equal(
 		context.DQ10CraftComponents[craftId].isLightHeatActive?.({ traitId: "light", heat: "1600" }),
 		true,
@@ -72,6 +74,40 @@ vm.createContext(context);
 	assert.equal(focusByLevel[79], 205);
 	assert.equal(focusByLevel[80], 208);
 });
+
+{
+	const component = context.DQ10CraftComponents["weapon-smithing"];
+	assert.deepEqual(
+		JSON.parse(JSON.stringify(component.getHeatTraitState({ craftType: "weapon-smithing", traitId: "double-half", heat: "600" }))),
+		{
+			isActive: true,
+			label: "半減",
+			description: "威力0.5倍",
+			damageMultiplier: 0.5,
+		},
+		"倍半の200℃ターンはBOARD上部に半減状態として表示してください",
+	);
+	assert.deepEqual(
+		JSON.parse(JSON.stringify(component.getAdjustedDamageRange([10, 15], { craftType: "weapon-smithing", traitId: "double-half", heat: "600" }))),
+		[5, 8],
+		"倍半の半減は温度別ダメージ表にも反映してください",
+	);
+	assert.deepEqual(
+		JSON.parse(JSON.stringify(component.getAdjustedDamageRange([10, 15], { craftType: "weapon-smithing", traitId: "double-half", heat: "800" }))),
+		[20, 30],
+		"倍半の2倍ターンは温度別ダメージ表にも反映してください",
+	);
+	assert.equal(
+		component.getHeatTraitState({ craftType: "weapon-smithing", traitId: "double-half", heat: "650" }).isActive,
+		false,
+		"200℃単位以外では鍛冶特性状態を通常扱いにしてください",
+	);
+	assert.equal(
+		component.getHeatTraitState({ craftType: "weapon-smithing", traitId: "focus-change", heat: "600" }).label,
+		"集中増加",
+		"集中変化の200℃ターンはBOARD上部に現在状態を表示してください",
+	);
+}
 
 assert.equal(context.DQ10CraftConfigs["weapon-smithing"].techniques[0].name, "半減打ち");
 assert.equal(context.DQ10CraftConfigs["armor-smithing"].techniques[2].name, "上下打ち");
