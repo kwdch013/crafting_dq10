@@ -3,8 +3,15 @@
   function createWoodworkingComponent() {
     return {
       craftFamily: "woodworking",
+      // 木工BOARDでは右クリック編集で現在値と威力別判定を確認できます。
+      isBoardCellEditable,
       rotateGrain,
     };
+  }
+
+  // 木工の各マスは右クリック編集で現在値を変更できます。
+  function isBoardCellEditable() {
+    return true;
   }
 
   // 木材を90度回転した時の盤面位置を、3x3グリッド上の座標変換として反映します。
