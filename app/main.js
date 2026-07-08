@@ -1773,9 +1773,9 @@ function getBoardCellEditorElement() {
           <span>四隅が戻り</span>
         </label>
       </fieldset>
-      <fieldset class="editor-smithing-judgements">
-        <legend>鍛冶倍率判定</legend>
-        <div class="editor-smithing-judgement-rows"></div>
+      <fieldset class="editor-damage-judgements editor-smithing-judgements">
+        <legend>ダメージ判定</legend>
+        <div class="editor-damage-judgement-rows editor-smithing-judgement-rows"></div>
       </fieldset>
       <div class="editor-actions">
         <button class="button primary" type="submit">更新</button>
@@ -1790,7 +1790,7 @@ function getBoardCellEditorElement() {
   });
   editor.querySelector(".editor-current").addEventListener("input", () => {
     syncBoardCellEditorLock(editor);
-    renderSmithingCellJudgements(editor);
+    renderCraftCellJudgements(editor);
   });
   editor.querySelector(".editor-cancel").addEventListener("click", closeBoardCellEditor);
   document.body.append(editor);
@@ -1821,7 +1821,7 @@ function openBoardCellEditor(event, item, cell = item?.gridCell) {
   });
   syncBoardCellEditorTrait(editor);
   syncBoardCellEditorLock(editor);
-  renderSmithingCellJudgements(editor);
+  renderCraftCellJudgements(editor);
   editor.hidden = false;
   positionBoardCellEditor(editor, event.clientX, event.clientY);
   if (item) {
@@ -1840,7 +1840,7 @@ function syncBoardCellEditorTrait(editor) {
   const blockEffectField = editor.querySelector(".editor-block-effect");
   const cellEffectField = editor.querySelector(".editor-cell-effect");
   const effectModeField = editor.querySelector(".editor-effect-mode");
-  const smithingJudgementField = editor.querySelector(".editor-smithing-judgements");
+  const smithingJudgementField = editor.querySelector(".editor-damage-judgements");
   const glowInput = editor.querySelector(".editor-glowing");
   const canUseLight = canEditLightState();
   const disabledByHeat = isCurrentCraftFamily("smithing") && state.traitId === "light" && !isSmithingLightHeatActive();
@@ -1852,7 +1852,7 @@ function syncBoardCellEditorTrait(editor) {
   blockEffectField.hidden = !hasIngredient || !isCurrentCraftFamily("cooking");
   cellEffectField.hidden = !isCurrentCraftFamily("cooking");
   effectModeField.hidden = !hasIngredient || state.traitId !== "light-return";
-  smithingJudgementField.hidden = !hasIngredient || !isCurrentCraftFamily("smithing");
+  smithingJudgementField.hidden = !hasIngredient || !canShowCraftCellJudgements();
 
   effectModeField.querySelectorAll("input").forEach((input) => {
     input.checked = input.value === state.cookingEffectMode;
@@ -1886,10 +1886,72 @@ function syncBoardCellEditorLock(editor) {
   }
 }
 
-// 右クリック編集中の現在値を使い、鍛冶の倍率ごとの判定を表示します。
-function renderSmithingCellJudgements(editor) {
-  const field = editor.querySelector(".editor-smithing-judgements");
-  const rows = editor.querySelector(".editor-smithing-judgement-rows");
+// 木工・裁縫・鍛冶の右クリック判定欄を表示できるか返します。
+function canShowCraftCellJudgements() {
+  return ["smithing", "woodworking", "sewing"].includes(getCurrentCraftComponent().craftFamily);
+}
+
+// 右クリック編集中のマスで確認する職人別ダメージ候補を返します。
+function getCellJudgementEntries(ingredient) {
+  const craftFamily = getCurrentCraftComponent().craftFamily;
+
+  if (craftFamily === "smithing") {
+    const smithingDamage = window.DQ10SmithingDamage || {};
+    const rangeSet = smithingDamage.ranges?.[state.heat];
+    return getSmithingDamagePowerEntries().map(([powerId, power]) => {
+      const range = rangeSet?.[powerId];
+      return {
+        id: powerId,
+        label: power.label,
+        technique: range ? {
+          normalMin: range[0],
+          normalMax: range[1],
+          damageModel: "smithing-temperature",
+          powerId,
+          criticalMultiplier: smithingDamage.criticalMultiplier || 2,
+        } : null,
+      };
+    });
+  }
+
+  if (craftFamily === "woodworking") {
+    const woodworkingDamage = window.DQ10WoodworkingDamage || {};
+    return Object.entries(woodworkingDamage.powers || {})
+      .sort(([, a], [, b]) => (a.multiplier ?? 0) - (b.multiplier ?? 0))
+      .map(([powerId, power]) => ({
+        id: powerId,
+        label: power.label,
+        technique: {
+          damageModel: "woodworking-grain",
+          powerId,
+          criticalMultiplier: woodworkingDamage.criticalMultiplier || 2,
+        },
+      }));
+  }
+
+  if (craftFamily === "sewing") {
+    const sewingDamage = window.DQ10SewingDamage || {};
+    return Object.entries(sewingDamage.actions || {})
+      .filter(([actionId]) => sewingDamage.getRange?.(state.heat || "normal", actionId))
+      .sort(([, a], [, b]) => Math.abs(a.multiplier ?? 0) - Math.abs(b.multiplier ?? 0))
+      .map(([actionId, action]) => ({
+        id: actionId,
+        label: action.label,
+        technique: {
+          damageModel: "sewing-power",
+          actionId,
+          criticalMultiplier: sewingDamage.criticalMultiplier || 2,
+        },
+      }));
+  }
+
+  return [];
+}
+
+// 右クリック編集中の現在値を使い、職人別の威力ごとの判定を表示します。
+function renderCraftCellJudgements(editor) {
+  const field = editor.querySelector(".editor-damage-judgements");
+  const rows = editor.querySelector(".editor-damage-judgement-rows");
   const ingredient = state.ingredients.find((item) => item.id === editor.dataset.id);
 
   if (!field || !rows) {
@@ -1897,14 +1959,13 @@ function renderSmithingCellJudgements(editor) {
   }
 
   rows.replaceChildren();
-  if (!ingredient || !isCurrentCraftFamily("smithing")) {
+  if (!ingredient || !canShowCraftCellJudgements()) {
     field.hidden = true;
     return;
   }
 
   field.hidden = false;
-  const smithingDamage = window.DQ10SmithingDamage || {};
-  const rangeSet = smithingDamage.ranges?.[state.heat];
+  field.querySelector("legend").textContent = isCurrentCraftFamily("smithing") ? "鍛冶倍率判定" : "威力別ダメージ判定";
   const current = numberOr(editor.querySelector(".editor-current").value, ingredient.current);
   const editorIngredient = {
     ...ingredient,
@@ -1915,14 +1976,13 @@ function renderSmithingCellJudgements(editor) {
       editor.querySelector(".editor-glowing").checked,
   };
 
-  getSmithingDamagePowerEntries().forEach(([powerId, power]) => {
-    const range = rangeSet?.[powerId];
+  getCellJudgementEntries(editorIngredient).forEach((entry) => {
     const row = document.createElement("div");
-    row.className = "editor-smithing-judgement-row";
+    row.className = "editor-damage-judgement-row editor-smithing-judgement-row";
 
-    if (!range) {
+    if (!entry.technique) {
       row.innerHTML = `
-        <strong>${escapeHtml(power.label)}</strong>
+        <strong>${escapeHtml(entry.label)}</strong>
         <span>未設定</span>
       `;
       rows.append(row);
@@ -1931,24 +1991,23 @@ function renderSmithingCellJudgements(editor) {
 
     const analysis = DQ10CraftEngine.analyzeIngredient(
       editorIngredient,
-      DQ10CraftEngine.resolveTechnique(state, {
-        normalMin: range[0],
-        normalMax: range[1],
-        damageModel: "smithing-temperature",
-        powerId,
-        criticalMultiplier: smithingDamage.criticalMultiplier || 2,
-      }, editorIngredient),
+      DQ10CraftEngine.resolveTechnique(state, entry.technique, editorIngredient),
       state.targetMode,
     );
 
     row.classList.add(`status-${analysis.status}`);
     row.innerHTML = `
-      <strong>${escapeHtml(power.label)}</strong>
+      <strong>${escapeHtml(entry.label)}</strong>
       <span class="numeric">${analysis.normalMin}-${analysis.normalMax} / 会心 ${analysis.criticalMin}-${analysis.criticalMax}</span>
       <small>${escapeHtml(analysis.statusLabel)}</small>
     `;
     rows.append(row);
   });
+}
+
+// 既存テストと外部参照用に、鍛冶判定描画名を職人別判定へ委譲します。
+function renderSmithingCellJudgements(editor) {
+  renderCraftCellJudgements(editor);
 }
 
 function positionBoardCellEditor(editor, x, y) {

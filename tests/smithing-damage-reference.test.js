@@ -67,10 +67,10 @@ assert.match(mainJs, /smithingHeatDownButton\?\.addEventListener\("click", \(\) 
 assert.match(mainJs, /smithingHeatUpButton\?\.addEventListener\("click", \(\) => adjustSmithingHeat\(50\)\)/);
 assert.match(mainJs, /smithingTemperatureSelect\?\.addEventListener\("change", \(\) => changeSmithingHeatFromBoard\(\)\)/);
 assert.match(smithingDamageJs, /power_1_2: \{ label: "1\.2倍"/, "1.2倍威力は倍率表記にしてください");
+assert.doesNotMatch(smithingDamageJs, /power_0_8/, "鍛冶ダメージ表から0.8倍威力を削除してください");
 const powersDefinition = smithingDamageJs.slice(smithingDamageJs.indexOf("const powers = {"));
 assert.ok(
-  powersDefinition.indexOf("power_0_5") < powersDefinition.indexOf("power_0_8") &&
-    powersDefinition.indexOf("power_0_8") < powersDefinition.indexOf("normal:") &&
+  powersDefinition.indexOf("power_0_5") < powersDefinition.indexOf("normal:") &&
     powersDefinition.indexOf("normal:") < powersDefinition.indexOf("power_1_2") &&
     powersDefinition.indexOf("power_1_2") < powersDefinition.indexOf("power_2_0") &&
     powersDefinition.indexOf("power_2_0") < powersDefinition.indexOf("power_2_5") &&
