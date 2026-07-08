@@ -130,7 +130,7 @@ assert.deepEqual(
 
 assert.deepEqual(
 	Array.from(context.DQ10CraftConfigs["tool-smithing"].recipeCategoryOptions, (category) => category.label),
-	["ツボ", "ハンマー", "フライパン", "ランプ", "ルアー", "木工刀", "素材", "針"],
+	["針", "木工刀", "ハンマー", "ツボ", "ランプ", "フライパン", "ルアー", "素材"],
 );
 assert.equal(context.DQ10CraftConfigs["tool-smithing"].recipeCategoryLabel, "大項目");
 assert.equal(context.DQ10CraftConfigs["tool-smithing"].recipeSubcategoryLabel, "道具名");

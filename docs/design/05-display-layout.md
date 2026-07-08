@@ -33,7 +33,7 @@ layout: {
 ```js
 {
   id: "slot-5",
-  name: "中央",
+  name: "E",
   optionId: "center",
   gridCell: { row: 2, column: 2 },
   current: 0,
@@ -42,13 +42,13 @@ layout: {
 }
 ```
 
-`row` と `column` は1始まりです。
+`row` と `column` は1始まりです。`name` は空白セルも含めて左上から右方向へA/B/C...と割り当てます。
 
 `rowSpan` と `columnSpan` を追加すると、将来の大きなマスにも対応できます。
 
 特技カードの代表値が必要な場合は `techniquePreviewOptionId` を設定します。
 
-調理は中央、木工は並行を代表値として表示します。
+調理は中央、木工は横を代表値として表示します。
 
 ## 調理の扱い
 
@@ -90,10 +90,11 @@ BOARDセルの判定は1倍相当で表示し、光地金の光選択はノー�
 
 | `optionId` | 画面表示 | 内部データ |
 | --- | --- | --- |
-| `parallel` | 並行 | 順目 |
-| `vertical` | 垂直 | 逆目 |
+| `horizontal` | 横 | 横木目 |
+| `vertical` | 縦 | 縦木目 |
 
 木工の計算では、画面全体の状態ではなく、各マスの `optionId` を参照します。
+BOARD上部の `左90°`、`右90°` は木材を90度回転した時の盤面変更として扱い、右90°では上にあるマスが右へ移るように各マスの座標を回転します。
 
 ## 表示フロー
 
@@ -149,5 +150,5 @@ sequenceDiagram
 1. `layout.rows` と `layout.columns` が最大サイズに合っていること。
 2. `gridCell.row` と `gridCell.column` が範囲内であること。
 3. 調理の `optionId` が `center`、`cross`、`corner` のいずれかであること。
-4. 木工の `optionId` が `parallel`、`vertical` のいずれかであること。
+4. 木工の `optionId` が `horizontal`、`vertical` のいずれかであること。
 5. 盤面と一覧表で同じマス数が表示されること。

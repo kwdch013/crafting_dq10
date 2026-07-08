@@ -7,7 +7,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-3-2",
-        "name": "下",
+        "name": "H",
         "optionId": "cross",
         "gridCell": {
           "row": 3,
@@ -20,7 +20,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-3",
-        "name": "右下",
+        "name": "I",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -42,7 +42,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-1-2",
-        "name": "上",
+        "name": "B",
         "optionId": "cross",
         "gridCell": {
           "row": 1,
@@ -55,7 +55,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-1",
-        "name": "左下",
+        "name": "G",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -68,7 +68,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-2",
-        "name": "下",
+        "name": "H",
         "optionId": "cross",
         "gridCell": {
           "row": 3,
@@ -90,7 +90,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-1-1",
-        "name": "左上",
+        "name": "A",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -103,7 +103,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-1-2",
-        "name": "上",
+        "name": "B",
         "optionId": "cross",
         "gridCell": {
           "row": 1,
@@ -116,7 +116,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-1",
-        "name": "左下",
+        "name": "G",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -139,7 +139,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-1-2",
-        "name": "上",
+        "name": "B",
         "optionId": "cross",
         "gridCell": {
           "row": 1,
@@ -152,7 +152,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-1-3",
-        "name": "右上",
+        "name": "C",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -165,7 +165,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-2-3",
-        "name": "右",
+        "name": "F",
         "optionId": "cross",
         "gridCell": {
           "row": 2,
@@ -178,7 +178,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-3",
-        "name": "右下",
+        "name": "I",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -201,7 +201,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-1-3",
-        "name": "右上",
+        "name": "C",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -214,7 +214,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-2-2",
-        "name": "中央",
+        "name": "E",
         "optionId": "center",
         "gridCell": {
           "row": 2,
@@ -227,7 +227,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-2-3",
-        "name": "右",
+        "name": "F",
         "optionId": "cross",
         "gridCell": {
           "row": 2,
@@ -240,7 +240,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-2",
-        "name": "下",
+        "name": "H",
         "optionId": "cross",
         "gridCell": {
           "row": 3,
@@ -253,7 +253,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-3",
-        "name": "右下",
+        "name": "I",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -276,7 +276,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-1-1",
-        "name": "左上",
+        "name": "A",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -289,7 +289,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-2-1",
-        "name": "左",
+        "name": "D",
         "optionId": "cross",
         "gridCell": {
           "row": 2,
@@ -302,7 +302,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-1",
-        "name": "左下",
+        "name": "G",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -315,7 +315,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-2",
-        "name": "下",
+        "name": "H",
         "optionId": "cross",
         "gridCell": {
           "row": 3,
@@ -328,7 +328,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-3",
-        "name": "右下",
+        "name": "I",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -350,7 +350,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-1-2",
-        "name": "上",
+        "name": "B",
         "optionId": "cross",
         "gridCell": {
           "row": 1,
@@ -366,7 +366,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-1-3",
-        "name": "右上",
+        "name": "C",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -382,7 +382,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-2-3",
-        "name": "右",
+        "name": "F",
         "optionId": "cross",
         "gridCell": {
           "row": 2,
@@ -396,7 +396,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-1",
-        "name": "左下",
+        "name": "G",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -412,7 +412,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-2",
-        "name": "下",
+        "name": "H",
         "optionId": "cross",
         "gridCell": {
           "row": 3,
@@ -428,7 +428,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-3",
-        "name": "右下",
+        "name": "I",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -451,7 +451,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-1-2",
-        "name": "上",
+        "name": "B",
         "optionId": "cross",
         "gridCell": {
           "row": 1,
@@ -467,7 +467,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-2-1",
-        "name": "左",
+        "name": "D",
         "optionId": "cross",
         "gridCell": {
           "row": 2,
@@ -483,7 +483,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-2-2",
-        "name": "中央",
+        "name": "E",
         "optionId": "center",
         "gridCell": {
           "row": 2,
@@ -499,7 +499,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-2-3",
-        "name": "右",
+        "name": "F",
         "optionId": "cross",
         "gridCell": {
           "row": 2,
@@ -513,7 +513,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-1",
-        "name": "左下",
+        "name": "G",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -529,7 +529,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-3",
-        "name": "右下",
+        "name": "I",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -552,7 +552,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-1-1",
-        "name": "左上",
+        "name": "A",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -565,7 +565,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-2-1",
-        "name": "左",
+        "name": "D",
         "optionId": "cross",
         "gridCell": {
           "row": 2,
@@ -588,7 +588,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-2-3",
-        "name": "右",
+        "name": "F",
         "optionId": "cross",
         "gridCell": {
           "row": 2,
@@ -601,7 +601,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-2",
-        "name": "下",
+        "name": "H",
         "optionId": "cross",
         "gridCell": {
           "row": 3,
@@ -614,7 +614,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-3",
-        "name": "右下",
+        "name": "I",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -637,7 +637,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-2-1",
-        "name": "左",
+        "name": "D",
         "optionId": "cross",
         "gridCell": {
           "row": 2,
@@ -650,7 +650,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-1",
-        "name": "左下",
+        "name": "G",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -663,7 +663,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-2",
-        "name": "下",
+        "name": "H",
         "optionId": "cross",
         "gridCell": {
           "row": 3,
@@ -686,7 +686,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-1-1",
-        "name": "左上",
+        "name": "A",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -699,7 +699,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-1-3",
-        "name": "右上",
+        "name": "C",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -712,7 +712,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-2-1",
-        "name": "左",
+        "name": "D",
         "optionId": "cross",
         "gridCell": {
           "row": 2,
@@ -725,7 +725,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-2-3",
-        "name": "右",
+        "name": "F",
         "optionId": "cross",
         "gridCell": {
           "row": 2,
@@ -738,7 +738,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-3",
-        "name": "右下",
+        "name": "I",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -761,7 +761,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-1-1",
-        "name": "左上",
+        "name": "A",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -774,7 +774,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-1-3",
-        "name": "右上",
+        "name": "C",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -787,7 +787,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-2-1",
-        "name": "左",
+        "name": "D",
         "optionId": "cross",
         "gridCell": {
           "row": 2,
@@ -800,7 +800,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-2-3",
-        "name": "右",
+        "name": "F",
         "optionId": "cross",
         "gridCell": {
           "row": 2,
@@ -813,7 +813,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-1",
-        "name": "左下",
+        "name": "G",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -826,7 +826,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-3",
-        "name": "右下",
+        "name": "I",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -849,7 +849,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-1-1",
-        "name": "左上",
+        "name": "A",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -862,7 +862,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-1-3",
-        "name": "右上",
+        "name": "C",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -875,7 +875,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-2-1",
-        "name": "左",
+        "name": "D",
         "optionId": "cross",
         "gridCell": {
           "row": 2,
@@ -888,7 +888,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-2-3",
-        "name": "右",
+        "name": "F",
         "optionId": "cross",
         "gridCell": {
           "row": 2,
@@ -901,7 +901,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-1",
-        "name": "左下",
+        "name": "G",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -914,7 +914,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-3",
-        "name": "右下",
+        "name": "I",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -937,7 +937,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-1-1",
-        "name": "左上",
+        "name": "A",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -950,7 +950,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-1-2",
-        "name": "上",
+        "name": "B",
         "optionId": "cross",
         "gridCell": {
           "row": 1,
@@ -963,7 +963,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-1-3",
-        "name": "右上",
+        "name": "C",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -976,7 +976,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-1",
-        "name": "左下",
+        "name": "G",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -989,7 +989,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-2",
-        "name": "下",
+        "name": "H",
         "optionId": "cross",
         "gridCell": {
           "row": 3,
@@ -1002,7 +1002,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-3",
-        "name": "右下",
+        "name": "I",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -1024,7 +1024,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-1-2",
-        "name": "上",
+        "name": "B",
         "optionId": "cross",
         "gridCell": {
           "row": 1,
@@ -1037,7 +1037,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-1-3",
-        "name": "右上",
+        "name": "C",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -1050,7 +1050,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-2-1",
-        "name": "左",
+        "name": "D",
         "optionId": "cross",
         "gridCell": {
           "row": 2,
@@ -1063,7 +1063,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-2-3",
-        "name": "右",
+        "name": "F",
         "optionId": "cross",
         "gridCell": {
           "row": 2,
@@ -1076,7 +1076,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-1",
-        "name": "左下",
+        "name": "G",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -1089,7 +1089,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-2",
-        "name": "下",
+        "name": "H",
         "optionId": "cross",
         "gridCell": {
           "row": 3,
@@ -1112,7 +1112,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-1-1",
-        "name": "左上",
+        "name": "A",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -1125,7 +1125,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-1-2",
-        "name": "上",
+        "name": "B",
         "optionId": "cross",
         "gridCell": {
           "row": 1,
@@ -1148,7 +1148,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-2-3",
-        "name": "右",
+        "name": "F",
         "optionId": "cross",
         "gridCell": {
           "row": 2,
@@ -1161,7 +1161,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-1",
-        "name": "左下",
+        "name": "G",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -1184,7 +1184,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-1-1",
-        "name": "左上",
+        "name": "A",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -1197,7 +1197,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-1-2",
-        "name": "上",
+        "name": "B",
         "optionId": "cross",
         "gridCell": {
           "row": 1,
@@ -1210,7 +1210,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-1-3",
-        "name": "右上",
+        "name": "C",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -1223,7 +1223,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-2-1",
-        "name": "左",
+        "name": "D",
         "optionId": "cross",
         "gridCell": {
           "row": 2,
@@ -1246,7 +1246,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-1-3",
-        "name": "右上",
+        "name": "C",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -1259,7 +1259,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-2-3",
-        "name": "右",
+        "name": "F",
         "optionId": "cross",
         "gridCell": {
           "row": 2,
@@ -1272,7 +1272,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-1",
-        "name": "左下",
+        "name": "G",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -1285,7 +1285,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-2",
-        "name": "下",
+        "name": "H",
         "optionId": "cross",
         "gridCell": {
           "row": 3,
@@ -1298,7 +1298,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-3",
-        "name": "右下",
+        "name": "I",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -1320,7 +1320,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-1-1",
-        "name": "左上",
+        "name": "A",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -1333,7 +1333,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-1-2",
-        "name": "上",
+        "name": "B",
         "optionId": "cross",
         "gridCell": {
           "row": 1,
@@ -1346,7 +1346,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-1-3",
-        "name": "右上",
+        "name": "C",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -1359,7 +1359,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-1",
-        "name": "左下",
+        "name": "G",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -1372,7 +1372,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-2",
-        "name": "下",
+        "name": "H",
         "optionId": "cross",
         "gridCell": {
           "row": 3,
@@ -1385,7 +1385,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-3",
-        "name": "右下",
+        "name": "I",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -1408,7 +1408,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-1-1",
-        "name": "左上",
+        "name": "A",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -1421,7 +1421,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-1-2",
-        "name": "上",
+        "name": "B",
         "optionId": "cross",
         "gridCell": {
           "row": 1,
@@ -1434,7 +1434,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-1-3",
-        "name": "右上",
+        "name": "C",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -1447,7 +1447,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-1",
-        "name": "左下",
+        "name": "G",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -1460,7 +1460,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-2",
-        "name": "下",
+        "name": "H",
         "optionId": "cross",
         "gridCell": {
           "row": 3,
@@ -1473,7 +1473,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-3",
-        "name": "右下",
+        "name": "I",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -1496,7 +1496,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-1-2",
-        "name": "上",
+        "name": "B",
         "optionId": "cross",
         "gridCell": {
           "row": 1,
@@ -1518,7 +1518,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-1-2",
-        "name": "上",
+        "name": "B",
         "optionId": "cross",
         "gridCell": {
           "row": 1,
@@ -1531,7 +1531,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-2-1",
-        "name": "左",
+        "name": "D",
         "optionId": "cross",
         "gridCell": {
           "row": 2,
@@ -1554,7 +1554,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-1-1",
-        "name": "左上",
+        "name": "A",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -1567,7 +1567,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-1-2",
-        "name": "上",
+        "name": "B",
         "optionId": "cross",
         "gridCell": {
           "row": 1,
@@ -1580,7 +1580,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-2",
-        "name": "下",
+        "name": "H",
         "optionId": "cross",
         "gridCell": {
           "row": 3,
@@ -1593,7 +1593,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-3",
-        "name": "右下",
+        "name": "I",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -1615,7 +1615,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-1-1",
-        "name": "左上",
+        "name": "A",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -1628,7 +1628,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-2-1",
-        "name": "左",
+        "name": "D",
         "optionId": "cross",
         "gridCell": {
           "row": 2,
@@ -1641,7 +1641,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-2",
-        "name": "下",
+        "name": "H",
         "optionId": "cross",
         "gridCell": {
           "row": 3,
@@ -1654,7 +1654,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-3",
-        "name": "右下",
+        "name": "I",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -1676,7 +1676,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-1-2",
-        "name": "上",
+        "name": "B",
         "optionId": "cross",
         "gridCell": {
           "row": 1,
@@ -1689,7 +1689,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-1",
-        "name": "左下",
+        "name": "G",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -1702,7 +1702,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-2",
-        "name": "下",
+        "name": "H",
         "optionId": "cross",
         "gridCell": {
           "row": 3,
@@ -1715,7 +1715,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-3",
-        "name": "右下",
+        "name": "I",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -1737,7 +1737,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-1-2",
-        "name": "上",
+        "name": "B",
         "optionId": "cross",
         "gridCell": {
           "row": 1,
@@ -1750,7 +1750,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-1-3",
-        "name": "右上",
+        "name": "C",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -1763,7 +1763,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-2-3",
-        "name": "右",
+        "name": "F",
         "optionId": "cross",
         "gridCell": {
           "row": 2,
@@ -1776,7 +1776,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-1",
-        "name": "左下",
+        "name": "G",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -1798,7 +1798,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-1-3",
-        "name": "右上",
+        "name": "C",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -1811,7 +1811,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-2-3",
-        "name": "右",
+        "name": "F",
         "optionId": "cross",
         "gridCell": {
           "row": 2,
@@ -1824,7 +1824,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-2",
-        "name": "下",
+        "name": "H",
         "optionId": "cross",
         "gridCell": {
           "row": 3,
@@ -1837,7 +1837,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-3",
-        "name": "右下",
+        "name": "I",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -1859,7 +1859,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-1-1",
-        "name": "左上",
+        "name": "A",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -1872,7 +1872,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-1-2",
-        "name": "上",
+        "name": "B",
         "optionId": "cross",
         "gridCell": {
           "row": 1,
@@ -1885,7 +1885,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-1-3",
-        "name": "右上",
+        "name": "C",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -1898,7 +1898,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-1",
-        "name": "左下",
+        "name": "G",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -1911,7 +1911,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-2",
-        "name": "下",
+        "name": "H",
         "optionId": "cross",
         "gridCell": {
           "row": 3,
@@ -1934,7 +1934,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-1-1",
-        "name": "左上",
+        "name": "A",
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -1947,7 +1947,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-1-2",
-        "name": "上",
+        "name": "B",
         "optionId": "cross",
         "gridCell": {
           "row": 1,
@@ -1960,7 +1960,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-2-1",
-        "name": "左",
+        "name": "D",
         "optionId": "cross",
         "gridCell": {
           "row": 2,
@@ -1983,7 +1983,7 @@ registerDQ10CraftRecipes("cooking", [
     "items": [
       {
         "id": "slot-1-2",
-        "name": "上",
+        "name": "B",
         "ingredientGroupId": "heal-carbonara-meat",
         "ingredientGroupLabel": "肉",
         "ingredientSize": 2,
@@ -1999,7 +1999,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-1-3",
-        "name": "右上",
+        "name": "C",
         "ingredientGroupId": "heal-carbonara-meat",
         "ingredientGroupLabel": "肉",
         "ingredientSize": 2,
@@ -2015,7 +2015,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-2-1",
-        "name": "左",
+        "name": "D",
         "ingredientGroupLabel": "麺",
         "optionId": "cross",
         "gridCell": {
@@ -2029,7 +2029,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-1",
-        "name": "左下",
+        "name": "G",
         "ingredientGroupLabel": "麺",
         "optionId": "corner",
         "gridCell": {
@@ -2043,7 +2043,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-2",
-        "name": "下",
+        "name": "H",
         "ingredientGroupLabel": "麺",
         "optionId": "cross",
         "gridCell": {
@@ -2057,7 +2057,7 @@ registerDQ10CraftRecipes("cooking", [
       },
       {
         "id": "slot-3-3",
-        "name": "右下",
+        "name": "I",
         "ingredientGroupLabel": "卵",
         "optionId": "corner",
         "gridCell": {

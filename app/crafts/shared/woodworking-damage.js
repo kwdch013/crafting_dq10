@@ -32,13 +32,24 @@
     }));
   }
 
+  // レシピの木目は横/縦で保持し、既存の順目/逆目ダメージ表へ解決します。
+  function normalizeGrainId(grainId) {
+    const aliases = {
+      horizontal: "parallel",
+      vertical: "vertical",
+      parallel: "parallel",
+    };
+
+    return aliases[grainId] || "parallel";
+  }
+
   function getDistribution(grainId, powerId) {
-    const values = distributions[grainId]?.[powerId];
+    const values = distributions[normalizeGrainId(grainId)]?.[powerId];
     return values ? withPercent(values) : null;
   }
 
   function getRange(grainId, powerId) {
-    const values = distributions[grainId]?.[powerId];
+    const values = distributions[normalizeGrainId(grainId)]?.[powerId];
 
     if (!values) {
       return null;
@@ -55,9 +66,10 @@
     distributions,
     getDistribution,
     getRange,
+    normalizeGrainId,
     grainStates: [
-      { id: "parallel", label: "順目" },
-      { id: "vertical", label: "逆目" },
+      { id: "horizontal", label: "横" },
+      { id: "vertical", label: "縦" },
     ],
   };
 })(window);

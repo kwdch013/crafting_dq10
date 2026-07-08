@@ -41,6 +41,8 @@ const elements = {
   boardActions: document.querySelector("#boardActions"),
   cookingCommandPanel: document.querySelector("#cookingCommandPanel"),
   cookingOnlyCommandGroups: document.querySelectorAll(".cooking-only-command"),
+  rotateWoodLeftButton: document.querySelector("#rotateWoodLeftButton"),
+  rotateWoodRightButton: document.querySelector("#rotateWoodRightButton"),
   undoBoardButton: document.querySelector("#undoBoardButton"),
   redoBoardButton: document.querySelector("#redoBoardButton"),
   miracleGrillButton: document.querySelector("#miracleGrillButton"),
@@ -1142,13 +1144,22 @@ function canRearrangeBoard(config = getCurrentCraftConfig()) {
 
 function syncBoardActionButtons() {
   const canRearrange = state ? canRearrangeBoard() : false;
+  const canRotateWoodworking = state ? canRotateWoodworkingGrain() : false;
   const isCooking = isCurrentCraftFamily("cooking");
   const isSmithing = isCurrentCraftFamily("smithing");
   const showsCommandPanel = isCooking || isSmithing;
   const selectedIngredient = canRearrange
     ? state.ingredients.find((ingredient) => ingredient.id === selectedBoardIngredientId)
     : null;
-  elements.boardActions.hidden = !canRearrange;
+  elements.boardActions.hidden = !canRearrange && !canRotateWoodworking;
+  if (elements.rotateWoodLeftButton) {
+    elements.rotateWoodLeftButton.hidden = !canRotateWoodworking;
+    elements.rotateWoodLeftButton.disabled = !canRotateWoodworking;
+  }
+  if (elements.rotateWoodRightButton) {
+    elements.rotateWoodRightButton.hidden = !canRotateWoodworking;
+    elements.rotateWoodRightButton.disabled = !canRotateWoodworking;
+  }
   if (elements.cookingCommandPanel) {
     elements.cookingCommandPanel.hidden = !showsCommandPanel;
   }
@@ -1357,6 +1368,33 @@ function canApplyGroupMoves(moves, ignoredIds) {
     ignoredIds,
     getCurrentCraftConfig().layout,
   );
+}
+
+// 木工の木材回転操作に対応しているかを職人コンポーネントから判定します。
+function canRotateWoodworkingGrain() {
+  return typeof getCurrentCraftComponent().rotateGrain === "function";
+}
+
+// 木工の90度回転で、BOARD上の各マス座標を回転します。
+function rotateWoodworkingGrain(direction) {
+  const component = getCurrentCraftComponent();
+  if (typeof component.rotateGrain !== "function") {
+    return;
+  }
+
+  pushBoardHistory();
+  const changed = component.rotateGrain(state, direction, getCurrentCraftConfig().layout);
+  if (!changed) {
+    undoStack.pop();
+    return;
+  }
+
+  selectedBoardIngredientId = null;
+  markCustomRecipe();
+  renderLayoutBoard();
+  renderCraftReference();
+  renderAnalysis();
+  saveState();
 }
 
 function applyGroupMoves(moves) {
@@ -2476,17 +2514,23 @@ function renderSmithingAddRecipeItems(config, seedItems) {
 }
 
 function appendFixedLayoutAddRecipeCell(config, rowIndex, columnIndex, item = null) {
+  const positionName = item?.name || getCoordinatePositionName(config, rowIndex, columnIndex);
   const cell = document.createElement("fieldset");
   cell.className = "recipe-layout-cell";
   cell.dataset.row = String(rowIndex);
   cell.dataset.column = String(columnIndex);
-  cell.dataset.name = item?.name || `${rowIndex}行${columnIndex}列`;
+  cell.dataset.name = positionName;
   cell.style.gridRow = String(rowIndex);
   cell.style.gridColumn = String(columnIndex);
-  cell.innerHTML = `<legend>${escapeHtml(item?.name || `${rowIndex}行${columnIndex}列`)}</legend>`;
+  cell.innerHTML = `<legend>${escapeHtml(positionName)}</legend>`;
 
   if (Array.isArray(config.itemOptions) && config.itemOptions.length > 0) {
-    cell.append(createRecipeItemSelect("optionId", "位置", item?.optionId || config.itemOptions[0]?.id || "", config.itemOptions));
+    cell.append(createRecipeItemSelect(
+      "optionId",
+      getItemOptionFieldLabel(config),
+      item?.optionId || config.itemOptions[0]?.id || "",
+      config.itemOptions,
+    ));
   }
   if (isFixedTargetRecipeEditor(config)) {
     cell.append(createRecipeItemNumber("target", "基準値", item?.target ?? item?.successMin ?? "", 0, 9999));
@@ -2497,14 +2541,16 @@ function appendFixedLayoutAddRecipeCell(config, rowIndex, columnIndex, item = nu
   elements.addRecipeItems.append(cell);
 }
 
-function appendSmithingAddRecipeCell(rowIndex, columnIndex, item = null) {
+function appendSmithingAddRecipeCell(config, rowIndex, columnIndex, item = null) {
+  const positionName = item?.name || getCoordinatePositionName(config, rowIndex, columnIndex);
   const cell = document.createElement("fieldset");
   cell.className = "recipe-layout-cell";
   cell.dataset.row = String(rowIndex);
   cell.dataset.column = String(columnIndex);
+  cell.dataset.name = positionName;
   cell.style.gridRow = String(rowIndex);
   cell.style.gridColumn = String(columnIndex);
-  cell.innerHTML = `<legend>${rowIndex}行${columnIndex}列</legend>`;
+  cell.innerHTML = `<legend>${escapeHtml(positionName)}</legend>`;
   cell.append(createRecipeItemNumber("successMin", "下限", item?.successMin ?? "", 0, 9999, false));
   cell.append(createRecipeItemNumber("successMax", "上限", item?.successMax ?? "", 0, 9999, false));
   elements.addRecipeItems.append(cell);
@@ -2522,7 +2568,12 @@ function appendAddRecipeItemRow(config, item = {}, index = elements.addRecipeIte
     row.append(createRecipeItemInput("name", config.itemNameLabel || "マス名", item.name || ""));
   }
   if (itemOptions.length > 0) {
-    row.append(createRecipeItemSelect("optionId", "位置", item.optionId || itemOptions[0]?.id || "", itemOptions));
+    row.append(createRecipeItemSelect(
+      "optionId",
+      getItemOptionFieldLabel(config),
+      item.optionId || itemOptions[0]?.id || "",
+      itemOptions,
+    ));
   }
   if (config.layout) {
     row.append(createRecipeItemNumber("row", "行", item.gridCell?.row || 1, 1, config.layout.rows || 9));
@@ -2563,10 +2614,32 @@ function getDefaultRecipeItemName(config, row, index) {
   if (getCraftComponent(config.id).craftFamily === "cooking") {
     const rowIndex = row.querySelector('[data-field="row"]')?.value || "1";
     const columnIndex = row.querySelector('[data-field="column"]')?.value || String(index + 1);
-    return `${rowIndex}行${columnIndex}列`;
+    return getCoordinatePositionName(config, rowIndex, columnIndex);
   }
 
   return `${config.itemNameLabel || "マス"} ${index + 1}`;
+}
+
+// 空白セルも含めた座標順をレシピ画面のA/B/C...表示名に変換します。
+function getCoordinatePositionName(config, row, column) {
+  const columns = Math.max(1, numberOr(config.layout?.columns, 1));
+  if (typeof createDQ10CoordinatePositionName === "function") {
+    return createDQ10CoordinatePositionName(row, column, columns);
+  }
+
+  let remaining = ((numberOr(row, 1) - 1) * columns) + numberOr(column, 1);
+  let label = "";
+  while (remaining > 0) {
+    remaining -= 1;
+    label = String.fromCharCode(65 + (remaining % 26)) + label;
+    remaining = Math.floor(remaining / 26);
+  }
+  return label || "A";
+}
+
+// 職人固有のoptionId入力名を返し、木工では位置ではなく木目として表示します。
+function getItemOptionFieldLabel(config) {
+  return config.itemOptionLabel || "位置";
 }
 
 function createRecipeItemInput(field, labelText, value) {
@@ -2726,7 +2799,7 @@ function collectFixedLayoutAddRecipeItems(config) {
         const index = ((row - 1) * Math.max(1, numberOr(config.layout?.columns, 1))) + column;
         const item = {
           id: `item-${index}`,
-          name: cell.dataset.name || `${row}行${column}列`,
+          name: cell.dataset.name || getCoordinatePositionName(config, row, column),
           current: 0,
           target,
           successMin: target,
@@ -2754,7 +2827,7 @@ function collectFixedLayoutAddRecipeItems(config) {
 
       return {
         id: `item-${index}`,
-        name: `${row}行${column}列`,
+        name: cell.dataset.name || getCoordinatePositionName(config, row, column),
         current: 0,
         target: Math.round((successMin + successMax) / 2),
         successMin,
@@ -2910,6 +2983,8 @@ elements.heatInput.addEventListener("change", () => {
 });
 elements.undoBoardButton.addEventListener("click", undoBoardAction);
 elements.redoBoardButton.addEventListener("click", redoBoardAction);
+elements.rotateWoodLeftButton?.addEventListener("click", () => rotateWoodworkingGrain("left"));
+elements.rotateWoodRightButton?.addEventListener("click", () => rotateWoodworkingGrain("right"));
 elements.smithingHeatDownButton?.addEventListener("click", () => adjustSmithingHeat(-50));
 elements.smithingHeatUpButton?.addEventListener("click", () => adjustSmithingHeat(50));
 elements.smithingTemperatureSelect?.addEventListener("change", () => changeSmithingHeatFromBoard());

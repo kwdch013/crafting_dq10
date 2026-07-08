@@ -375,7 +375,7 @@
 
     if (technique.damageModel === "woodworking-grain") {
       const woodworkingDamage = global.DQ10WoodworkingDamage;
-      const grain = ingredient?.optionId || state.heat || "parallel";
+      const grain = ingredient?.optionId || state.heat || "horizontal";
       const range = woodworkingDamage?.getRange(grain, technique.powerId);
 
       if (!range) {

@@ -1,3 +1,12 @@
+// 設定単体で読み込まれるテストでも座標名を生成できるようにします。
+function getWeaponSmithingPositionName(row, column) {
+  if (typeof createDQ10CoordinatePositionName === "function") {
+    return createDQ10CoordinatePositionName(row, column, 2);
+  }
+
+  return String.fromCharCode(64 + ((Number(row) - 1) * 2 + Number(column)));
+}
+
 // 武器鍛冶の種別ごとに、レシピ追加時の初期マスを定義します。
 function createWeaponSmithingTemplateItems(rows, columns, cells = null) {
   const gridCells = Array.isArray(cells)
@@ -6,27 +15,10 @@ function createWeaponSmithingTemplateItems(rows, columns, cells = null) {
       row: Math.floor(index / columns) + 1,
       column: (index % columns) + 1,
     }));
-  const verticalNames = {
-    2: ["上", "下"],
-    3: ["上", "中", "下"],
-    4: ["上", "中上", "中下", "下"],
-  };
-  const matrixNames = {
-    "1:1": "左上",
-    "1:2": "右上",
-    "2:1": rows === 2 ? "左下" : "左中",
-    "2:2": rows === 2 ? "右下" : "右中",
-    "3:1": rows === 3 ? "左下" : "左中下",
-    "3:2": rows === 3 ? "右下" : "右中下",
-    "4:1": "左下",
-    "4:2": "右下",
-  };
 
   return gridCells.map(({ row, column }, index) => ({
     id: `part-${index + 1}`,
-    name: columns === 1
-      ? verticalNames[rows]?.[row - 1] || `${row}行`
-      : matrixNames[`${row}:${column}`] || `${row}行${column}列`,
+    name: getWeaponSmithingPositionName(row, column),
     gridCell: { row, column },
     current: 0,
     successMin: 80,
@@ -78,8 +70,8 @@ registerDQ10Craft(createDQ10SmithingCraftConfig({
     { id: "double", name: "2倍打ち", focusCost: 8, damageModel: "smithing-temperature", powerId: "power_2_0", multiplier: 2, criticalMultiplier: 2, criticalWeight: 0.9 },
   ],
   items: [
-    { id: "part-1", name: "上段", gridCell: { row: 1, column: 1 }, current: 0, successMin: 80, successMax: 95 },
-    { id: "part-2", name: "中段", gridCell: { row: 2, column: 1 }, current: 0, successMin: 80, successMax: 95 },
-    { id: "part-3", name: "下段", gridCell: { row: 3, column: 1 }, current: 0, successMin: 80, successMax: 95 },
+    { id: "part-1", name: "A", gridCell: { row: 1, column: 1 }, current: 0, successMin: 80, successMax: 95 },
+    { id: "part-2", name: "C", gridCell: { row: 2, column: 1 }, current: 0, successMin: 80, successMax: 95 },
+    { id: "part-3", name: "E", gridCell: { row: 3, column: 1 }, current: 0, successMin: 80, successMax: 95 },
   ],
 }));

@@ -211,6 +211,23 @@
     global.DQ10CraftRecipes[craftId] = recipes;
   };
 
+  // 空白マスも含めた左上からの座標順をA/B/C...の表示名に変換します。
+  global.createDQ10CoordinatePositionName = function createDQ10CoordinatePositionName(row, column, columns) {
+    const rowNumber = Number(row);
+    const columnNumber = Number(column);
+    const columnCount = Number(columns);
+    let remaining = (rowNumber - 1) * columnCount + columnNumber;
+    let label = "";
+
+    while (remaining > 0) {
+      remaining -= 1;
+      label = String.fromCharCode(65 + (remaining % 26)) + label;
+      remaining = Math.floor(remaining / 26);
+    }
+
+    return label || "A";
+  };
+
   // 職人ごとの画面差分を扱うコンポーネントを登録します。
   global.registerDQ10CraftComponent = function registerDQ10CraftComponent(craftId, component) {
     if (!craftId || !component || typeof component !== "object") {

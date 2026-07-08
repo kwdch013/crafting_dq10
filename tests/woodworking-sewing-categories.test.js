@@ -23,13 +23,24 @@ vm.createContext(context);
 	assert.equal(config.recipeSubcategoryLabel, "装備名");
 	assert.deepEqual(
 		JSON.parse(JSON.stringify(config.recipeCategoryOptions.map((category) => category.label))),
-		["スティック", "弓", "扇", "昆", "杖"],
+		["スティック", "杖", "昆", "扇", "弓"],
 	);
 	const categories = Object.fromEntries(config.recipeCategoryOptions.map((category) => [category.id, category]));
+	assert.deepEqual(
+		JSON.parse(JSON.stringify(config.itemOptions)),
+		[
+			{ id: "horizontal", label: "横" },
+			{ id: "vertical", label: "縦" },
+		],
+	);
 	assert.equal(categories.stick.templateItems.length, 2);
 	assert.equal(categories.bow.templateItems.length, 5);
 	assert.equal(categories.fan.templateItems.length, 4);
 	assert.equal(categories.kon.templateItems.length, 6);
+	assert.ok(
+		categories.kon.templateItems.every((item) => ["horizontal", "vertical"].includes(item.optionId)),
+		"木工テンプレートの木目は横または縦で設定してください",
+	);
 	assert.deepEqual(JSON.parse(JSON.stringify(categories.staff.templateItems.map((item) => item.gridCell))), [
 		{ row: 1, column: 2 },
 		{ row: 2, column: 2 },
@@ -43,7 +54,7 @@ vm.createContext(context);
 	assert.equal(config.recipeSubcategoryLabel, "装備名");
 	assert.deepEqual(
 		JSON.parse(JSON.stringify(config.recipeCategoryOptions.map((category) => category.label))),
-		["体上", "体下", "腕", "足", "頭"],
+		["アタマ", "からだ上", "からだ下", "ウデ", "足"],
 	);
 	const categories = Object.fromEntries(config.recipeCategoryOptions.map((category) => [category.id, category]));
 	assert.equal(categories["body-upper"].templateItems.length, 6);
@@ -59,11 +70,19 @@ vm.createContext(context);
 }
 
 [
-	["api/data/crafts/woodworking/recipes.json", ["stick", "bow", "fan", "kon", "staff"]],
-	["api/data/crafts/sewing/recipes.json", ["body-upper", "body-lower", "arm", "foot", "head"]],
+	["api/data/crafts/woodworking/recipes.json", ["stick", "staff", "kon", "fan", "bow"]],
+	["api/data/crafts/sewing/recipes.json", ["head", "body-upper", "body-lower", "arm", "foot"]],
 ].forEach(([file, categoryIds]) => {
-	JSON.parse(fs.readFileSync(file, "utf8")).forEach((recipe) => {
+	const recipes = JSON.parse(fs.readFileSync(file, "utf8"));
+	assert.deepEqual(recipes.map((recipe) => recipe.categoryId), categoryIds);
+	recipes.forEach((recipe) => {
 		assert.ok(categoryIds.includes(recipe.categoryId), `${recipe.id} の大項目IDを参照画像名由来にしてください`);
+		if (file.includes("woodworking")) {
+			assert.ok(
+				recipe.items.every((item) => ["horizontal", "vertical"].includes(item.optionId)),
+				`${recipe.id} の木目は横または縦で設定してください`,
+			);
+		}
 		assert.notEqual(recipe.category, "木工刀", `${recipe.id} に道具画像名を使わないでください`);
 		assert.notEqual(recipe.category, "針", `${recipe.id} に道具画像名を使わないでください`);
 	});

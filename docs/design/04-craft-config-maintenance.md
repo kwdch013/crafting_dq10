@@ -49,7 +49,7 @@ app/crafts/
 - `itemOptions`: マスや具材ごとの種別選択肢
 - `items`: 初期マス一覧
 
-道具鍛冶の大項目は `refarence/tool` の画像種別と合わせ、ツボ、ハンマー、フライパン、ランプ、ルアー、木工刀、素材、針の8種類を `tool-smithing/config.js` に定義します。ハンマーのテンプレートは左列が縦3マス、右列が縦2マスの5マス配置として扱います。ルアーのテンプレートは左列が縦2マス、右列が上段1マスの3マス配置として扱います。素材のテンプレートは左列が縦3マス、右列も縦3マスの6マス配置として扱います。
+道具鍛冶の大項目は `refarence/tool` の画像種別と合わせ、針、木工刀、ハンマー、ツボ、ランプ、フライパン、ルアー、素材の8種類を `tool-smithing/config.js` に定義します。ハンマーのテンプレートは左列が縦3マス、右列が縦2マスの5マス配置として扱います。ルアーのテンプレートは左列が縦2マス、右列が上段1マスの3マス配置として扱います。素材のテンプレートは左列が縦3マス、右列も縦3マスの6マス配置として扱います。
 具体的な制作物名は道具名としてレシピJSONに登録します。
 
 調理の位置別ダメージは `shared/cooking-damage.js` に分離します。
@@ -192,10 +192,8 @@ parallel: {
 }
 ```
 
-`parallel` は順目です。
-`vertical` は逆目です。
-
-ユーザー向けには、順目を並行、逆目を垂直として扱います。
+レシピ側の `optionId` は `horizontal` を横、`vertical` を縦として保存します。
+ダメージ表の既存キーでは `horizontal` を順目の `parallel` へ解決し、`vertical` を逆目として扱います。
 
 現在の木工データは `https://xn--10-yg4a1a3kyh.jp/dq10_artisan4.html` を参照して作成しています。
 
@@ -247,7 +245,8 @@ focus: createDQ10FocusConfig({
 ```js
 {
   id: "slot-1",
-  name: "具材 1",
+  name: "A",
+  gridCell: { row: 1, column: 1 },
   current: 0,
   successMin: 60,
   successMax: 75
@@ -259,7 +258,8 @@ focus: createDQ10FocusConfig({
 | 項目 | 意味 |
 | --- | --- |
 | `id` | マスの内部ID |
-| `name` | UI表示名 |
+| `name` | 空白セルも含め、左上から右方向へA/B/C...と数えた位置名 |
+| `gridCell` | 1始まりの盤面座標 |
 | `current` | 初期現在値 |
 | `successMin` | 成功下限 |
 | `successMax` | 成功上限 |

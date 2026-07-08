@@ -1,68 +1,354 @@
 registerDQ10CraftRecipes("sewing", [
   {
-    id: "sewing-body-upper-template",
-    name: "体上テンプレート",
-    category: "体上",
-    categoryId: "body-upper",
-    items: [
-      { id: "part-1", name: "左上", gridCell: { row: 1, column: 1 }, current: 0, target: 78, successMin: 78, successMax: 78 },
-      { id: "part-2", name: "上", gridCell: { row: 1, column: 2 }, current: 0, target: 78, successMin: 78, successMax: 78 },
-      { id: "part-3", name: "右上", gridCell: { row: 1, column: 3 }, current: 0, target: 78, successMin: 78, successMax: 78 },
-      { id: "part-4", name: "左下", gridCell: { row: 2, column: 1 }, current: 0, target: 78, successMin: 78, successMax: 78 },
-      { id: "part-5", name: "下", gridCell: { row: 2, column: 2 }, current: 0, target: 78, successMin: 78, successMax: 78 },
-      { id: "part-6", name: "右下", gridCell: { row: 2, column: 3 }, current: 0, target: 78, successMin: 78, successMax: 78 },
-    ],
+    "id": "sewing-head-template",
+    "name": "アタマテンプレート",
+    "category": "アタマ",
+    "categoryId": "head",
+    "items": [
+      {
+        "id": "part-1",
+        "name": "B",
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        },
+        "current": 0,
+        "target": 78,
+        "successMin": 78,
+        "successMax": 78
+      },
+      {
+        "id": "part-2",
+        "name": "D",
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        },
+        "current": 0,
+        "target": 78,
+        "successMin": 78,
+        "successMax": 78
+      },
+      {
+        "id": "part-3",
+        "name": "E",
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        },
+        "current": 0,
+        "target": 78,
+        "successMin": 78,
+        "successMax": 78
+      },
+      {
+        "id": "part-4",
+        "name": "F",
+        "gridCell": {
+          "row": 2,
+          "column": 3
+        },
+        "current": 0,
+        "target": 78,
+        "successMin": 78,
+        "successMax": 78
+      }
+    ]
   },
   {
-    id: "sewing-body-lower-template",
-    name: "体下テンプレート",
-    category: "体下",
-    categoryId: "body-lower",
-    items: [
-      { id: "part-1", name: "左上", gridCell: { row: 1, column: 1 }, current: 0, target: 78, successMin: 78, successMax: 78 },
-      { id: "part-2", name: "上", gridCell: { row: 1, column: 2 }, current: 0, target: 78, successMin: 78, successMax: 78 },
-      { id: "part-3", name: "左", gridCell: { row: 2, column: 1 }, current: 0, target: 78, successMin: 78, successMax: 78 },
-      { id: "part-4", name: "中央", gridCell: { row: 2, column: 2 }, current: 0, target: 78, successMin: 78, successMax: 78 },
-      { id: "part-5", name: "左下", gridCell: { row: 3, column: 1 }, current: 0, target: 78, successMin: 78, successMax: 78 },
-      { id: "part-6", name: "下", gridCell: { row: 3, column: 2 }, current: 0, target: 78, successMin: 78, successMax: 78 },
-    ],
+    "id": "sewing-body-upper-template",
+    "name": "からだ上テンプレート",
+    "category": "からだ上",
+    "categoryId": "body-upper",
+    "items": [
+      {
+        "id": "part-1",
+        "name": "A",
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        },
+        "current": 0,
+        "target": 78,
+        "successMin": 78,
+        "successMax": 78
+      },
+      {
+        "id": "part-2",
+        "name": "B",
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        },
+        "current": 0,
+        "target": 78,
+        "successMin": 78,
+        "successMax": 78
+      },
+      {
+        "id": "part-3",
+        "name": "C",
+        "gridCell": {
+          "row": 1,
+          "column": 3
+        },
+        "current": 0,
+        "target": 78,
+        "successMin": 78,
+        "successMax": 78
+      },
+      {
+        "id": "part-4",
+        "name": "D",
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        },
+        "current": 0,
+        "target": 78,
+        "successMin": 78,
+        "successMax": 78
+      },
+      {
+        "id": "part-5",
+        "name": "E",
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        },
+        "current": 0,
+        "target": 78,
+        "successMin": 78,
+        "successMax": 78
+      },
+      {
+        "id": "part-6",
+        "name": "F",
+        "gridCell": {
+          "row": 2,
+          "column": 3
+        },
+        "current": 0,
+        "target": 78,
+        "successMin": 78,
+        "successMax": 78
+      }
+    ]
   },
   {
-    id: "sewing-arm-template",
-    name: "腕テンプレート",
-    category: "腕",
-    categoryId: "arm",
-    items: [
-      { id: "part-1", name: "左上", gridCell: { row: 1, column: 1 }, current: 0, target: 78, successMin: 78, successMax: 78 },
-      { id: "part-2", name: "上", gridCell: { row: 1, column: 2 }, current: 0, target: 78, successMin: 78, successMax: 78 },
-      { id: "part-3", name: "右上", gridCell: { row: 1, column: 3 }, current: 0, target: 78, successMin: 78, successMax: 78 },
-      { id: "part-4", name: "左下", gridCell: { row: 2, column: 1 }, current: 0, target: 78, successMin: 78, successMax: 78 },
-      { id: "part-5", name: "下", gridCell: { row: 2, column: 2 }, current: 0, target: 78, successMin: 78, successMax: 78 },
-      { id: "part-6", name: "右下", gridCell: { row: 2, column: 3 }, current: 0, target: 78, successMin: 78, successMax: 78 },
-    ],
+    "id": "sewing-body-lower-template",
+    "name": "からだ下テンプレート",
+    "category": "からだ下",
+    "categoryId": "body-lower",
+    "items": [
+      {
+        "id": "part-1",
+        "name": "A",
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        },
+        "current": 0,
+        "target": 78,
+        "successMin": 78,
+        "successMax": 78
+      },
+      {
+        "id": "part-2",
+        "name": "B",
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        },
+        "current": 0,
+        "target": 78,
+        "successMin": 78,
+        "successMax": 78
+      },
+      {
+        "id": "part-3",
+        "name": "D",
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        },
+        "current": 0,
+        "target": 78,
+        "successMin": 78,
+        "successMax": 78
+      },
+      {
+        "id": "part-4",
+        "name": "E",
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        },
+        "current": 0,
+        "target": 78,
+        "successMin": 78,
+        "successMax": 78
+      },
+      {
+        "id": "part-5",
+        "name": "G",
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        },
+        "current": 0,
+        "target": 78,
+        "successMin": 78,
+        "successMax": 78
+      },
+      {
+        "id": "part-6",
+        "name": "H",
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        },
+        "current": 0,
+        "target": 78,
+        "successMin": 78,
+        "successMax": 78
+      }
+    ]
   },
   {
-    id: "sewing-foot-template",
-    name: "足テンプレート",
-    category: "足",
-    categoryId: "foot",
-    items: [
-      { id: "part-1", name: "左上", gridCell: { row: 1, column: 1 }, current: 0, target: 78, successMin: 78, successMax: 78 },
-      { id: "part-2", name: "上", gridCell: { row: 1, column: 2 }, current: 0, target: 78, successMin: 78, successMax: 78 },
-      { id: "part-3", name: "左下", gridCell: { row: 2, column: 1 }, current: 0, target: 78, successMin: 78, successMax: 78 },
-      { id: "part-4", name: "下", gridCell: { row: 2, column: 2 }, current: 0, target: 78, successMin: 78, successMax: 78 },
-    ],
+    "id": "sewing-arm-template",
+    "name": "ウデテンプレート",
+    "category": "ウデ",
+    "categoryId": "arm",
+    "items": [
+      {
+        "id": "part-1",
+        "name": "A",
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        },
+        "current": 0,
+        "target": 78,
+        "successMin": 78,
+        "successMax": 78
+      },
+      {
+        "id": "part-2",
+        "name": "B",
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        },
+        "current": 0,
+        "target": 78,
+        "successMin": 78,
+        "successMax": 78
+      },
+      {
+        "id": "part-3",
+        "name": "C",
+        "gridCell": {
+          "row": 1,
+          "column": 3
+        },
+        "current": 0,
+        "target": 78,
+        "successMin": 78,
+        "successMax": 78
+      },
+      {
+        "id": "part-4",
+        "name": "D",
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        },
+        "current": 0,
+        "target": 78,
+        "successMin": 78,
+        "successMax": 78
+      },
+      {
+        "id": "part-5",
+        "name": "E",
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        },
+        "current": 0,
+        "target": 78,
+        "successMin": 78,
+        "successMax": 78
+      },
+      {
+        "id": "part-6",
+        "name": "F",
+        "gridCell": {
+          "row": 2,
+          "column": 3
+        },
+        "current": 0,
+        "target": 78,
+        "successMin": 78,
+        "successMax": 78
+      }
+    ]
   },
   {
-    id: "sewing-head-template",
-    name: "頭テンプレート",
-    category: "頭",
-    categoryId: "head",
-    items: [
-      { id: "part-1", name: "上", gridCell: { row: 1, column: 2 }, current: 0, target: 78, successMin: 78, successMax: 78 },
-      { id: "part-2", name: "左下", gridCell: { row: 2, column: 1 }, current: 0, target: 78, successMin: 78, successMax: 78 },
-      { id: "part-3", name: "下", gridCell: { row: 2, column: 2 }, current: 0, target: 78, successMin: 78, successMax: 78 },
-      { id: "part-4", name: "右下", gridCell: { row: 2, column: 3 }, current: 0, target: 78, successMin: 78, successMax: 78 },
-    ],
-  },
+    "id": "sewing-foot-template",
+    "name": "足テンプレート",
+    "category": "足",
+    "categoryId": "foot",
+    "items": [
+      {
+        "id": "part-1",
+        "name": "A",
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        },
+        "current": 0,
+        "target": 78,
+        "successMin": 78,
+        "successMax": 78
+      },
+      {
+        "id": "part-2",
+        "name": "B",
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        },
+        "current": 0,
+        "target": 78,
+        "successMin": 78,
+        "successMax": 78
+      },
+      {
+        "id": "part-3",
+        "name": "D",
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        },
+        "current": 0,
+        "target": 78,
+        "successMin": 78,
+        "successMax": 78
+      },
+      {
+        "id": "part-4",
+        "name": "E",
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        },
+        "current": 0,
+        "target": 78,
+        "successMin": 78,
+        "successMax": 78
+      }
+    ]
+  }
 ]);
