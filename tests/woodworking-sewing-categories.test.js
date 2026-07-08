@@ -13,6 +13,8 @@ vm.createContext(context);
 	"app/crafts/shared/sewing-damage.js",
 	"app/crafts/woodworking/config.js",
 	"app/crafts/sewing/config.js",
+	"app/crafts/woodworking/component.js",
+	"app/crafts/sewing/component.js",
 ].forEach((file) => {
 	vm.runInContext(fs.readFileSync(file, "utf8"), context, { filename: file });
 });
@@ -46,6 +48,11 @@ vm.createContext(context);
 		{ row: 2, column: 2 },
 		{ row: 3, column: 2 },
 	]);
+	assert.equal(
+		context.DQ10CraftComponents.woodworking.isBoardCellEditable?.({}),
+		true,
+		"木工はBOARDセル右クリック編集を有効にしてください",
+	);
 }
 
 {
@@ -67,6 +74,11 @@ vm.createContext(context);
 		{ row: 2, column: 2 },
 		{ row: 2, column: 3 },
 	]);
+	assert.equal(
+		context.DQ10CraftComponents.sewing.isBoardCellEditable?.({}),
+		true,
+		"裁縫はBOARDセル右クリック編集を有効にしてください",
+	);
 }
 
 [
