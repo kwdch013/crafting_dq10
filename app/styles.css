@@ -1082,6 +1082,7 @@ select:focus {
 .editor-effect-mode,
 .editor-block-effect,
 .editor-cell-effect,
+.editor-damage-judgements,
 .editor-smithing-judgements {
   display: grid;
   gap: 8px;
@@ -1094,6 +1095,7 @@ select:focus {
 .editor-effect-mode[hidden],
 .editor-block-effect[hidden],
 .editor-cell-effect[hidden],
+.editor-damage-judgements[hidden],
 .editor-smithing-judgements[hidden] {
   display: none;
 }
@@ -1101,17 +1103,20 @@ select:focus {
 .editor-effect-mode legend,
 .editor-block-effect legend,
 .editor-cell-effect legend,
+.editor-damage-judgements legend,
 .editor-smithing-judgements legend {
   color: var(--muted);
   font-size: 12px;
   font-weight: 900;
 }
 
+.editor-damage-judgement-rows,
 .editor-smithing-judgement-rows {
   display: grid;
   gap: 6px;
 }
 
+.editor-damage-judgement-row,
 .editor-smithing-judgement-row {
   display: grid;
   grid-template-columns: 48px minmax(0, 1fr);
@@ -1121,11 +1126,15 @@ select:focus {
   padding-bottom: 6px;
 }
 
+.editor-damage-judgement-row:last-child,
 .editor-smithing-judgement-row:last-child {
   border-bottom: 0;
   padding-bottom: 0;
 }
 
+.editor-damage-judgement-row strong,
+.editor-damage-judgement-row span,
+.editor-damage-judgement-row small,
 .editor-smithing-judgement-row strong,
 .editor-smithing-judgement-row span,
 .editor-smithing-judgement-row small {
@@ -1133,6 +1142,7 @@ select:focus {
   font-size: 12px;
 }
 
+.editor-damage-judgement-row small,
 .editor-smithing-judgement-row small {
   grid-column: 2;
   font-weight: 800;

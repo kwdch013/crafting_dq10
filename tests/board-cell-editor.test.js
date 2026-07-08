@@ -1,6 +1,8 @@
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
 
 const editor = require("../app/board-cell-editor.js");
+const mainJs = fs.readFileSync("app/main.js", "utf8");
 
 {
 	const result = editor.normalizeEditValue(
@@ -119,3 +121,9 @@ const editor = require("../app/board-cell-editor.js");
 		"none",
 	);
 }
+
+assert.match(mainJs, /editor-damage-judgements/, "右クリック編集に職人別ダメージ判定欄を追加してください");
+assert.match(mainJs, /function renderCraftCellJudgements\(editor\)/, "木工・裁縫を含む職人別ダメージ判定を描画してください");
+assert.match(mainJs, /function getCellJudgementEntries\(ingredient\)/, "職人別の威力別ダメージ候補を取得してください");
+assert.match(mainJs, /damageModel: "woodworking-grain"/, "木工の右クリック判定は木目別ダメージを使ってください");
+assert.match(mainJs, /damageModel: "sewing-power"/, "裁縫の右クリック判定はぬいパワー別ダメージを使ってください");
