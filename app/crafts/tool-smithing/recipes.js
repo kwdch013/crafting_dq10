@@ -7,7 +7,7 @@ registerDQ10CraftRecipes("tool-smithing", [
     "items": [
       {
         "id": "part-1",
-        "name": "左上",
+        "name": "A",
         "gridCell": {
           "row": 1,
           "column": 1
@@ -18,7 +18,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-2",
-        "name": "右上",
+        "name": "B",
         "gridCell": {
           "row": 1,
           "column": 2
@@ -29,7 +29,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-3",
-        "name": "左中",
+        "name": "C",
         "gridCell": {
           "row": 2,
           "column": 1
@@ -40,7 +40,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-4",
-        "name": "右中",
+        "name": "D",
         "gridCell": {
           "row": 2,
           "column": 2
@@ -51,7 +51,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-5",
-        "name": "左下",
+        "name": "E",
         "gridCell": {
           "row": 3,
           "column": 1
@@ -70,7 +70,7 @@ registerDQ10CraftRecipes("tool-smithing", [
     "items": [
       {
         "id": "part-1",
-        "name": "上",
+        "name": "A",
         "gridCell": {
           "row": 1,
           "column": 1
@@ -81,7 +81,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-2",
-        "name": "中",
+        "name": "C",
         "gridCell": {
           "row": 2,
           "column": 1
@@ -92,7 +92,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-3",
-        "name": "下",
+        "name": "E",
         "gridCell": {
           "row": 3,
           "column": 1
@@ -111,7 +111,7 @@ registerDQ10CraftRecipes("tool-smithing", [
     "items": [
       {
         "id": "part-1",
-        "name": "上",
+        "name": "A",
         "gridCell": {
           "row": 1,
           "column": 1
@@ -122,7 +122,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-2",
-        "name": "下",
+        "name": "C",
         "gridCell": {
           "row": 2,
           "column": 1
@@ -141,7 +141,7 @@ registerDQ10CraftRecipes("tool-smithing", [
     "items": [
       {
         "id": "part-1",
-        "name": "左上",
+        "name": "A",
         "gridCell": {
           "row": 1,
           "column": 1
@@ -152,7 +152,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-2",
-        "name": "右上",
+        "name": "B",
         "gridCell": {
           "row": 1,
           "column": 2
@@ -163,7 +163,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-3",
-        "name": "左中",
+        "name": "C",
         "gridCell": {
           "row": 2,
           "column": 1
@@ -174,7 +174,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-4",
-        "name": "右中",
+        "name": "D",
         "gridCell": {
           "row": 2,
           "column": 2
@@ -185,7 +185,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-5",
-        "name": "左中下",
+        "name": "E",
         "gridCell": {
           "row": 3,
           "column": 1
@@ -196,7 +196,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-6",
-        "name": "右中下",
+        "name": "F",
         "gridCell": {
           "row": 3,
           "column": 2
@@ -207,7 +207,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-7",
-        "name": "左下",
+        "name": "G",
         "gridCell": {
           "row": 4,
           "column": 1
@@ -226,7 +226,7 @@ registerDQ10CraftRecipes("tool-smithing", [
     "items": [
       {
         "id": "part-1",
-        "name": "左上",
+        "name": "A",
         "gridCell": {
           "row": 1,
           "column": 1
@@ -237,7 +237,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-2",
-        "name": "右上",
+        "name": "B",
         "gridCell": {
           "row": 1,
           "column": 2
@@ -248,7 +248,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-3",
-        "name": "左下",
+        "name": "C",
         "gridCell": {
           "row": 2,
           "column": 1
@@ -259,7 +259,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-4",
-        "name": "右下",
+        "name": "D",
         "gridCell": {
           "row": 2,
           "column": 2
@@ -278,7 +278,7 @@ registerDQ10CraftRecipes("tool-smithing", [
     "items": [
       {
         "id": "part-1",
-        "name": "左上",
+        "name": "A",
         "gridCell": {
           "row": 1,
           "column": 1
@@ -289,7 +289,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-2",
-        "name": "右上",
+        "name": "B",
         "gridCell": {
           "row": 1,
           "column": 2
@@ -300,7 +300,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-3",
-        "name": "左中",
+        "name": "C",
         "gridCell": {
           "row": 2,
           "column": 1
@@ -311,7 +311,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-4",
-        "name": "右中",
+        "name": "D",
         "gridCell": {
           "row": 2,
           "column": 2
@@ -322,7 +322,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-5",
-        "name": "左下",
+        "name": "E",
         "gridCell": {
           "row": 3,
           "column": 1
@@ -333,7 +333,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-6",
-        "name": "右下",
+        "name": "F",
         "gridCell": {
           "row": 3,
           "column": 2
@@ -352,7 +352,7 @@ registerDQ10CraftRecipes("tool-smithing", [
     "items": [
       {
         "id": "part-1",
-        "name": "左上",
+        "name": "A",
         "gridCell": {
           "row": 1,
           "column": 1
@@ -363,7 +363,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-2",
-        "name": "右上",
+        "name": "B",
         "gridCell": {
           "row": 1,
           "column": 2
@@ -374,7 +374,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-3",
-        "name": "左中",
+        "name": "C",
         "gridCell": {
           "row": 2,
           "column": 1
@@ -385,7 +385,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-4",
-        "name": "右中",
+        "name": "D",
         "gridCell": {
           "row": 2,
           "column": 2
@@ -396,7 +396,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-5",
-        "name": "左下",
+        "name": "E",
         "gridCell": {
           "row": 3,
           "column": 1
@@ -415,7 +415,7 @@ registerDQ10CraftRecipes("tool-smithing", [
     "items": [
       {
         "id": "part-1",
-        "name": "上",
+        "name": "A",
         "gridCell": {
           "row": 1,
           "column": 1
@@ -426,7 +426,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-2",
-        "name": "中",
+        "name": "C",
         "gridCell": {
           "row": 2,
           "column": 1
@@ -437,7 +437,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-3",
-        "name": "下",
+        "name": "E",
         "gridCell": {
           "row": 3,
           "column": 1
@@ -456,7 +456,7 @@ registerDQ10CraftRecipes("tool-smithing", [
     "items": [
       {
         "id": "part-1",
-        "name": "上",
+        "name": "A",
         "gridCell": {
           "row": 1,
           "column": 1
@@ -467,7 +467,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-2",
-        "name": "下",
+        "name": "C",
         "gridCell": {
           "row": 2,
           "column": 1
@@ -486,7 +486,7 @@ registerDQ10CraftRecipes("tool-smithing", [
     "items": [
       {
         "id": "part-1",
-        "name": "左上",
+        "name": "A",
         "gridCell": {
           "row": 1,
           "column": 1
@@ -497,7 +497,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-2",
-        "name": "右上",
+        "name": "B",
         "gridCell": {
           "row": 1,
           "column": 2
@@ -508,7 +508,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-3",
-        "name": "左中",
+        "name": "C",
         "gridCell": {
           "row": 2,
           "column": 1
@@ -519,7 +519,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-4",
-        "name": "右中",
+        "name": "D",
         "gridCell": {
           "row": 2,
           "column": 2
@@ -530,7 +530,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-5",
-        "name": "左中下",
+        "name": "E",
         "gridCell": {
           "row": 3,
           "column": 1
@@ -541,7 +541,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-6",
-        "name": "右中下",
+        "name": "F",
         "gridCell": {
           "row": 3,
           "column": 2
@@ -552,7 +552,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-7",
-        "name": "左下",
+        "name": "G",
         "gridCell": {
           "row": 4,
           "column": 1
@@ -571,7 +571,7 @@ registerDQ10CraftRecipes("tool-smithing", [
     "items": [
       {
         "id": "part-1",
-        "name": "左上",
+        "name": "A",
         "gridCell": {
           "row": 1,
           "column": 1
@@ -582,7 +582,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-2",
-        "name": "右上",
+        "name": "B",
         "gridCell": {
           "row": 1,
           "column": 2
@@ -593,7 +593,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-3",
-        "name": "左下",
+        "name": "C",
         "gridCell": {
           "row": 2,
           "column": 1
@@ -604,7 +604,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-4",
-        "name": "右下",
+        "name": "D",
         "gridCell": {
           "row": 2,
           "column": 2
@@ -623,7 +623,7 @@ registerDQ10CraftRecipes("tool-smithing", [
     "items": [
       {
         "id": "part-1",
-        "name": "左上",
+        "name": "A",
         "gridCell": {
           "row": 1,
           "column": 1
@@ -634,7 +634,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-2",
-        "name": "右上",
+        "name": "B",
         "gridCell": {
           "row": 1,
           "column": 2
@@ -645,7 +645,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-3",
-        "name": "左中",
+        "name": "C",
         "gridCell": {
           "row": 2,
           "column": 1
@@ -656,7 +656,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-4",
-        "name": "右中",
+        "name": "D",
         "gridCell": {
           "row": 2,
           "column": 2
@@ -667,7 +667,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-5",
-        "name": "左下",
+        "name": "E",
         "gridCell": {
           "row": 3,
           "column": 1
@@ -678,7 +678,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-6",
-        "name": "右下",
+        "name": "F",
         "gridCell": {
           "row": 3,
           "column": 2
@@ -697,7 +697,7 @@ registerDQ10CraftRecipes("tool-smithing", [
     "items": [
       {
         "id": "part-1",
-        "name": "左上",
+        "name": "A",
         "gridCell": {
           "row": 1,
           "column": 1
@@ -708,7 +708,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-2",
-        "name": "右上",
+        "name": "B",
         "gridCell": {
           "row": 1,
           "column": 2
@@ -719,7 +719,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-3",
-        "name": "左中",
+        "name": "C",
         "gridCell": {
           "row": 2,
           "column": 1
@@ -730,7 +730,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-4",
-        "name": "右中",
+        "name": "D",
         "gridCell": {
           "row": 2,
           "column": 2
@@ -741,7 +741,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-5",
-        "name": "左下",
+        "name": "E",
         "gridCell": {
           "row": 3,
           "column": 1
@@ -760,7 +760,7 @@ registerDQ10CraftRecipes("tool-smithing", [
     "items": [
       {
         "id": "part-1",
-        "name": "上",
+        "name": "A",
         "gridCell": {
           "row": 1,
           "column": 1
@@ -771,7 +771,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-2",
-        "name": "中",
+        "name": "C",
         "gridCell": {
           "row": 2,
           "column": 1
@@ -782,7 +782,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-3",
-        "name": "下",
+        "name": "E",
         "gridCell": {
           "row": 3,
           "column": 1
@@ -801,7 +801,7 @@ registerDQ10CraftRecipes("tool-smithing", [
     "items": [
       {
         "id": "part-1",
-        "name": "上",
+        "name": "A",
         "gridCell": {
           "row": 1,
           "column": 1
@@ -812,7 +812,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-2",
-        "name": "下",
+        "name": "C",
         "gridCell": {
           "row": 2,
           "column": 1
@@ -831,7 +831,7 @@ registerDQ10CraftRecipes("tool-smithing", [
     "items": [
       {
         "id": "part-1",
-        "name": "左上",
+        "name": "A",
         "gridCell": {
           "row": 1,
           "column": 1
@@ -842,7 +842,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-2",
-        "name": "右上",
+        "name": "B",
         "gridCell": {
           "row": 1,
           "column": 2
@@ -853,7 +853,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-3",
-        "name": "左中",
+        "name": "C",
         "gridCell": {
           "row": 2,
           "column": 1
@@ -864,7 +864,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-4",
-        "name": "右中",
+        "name": "D",
         "gridCell": {
           "row": 2,
           "column": 2
@@ -875,7 +875,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-5",
-        "name": "左中下",
+        "name": "E",
         "gridCell": {
           "row": 3,
           "column": 1
@@ -886,7 +886,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-6",
-        "name": "右中下",
+        "name": "F",
         "gridCell": {
           "row": 3,
           "column": 2
@@ -897,7 +897,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-7",
-        "name": "左下",
+        "name": "G",
         "gridCell": {
           "row": 4,
           "column": 1
@@ -916,7 +916,7 @@ registerDQ10CraftRecipes("tool-smithing", [
     "items": [
       {
         "id": "part-1",
-        "name": "左上",
+        "name": "A",
         "gridCell": {
           "row": 1,
           "column": 1
@@ -927,7 +927,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-2",
-        "name": "右上",
+        "name": "B",
         "gridCell": {
           "row": 1,
           "column": 2
@@ -938,7 +938,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-3",
-        "name": "左下",
+        "name": "C",
         "gridCell": {
           "row": 2,
           "column": 1
@@ -949,7 +949,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-4",
-        "name": "右下",
+        "name": "D",
         "gridCell": {
           "row": 2,
           "column": 2
@@ -968,7 +968,7 @@ registerDQ10CraftRecipes("tool-smithing", [
     "items": [
       {
         "id": "part-1",
-        "name": "左上",
+        "name": "A",
         "gridCell": {
           "row": 1,
           "column": 1
@@ -979,7 +979,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-2",
-        "name": "右上",
+        "name": "B",
         "gridCell": {
           "row": 1,
           "column": 2
@@ -990,7 +990,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-3",
-        "name": "左中",
+        "name": "C",
         "gridCell": {
           "row": 2,
           "column": 1
@@ -1001,7 +1001,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-4",
-        "name": "右中",
+        "name": "D",
         "gridCell": {
           "row": 2,
           "column": 2
@@ -1012,7 +1012,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-5",
-        "name": "左下",
+        "name": "E",
         "gridCell": {
           "row": 3,
           "column": 1
@@ -1023,7 +1023,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-6",
-        "name": "右下",
+        "name": "F",
         "gridCell": {
           "row": 3,
           "column": 2
@@ -1041,7 +1041,7 @@ registerDQ10CraftRecipes("tool-smithing", [
     "items": [
       {
         "id": "part-1",
-        "name": "上",
+        "name": "A",
         "gridCell": {
           "row": 1,
           "column": 1
@@ -1053,7 +1053,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-2",
-        "name": "中",
+        "name": "C",
         "gridCell": {
           "row": 2,
           "column": 1
@@ -1065,7 +1065,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-3",
-        "name": "下",
+        "name": "E",
         "gridCell": {
           "row": 3,
           "column": 1
@@ -1084,7 +1084,7 @@ registerDQ10CraftRecipes("tool-smithing", [
     "items": [
       {
         "id": "part-1",
-        "name": "左上",
+        "name": "A",
         "gridCell": {
           "row": 1,
           "column": 1
@@ -1095,7 +1095,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-2",
-        "name": "右上",
+        "name": "B",
         "gridCell": {
           "row": 1,
           "column": 2
@@ -1106,7 +1106,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-3",
-        "name": "左下",
+        "name": "C",
         "gridCell": {
           "row": 2,
           "column": 1
@@ -1117,7 +1117,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-4",
-        "name": "右下",
+        "name": "D",
         "gridCell": {
           "row": 2,
           "column": 2
@@ -1128,5 +1128,4 @@ registerDQ10CraftRecipes("tool-smithing", [
       }
     ]
   }
-]
-);
+]);

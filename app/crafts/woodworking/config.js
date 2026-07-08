@@ -1,15 +1,18 @@
+// 設定単体で読み込まれるテストでも座標名を生成できるようにします。
+function getWoodworkingPositionName(row, column) {
+  if (typeof createDQ10CoordinatePositionName === "function") {
+    return createDQ10CoordinatePositionName(row, column, 3);
+  }
+
+  return String.fromCharCode(64 + ((Number(row) - 1) * 3 + Number(column)));
+}
+
 // 木工の参照画像に合わせた固定基準値テンプレートを作成します。
 function createWoodworkingTemplateItems(cells) {
-  const names = {
-    "1:2": "上",
-    "2:2": "中央",
-    "3:2": "下",
-  };
-
   return cells.map(({ row, column }, index) => ({
     id: `part-${index + 1}`,
-    name: names[`${row}:${column}`] || `${row}行${column}列`,
-    optionId: "parallel",
+    name: getWoodworkingPositionName(row, column),
+    optionId: "horizontal",
     gridCell: { row, column },
     current: 0,
     target: 74,
@@ -29,6 +32,7 @@ registerDQ10Craft({
   resourceLabel: "集中力",
   stateLabel: "状態",
   defaultRecipeName: "木工メモ",
+  itemOptionLabel: "木目",
   defaultFocus: 135,
   focus: createDQ10FocusConfig({
     defaultFocus: 135,
@@ -44,18 +48,43 @@ registerDQ10Craft({
     fixed: true,
   },
   itemOptions: [
-    { id: "parallel", label: "並行" },
-    { id: "vertical", label: "垂直" },
+    { id: "horizontal", label: "横" },
+    { id: "vertical", label: "縦" },
   ],
   // 木工の大項目は参照画像ファイル名と同期します。
   recipeCategoryOptions: [
-    { id: "woodworking-knife", label: "木工刀", templateItems: createWoodworkingTemplateItems([
+    { id: "stick", label: "スティック", templateItems: createWoodworkingTemplateItems([
+      { row: 1, column: 2 },
+      { row: 2, column: 2 },
+    ]) },
+    { id: "staff", label: "杖", templateItems: createWoodworkingTemplateItems([
       { row: 1, column: 2 },
       { row: 2, column: 2 },
       { row: 3, column: 2 },
     ]) },
+    { id: "kon", label: "昆", templateItems: createWoodworkingTemplateItems([
+      { row: 1, column: 1 },
+      { row: 1, column: 2 },
+      { row: 2, column: 1 },
+      { row: 2, column: 2 },
+      { row: 3, column: 1 },
+      { row: 3, column: 2 },
+    ]) },
+    { id: "fan", label: "扇", templateItems: createWoodworkingTemplateItems([
+      { row: 1, column: 1 },
+      { row: 1, column: 2 },
+      { row: 2, column: 1 },
+      { row: 2, column: 2 },
+    ]) },
+    { id: "bow", label: "弓", templateItems: createWoodworkingTemplateItems([
+      { row: 1, column: 1 },
+      { row: 1, column: 2 },
+      { row: 2, column: 1 },
+      { row: 3, column: 1 },
+      { row: 3, column: 2 },
+    ]) },
   ],
-  techniquePreviewOptionId: "parallel",
+  techniquePreviewOptionId: "horizontal",
   heatStates: [
     { id: "normal", label: "通常" },
   ],
@@ -69,8 +98,7 @@ registerDQ10Craft({
     { id: "river", name: "大河彫り", focusCost: 7, damageModel: "woodworking-grain", powerId: "power_1_4", multiplier: 1.4, criticalMultiplier: 2, criticalWeight: 0.9 },
   ],
   items: [
-    { id: "part-1", name: "上", optionId: "parallel", gridCell: { row: 1, column: 2 }, current: 0, target: 74, successMin: 74, successMax: 74 },
-    { id: "part-2", name: "中央", optionId: "parallel", gridCell: { row: 2, column: 2 }, current: 0, target: 74, successMin: 74, successMax: 74 },
-    { id: "part-3", name: "下", optionId: "parallel", gridCell: { row: 3, column: 2 }, current: 0, target: 74, successMin: 74, successMax: 74 },
+    { id: "part-1", name: "B", optionId: "horizontal", gridCell: { row: 1, column: 2 }, current: 0, target: 74, successMin: 74, successMax: 74 },
+    { id: "part-2", name: "E", optionId: "horizontal", gridCell: { row: 2, column: 2 }, current: 0, target: 74, successMin: 74, successMax: 74 },
   ],
 });

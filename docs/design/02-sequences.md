@@ -132,16 +132,23 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
+  participant User as ユーザー
+  participant Game as DQ10
   participant Capture as キャプチャ層
   participant Recognition as 認識層
   participant UI as UI層
   participant Engine as 共通計算エンジン
-  participant User as ユーザー
 
+  User->>UI: 基本設定を手動入力
+  User->>UI: 画面取り込みを有効化
+  User->>Game: くわしく見るを押す
+  Game-->>User: 現在値を表示
+  User->>UI: キャプチャボタンを押す
+  UI->>Capture: 現在フレーム取得を依頼
   Capture->>Recognition: 切り出し画像を渡す
-  Recognition->>Recognition: OCR・色判定・テンプレート照合
+  Recognition->>Recognition: OCR・色判定・テンプレート照合で現在値を読む
   Recognition-->>UI: 認識値と信頼度を返す
-  UI-->>User: 認識値を表示
+  UI-->>User: 認識値を盤面へ反映して表示
   User->>UI: 必要なら手入力で補正
   UI->>Engine: 補正後の状態を評価
   Engine-->>UI: 判定結果を返す
