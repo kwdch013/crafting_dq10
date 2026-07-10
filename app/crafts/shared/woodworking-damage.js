@@ -32,6 +32,26 @@
     }));
   }
 
+  function combineWeightedDistributions(baseItems, repeat) {
+    let totals = [{ value: 0, weight: 1 }];
+
+    for (let index = 0; index < repeat; index += 1) {
+      const nextTotals = new Map();
+      totals.forEach((totalItem) => {
+        baseItems.forEach((baseItem) => {
+          const value = totalItem.value + baseItem.value;
+          const weight = totalItem.weight * baseItem.weight;
+          nextTotals.set(value, (nextTotals.get(value) || 0) + weight);
+        });
+      });
+      totals = [...nextTotals.entries()]
+        .map(([value, weight]) => ({ value, weight }))
+        .sort((a, b) => a.value - b.value);
+    }
+
+    return totals;
+  }
+
   // レシピの木目は横/縦で保持し、既存の順目/逆目ダメージ表へ解決します。
   function normalizeGrainId(grainId) {
     const aliases = {
@@ -46,6 +66,17 @@
   function getDistribution(grainId, powerId) {
     const values = distributions[normalizeGrainId(grainId)]?.[powerId];
     return values ? withPercent(values) : null;
+  }
+
+  function getRepeatedDistribution(grainId, powerId, repeat = 1) {
+    const values = distributions[normalizeGrainId(grainId)]?.[powerId];
+    const count = Math.max(1, Math.floor(Number(repeat) || 1));
+
+    if (!values) {
+      return null;
+    }
+
+    return withPercent(combineWeightedDistributions(values, count));
   }
 
   function getRange(grainId, powerId) {
@@ -65,6 +96,7 @@
     powers,
     distributions,
     getDistribution,
+    getRepeatedDistribution,
     getRange,
     normalizeGrainId,
     grainStates: [
