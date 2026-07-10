@@ -476,7 +476,6 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/50
 
 固定は基準範囲内だけ許可し、右クリック編集の枠外クリックでも入力内容を反映します。
 URL: https://github.com/kwdch013/crafting_dq10/issues/53
-
 ### #77 道具鍛冶: ハンマーのレシピ配置を修正する
 ハンマーのカテゴリテンプレートを、左列3マス、右列2マスの5マス配置に修正します。レシピ追加・編集画面では不要な右下セルを表示しません。URL: https://github.com/kwdch013/crafting_dq10/issues/77
 ### #83 道具鍛冶: 素材テンプレートを左右縦3マスに修正する
@@ -497,3 +496,4 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/53
 鍛冶BOARD上部の特性状態欄は温度変更で折りたたまず、未発動時も通常状態を表示してBOARDや操作ボタンの位置を安定させます。今後のUI修正でも、基本設定以外の状態変化による表示有無でレイアウトが収縮しないようAGENTS.mdへルールを追加します。URL: https://github.com/kwdch013/crafting_dq10/issues/107
 ### #109 鍛冶職人: 必殺ヘパイトスの火種を実装する 鍛冶BOARD上部で `ヘパイトスの火種` を4状態で操作し、`使用中` は会心範囲として判定します。基準値到達済みはダメージなしとして扱います。URL: https://github.com/kwdch013/crafting_dq10/issues/109
 ### #111 鍛冶職人: ヘパイトスの火種を会心範囲判定へ修正する `ヘパイトスの火種` は威力2倍ではなく会心範囲で判定し、不足、偽会心、本会心の可能性を正しく残します。URL: https://github.com/kwdch013/crafting_dq10/issues/111
+### #118 共通: 設定分類とドキュメント最新化 職人設定登録時に共通設定と個別設定を分類し、READMEと設計文書を現在の6職人構成、共有集中力表、分類スキーマに合わせます。URL: https://github.com/kwdch013/crafting_dq10/issues/118
