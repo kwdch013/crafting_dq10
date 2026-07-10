@@ -924,6 +924,11 @@ function renderTechniqueEditor() {
         card.querySelector(".tech-critical-range").textContent = `${resolvedTechnique.criticalMin} - ${resolvedTechnique.criticalMax}`;
         card.querySelector(".tech-multiplier").textContent = `${resolvedTechnique.multiplier || 1}倍`;
       }
+      const distribution = card.querySelector(".tech-distribution");
+      if (distribution) {
+        distribution.textContent = formatDamageDistribution(resolvedTechnique.distribution);
+        distribution.hidden = !distribution.textContent;
+      }
       elements.techniqueEditor.append(card);
     });
 }
@@ -1618,12 +1623,8 @@ function formatTargetSummary(item, targetMode) {
   return `基準 ${item.target} / ${item.successMin} - ${item.successMax}`;
 }
 
-function formatBoardTargetSummary(item, targetMode) {
-  if (targetMode === "random-in-range") {
-    return `基準 ${item.successMin}-${item.successMax}`;
-  }
-
-  return `基準 ${item.target} / ${item.successMin}-${item.successMax}`;
+function formatBoardTargetSummary(item) {
+  return `基準 ${item.target}`;
 }
 
 function getItemOptionLabel(config, optionId) {
@@ -1999,10 +2000,21 @@ function renderCraftCellJudgements(editor) {
     row.innerHTML = `
       <strong>${escapeHtml(entry.label)}</strong>
       <span class="numeric">${analysis.normalMin}-${analysis.normalMax} / 会心 ${analysis.criticalMin}-${analysis.criticalMax}</span>
-      <small>${escapeHtml(analysis.statusLabel)}</small>
+      <small>${escapeHtml([analysis.statusLabel, formatDamageDistribution(analysis.technique.distribution)].filter(Boolean).join(" / "))}</small>
     `;
     rows.append(row);
   });
+}
+
+// 木工・裁縫の特技別ダメージ分布を、値ごとの発生率として表示します。
+function formatDamageDistribution(distribution) {
+  if (!Array.isArray(distribution) || distribution.length === 0) {
+    return "";
+  }
+
+  return distribution
+    .map((item) => `${item.value}: ${item.percent}%`)
+    .join(" / ");
 }
 
 // 既存テストと外部参照用に、鍛冶判定描画名を職人別判定へ委譲します。

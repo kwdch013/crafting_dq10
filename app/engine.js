@@ -389,7 +389,7 @@
 
       return {
         ...technique,
-        distribution: woodworkingDamage.getDistribution(grain, technique.powerId),
+        distribution: woodworkingDamage.getRepeatedDistribution(grain, technique.powerId, repeat),
         normalMin,
         normalMax,
         criticalMin: Math.ceil(normalMin * criticalMultiplier),
