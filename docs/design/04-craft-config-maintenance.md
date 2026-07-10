@@ -31,23 +31,14 @@ app/crafts/
 
 各 `config.js` は `registerDQ10Craft()` を呼び出して職人設定を登録します。
 
-設定する主な項目:
-- `id`: 職人ID
-- `label`: UI表示名
-- `modeLabel`: 画面上部の補足表示
-- `recipeLabel`: 品目名ラベル
-- `recipeCategoryLabel`: 制作物を大項目で分ける場合の大項目ラベル
-- `recipeSubcategoryLabel`: 制作物を大項目で分ける場合の道具名ラベル
-- `recipeCategoryOptions`: 大項目の選択肢
-- `itemNameLabel`: 手入力データ補完時のマス名ラベル
-- `resourceLabel`: 集中力などのリソース名
-- `defaultRecipeName`: 初期品目名
-- `defaultFocus`: 初期集中力
-- `focus`: レベル別集中力と道具補正
-- `heatStates`: 火力や状態の選択肢
-- `techniques`: 特技一覧
-- `itemOptions`: マスや具材ごとの種別選択肢
-- `items`: 初期マス一覧
+登録時に `app/crafts/registry.js` が設定キーを `settingGroups.common` と `settingGroups.individual` に分類します。
+未分類キーは `settingGroups.unknown` に入り、テストで検出します。
+
+共通設定はUIやエンジンで同じ意味を持つ設定です。
+対象キー: `resourceLabel`、`stateLabel`、`targetMode`、`defaultFocus`、`focus`、`focusNote`、`layout`、`heatStates`、`techniquePreviewOptionId`、`defaultHeatId`、`allowCustomRecipes`
+
+個別設定は職人やレシピ種別ごとに意味や値が変わる設定です。
+対象キー: `id`、`label`、`modeLabel`、`recipeLabel`、`recipeCategoryLabel`、`recipeSubcategoryLabel`、`recipeCategoryOptions`、`itemNameLabel`、`itemOptionLabel`、`itemOptions`、`defaultRecipeName`、`defaultTraitId`、`defaultTurns`、`traits`、`techniques`、`items`
 
 道具鍛冶の大項目は `refarence/tool` の画像種別と合わせ、針、木工刀、ハンマー、ツボ、ランプ、フライパン、ルアー、素材の8種類を `tool-smithing/config.js` に定義します。ハンマーのテンプレートは左列が縦3マス、右列が縦2マスの5マス配置として扱います。ルアーのテンプレートは左列が縦2マス、右列が上段1マスの3マス配置として扱います。素材のテンプレートは左列が縦3マス、右列も縦3マスの6マス配置として扱います。
 具体的な制作物名は道具名としてレシピJSONに登録します。

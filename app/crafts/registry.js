@@ -3,6 +3,41 @@
   global.DQ10CraftRecipes = global.DQ10CraftRecipes || {};
   global.DQ10CraftComponents = global.DQ10CraftComponents || {};
 
+  // 職人設定の責務を、UI/エンジン共通の設定と職人別差分へ分類します。
+  const craftSettingSchema = {
+    common: [
+      "resourceLabel",
+      "stateLabel",
+      "targetMode",
+      "defaultFocus",
+      "focus",
+      "focusNote",
+      "layout",
+      "heatStates",
+      "techniquePreviewOptionId",
+      "defaultHeatId",
+      "allowCustomRecipes",
+    ],
+    individual: [
+      "id",
+      "label",
+      "modeLabel",
+      "recipeLabel",
+      "recipeCategoryLabel",
+      "recipeSubcategoryLabel",
+      "recipeCategoryOptions",
+      "itemNameLabel",
+      "itemOptionLabel",
+      "itemOptions",
+      "defaultRecipeName",
+      "defaultTraitId",
+      "defaultTurns",
+      "traits",
+      "techniques",
+      "items",
+    ],
+  };
+
   // 職人レベルごとの集中力基礎値を定義します。
   const focusLevelTables = {
     smithing: [
@@ -199,7 +234,26 @@
       throw new Error("Craft config requires an id.");
     }
 
+    config.settingGroups = global.classifyDQ10CraftConfig(config);
     global.DQ10CraftConfigs[config.id] = config;
+  };
+
+  // 設定キーを分類し、未分類キーをテストで検出できる形にします。
+  global.classifyDQ10CraftConfig = function classifyDQ10CraftConfig(config) {
+    const common = new Set(craftSettingSchema.common);
+    const individual = new Set(craftSettingSchema.individual);
+    const entries = Object.keys(config).filter((key) => key !== "settingGroups");
+
+    return {
+      common: entries.filter((key) => common.has(key)),
+      individual: entries.filter((key) => individual.has(key)),
+      unknown: entries.filter((key) => !common.has(key) && !individual.has(key)),
+    };
+  };
+
+  global.DQ10CraftSettingSchema = {
+    common: [...craftSettingSchema.common],
+    individual: [...craftSettingSchema.individual],
   };
 
   // API停止時フォールバック用のレシピ一覧を登録します。

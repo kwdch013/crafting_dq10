@@ -23,7 +23,7 @@ docker compose down
 ## 実装済み
 
 - 職人ごとの設定ディレクトリ
-- 調理職人、武器鍛冶、防具鍛冶、道具鍛冶、裁縫、木工、ランプ錬金、ツボ錬金の設定
+- 調理職人、武器鍛冶、防具鍛冶、道具鍛冶、裁縫、木工の設定
 - 品目名、職人レベル、使用道具、道具の★数、残りターン/残り手数、火力状態の入力
 - レベルと道具設定による集中力の自動計算
 - マス/具材ごとの現在値、成功下限、成功上限の入力
@@ -98,15 +98,15 @@ app/crafts/
   tool-smithing/config.js
   sewing/config.js
   woodworking/config.js
-  lamp-alchemy/config.js
-  pot-alchemy/config.js
 ```
 
-各 `config.js` では、職人名、入力ラベル、レベル別集中力、道具種類と★数ごとの補正、火力状態、特技ごとの消費集中力・通常範囲・会心範囲、初期マスを管理します。
+各 `config.js` では、職人名、入力ラベル、大項目、特技、特性、初期マスなどの職人個別設定を管理します。
+集中力、火力・状態候補、盤面サイズ、基準値モードなどUIとエンジンで同じ意味を持つ設定は共通設定として扱い、登録時に `settingGroups.common` と `settingGroups.individual` へ分類します。
 道具鍛冶の大項目は `app/crafts/tool-smithing/config.js` の `recipeCategoryOptions` に定義し、小項目の具体的な制作物はレシピJSONに追加します。
 
 鍛冶職人の選択特技は各 `app/crafts/*-smithing/config.js` で倍率の低い順に管理します。
 
+レベル別集中力と道具補正は `app/crafts/registry.js` の共有表から取得します。
 調理の位置別ダメージは `app/crafts/shared/cooking-damage.js` に集約しています。
 鍛冶系の温度別ダメージは `app/crafts/shared/smithing-damage.js` に集約しています。
 このファイルでは、各温度と威力ごとの最小値・最大値だけを保持します。
