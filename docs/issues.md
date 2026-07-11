@@ -219,6 +219,7 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/10
 ### #122 鍛冶職人: 会心時確定が偽会心ケースを含む（基準値未到達の偽会心ケースを確定扱いにしない） URL: https://github.com/kwdch013/crafting_dq10/issues/122
 ### #124 鍛冶職人: ゲージ突入判定の優先順位を通常時超過リスク後にする URL: https://github.com/kwdch013/crafting_dq10/issues/124
 ### #126 裁縫・木工: 固定基準値向けの判定基準を分離する URL: https://github.com/kwdch013/crafting_dq10/issues/126
+### #128 裁縫・木工: 不要な判定表示を除外し職人別判定フローを文書化する URL: https://github.com/kwdch013/crafting_dq10/issues/128
 ### #11 調理職人: レシピ特性の実データ割り当てを検証する
 
 現状:
@@ -467,14 +468,11 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/43
 URL: https://github.com/kwdch013/crafting_dq10/issues/45
 
 ### #50 調理職人: 火力変更後に盤面の会心判定表示が更新されない
-
 火力変更時に盤面セルを再描画し、正規化後も `includeInAnalysis` などの特技フラグを保持します。
 現在値0、基準範囲180-210、強火の回帰条件では、ミラクルグリルを通常判定に混ぜず `不足` と表示されることを確認します。
-
 URL: https://github.com/kwdch013/crafting_dq10/issues/50
 
 ### #53 調理職人: 右クリック編集の固定条件と枠外更新を修正する
-
 固定は基準範囲内だけ許可し、右クリック編集の枠外クリックでも入力内容を反映します。
 URL: https://github.com/kwdch013/crafting_dq10/issues/53
 ### #77 道具鍛冶: ハンマーのレシピ配置を修正する

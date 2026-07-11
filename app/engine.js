@@ -444,7 +444,7 @@
       targetMode,
     } = analysisBase;
     const currentOver = current > target;
-    const shortage = !currentOver && rawCriticalAfterMax < target;
+    const shortage = !currentOver && rawCriticalAfterMin < target;
     const targetReached = current === target;
     const normalChance = !currentOver && !shortage && !targetReached && normalAfterMin <= target && normalAfterMax === target;
     const overGuaranteed = !currentOver && !shortage && !targetReached && normalAfterMin > target;
@@ -453,18 +453,18 @@
     const normalHits = normalAfterMin === target && normalAfterMax === target;
     const normalCanHit = normalAfterMin <= target && normalAfterMax >= target;
     const criticalCanHit = criticalAfterMin <= target && criticalAfterMax >= target;
-    let status = "in-range";
+    let status = "shortage";
 
     if (currentOver) {
       status = "over";
+    } else if (targetReached) {
+      status = "target";
     } else if (shortage) {
       status = "shortage";
     } else if (normalChance) {
       status = "normal-chance";
     } else if (overRisk) {
       status = "over-risk";
-    } else if (targetReached) {
-      status = "target";
     } else if (criticalOnly) {
       status = "critical-only";
     } else if (overGuaranteed) {

@@ -950,10 +950,22 @@ function renderCraftReference() {
   });
 }
 
-// 固定判定は調理固有のため、鍛冶などの職人では凡例から隠します。
+// 職人ごとに使わない判定があるため、選択中の職人に必要な凡例だけを表示します。
 function syncJudgementLegend() {
+  const craftFamily = getCurrentCraftComponent().craftFamily;
+  const isFixedTargetCraft = ["woodworking", "sewing"].includes(craftFamily);
+
   document.querySelectorAll(".cooking-only-judgement").forEach((element) => {
-    element.hidden = !isCurrentCraftFamily("cooking");
+    element.hidden = craftFamily !== "cooking";
+  });
+  document.querySelectorAll(".smithing-only-judgement").forEach((element) => {
+    element.hidden = craftFamily !== "smithing";
+  });
+  document.querySelectorAll(".fixed-target-only-judgement").forEach((element) => {
+    element.hidden = !isFixedTargetCraft;
+  });
+  document.querySelectorAll(".range-target-only-judgement").forEach((element) => {
+    element.hidden = isFixedTargetCraft;
   });
 }
 
