@@ -541,8 +541,8 @@
       current,
       criticalMin,
       criticalMax,
-      targetMode === "random-in-range" ? successMin : target,
-      targetMode === "random-in-range" ? successMax : target,
+      target,
+      target,
       targetMode,
     );
     const forcedCritical = technique.forcedCritical === true;
@@ -568,7 +568,7 @@
         !currentOver &&
         !shortage &&
         !inTargetRangeUnlocked &&
-        current + criticalMin >= successMax;
+        current + criticalMin >= target;
       const possibleFakeCritical =
         !currentOver &&
         !shortage &&
@@ -644,7 +644,7 @@
       !shortage &&
       !normalOver &&
       current < successMin &&
-      current + criticalMin >= successMin;
+      current + criticalMin >= target;
     const criticalCanHit =
       criticalAfterMax >= successMin && criticalAfterMin <= successMax;
     const criticalOver = currentOver;
@@ -655,7 +655,7 @@
       !normalOver &&
       !guaranteedCritical &&
       current < successMin &&
-      current + criticalMin < successMin &&
+      current + criticalMin < target &&
       criticalCanReachTarget;
     const possibleFakeCritical =
       !currentOver &&
