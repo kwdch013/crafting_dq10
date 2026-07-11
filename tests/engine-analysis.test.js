@@ -435,6 +435,7 @@ global.DQ10SmithingDamage = {
 
 	assert.equal(result.status, "gauge-entry");
 	assert.equal(result.statusLabel, "ゲージ突入");
+	assert.equal(result.normalCanReachTarget, true);
 	assert.equal(result.normalMaxCanEnterTargetRange, true);
 }
 
@@ -627,7 +628,9 @@ assert.equal(engine.isSmithingReturnNextTurn({ craftType: "weapon-smithing", tra
 	assert.equal(result.technique.id, "board-normal");
 	assert.equal(result.normalMin, 12);
 	assert.equal(result.normalMax, 18);
+	assert.equal(result.normalOver, true);
 	assert.equal(result.status, "normal-over-risk");
+	assert.equal(result.statusLabel, "通常時超過の可能性あり");
 }
 
 {
