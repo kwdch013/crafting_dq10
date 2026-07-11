@@ -398,20 +398,56 @@ global.DQ10SmithingDamage = {
 }
 
 {
+	const baseIngredient = {
+		id: "part",
+		target: 100,
+		successMin: 100,
+		successMax: 100,
+	};
+	const technique = {
+		id: "sew",
+		name: "ぬう",
+		normalMin: 8,
+		normalMax: 12,
+		criticalMin: 16,
+		criticalMax: 24,
+	};
+	const analyzeFixedTarget = (current, overrideTechnique = {}) => engine.analyzeIngredient(
+		{ ...baseIngredient, current },
+		{ ...technique, ...overrideTechnique },
+		"fixed",
+		{ craftType: "sewing" },
+	);
+
+	assert.equal(analyzeFixedTarget(70).status, "shortage");
+	assert.equal(analyzeFixedTarget(88).status, "normal-chance");
+	assert.equal(analyzeFixedTarget(90).status, "over-risk");
+	assert.equal(analyzeFixedTarget(100).status, "target");
+	assert.equal(analyzeFixedTarget(84, { normalMin: 4, normalMax: 8, criticalMin: 16, criticalMax: 24 }).status, "critical-only");
+	assert.equal(analyzeFixedTarget(94).status, "over-guaranteed");
+	assert.equal(analyzeFixedTarget(101).status, "over");
+}
+
+{
 	const fakeCriticalLabels = Object.values(engine.statusLabels).filter(
 		(label) => label === "偽会心の可能性あり",
 	);
 
 	assert.deepEqual(Object.keys(engine.statusLabels).sort(), [
+		"critical-only",
 		"fake-critical-risk",
 		"gauge-entry",
 		"guaranteed",
 		"in-range",
 		"locked",
 		"locked-critical",
+		"normal-chance",
 		"normal-over-risk",
 		"over",
+		"over-guaranteed",
+		"over-risk",
 		"shortage",
+		"target",
 	]);
 	assert.equal(fakeCriticalLabels.length, 1);
 }
