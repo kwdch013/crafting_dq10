@@ -632,6 +632,10 @@
       normalAfterMin >= successMin && normalAfterMax <= successMax;
     const normalCanHit =
       normalAfterMax >= successMin && normalAfterMin <= successMax;
+    const normalCanReachTarget =
+      current < successMin &&
+      normalAfterMin <= target &&
+      normalAfterMax >= target;
     const normalMaxCanEnterTargetRange =
       current < successMin &&
       normalAfterMax >= successMin &&
@@ -699,6 +703,7 @@
       criticalStopApplies,
       normalHits,
       normalCanHit,
+      normalCanReachTarget,
       normalMaxCanEnterTargetRange,
       guaranteedCritical,
       criticalCanHit,
@@ -732,7 +737,10 @@
     const techniqueAnalyses = analysisTechniques.map((technique) => {
       const resolvedTechnique = resolveTechnique(state, technique, normalizedIngredient);
       const analysis = analyzeIngredient(normalizedIngredient, resolvedTechnique, state.targetMode);
-      const smithingStatus = isSmithingCraft && analysis.forcedCritical !== true && analysis.normalMaxCanEnterTargetRange
+      const smithingStatus = isSmithingCraft &&
+        analysis.forcedCritical !== true &&
+        analysis.status !== "normal-over-risk" &&
+        analysis.normalCanReachTarget
         ? "gauge-entry"
         : analysis.status;
       return {

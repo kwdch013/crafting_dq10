@@ -217,7 +217,7 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/10
 完了条件: 各鍛冶職人で共通利用できる形で、対象機能を計算とUIから扱える。URL: https://github.com/kwdch013/crafting_dq10/issues/66
 
 ### #122 鍛冶職人: 会心時確定が偽会心ケースを含む（基準値未到達の偽会心ケースを確定扱いにしない） URL: https://github.com/kwdch013/crafting_dq10/issues/122
-
+### #124 鍛冶職人: ゲージ突入判定の優先順位を通常時超過リスク後にする URL: https://github.com/kwdch013/crafting_dq10/issues/124
 ### #11 調理職人: レシピ特性の実データ割り当てを検証する
 
 現状:
