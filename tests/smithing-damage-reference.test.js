@@ -23,7 +23,7 @@ assert.match(html, /id="techniqueDataPanel"/, "特技データパネルは職人
 assert.match(html, /id="techniqueDataPanel"[\s\S]*<h2>特技データ<\/h2>/, "特技データパネル本体に表示制御IDを付けてください");
 assert.doesNotMatch(html, /id="smithingTechniquePanel"/, "鍛冶職人の追加特技データ表は表示しないでください");
 assert.doesNotMatch(html, /id="smithingTechniqueRows"/, "鍛冶職人の追加特技データ表は表示しないでください");
-assert.match(html, /status-gauge-entry">ゲージ突入/, "鍛冶のゲージ突入判定を凡例に表示してください");
+assert.match(html, /status-gauge-entry[^"]*">ゲージ突入/, "鍛冶のゲージ突入判定を凡例に表示してください");
 
 assert.match(mainJs, /smithingDamagePanel: document\.querySelector\("#smithingDamagePanel"\)/);
 assert.match(mainJs, /smithingBoardTraitState: document\.querySelector\("#smithingBoardTraitState"\)/);

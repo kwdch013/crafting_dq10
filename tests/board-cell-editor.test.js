@@ -127,3 +127,6 @@ assert.match(mainJs, /function renderCraftCellJudgements\(editor\)/, "木工・�
 assert.match(mainJs, /function getCellJudgementEntries\(ingredient\)/, "職人別の威力別ダメージ候補を取得してください");
 assert.match(mainJs, /damageModel: "woodworking-grain"/, "木工の右クリック判定は木目別ダメージを使ってください");
 assert.match(mainJs, /damageModel: "sewing-power"/, "裁縫の右クリック判定はぬいパワー別ダメージを使ってください");
+assert.match(mainJs, /function syncJudgementLegend\(\)/, "判定凡例は職人別に表示を同期してください");
+assert.match(mainJs, /fixed-target-only-judgement/, "裁縫・木工専用判定の凡例分類を定義してください");
+assert.match(mainJs, /range-target-only-judgement/, "範囲基準職人専用判定の凡例分類を定義してください");
