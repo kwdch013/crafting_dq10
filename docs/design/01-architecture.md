@@ -137,7 +137,7 @@ flowchart LR
 
 1. ブラウザが `frontend` から静的ファイルを読み込みます。
 2. 起動時に職人設定ファイルと職人別コンポーネントを読み込みます。
-3. `main.js` がAPIから料理データを取得します。
+3. `main.js` がAPIから職人別レシピデータを取得します。
 4. APIが使えない場合はローカルの `recipes.js` を使います。
 5. `main.js` が選択中の職人設定から初期状態を作ります。
 6. ユーザー入力を状態に反映します。
@@ -155,7 +155,7 @@ flowchart TB
   Compose[docker-compose.yml] --> Front[frontend service]
   Compose --> Api[api service]
   Front --> Node[node:22-alpine]
-  Api --> Python[python:3.12-alpine]
+  Api --> Python[python:3.14-alpine]
   Front --> PortFront[localhost:3000 -> container:3000]
   Api --> PortApi[localhost:8000 -> container:8000]
 ```
