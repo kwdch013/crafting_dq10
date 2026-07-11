@@ -74,12 +74,12 @@ global.DQ10SmithingDamage = {
 	);
 
 	assert.equal(result.criticalCanHit, true);
-	assert.equal(result.guaranteedCritical, true);
+	assert.equal(result.guaranteedCritical, false);
 	assert.equal(result.inTargetRangeUnlocked, false);
-	assert.equal(result.criticalCanEnterTargetRangeBeforeGuarantee, false);
-	assert.equal(result.possibleFakeCritical, false);
-	assert.equal(result.status, "guaranteed");
-	assert.equal(result.statusLabel, "会心時確定");
+	assert.equal(result.criticalCanEnterTargetRangeBeforeGuarantee, true);
+	assert.equal(result.possibleFakeCritical, true);
+	assert.equal(result.status, "fake-critical-risk");
+	assert.equal(result.statusLabel, "偽会心の可能性あり");
 }
 
 {
@@ -361,7 +361,7 @@ global.DQ10SmithingDamage = {
 	assert.equal(over.status, "over");
 	assert.equal(shortage.status, "shortage");
 	assert.equal(normalOverRisk.status, "normal-over-risk");
-	assert.equal(guaranteed.status, "guaranteed");
+	assert.equal(guaranteed.status, "fake-critical-risk");
 	assert.equal(fakeByCriticalRange.status, "fake-critical-risk");
 	assert.equal(lowerBoundary.status, "in-range");
 	assert.equal(upperBoundary.status, "in-range");
@@ -457,6 +457,29 @@ global.DQ10SmithingDamage = {
 
 	assert.equal(result.status, "guaranteed");
 	assert.equal(result.statusLabel, "本会心！");
+}
+
+{
+	const result = engine.analyzeIngredientAcrossTechniques(
+		{
+			craftType: "weapon-smithing",
+			heat: "1000",
+			traitId: "none",
+			targetMode: "random-in-range",
+			techniques: [],
+		},
+		{
+			current: 58,
+			target: 85,
+			successMin: 80,
+			successMax: 95,
+		},
+	);
+
+	assert.equal(result.status, "fake-critical-risk");
+	assert.equal(result.statusLabel, "偽会心の可能性あり");
+	assert.equal(result.guaranteedCritical, false);
+	assert.equal(result.criticalCanEnterTargetRangeBeforeGuarantee, true);
 }
 
 {
@@ -797,4 +820,27 @@ assert.equal(engine.isSmithingReturnNextTurn({ craftType: "weapon-smithing", tra
 	assert.equal(result.guaranteedCritical, true);
 	assert.equal(result.possibleFakeCritical, false);
 	assert.equal(result.statusLabel, "本会心！");
+}
+
+{
+	const result = engine.analyzeIngredientAcrossTechniques(
+		{
+			craftType: "weapon-smithing",
+			heat: "1000",
+			traitId: "none",
+			specialChargeState: "using",
+			targetMode: "random-in-range",
+			techniques: [],
+		},
+		{
+			current: 68,
+			target: 100,
+			successMin: 90,
+			successMax: 110,
+		},
+	);
+
+	assert.equal(result.guaranteedCritical, false);
+	assert.equal(result.possibleFakeCritical, true);
+	assert.equal(result.statusLabel, "偽会心の可能性あり");
 }
