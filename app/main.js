@@ -1,5 +1,4 @@
 const storageKey = "dq10-craft-support-mvp";
-const legacyStorageKey = "dq10-cooking-craft-mvp";
 const userRecipesStorageKey = "dq10-craft-user-recipes";
 const apiBaseUrl = window.DQ10_API_BASE_URL || "http://localhost:8000";
 
@@ -126,7 +125,7 @@ async function hydrateRecipesFromApi() {
 }
 
 function loadState() {
-  const stored = localStorage.getItem(storageKey) || localStorage.getItem(legacyStorageKey);
+  const stored = localStorage.getItem(storageKey);
 
   if (stored) {
     try {
@@ -601,7 +600,6 @@ function numberOr(value, fallback) {
 
 function saveState() {
   localStorage.setItem(storageKey, JSON.stringify(state));
-  localStorage.removeItem(legacyStorageKey);
 }
 
 function createBoardSnapshot() {
@@ -2229,7 +2227,6 @@ function createResetStateForCurrentSelection() {
 
 function resetState() {
   localStorage.removeItem(storageKey);
-  localStorage.removeItem(legacyStorageKey);
   clearBoardHistory();
   state = createResetStateForCurrentSelection();
   render();

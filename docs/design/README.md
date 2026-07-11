@@ -40,5 +40,5 @@ DQ10 職人ダメージ計算の設計ドキュメントです。
 - UI制御: `app/main.js`
 - 共通計算エンジン: `app/engine.js`
 - 職人設定: `app/crafts/<職人>/config.js`
-- コンテナ: `Dockerfile`
+- コンテナ: `frontend/Dockerfile`, `api/Dockerfile`
 - 起動定義: `docker-compose.yml`
