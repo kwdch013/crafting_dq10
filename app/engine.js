@@ -4,7 +4,12 @@
     "locked-critical": "本会心固定",
     guaranteed: "会心時確定",
     "gauge-entry": "ゲージ突入",
+    "normal-chance": "通常チャンス",
+    "over-risk": "超過",
+    target: "基準値",
+    "critical-only": "会心時のみ確定",
     "normal-over-risk": "通常時超過の可能性あり",
+    "over-guaranteed": "超過確定",
     over: "超過中",
     "fake-critical-risk": "偽会心の可能性あり",
     "in-range": "基準内",
@@ -14,10 +19,15 @@
     "locked-critical": 7,
     locked: 6,
     over: 5,
+    "over-guaranteed": 4.5,
     guaranteed: 4,
+    "critical-only": 3.7,
     "normal-over-risk": 3,
+    "over-risk": 3,
     "gauge-entry": 2.5,
     "fake-critical-risk": 2,
+    target: 1.8,
+    "normal-chance": 1.7,
     "in-range": 1.5,
     shortage: 1,
   };
@@ -60,6 +70,10 @@
 
   function isSmithingCraftState(state = {}) {
     return ["weapon-smithing", "armor-smithing", "tool-smithing"].includes(state.craftType);
+  }
+
+  function isFixedTargetCraftState(state = {}) {
+    return ["sewing", "woodworking"].includes(state.craftType);
   }
 
   function isSmithingLightActive(state = {}, ingredient = {}) {
@@ -405,6 +419,96 @@
     return toNumber(ingredient?.target, Math.round((successMin + successMax) / 2));
   }
 
+  // 裁縫・木工は範囲ではなく基準値ちょうどを狙うため、通常範囲と会心停止を別基準で分類します。
+  function analyzeFixedTargetIngredient(analysisBase) {
+    const {
+      ingredient,
+      current,
+      target,
+      successMin,
+      successMax,
+      targetDiff,
+      lowerDiff,
+      upperDiff,
+      normalMin,
+      normalMax,
+      normalAfterMin,
+      normalAfterMax,
+      criticalMin,
+      criticalMax,
+      rawCriticalAfterMin,
+      rawCriticalAfterMax,
+      criticalAfterMin,
+      criticalAfterMax,
+      criticalStopApplies,
+      targetMode,
+    } = analysisBase;
+    const currentOver = current > target;
+    const shortage = !currentOver && rawCriticalAfterMax < target;
+    const targetReached = current === target;
+    const normalChance = !currentOver && !shortage && !targetReached && normalAfterMin <= target && normalAfterMax === target;
+    const overGuaranteed = !currentOver && !shortage && !targetReached && normalAfterMin > target;
+    const overRisk = !currentOver && !shortage && !targetReached && !normalChance && !overGuaranteed && normalAfterMax > target;
+    const criticalOnly = !currentOver && !shortage && !targetReached && !normalChance && !overRisk && !overGuaranteed && rawCriticalAfterMin >= target;
+    const normalHits = normalAfterMin === target && normalAfterMax === target;
+    const normalCanHit = normalAfterMin <= target && normalAfterMax >= target;
+    const criticalCanHit = criticalAfterMin <= target && criticalAfterMax >= target;
+    let status = "in-range";
+
+    if (currentOver) {
+      status = "over";
+    } else if (shortage) {
+      status = "shortage";
+    } else if (normalChance) {
+      status = "normal-chance";
+    } else if (overRisk) {
+      status = "over-risk";
+    } else if (targetReached) {
+      status = "target";
+    } else if (criticalOnly) {
+      status = "critical-only";
+    } else if (overGuaranteed) {
+      status = "over-guaranteed";
+    }
+
+    return {
+      ...ingredient,
+      current,
+      target,
+      successMin,
+      successMax,
+      targetDiff,
+      lowerDiff,
+      upperDiff,
+      normalMin,
+      normalMax,
+      normalAfterMin,
+      normalAfterMax,
+      criticalMin,
+      criticalMax,
+      rawCriticalAfterMin,
+      rawCriticalAfterMax,
+      criticalAfterMin,
+      criticalAfterMax,
+      criticalStopApplies,
+      normalHits,
+      normalCanHit,
+      normalCanReachTarget: normalCanHit,
+      normalMaxCanEnterTargetRange: normalChance,
+      guaranteedCritical: criticalOnly,
+      criticalCanHit,
+      inTargetRangeUnlocked: targetReached,
+      criticalCanEnterTargetRangeBeforeGuarantee: false,
+      possibleFakeCritical: false,
+      normalOver: overRisk || overGuaranteed,
+      criticalOver: currentOver,
+      currentOver,
+      targetMode,
+      status,
+      statusLabel: statusLabels[status],
+    };
+  }
+
   function getCookingCriticalDamageValues(ingredient, state = {}) {
     const conditionId = state.heat || "normal";
     const damageSource = resolveCookingDamageSource(state, ingredient, conditionId);
@@ -477,7 +581,7 @@
     };
   }
 
-  function analyzeIngredient(ingredient, technique, targetMode = "fixed") {
+  function analyzeIngredient(ingredient, technique, targetMode = "fixed", state = {}) {
     const [successMin, successMax] = normalizeRange(ingredient.successMin, ingredient.successMax);
     const [normalMin, normalMax] = normalizeRange(technique.normalMin, technique.normalMax);
     const [criticalMin, criticalMax] = normalizeRange(technique.criticalMin, technique.criticalMax);
@@ -549,6 +653,31 @@
 
     const lowerDiff = successMin - current;
     const upperDiff = successMax - current;
+    if (isFixedTargetCraftState(state)) {
+      return analyzeFixedTargetIngredient({
+        ingredient,
+        current,
+        target,
+        successMin,
+        successMax,
+        targetDiff,
+        lowerDiff,
+        upperDiff,
+        normalMin,
+        normalMax,
+        normalAfterMin,
+        normalAfterMax,
+        criticalMin,
+        criticalMax,
+        rawCriticalAfterMin,
+        rawCriticalAfterMax,
+        criticalAfterMin,
+        criticalAfterMax,
+        criticalStopApplies,
+        targetMode,
+      });
+    }
+
     if (forcedCritical) {
       const currentToTarget = target - current;
       const hephaestusStopsAtTarget = technique.hephaestusActive === true && currentToTarget > 0 && rawCriticalAfterMax >= target;
@@ -736,7 +865,7 @@
       : state.techniques.filter((technique) => technique.includeInAnalysis !== false);
     const techniqueAnalyses = analysisTechniques.map((technique) => {
       const resolvedTechnique = resolveTechnique(state, technique, normalizedIngredient);
-      const analysis = analyzeIngredient(normalizedIngredient, resolvedTechnique, state.targetMode);
+      const analysis = analyzeIngredient(normalizedIngredient, resolvedTechnique, state.targetMode, state);
       const smithingStatus = isSmithingCraft &&
         analysis.forcedCritical !== true &&
         analysis.status !== "normal-over-risk" &&
@@ -788,7 +917,7 @@
     const focus = state.focus;
     const resolvedTechnique = resolveTechnique(state, technique, ingredients[0]);
     const analysis = ingredients.map((ingredient) =>
-      analyzeIngredient(ingredient, resolveTechnique(state, technique, ingredient), state.targetMode),
+      analyzeIngredient(ingredient, resolveTechnique(state, technique, ingredient), state.targetMode, state),
     );
     const affordable = toNumber(focus) >= toNumber(resolvedTechnique.focusCost);
     const scoring = {

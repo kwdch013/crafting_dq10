@@ -1992,6 +1992,7 @@ function renderCraftCellJudgements(editor) {
       editorIngredient,
       DQ10CraftEngine.resolveTechnique(state, entry.technique, editorIngredient),
       state.targetMode,
+      state,
     );
 
     row.classList.add(`status-${analysis.status}`);

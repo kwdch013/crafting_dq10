@@ -1187,9 +1187,34 @@ select:focus {
   color: #5b21b6;
 }
 
+.status-normal-chance {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-over-risk {
+  background: #ffedd5;
+  color: #9a3412;
+}
+
+.status-target {
+  background: #ccfbf1;
+  color: #115e59;
+}
+
+.status-critical-only {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
 .status-normal-over-risk {
   background: #ffedd5;
   color: #9a3412;
+}
+
+.status-over-guaranteed {
+  background: #fecaca;
+  color: #991b1b;
 }
 
 .status-over {
