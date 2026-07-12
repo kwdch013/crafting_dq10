@@ -42,6 +42,9 @@ function createColumnLabel(index) {
 	return label;
 }
 
+// 鍛冶3職人はマス名を占有マスの読み順(行→列)で採番します。
+const READING_ORDER_CRAFTS = new Set(["weapon-smithing", "armor-smithing", "tool-smithing"]);
+
 // 空白マスも含めた左上からの座標順で、A/B/C...の位置名を割り当てます。
 function createExpectedPositionName(item, columns) {
 	const row = Number(item.gridCell?.row);
@@ -53,8 +56,32 @@ function createExpectedPositionName(item, columns) {
 	return createColumnLabel((row - 1) * columns + column);
 }
 
-function assertItemsHaveCoordinateNames(items, columns, sourceLabel) {
+// 占有マスだけを読み順に並べた期待名(飛び番にならないA/B/C...)を作ります。
+function createExpectedReadingOrderNames(items) {
+	const order = items
+		.map((item, index) => ({ index, row: Number(item.gridCell?.row), column: Number(item.gridCell?.column) }))
+		.sort((a, b) => a.row - b.row || a.column - b.column);
+	const names = new Array(items.length);
+	order.forEach((entry, rank) => {
+		names[entry.index] = createColumnLabel(rank + 1);
+	});
+	return names;
+}
+
+function assertItemsHaveCoordinateNames(items, columns, sourceLabel, useReadingOrder = false) {
 	assert.ok(Array.isArray(items), `${sourceLabel} のitemsを配列にしてください`);
+
+	if (useReadingOrder) {
+		const expected = createExpectedReadingOrderNames(items);
+		items.forEach((item, index) => {
+			assert.equal(
+				item.name,
+				expected[index],
+				`${sourceLabel} ${item.id} は占有マスの読み順(A/B/C...)の位置名にしてください`,
+			);
+		});
+		return;
+	}
 
 	items.forEach((item) => {
 		assert.equal(
@@ -95,9 +122,10 @@ const context = createConfigContext();
 craftIds.forEach((craftId) => {
 	const config = context.DQ10CraftConfigs[craftId];
 	const columns = Number(config.layout?.columns);
+	const useReadingOrder = READING_ORDER_CRAFTS.has(craftId);
 
 	assert.ok(Number.isInteger(columns) && columns >= 1, `${craftId} のlayout.columnsを設定してください`);
-	assertItemsHaveCoordinateNames(config.items, columns, `${craftId} config.items`);
+	assertItemsHaveCoordinateNames(config.items, columns, `${craftId} config.items`, useReadingOrder);
 
 	(config.recipeCategoryOptions || []).forEach((category) => {
 		if (category.templateItems) {
@@ -105,6 +133,7 @@ craftIds.forEach((craftId) => {
 				category.templateItems,
 				columns,
 				`${craftId} ${category.id} templateItems`,
+				useReadingOrder,
 			);
 		}
 	});
@@ -113,7 +142,7 @@ craftIds.forEach((craftId) => {
 		fs.readFileSync(path.join("api/data/crafts", craftId, "recipes.json"), "utf8"),
 	);
 	apiRecipes.forEach((recipe) => {
-		assertItemsHaveCoordinateNames(recipe.items, columns, `${craftId} API ${recipe.id}`);
+		assertItemsHaveCoordinateNames(recipe.items, columns, `${craftId} API ${recipe.id}`, useReadingOrder);
 	});
 });
 
@@ -127,7 +156,8 @@ craftIds.forEach((craftId) => {
 
 craftIds.forEach((craftId) => {
 	const columns = Number(context.DQ10CraftConfigs[craftId].layout?.columns);
+	const useReadingOrder = READING_ORDER_CRAFTS.has(craftId);
 	context.DQ10CraftRecipes[craftId].forEach((recipe) => {
-		assertItemsHaveCoordinateNames(recipe.items, columns, `${craftId} fallback ${recipe.id}`);
+		assertItemsHaveCoordinateNames(recipe.items, columns, `${craftId} fallback ${recipe.id}`, useReadingOrder);
 	});
 });

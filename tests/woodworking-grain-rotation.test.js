@@ -28,6 +28,7 @@ assert.equal(typeof component.rotateGrain, "function", "木工コンポーネン
 		],
 	};
 
+	// 90度回転では位置変換に加えて、全マスの木目(順目/逆目)が横↔縦で反転します。
 	assert.equal(component.rotateGrain(state, "right", { rows: 3, columns: 3 }), true);
 	assert.deepEqual(
 		Object.fromEntries(state.ingredients.map((ingredient) => [
@@ -35,9 +36,9 @@ assert.equal(typeof component.rotateGrain, "function", "木工コンポーネン
 			[ingredient.gridCell.row, ingredient.gridCell.column, ingredient.optionId],
 		])),
 		{
-			top: [2, 3, "horizontal"],
-			left: [1, 2, "vertical"],
-			center: [2, 2, "horizontal"],
+			top: [2, 3, "vertical"],
+			left: [1, 2, "horizontal"],
+			center: [2, 2, "vertical"],
 		},
 	);
 }
@@ -57,8 +58,8 @@ assert.equal(typeof component.rotateGrain, "function", "木工コンポーネン
 			[ingredient.gridCell.row, ingredient.gridCell.column, ingredient.optionId],
 		])),
 		{
-			top: [2, 1, "horizontal"],
-			right: [1, 2, "vertical"],
+			top: [2, 1, "vertical"],
+			right: [1, 2, "horizontal"],
 		},
 	);
 }
@@ -72,4 +73,17 @@ assert.equal(typeof component.rotateGrain, "function", "木工コンポーネン
 
 	assert.equal(component.rotateGrain(state, "up", { rows: 3, columns: 3 }), false);
 	assert.deepEqual(state.ingredients.map((ingredient) => ingredient.gridCell), [{ row: 1, column: 2 }]);
+	assert.equal(state.ingredients[0].optionId, "horizontal", "無効な方向では木目も変更しないでください");
+}
+
+{
+	// 位置が変わらない中央マスでも、木目反転が起きたら変更ありとして扱います。
+	const state = {
+		ingredients: [
+			{ id: "center", optionId: "horizontal", gridCell: { row: 2, column: 2 } },
+		],
+	};
+
+	assert.equal(component.rotateGrain(state, "right", { rows: 3, columns: 3 }), true);
+	assert.equal(state.ingredients[0].optionId, "vertical");
 }

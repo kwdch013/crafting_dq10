@@ -1019,8 +1019,9 @@ function renderLayoutBoard() {
   const selectedGroupId = getIngredientGroupId(selectedIngredient);
 
   elements.layoutBoard.replaceChildren();
-  elements.layoutBoard.classList.remove("square-board", "smithing-board");
+  elements.layoutBoard.classList.remove("square-board", "smithing-board", "woodworking-board");
   elements.layoutBoard.classList.toggle("smithing-board", component.craftFamily === "smithing");
+  elements.layoutBoard.classList.toggle("woodworking-board", component.craftFamily === "woodworking");
   elements.layoutBoard.classList.toggle(
     "special-active-board",
     isCurrentCraftFamily("cooking") && state.specialChargeState === "active",
@@ -1100,6 +1101,11 @@ function renderLayoutBoard() {
       if (ingredientVisual) {
         cell.classList.add("has-ingredient-visual", `ingredient-${ingredientVisual.id}`);
       }
+      // 木工では順目/逆目の背景パターンと現在の木目方向をセルに描きます。
+      const grainVisual = component.getGrainVisual?.(item) || null;
+      if (grainVisual) {
+        cell.classList.add("has-grain", grainVisual.patternClass);
+      }
       const boardCellTitle = formatBoardCellTitle(item);
 
       cell.innerHTML = `
@@ -1115,6 +1121,7 @@ function renderLayoutBoard() {
             ${ingredientVisual?.isInferred ? formatBoardBadge("推定") : ""}
           </div>
         </div>
+        ${formatWoodworkingGrainIndicator(grainVisual)}
         ${formatCookingIngredientVisual(ingredientVisual)}
         <div class="board-cell-values">
           <span class="numeric">${item.current}</span>
@@ -1677,6 +1684,19 @@ function formatCookingCellEffectBadge(effect) {
 
 function formatBoardBadge(label) {
   return label ? `<span>${escapeHtml(label)}</span>` : "";
+}
+
+// 木工セルの木目を、名称の下へ背景色付きの順目/逆目ラベルとして表示します(背景パターンと併用)。
+function formatWoodworkingGrainIndicator(grainVisual) {
+  if (!grainVisual) {
+    return "";
+  }
+
+  return `
+    <div class="board-cell-grain">
+      <span class="grain-label ${escapeHtml(grainVisual.patternClass)}">${escapeHtml(grainVisual.grainLabel)}</span>
+    </div>
+  `;
 }
 
 // 職人別にBOARDセル左上の見出しを整形します。

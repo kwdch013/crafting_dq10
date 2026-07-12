@@ -1,12 +1,3 @@
-// 設定単体で読み込まれるテストでも座標名を生成できるようにします。
-function getWeaponSmithingPositionName(row, column) {
-  if (typeof createDQ10CoordinatePositionName === "function") {
-    return createDQ10CoordinatePositionName(row, column, 2);
-  }
-
-  return String.fromCharCode(64 + ((Number(row) - 1) * 2 + Number(column)));
-}
-
 // 武器鍛冶の種別ごとに、レシピ追加時の初期マスを定義します。
 function createWeaponSmithingTemplateItems(rows, columns, cells = null) {
   const gridCells = Array.isArray(cells)
@@ -18,7 +9,8 @@ function createWeaponSmithingTemplateItems(rows, columns, cells = null) {
 
   return gridCells.map(({ row, column }, index) => ({
     id: `part-${index + 1}`,
-    name: getWeaponSmithingPositionName(row, column),
+    // マス名は占有マスの読み順(行→列)でA/B/C...を割り当てます。
+    name: createDQ10ReadingOrderPositionName(gridCells, row, column),
     gridCell: { row, column },
     current: 0,
     successMin: 80,
@@ -71,7 +63,7 @@ registerDQ10Craft(createDQ10SmithingCraftConfig({
   ],
   items: [
     { id: "part-1", name: "A", gridCell: { row: 1, column: 1 }, current: 0, successMin: 80, successMax: 95 },
-    { id: "part-2", name: "C", gridCell: { row: 2, column: 1 }, current: 0, successMin: 80, successMax: 95 },
-    { id: "part-3", name: "E", gridCell: { row: 3, column: 1 }, current: 0, successMin: 80, successMax: 95 },
+    { id: "part-2", name: "B", gridCell: { row: 2, column: 1 }, current: 0, successMin: 80, successMax: 95 },
+    { id: "part-3", name: "C", gridCell: { row: 3, column: 1 }, current: 0, successMin: 80, successMax: 95 },
   ],
 }));
