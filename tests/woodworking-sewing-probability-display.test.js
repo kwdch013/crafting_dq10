@@ -3,6 +3,7 @@ const fs = require("node:fs");
 
 const mainJs = fs.readFileSync("app/main.js", "utf8");
 const engineJs = fs.readFileSync("app/engine.js", "utf8");
+const indexHtml = fs.readFileSync("app/index.html", "utf8");
 
 assert.match(
 	mainJs,
@@ -53,4 +54,19 @@ assert.match(
 	engineJs,
 	/getRepeatedDistribution\(grain, technique\.powerId, repeat\)/,
 	"木工の複数回削りは合算後の分布を使ってください",
+);
+assert.match(
+	engineJs,
+	/"normal-chance": "チャンス!"/,
+	"動的な判定結果は「チャンス!」と表示してください",
+);
+assert.match(
+	indexHtml,
+	/status-normal-chance fixed-target-only-judgement">チャンス!<\/span>/,
+	"判定基準の凡例は「チャンス!」と表示してください",
+);
+assert.doesNotMatch(
+	`${engineJs}\n${indexHtml}`,
+	/通常チャンス/,
+	"旧判定名の「通常チャンス」をアプリ内に残さないでください",
 );
