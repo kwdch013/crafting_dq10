@@ -14,6 +14,16 @@ const mainJs = fs.readFileSync("app/main.js", "utf8");
 	assert.equal(result.isGlowing, true);
 	assert.equal(result.cookingEffectMode, "none");
 	assert.equal(result.cookingBlockEffect, "none");
+	assert.equal(result.isWedged, false);
+}
+
+{
+	const result = editor.normalizeEditValue(
+		{ current: 12, isWedged: false },
+		{ current: "12", isWedged: true },
+	);
+
+	assert.equal(result.isWedged, true);
 }
 
 {
@@ -126,6 +136,8 @@ assert.match(mainJs, /editor-damage-judgements/, "右クリック編集に職人
 assert.match(mainJs, /function renderCraftCellJudgements\(editor\)/, "木工・裁縫を含む職人別ダメージ判定を描画してください");
 assert.match(mainJs, /function getCellJudgementEntries\(ingredient\)/, "職人別の威力別ダメージ候補を取得してください");
 assert.match(mainJs, /damageModel: "woodworking-grain"/, "木工の右クリック判定は木目別ダメージを使ってください");
+assert.match(mainJs, /editor-wedged/, "木工の右クリック編集にくさび切替を追加してください");
+assert.match(mainJs, /ingredient\.isWedged = normalized\.isWedged/, "くさび状態をマスへ保存してください");
 assert.match(mainJs, /damageModel: "sewing-power"/, "裁縫の右クリック判定はぬいパワー別ダメージを使ってください");
 assert.match(mainJs, /function syncJudgementLegend\(\)/, "判定凡例は職人別に表示を同期してください");
 assert.match(mainJs, /fixed-target-only-judgement/, "裁縫・木工専用判定の凡例分類を定義してください");

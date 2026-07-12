@@ -52,8 +52,8 @@ assert.doesNotMatch(
 );
 assert.match(
 	engineJs,
-	/getRepeatedDistribution\(grain, technique\.powerId, repeat\)/,
-	"木工の複数回削りは合算後の分布を使ってください",
+	/getDistribution\(grain, technique\.powerId, \{ wedged: ingredient\?\.isWedged === true \}\)/,
+	"木工はくさび状態を反映した参照表の分布を使ってください",
 );
 assert.match(
 	engineJs,

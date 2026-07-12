@@ -37,6 +37,7 @@
 		return {
 			current,
 			isGlowing: inputValue.isGlowing === true,
+			isWedged: inputValue.isWedged === true,
 			cookingEffectMode: inputValue.cookingEffectMode || "none",
 			cookingBlockEffect: inputValue.cookingBlockEffect || "none",
 			locked: inputValue.locked === true && isCurrentInSuccessRange(current, currentValue),

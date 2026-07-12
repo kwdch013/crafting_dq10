@@ -179,6 +179,7 @@ function normalizeState(value) {
       lockJudgement: isSmithingConfig ? "" : ingredient.lockJudgement || "",
       lockJudgementLabel: isSmithingConfig ? "" : ingredient.lockJudgementLabel || "",
       isGlowing: ingredient.isGlowing === true,
+      isWedged: ingredient.isWedged === true,
       cookingBlockEffect: normalizeCookingBlockEffect(ingredient.cookingBlockEffect || defaultItem?.cookingBlockEffect),
       target: numberOr(ingredient.target, defaultItem?.target ?? Math.round((successMin + successMax) / 2)),
       successMin,
@@ -1121,6 +1122,7 @@ function renderLayoutBoard() {
             ${formatCookingBlockEffectBadge(item.cookingBlockEffect)}
             ${formatCookingCellEffectBadge(cellEffect)}
             ${formatLockBadge(item)}
+            ${formatWoodworkingWedgeBadge(item)}
             ${formatBoardBadge(item.ingredientGroupLabel)}
             ${ingredientVisual?.isInferred ? formatBoardBadge("推定") : ""}
           </div>
@@ -1724,6 +1726,16 @@ function formatLockBadge(item) {
   return `<span class="locked-badge">${escapeHtml(label)}</span>`;
 }
 
+// 木工ではくさび状態の有無にかかわらず同じ表示領域を確保します。
+function formatWoodworkingWedgeBadge(item) {
+  if (!isCurrentCraftFamily("woodworking")) {
+    return "";
+  }
+
+  const label = item.isWedged === true ? "くさびON" : "くさびOFF";
+  return `<span class="board-badge woodworking-wedge-badge">${label}</span>`;
+}
+
 // 職人コンポーネントに盤面上の光切替ボタン整形を委譲します。
 function formatCookingLightToggle(item, special) {
   return getCurrentCraftComponent().formatLightToggle?.(state, item, special, escapeHtml) || "";
@@ -1766,6 +1778,10 @@ function getBoardCellEditorElement() {
       <label class="checkbox-field editor-locked-field">
         <input class="editor-locked" type="checkbox" />
         <span class="editor-locked-label">固定する</span>
+      </label>
+      <label class="checkbox-field editor-wedged-field">
+        <input class="editor-wedged" type="checkbox" />
+        <span>くさびを使う</span>
       </label>
       <fieldset class="editor-block-effect">
         <legend>封じ</legend>
@@ -1827,6 +1843,7 @@ function getBoardCellEditorElement() {
     syncBoardCellEditorLock(editor);
     renderCraftCellJudgements(editor);
   });
+  editor.querySelector(".editor-wedged").addEventListener("change", () => renderCraftCellJudgements(editor));
   editor.querySelector(".editor-cancel").addEventListener("click", closeBoardCellEditor);
   document.body.append(editor);
   boardCellEditorElement = editor;
@@ -1847,6 +1864,7 @@ function openBoardCellEditor(event, item, cell = item?.gridCell) {
   editor.querySelector(".editor-current").value = item?.current ?? "";
   editor.querySelector(".editor-glowing").checked = item?.isGlowing === true;
   editor.querySelector(".editor-locked").checked = item?.locked === true;
+  editor.querySelector(".editor-wedged").checked = item?.isWedged === true;
   editor.querySelectorAll("[name='editorBlockEffect']").forEach((input) => {
     input.checked = input.value === normalizeCookingBlockEffect(item?.cookingBlockEffect);
   });
@@ -1872,6 +1890,7 @@ function syncBoardCellEditorTrait(editor) {
   const currentField = editor.querySelector(".editor-current-field");
   const glowField = editor.querySelector(".editor-glowing-field");
   const lockedField = editor.querySelector(".editor-locked-field");
+  const wedgedField = editor.querySelector(".editor-wedged-field");
   const blockEffectField = editor.querySelector(".editor-block-effect");
   const cellEffectField = editor.querySelector(".editor-cell-effect");
   const effectModeField = editor.querySelector(".editor-effect-mode");
@@ -1884,6 +1903,7 @@ function syncBoardCellEditorTrait(editor) {
   glowInput.disabled = disabledByHeat;
   glowInput.title = disabledByHeat ? "光地金は温度が200の倍数の時だけ有効です" : "";
   lockedField.hidden = !hasIngredient;
+  wedgedField.hidden = !hasIngredient || !isCurrentCraftFamily("woodworking");
   blockEffectField.hidden = !hasIngredient || !isCurrentCraftFamily("cooking");
   cellEffectField.hidden = !isCurrentCraftFamily("cooking");
   effectModeField.hidden = !hasIngredient || state.traitId !== "light-return";
@@ -2006,6 +2026,7 @@ function renderCraftCellJudgements(editor) {
     ...ingredient,
     current,
     locked: false,
+    isWedged: editor.querySelector(".editor-wedged").checked,
     isGlowing: state.traitId === "light" &&
       isSmithingLightHeatActive() &&
       editor.querySelector(".editor-glowing").checked,
@@ -2123,6 +2144,9 @@ function applyBoardCellEditor(editor) {
           ? editor.querySelector(".editor-glowing").checked
           : ingredient.isGlowing === true),
     cookingEffectMode: editor.querySelector("[name='editorEffectMode']:checked")?.value,
+    isWedged: isCurrentCraftFamily("woodworking")
+      ? editor.querySelector(".editor-wedged").checked
+      : ingredient.isWedged === true,
     locked: editor.querySelector(".editor-locked").checked,
     cookingBlockEffect: normalizeCookingBlockEffect(editor.querySelector("[name='editorBlockEffect']:checked")?.value),
   });
@@ -2130,6 +2154,7 @@ function applyBoardCellEditor(editor) {
     (state.traitId === "light" && ingredient.isGlowing !== normalized.isGlowing) ||
     (state.traitId === "light-return" && state.cookingEffectMode !== normalizeCookingEffectMode(state.traitId, normalized.cookingEffectMode)) ||
     ingredient.cookingBlockEffect !== normalized.cookingBlockEffect ||
+    ingredient.isWedged !== normalized.isWedged ||
     cellEffectChanged;
 
   if (willChangeEffect) {
@@ -2146,6 +2171,7 @@ function applyBoardCellEditor(editor) {
   }
   ingredient.current = normalized.current;
   ingredient.isGlowing = normalized.isGlowing;
+  ingredient.isWedged = normalized.isWedged;
   ingredient.cookingBlockEffect = normalized.cookingBlockEffect;
   state.cookingEffectMode = normalizeCookingEffectMode(state.traitId, normalized.cookingEffectMode);
   updateCookingCellEffect(row, column, nextCellEffectId);
