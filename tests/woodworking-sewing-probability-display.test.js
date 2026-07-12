@@ -21,8 +21,13 @@ assert.match(
 );
 assert.match(
 	mainJs,
-	/formatDamageDistribution\(analysis\.technique\.distribution\)/,
-	"右クリック判定では判定に使った特技の分布を表示してください",
+	/formatDamageDistribution\(resolvedTechnique\.distribution\)[\s\S]*filter\(Boolean\)/,
+	"右クリック判定では解決済み特技の分布を表示してください(analysisにtechniqueは無い)",
+);
+assert.doesNotMatch(
+	mainJs,
+	/analysis\.technique\.distribution/,
+	"analyzeIngredientの戻り値にtechniqueは無いため参照しないでください",
 );
 assert.match(
 	engineJs,
