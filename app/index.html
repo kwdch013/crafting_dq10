@@ -184,6 +184,7 @@
               </div>
             </div>
             <div class="smithing-board-trait-state" id="smithingBoardTraitState"></div>
+            <div class="board-total-error" id="boardTotalError" hidden></div>
             <div id="layoutBoard" class="craft-board"></div>
           </div>
 
@@ -246,13 +247,15 @@
                 <span class="status status-gauge-entry smithing-only-judgement range-target-only-judgement">ゲージ突入</span>
                 <p class="smithing-only-judgement range-target-only-judgement">鍛冶で現在値が基準下限未満かつ、非会心の最大ダメージで基準範囲に入ります。</p>
                 <span class="status status-normal-chance fixed-target-only-judgement">チャンス!</span>
-                <p class="fixed-target-only-judgement">裁縫・木工で通常ダメージ最大値を加えると基準値ちょうどになります。</p>
+                <p class="fixed-target-only-judgement">裁縫・木工で非会心ダメージのいずれかを加えると基準値ちょうどになります。</p>
                 <span class="status status-fake-critical-risk range-target-only-judgement">偽会心の可能性あり</span>
                 <p class="range-target-only-judgement">会心最大値なら基準下限へ届きますが、会心最小値では届かない状態です。</p>
                 <span class="status status-over-risk fixed-target-only-judgement">超過</span>
                 <p class="fixed-target-only-judgement">裁縫・木工で通常最大値を加えると基準値を超える状態です。</p>
                 <span class="status status-target fixed-target-only-judgement">基準値</span>
                 <p class="fixed-target-only-judgement">裁縫・木工で現在値が基準値ちょうどの状態です。</p>
+                <span class="status status-near-target fixed-target-only-judgement">基準値付近</span>
+                <p class="fixed-target-only-judgement">裁縫・木工で現在値と基準値の差が±1〜3の状態です。</p>
                 <span class="status status-critical-only fixed-target-only-judgement">会心時のみ確定</span>
                 <p class="fixed-target-only-judgement">裁縫・木工で通常時は基準値に届かず、会心最小値で基準値へ届く状態です。</p>
                 <span class="status status-normal-over-risk range-target-only-judgement">通常時超過の可能性あり</span>

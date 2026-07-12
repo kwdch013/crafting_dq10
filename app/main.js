@@ -53,6 +53,7 @@ const elements = {
   clearCookingEffectButton: document.querySelector("#clearCookingEffectButton"),
   crossGlowButton: document.querySelector("#crossGlowButton"),
   cornerReturnButton: document.querySelector("#cornerReturnButton"),
+  boardTotalError: document.querySelector("#boardTotalError"),
   layoutBoard: document.querySelector("#layoutBoard"),
   techniqueTemplate: document.querySelector("#techniqueTemplate"),
   recipeListButton: document.querySelector("#recipeListButton"),
@@ -1017,6 +1018,9 @@ function renderLayoutBoard() {
   const canRearrange = canRearrangeBoard(config);
   const selectedIngredient = state.ingredients.find((ingredient) => ingredient.id === selectedBoardIngredientId);
   const selectedGroupId = getIngredientGroupId(selectedIngredient);
+
+  elements.boardTotalError.hidden = !Number.isFinite(analysis.totalError);
+  elements.boardTotalError.textContent = `全体の誤差: ${analysis.totalError}`;
 
   elements.layoutBoard.replaceChildren();
   elements.layoutBoard.classList.remove("square-board", "smithing-board", "woodworking-board");
