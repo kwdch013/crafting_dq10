@@ -220,6 +220,7 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/10
 ### #124 鍛冶職人: ゲージ突入判定の優先順位を通常時超過リスク後にする URL: https://github.com/kwdch013/crafting_dq10/issues/124
 ### #126 裁縫・木工: 固定基準値向けの判定基準を分離する URL: https://github.com/kwdch013/crafting_dq10/issues/126
 ### #128 裁縫・木工: 不要な判定表示を除外し職人別判定フローを文書化する URL: https://github.com/kwdch013/crafting_dq10/issues/128
+### #134 裁縫・木工: 判定基準の凡例に「通常チャンス」が残っている URL: https://github.com/kwdch013/crafting_dq10/issues/134
 ### #11 調理職人: レシピ特性の実データ割り当てを検証する
 
 現状:
