@@ -75,7 +75,7 @@ flowchart TD
   D -->|いいえ| F{rawCriticalAfterMin < target?}
   F -->|はい| G[不足]
   F -->|いいえ| H{normalAfterMax == target?}
-  H -->|はい| I[通常チャンス]
+  H -->|はい| I[チャンス!]
   H -->|いいえ| J{normalAfterMax > target?}
   J -->|はい| K{normalAfterMin > target?}
   K -->|はい| L[超過確定]
@@ -97,7 +97,7 @@ flowchart TD
   D -->|いいえ| F{rawCriticalAfterMin < target?}
   F -->|はい| G[不足]
   F -->|いいえ| H{normalAfterMax == target?}
-  H -->|はい| I[通常チャンス]
+  H -->|はい| I[チャンス!]
   H -->|いいえ| J{normalAfterMax > target?}
   J -->|はい| K{normalAfterMin > target?}
   K -->|はい| L[超過確定]

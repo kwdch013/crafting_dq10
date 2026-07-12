@@ -2013,21 +2013,36 @@ function renderCraftCellJudgements(editor) {
     row.innerHTML = `
       <strong>${escapeHtml(entry.label)}</strong>
       <span class="numeric">${analysis.normalMin}-${analysis.normalMax} / 会心 ${analysis.criticalMin}-${analysis.criticalMax}</span>
-      <small>${escapeHtml([analysis.statusLabel, formatDamageDistribution(resolvedTechnique.distribution)].filter(Boolean).join(" / "))}</small>
+      <small>${escapeHtml([analysis.statusLabel, formatDamageDistribution(resolvedTechnique.distribution, { targetValue: analysis.targetDiff })].filter(Boolean).join("\n"))}</small>
     `;
     rows.append(row);
   });
 }
 
-// 木工・裁縫の特技別ダメージ分布を、値ごとの発生率として表示します。
-function formatDamageDistribution(distribution) {
+// 木工・裁縫の特技別ダメージ分布を、値ごとの発生率としてバー付きで縦に整形します。
+// options.targetValue に「基準値ちょうどへ到達する加算値(target - current)」を渡すと、
+// 該当行へ基準値マーカーを付け、狙う一手(チャンス!)を見つけやすくします。
+function formatDamageDistribution(distribution, options = {}) {
   if (!Array.isArray(distribution) || distribution.length === 0) {
     return "";
   }
 
+  const targetValue = Number.isFinite(options.targetValue) ? options.targetValue : null;
+  // バー長は集合内の最大発生率を基準に、最大8ブロックへ正規化して相対差を見せます。
+  const maxBars = 8;
+  const maxPercent = distribution.reduce((max, item) => Math.max(max, item.percent || 0), 0) || 1;
+  const valueWidth = Math.max(...distribution.map((item) => String(item.value).length));
+
   return distribution
-    .map((item) => `${item.value}: ${item.percent}%`)
-    .join(" / ");
+    .map((item) => {
+      const value = String(item.value).padStart(valueWidth, " ");
+      const percent = Math.round(item.percent || 0);
+      const barCount = Math.max(1, Math.round(((item.percent || 0) / maxPercent) * maxBars));
+      const bar = "█".repeat(barCount).padEnd(maxBars, " ");
+      const marker = targetValue !== null && item.value === targetValue ? " ◀基準値" : "";
+      return `${value} ${bar} ${String(percent).padStart(3, " ")}%${marker}`;
+    })
+    .join("\n");
 }
 
 // 既存テストと外部参照用に、鍛冶判定描画名を職人別判定へ委譲します。

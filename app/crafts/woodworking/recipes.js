@@ -42,7 +42,7 @@ registerDQ10CraftRecipes("woodworking", [
       {
         "id": "part-1",
         "name": "B",
-        "optionId": "horizontal",
+        "optionId": "vertical",
         "gridCell": {
           "row": 1,
           "column": 2

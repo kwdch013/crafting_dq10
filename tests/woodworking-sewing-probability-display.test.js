@@ -6,7 +6,7 @@ const engineJs = fs.readFileSync("app/engine.js", "utf8");
 
 assert.match(
 	mainJs,
-	/function formatDamageDistribution\(distribution\)/,
+	/function formatDamageDistribution\(distribution/,
 	"木工・裁縫の特技ごとの値別確率を整形してください",
 );
 assert.match(
@@ -21,8 +21,28 @@ assert.match(
 );
 assert.match(
 	mainJs,
-	/formatDamageDistribution\(resolvedTechnique\.distribution\)[\s\S]*filter\(Boolean\)/,
+	/formatDamageDistribution\(resolvedTechnique\.distribution[,)][\s\S]*filter\(Boolean\)/,
 	"右クリック判定では解決済み特技の分布を表示してください(analysisにtechniqueは無い)",
+);
+assert.match(
+	mainJs,
+	/"█"/,
+	"値別発生率はバーで視認しやすく整形してください",
+);
+assert.match(
+	mainJs,
+	/function formatDamageDistribution\(distribution, options = \{\}\)/,
+	"基準値ちょうどへ到達する値を強調するため、targetValueを受け取れるようにしてください",
+);
+assert.match(
+	mainJs,
+	/formatDamageDistribution\(resolvedTechnique\.distribution, \{ targetValue: analysis\.targetDiff \}\)/,
+	"右クリック判定では基準値ちょうどへ到達する値(targetDiff)を強調してください",
+);
+assert.match(
+	mainJs,
+	/基準値/,
+	"基準値ちょうどへ到達する行にはマーカーを付けてください",
 );
 assert.doesNotMatch(
 	mainJs,

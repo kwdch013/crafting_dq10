@@ -4,7 +4,7 @@
     "locked-critical": "本会心固定",
     guaranteed: "会心時確定",
     "gauge-entry": "ゲージ突入",
-    "normal-chance": "通常チャンス",
+    "normal-chance": "チャンス!",
     "over-risk": "超過",
     target: "基準値",
     "critical-only": "会心時のみ確定",

@@ -1,0 +1,60 @@
+{
+  "recipeCategoryLabel": "大項目",
+  "recipeSubcategoryLabel": "装備名",
+  "itemOptions": [
+    { "id": "horizontal", "label": "横" },
+    { "id": "vertical", "label": "縦" }
+  ],
+  "categories": [
+    {
+      "id": "stick",
+      "label": "スティック",
+      "templateGridCells": [
+        { "row": 1, "column": 2 },
+        { "row": 2, "column": 2 }
+      ]
+    },
+    {
+      "id": "staff",
+      "label": "杖",
+      "templateGridCells": [
+        { "row": 1, "column": 2 },
+        { "row": 2, "column": 2 },
+        { "row": 3, "column": 2 }
+      ]
+    },
+    {
+      "id": "kon",
+      "label": "昆",
+      "templateGridCells": [
+        { "row": 1, "column": 1 },
+        { "row": 1, "column": 2 },
+        { "row": 2, "column": 1 },
+        { "row": 2, "column": 2 },
+        { "row": 3, "column": 1 },
+        { "row": 3, "column": 2 }
+      ]
+    },
+    {
+      "id": "fan",
+      "label": "扇",
+      "templateGridCells": [
+        { "row": 1, "column": 1 },
+        { "row": 1, "column": 2 },
+        { "row": 2, "column": 1 },
+        { "row": 2, "column": 2 }
+      ]
+    },
+    {
+      "id": "bow",
+      "label": "弓",
+      "templateGridCells": [
+        { "row": 1, "column": 1 },
+        { "row": 1, "column": 2 },
+        { "row": 2, "column": 1 },
+        { "row": 3, "column": 1 },
+        { "row": 3, "column": 2 }
+      ]
+    }
+  ]
+}

@@ -276,3 +276,4 @@ sequenceDiagram
 - 道具鍛冶のテンプレートレシピは `archived: true` として非表示にし、実レシピを道具名の選択肢に表示します。
 - レシピ追加・編集・削除はブラウザの `localStorage` に保存し、API起動時は `api/data/crafts/<職人>/recipes.json` にも一時反映します。
 - API停止時や反映失敗時はブラウザ保存を優先し、画面上では従来どおりユーザー追加レシピを利用します。
+- 木工・裁縫のカテゴリ・テンプレート構造テストの正解は `tests/fixtures/<職人>-categories.json` に分離します。アプリのボード編集で `recipes.json` の並び順や件数が変わってもテストが壊れないよう、テストは config と本番データがこの fixture へ適合するかのみを検証します。
