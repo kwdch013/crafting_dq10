@@ -712,7 +712,10 @@ select:focus {
   font-size: 12px;
   font-weight: 800;
   line-height: 1.35;
-  overflow-wrap: anywhere;
+  /* バーと桁を縦に揃えて見せるため等幅で改行を保持し、はみ出しは横スクロールへ逃がす */
+  font-family: ui-monospace, "SFMono-Regular", "Consolas", monospace;
+  white-space: pre;
+  overflow-x: auto;
 }
 
 .summary-grid {
@@ -1155,6 +1158,10 @@ select:focus {
 .editor-smithing-judgement-row small {
   grid-column: 2;
   font-weight: 800;
+  /* 判定名と値別発生率(バー)を縦に揃えて見せるため等幅で改行を保持する */
+  font-family: ui-monospace, "SFMono-Regular", "Consolas", monospace;
+  white-space: pre;
+  overflow-x: auto;
 }
 
 .board-cell-values span {
