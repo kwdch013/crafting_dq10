@@ -1,6 +1,9 @@
 const assert = require("node:assert/strict");
 const engine = require("../app/engine.js");
 
+global.window = global;
+require("../app/crafts/shared/woodworking-damage.js");
+
 global.DQ10SmithingDamage = {
 	criticalMultiplier: 2,
 	ranges: {
@@ -25,6 +28,30 @@ global.DQ10SmithingDamage = {
 		},
 	},
 };
+
+{
+	const baseTechnique = {
+		id: "cut",
+		damageModel: "woodworking-grain",
+		powerId: "normal",
+		criticalMultiplier: 2,
+	};
+	const normal = engine.resolveTechnique(
+		{ craftType: "woodworking" },
+		baseTechnique,
+		{ optionId: "horizontal", isWedged: false },
+	);
+	const wedged = engine.resolveTechnique(
+		{ craftType: "woodworking" },
+		baseTechnique,
+		{ optionId: "horizontal", isWedged: true },
+	);
+
+	assert.deepEqual([normal.normalMin, normal.normalMax], [12, 18]);
+	assert.deepEqual([wedged.normalMin, wedged.normalMax], [20, 29]);
+	assert.deepEqual([wedged.criticalMin, wedged.criticalMax], [40, 58]);
+	assert.equal(wedged.distribution.find((item) => item.value === 25).percent, 14.3);
+}
 
 {
 	const result = engine.analyzeIngredient(

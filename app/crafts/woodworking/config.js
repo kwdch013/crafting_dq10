@@ -90,8 +90,8 @@ registerDQ10Craft({
   ],
   techniques: [
     { id: "cut", name: "けずる", focusCost: 5, damageModel: "woodworking-grain", powerId: "normal", multiplier: 1, criticalMultiplier: 2, criticalWeight: 1 },
-    { id: "double", name: "2倍削り", focusCost: 8, damageModel: "woodworking-grain", powerId: "normal", repeat: 2, multiplier: 2, criticalMultiplier: 2, criticalWeight: 0.9 },
-    { id: "triple", name: "3倍削り", focusCost: 11, damageModel: "woodworking-grain", powerId: "normal", repeat: 3, multiplier: 3, criticalMultiplier: 2, criticalWeight: 0.85 },
+    { id: "double", name: "2倍削り", focusCost: 8, damageModel: "woodworking-grain", powerId: "power_2_0", multiplier: 2, criticalMultiplier: 2, criticalWeight: 0.9 },
+    { id: "triple", name: "3倍削り", focusCost: 11, damageModel: "woodworking-grain", powerId: "power_3_0", multiplier: 3, criticalMultiplier: 2, criticalWeight: 0.85 },
     { id: "plane", name: "カンナがけ", focusCost: 6, damageModel: "woodworking-grain", powerId: "plane", multiplier: 0.4, criticalMultiplier: 2, criticalWeight: 0.8 },
     { id: "aim", name: "ねらい削り", focusCost: 16, damageModel: "woodworking-grain", powerId: "normal", multiplier: 1, criticalMultiplier: 2, criticalWeight: 1.8 },
     { id: "rise", name: "昇竜彫り", focusCost: 7, damageModel: "woodworking-grain", powerId: "power_1_4", multiplier: 1.4, criticalMultiplier: 2, criticalWeight: 0.9 },

@@ -222,6 +222,7 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/10
 ### #128 裁縫・木工: 不要な判定表示を除外し職人別判定フローを文書化する URL: https://github.com/kwdch013/crafting_dq10/issues/128
 ### #134 裁縫・木工: 判定基準の凡例に「通常チャンス」が残っている URL: https://github.com/kwdch013/crafting_dq10/issues/134
 ### #136 裁縫・木工: 倍率別チャンス判定と基準値付近・全体誤差を表示する URL: https://github.com/kwdch013/crafting_dq10/issues/136
+### #138 木工職人: ダメージ表・発生確率を修正し右クリックでくさびを切り替える URL: https://github.com/kwdch013/crafting_dq10/issues/138
 ### #11 調理職人: レシピ特性の実データ割り当てを検証する
 現状:
 
@@ -458,14 +459,12 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/40
 - 調理の特技データ表示から威力倍率を外す。
 - 位置と火力は別軸として扱い、位置行にデフォルト火力ラベルを表示しない。
 - 回帰テストと関連ドキュメントを更新する。
-
 URL: https://github.com/kwdch013/crafting_dq10/issues/43
 
 ### #45 調理職人: 調理の特技データ表示を必殺のみにする
 
 通常焼き、弱火焼き、強火焼き、ねらい焼きは特技データとして表示せず、現在火力、位置、光状態から通常・会心範囲を算出します。
 特技データ欄には必殺のミラクルグリルだけを表示し、光マスの実数値と弱火0.75倍繰り上げも反映します。
-
 URL: https://github.com/kwdch013/crafting_dq10/issues/45
 
 ### #50 調理職人: 火力変更後に盤面の会心判定表示が更新されない

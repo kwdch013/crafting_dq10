@@ -29,21 +29,58 @@ assert.deepEqual(
 	"旧データの順目IDも互換解決してください",
 );
 assert.deepEqual(
-	JSON.parse(JSON.stringify(damage.getRepeatedDistribution("horizontal", "normal", 2))),
+	JSON.parse(JSON.stringify(damage.getDistribution("horizontal", "power_2_0"))),
 	[
-		{ value: 24, percent: 2 },
-		{ value: 25, percent: 4.1 },
-		{ value: 26, percent: 6.1 },
-		{ value: 27, percent: 8.2 },
-		{ value: 28, percent: 10.2 },
-		{ value: 29, percent: 12.2 },
+		{ value: 24, percent: 14.3 },
+		{ value: 26, percent: 14.3 },
+		{ value: 28, percent: 14.3 },
 		{ value: 30, percent: 14.3 },
-		{ value: 31, percent: 12.2 },
-		{ value: 32, percent: 10.2 },
-		{ value: 33, percent: 8.2 },
-		{ value: 34, percent: 6.1 },
-		{ value: 35, percent: 4.1 },
-		{ value: 36, percent: 2 },
+		{ value: 32, percent: 14.3 },
+		{ value: 34, percent: 14.3 },
+		{ value: 36, percent: 14.3 },
 	],
-	"2倍削りは合算後の値ごとの確率を表示してください",
+	"2倍削りは参照表の7候補を等確率で表示してください",
+);
+assert.deepEqual(
+	JSON.parse(JSON.stringify(damage.getDistribution("vertical", "power_3_0"))),
+	[
+		{ value: 18, percent: 14.3 },
+		{ value: 20, percent: 14.3 },
+		{ value: 21, percent: 14.3 },
+		{ value: 23, percent: 14.3 },
+		{ value: 24, percent: 14.3 },
+		{ value: 26, percent: 14.3 },
+		{ value: 27, percent: 14.3 },
+	],
+	"3倍削りの逆目も参照表の候補を使ってください",
+);
+assert.deepEqual(
+	JSON.parse(JSON.stringify(damage.getDistribution("horizontal", "normal", { wedged: true }))),
+	[
+		{ value: 20, percent: 14.3 },
+		{ value: 21, percent: 14.3 },
+		{ value: 23, percent: 14.3 },
+		{ value: 25, percent: 14.3 },
+		{ value: 26, percent: 14.3 },
+		{ value: 28, percent: 14.3 },
+		{ value: 29, percent: 14.3 },
+	],
+	"くさび有効時は順目の専用候補を使ってください",
+);
+assert.deepEqual(
+	JSON.parse(JSON.stringify(damage.getDistribution("vertical", "normal", { wedged: true }))),
+	[
+		{ value: 10, percent: 14.3 },
+		{ value: 11, percent: 14.3 },
+		{ value: 12, percent: 14.3 },
+		{ value: 13, percent: 28.6 },
+		{ value: 14, percent: 14.3 },
+		{ value: 15, percent: 14.3 },
+	],
+	"重複するくさび候補は発生率を合算してください",
+);
+assert.deepEqual(
+	JSON.parse(JSON.stringify(damage.getRange("horizontal", "power_1_4", { wedged: true }))),
+	[28, 42],
+	"くさびは特殊彫りの威力表にも反映してください",
 );

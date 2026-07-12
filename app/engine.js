@@ -392,20 +392,20 @@
     if (technique.damageModel === "woodworking-grain") {
       const woodworkingDamage = global.DQ10WoodworkingDamage;
       const grain = ingredient?.optionId || state.heat || "horizontal";
-      const range = woodworkingDamage?.getRange(grain, technique.powerId);
+      const damageOptions = { wedged: ingredient?.isWedged === true };
+      const range = woodworkingDamage?.getRange(grain, technique.powerId, damageOptions);
 
       if (!range) {
         return technique;
       }
 
-      const repeat = toNumber(technique.repeat, 1);
       const criticalMultiplier = toNumber(technique.criticalMultiplier, woodworkingDamage.criticalMultiplier);
-      const normalMin = range[0] * repeat;
-      const normalMax = range[1] * repeat;
+      const normalMin = range[0];
+      const normalMax = range[1];
 
       return {
         ...technique,
-        distribution: woodworkingDamage.getRepeatedDistribution(grain, technique.powerId, repeat),
+        distribution: woodworkingDamage.getDistribution(grain, technique.powerId, { wedged: ingredient?.isWedged === true }),
         normalMin,
         normalMax,
         criticalMin: Math.ceil(normalMin * criticalMultiplier),
