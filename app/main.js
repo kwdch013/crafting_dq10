@@ -2000,9 +2000,11 @@ function renderCraftCellJudgements(editor) {
       return;
     }
 
+    // 分布(値別発生率)は解決済み特技側に載るため、analyzeIngredientの戻り値ではなく解決済み特技を保持して参照します。
+    const resolvedTechnique = DQ10CraftEngine.resolveTechnique(state, entry.technique, editorIngredient);
     const analysis = DQ10CraftEngine.analyzeIngredient(
       editorIngredient,
-      DQ10CraftEngine.resolveTechnique(state, entry.technique, editorIngredient),
+      resolvedTechnique,
       state.targetMode,
       state,
     );
@@ -2011,7 +2013,7 @@ function renderCraftCellJudgements(editor) {
     row.innerHTML = `
       <strong>${escapeHtml(entry.label)}</strong>
       <span class="numeric">${analysis.normalMin}-${analysis.normalMax} / 会心 ${analysis.criticalMin}-${analysis.criticalMax}</span>
-      <small>${escapeHtml([analysis.statusLabel, formatDamageDistribution(analysis.technique.distribution)].filter(Boolean).join(" / "))}</small>
+      <small>${escapeHtml([analysis.statusLabel, formatDamageDistribution(resolvedTechnique.distribution)].filter(Boolean).join(" / "))}</small>
     `;
     rows.append(row);
   });
