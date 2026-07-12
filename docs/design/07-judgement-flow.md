@@ -15,6 +15,7 @@
 - `criticalAfterMax`: 会心停止反映後の会心最大後の値
 - `rawCriticalAfterMin`: 会心停止前の会心最小後の値
 - `rawCriticalAfterMax`: 会心停止前の会心最大後の値
+- `normalDamageValues`: 選択した威力で発生する非会心ダメージ値の集合
 
 ## 調理
 
@@ -68,19 +69,21 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-  A[開始] --> B{current > target?}
-  B -->|はい| C[超過中]
-  B -->|いいえ| D{current == target?}
-  D -->|はい| E[基準値]
-  D -->|いいえ| F{rawCriticalAfterMin < target?}
-  F -->|はい| G[不足]
-  F -->|いいえ| H{normalAfterMax == target?}
-  H -->|はい| I[チャンス!]
-  H -->|いいえ| J{normalAfterMax > target?}
-  J -->|はい| K{normalAfterMin > target?}
-  K -->|はい| L[超過確定]
-  K -->|いいえ| M[超過]
-  J -->|いいえ| N[会心時のみ確定]
+  A[開始] --> B{current == target?}
+  B -->|はい| C[基準値]
+  B -->|いいえ| D{normalDamageValues に target-current がある?}
+  D -->|はい| E[チャンス!]
+  D -->|いいえ| F{abs target-current が3以下?}
+  F -->|はい| G[基準値付近]
+  F -->|いいえ| H{current > target?}
+  H -->|はい| I[超過中]
+  H -->|いいえ| J{rawCriticalAfterMin < target?}
+  J -->|はい| K[不足]
+  J -->|いいえ| L{normalAfterMax > target?}
+  L -->|はい| M{normalAfterMin > target?}
+  M -->|はい| N[超過確定]
+  M -->|いいえ| O[超過]
+  L -->|いいえ| P[会心時のみ確定]
 ```
 
 ## 木工
@@ -90,17 +93,19 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-  A[開始] --> B{current > target?}
-  B -->|はい| C[超過中]
-  B -->|いいえ| D{current == target?}
-  D -->|はい| E[基準値]
-  D -->|いいえ| F{rawCriticalAfterMin < target?}
-  F -->|はい| G[不足]
-  F -->|いいえ| H{normalAfterMax == target?}
-  H -->|はい| I[チャンス!]
-  H -->|いいえ| J{normalAfterMax > target?}
-  J -->|はい| K{normalAfterMin > target?}
-  K -->|はい| L[超過確定]
-  K -->|いいえ| M[超過]
-  J -->|いいえ| N[会心時のみ確定]
+  A[開始] --> B{current == target?}
+  B -->|はい| C[基準値]
+  B -->|いいえ| D{normalDamageValues に target-current がある?}
+  D -->|はい| E[チャンス!]
+  D -->|いいえ| F{abs target-current が3以下?}
+  F -->|はい| G[基準値付近]
+  F -->|いいえ| H{current > target?}
+  H -->|はい| I[超過中]
+  H -->|いいえ| J{rawCriticalAfterMin < target?}
+  J -->|はい| K[不足]
+  J -->|いいえ| L{normalAfterMax > target?}
+  L -->|はい| M{normalAfterMin > target?}
+  M -->|はい| N[超過確定]
+  M -->|いいえ| O[超過]
+  L -->|いいえ| P[会心時のみ確定]
 ```

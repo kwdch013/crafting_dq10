@@ -750,6 +750,19 @@ select:focus {
   overflow-x: auto;
 }
 
+.board-total-error {
+  min-height: 24px;
+  margin-bottom: 8px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 900;
+  text-align: right;
+}
+
+.board-total-error[hidden] {
+  display: none;
+}
+
 .board-cell {
   display: grid;
   grid-template-rows: auto 1fr auto;
@@ -1262,6 +1275,11 @@ select:focus {
 .status-target {
   background: #ccfbf1;
   color: #115e59;
+}
+
+.status-near-target {
+  background: #e0f2fe;
+  color: #075985;
 }
 
 .status-critical-only {

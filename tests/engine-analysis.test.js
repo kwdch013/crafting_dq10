@@ -422,12 +422,19 @@ global.DQ10SmithingDamage = {
 	assert.equal(analyzeFixedTarget(70).status, "shortage");
 	assert.equal(analyzeFixedTarget(80, { normalMin: 5, normalMax: 10, criticalMin: 15, criticalMax: 25 }).status, "shortage");
 	assert.equal(analyzeFixedTarget(88).status, "normal-chance");
-	assert.equal(analyzeFixedTarget(90).status, "over-risk");
+	assert.equal(analyzeFixedTarget(90).status, "normal-chance");
+	assert.equal(analyzeFixedTarget(90, {
+		distribution: [{ value: 8 }, { value: 12 }],
+	}).status, "over-risk");
+	assert.equal(analyzeFixedTarget(97).status, "near-target");
+	assert.equal(analyzeFixedTarget(103).status, "near-target");
+	assert.notEqual(analyzeFixedTarget(96).status, "near-target");
+	assert.notEqual(analyzeFixedTarget(104).status, "near-target");
 	assert.equal(analyzeFixedTarget(100).status, "target");
 	assert.equal(analyzeFixedTarget(100, { normalMin: -12, normalMax: -8, criticalMin: -12, criticalMax: -8 }).status, "target");
 	assert.equal(analyzeFixedTarget(84, { normalMin: 4, normalMax: 8, criticalMin: 16, criticalMax: 24 }).status, "critical-only");
 	assert.equal(analyzeFixedTarget(94).status, "over-guaranteed");
-	assert.equal(analyzeFixedTarget(101).status, "over");
+	assert.equal(analyzeFixedTarget(101).status, "near-target");
 	assert.ok(!["normal-over-risk", "gauge-entry", "fake-critical-risk", "in-range"].includes(analyzeFixedTarget(80, { normalMin: 5, normalMax: 10, criticalMin: 15, criticalMax: 25 }).status));
 }
 
@@ -444,6 +451,7 @@ global.DQ10SmithingDamage = {
 		"in-range",
 		"locked",
 		"locked-critical",
+		"near-target",
 		"normal-chance",
 		"normal-over-risk",
 		"over",
@@ -453,6 +461,26 @@ global.DQ10SmithingDamage = {
 		"target",
 	]);
 	assert.equal(fakeCriticalLabels.length, 1);
+}
+
+{
+	const result = engine.analyzeState({
+		craftType: "sewing",
+		targetMode: "fixed",
+		techniques: [{
+			id: "sew",
+			normalMin: 8,
+			normalMax: 12,
+			criticalMin: 16,
+			criticalMax: 24,
+		}],
+		ingredients: [
+			{ id: "a", current: 97, target: 100, successMin: 100, successMax: 100 },
+			{ id: "b", current: 105, target: 100, successMin: 100, successMax: 100 },
+		],
+	});
+
+	assert.equal(result.totalError, 8);
 }
 
 {

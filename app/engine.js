@@ -7,6 +7,7 @@
     "normal-chance": "チャンス!",
     "over-risk": "超過",
     target: "基準値",
+    "near-target": "基準値付近",
     "critical-only": "会心時のみ確定",
     "normal-over-risk": "通常時超過の可能性あり",
     "over-guaranteed": "超過確定",
@@ -27,6 +28,7 @@
     "gauge-entry": 2.5,
     "fake-critical-risk": 2,
     target: 1.8,
+    "near-target": 1.75,
     "normal-chance": 1.7,
     "in-range": 1.5,
     shortage: 1,
@@ -441,28 +443,32 @@
       criticalAfterMin,
       criticalAfterMax,
       criticalStopApplies,
+      normalDamageValues,
       targetMode,
     } = analysisBase;
     const currentOver = current > target;
     const shortage = !currentOver && rawCriticalAfterMin < target;
     const targetReached = current === target;
-    const normalChance = !currentOver && !shortage && !targetReached && normalAfterMin <= target && normalAfterMax === target;
-    const overGuaranteed = !currentOver && !shortage && !targetReached && normalAfterMin > target;
-    const overRisk = !currentOver && !shortage && !targetReached && !normalChance && !overGuaranteed && normalAfterMax > target;
-    const criticalOnly = !currentOver && !shortage && !targetReached && !normalChance && !overRisk && !overGuaranteed && rawCriticalAfterMin >= target;
+    const nearTarget = !targetReached && Math.abs(targetDiff) <= 3;
+    const normalChance = !targetReached && normalDamageValues.includes(targetDiff);
+    const overGuaranteed = !currentOver && !shortage && !targetReached && !nearTarget && normalAfterMin > target;
+    const overRisk = !currentOver && !shortage && !targetReached && !nearTarget && !normalChance && !overGuaranteed && normalAfterMax > target;
+    const criticalOnly = !currentOver && !shortage && !targetReached && !nearTarget && !normalChance && !overRisk && !overGuaranteed && rawCriticalAfterMin >= target;
     const normalHits = normalAfterMin === target && normalAfterMax === target;
     const normalCanHit = normalAfterMin <= target && normalAfterMax >= target;
     const criticalCanHit = criticalAfterMin <= target && criticalAfterMax >= target;
     let status = "shortage";
 
-    if (currentOver) {
-      status = "over";
-    } else if (targetReached) {
+    if (targetReached) {
       status = "target";
-    } else if (shortage) {
-      status = "shortage";
     } else if (normalChance) {
       status = "normal-chance";
+    } else if (nearTarget) {
+      status = "near-target";
+    } else if (currentOver) {
+      status = "over";
+    } else if (shortage) {
+      status = "shortage";
     } else if (overRisk) {
       status = "over-risk";
     } else if (criticalOnly) {
@@ -590,6 +596,9 @@
       ? resolveIngredientTarget(ingredient)
       : toNumber(ingredient.target, Math.round((successMin + successMax) / 2));
     const targetDiff = target - current;
+    const normalDamageValues = Array.isArray(technique.distribution) && technique.distribution.length > 0
+      ? technique.distribution.map((item) => toNumber(item?.value, NaN)).filter(Number.isFinite)
+      : expandIntegerRange([normalMin, normalMax]);
 
     if (ingredient.locked === true) {
       const inSuccessRange = current >= successMin && current <= successMax;
@@ -674,6 +683,7 @@
         criticalAfterMin,
         criticalAfterMax,
         criticalStopApplies,
+        normalDamageValues,
         targetMode,
       });
     }
@@ -886,9 +896,15 @@
     const representative = [...techniqueAnalyses].sort((a, b) =>
       statusRanks[b.status] - statusRanks[a.status],
     )[0];
+    const isNearFixedTarget = isFixedTargetCraftState(state) &&
+      representative.locked !== true &&
+      representative.targetDiff !== 0 &&
+      Math.abs(representative.targetDiff) <= 3;
 
     return {
       ...representative,
+      status: isNearFixedTarget ? "near-target" : representative.status,
+      statusLabel: isNearFixedTarget ? statusLabels["near-target"] : representative.statusLabel,
       techniqueAnalyses,
     };
   }
@@ -900,6 +916,9 @@
 
     return {
       ingredients,
+      totalError: isFixedTargetCraftState(state)
+        ? ingredients.reduce((sum, item) => sum + Math.abs(item.targetDiff), 0)
+        : null,
       guaranteedCount: ingredients.filter((item) =>
         item.techniqueAnalyses.some((analysis) => analysis.guaranteedCritical),
       ).length,
