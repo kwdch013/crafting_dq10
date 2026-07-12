@@ -101,18 +101,36 @@ assert.match(
 
 assert.equal(fs.existsSync("app/crafts/shared/smithing-techniques.json"), false, "鍛冶特技の追加JSONは不要です");
 
+// 占有マスの読み順(行→列)でA/B/C...を返す、config読み込み用の簡易実装です。
+function readingOrderPositionName(cells, row, column) {
+  const order = (cells || [])
+    .map((cell) => ({ row: Number(cell.row), column: Number(cell.column) }))
+    .sort((a, b) => a.row - b.row || a.column - b.column);
+  const index = order.findIndex((cell) => cell.row === Number(row) && cell.column === Number(column));
+  let remaining = (index < 0 ? 0 : index) + 1;
+  let label = "";
+  while (remaining > 0) {
+    remaining -= 1;
+    label = String.fromCharCode(65 + (remaining % 26)) + label;
+    remaining = Math.floor(remaining / 26);
+  }
+  return label || "A";
+}
+
 function loadSmithingConfig(path) {
   let capturedConfig = null;
   const source = fs.readFileSync(path, "utf8");
   Function(
     "registerDQ10Craft",
     "createDQ10SmithingCraftConfig",
+    "createDQ10ReadingOrderPositionName",
     `${source}\nreturn null;`,
   )(
     (config) => {
       capturedConfig = config;
     },
     (config) => config,
+    readingOrderPositionName,
   );
   return capturedConfig;
 }

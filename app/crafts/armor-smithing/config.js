@@ -1,12 +1,3 @@
-// 設定単体で読み込まれるテストでも座標名を生成できるようにします。
-function getArmorSmithingPositionName(row, column) {
-  if (typeof createDQ10CoordinatePositionName === "function") {
-    return createDQ10CoordinatePositionName(row, column, 2);
-  }
-
-  return String.fromCharCode(64 + ((Number(row) - 1) * 2 + Number(column)));
-}
-
 // 防具鍛冶の種別ごとに、レシピ追加時の初期マスを定義します。
 function createArmorSmithingTemplateItems(rows, columns, cells = null) {
   const gridCells = Array.isArray(cells)
@@ -18,7 +9,8 @@ function createArmorSmithingTemplateItems(rows, columns, cells = null) {
 
   return gridCells.map(({ row, column }, index) => ({
     id: `part-${index + 1}`,
-    name: getArmorSmithingPositionName(row, column),
+    // マス名は占有マスの読み順(行→列)でA/B/C...を割り当てます。
+    name: createDQ10ReadingOrderPositionName(gridCells, row, column),
     gridCell: { row, column },
     current: 0,
     successMin: 80,

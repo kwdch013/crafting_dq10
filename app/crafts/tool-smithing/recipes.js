@@ -81,7 +81,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-2",
-        "name": "C",
+        "name": "B",
         "gridCell": {
           "row": 2,
           "column": 1
@@ -92,7 +92,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-3",
-        "name": "E",
+        "name": "C",
         "gridCell": {
           "row": 3,
           "column": 1
@@ -122,7 +122,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-2",
-        "name": "C",
+        "name": "B",
         "gridCell": {
           "row": 2,
           "column": 1
@@ -426,7 +426,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-2",
-        "name": "C",
+        "name": "B",
         "gridCell": {
           "row": 2,
           "column": 1
@@ -437,7 +437,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-3",
-        "name": "E",
+        "name": "C",
         "gridCell": {
           "row": 3,
           "column": 1
@@ -467,7 +467,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-2",
-        "name": "C",
+        "name": "B",
         "gridCell": {
           "row": 2,
           "column": 1
@@ -771,7 +771,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-2",
-        "name": "C",
+        "name": "B",
         "gridCell": {
           "row": 2,
           "column": 1
@@ -782,7 +782,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-3",
-        "name": "E",
+        "name": "C",
         "gridCell": {
           "row": 3,
           "column": 1
@@ -812,7 +812,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-2",
-        "name": "C",
+        "name": "B",
         "gridCell": {
           "row": 2,
           "column": 1
@@ -1053,7 +1053,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-2",
-        "name": "C",
+        "name": "B",
         "gridCell": {
           "row": 2,
           "column": 1
@@ -1065,7 +1065,7 @@ registerDQ10CraftRecipes("tool-smithing", [
       },
       {
         "id": "part-3",
-        "name": "E",
+        "name": "C",
         "gridCell": {
           "row": 3,
           "column": 1

@@ -282,6 +282,18 @@
     return label || "A";
   };
 
+  // 鍛冶系の配置名は、占有マスだけを読み順(行→列)に並べたA/B/C...にします。
+  // 列数固定の座標式では単一列レシピが飛び番(A,C,E)になるため、実際の並びで採番します。
+  global.createDQ10ReadingOrderPositionName = function createDQ10ReadingOrderPositionName(cells, row, column) {
+    const order = (cells || [])
+      .map((cell) => ({ row: Number(cell.row), column: Number(cell.column) }))
+      .filter((cell) => Number.isFinite(cell.row) && Number.isFinite(cell.column))
+      .sort((a, b) => a.row - b.row || a.column - b.column);
+    const index = order.findIndex((cell) => cell.row === Number(row) && cell.column === Number(column));
+
+    return createDQ10CoordinatePositionName(1, (index < 0 ? 0 : index) + 1, 1);
+  };
+
   // 職人ごとの画面差分を扱うコンポーネントを登録します。
   global.registerDQ10CraftComponent = function registerDQ10CraftComponent(craftId, component) {
     if (!craftId || !component || typeof component !== "object") {

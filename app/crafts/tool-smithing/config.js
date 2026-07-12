@@ -1,12 +1,3 @@
-// 設定単体で読み込まれるテストでも座標名を生成できるようにします。
-function getToolSmithingPositionName(row, column) {
-  if (typeof createDQ10CoordinatePositionName === "function") {
-    return createDQ10CoordinatePositionName(row, column, 2);
-  }
-
-  return String.fromCharCode(64 + ((Number(row) - 1) * 2 + Number(column)));
-}
-
 // 道具鍛冶固有の表示名、特技、初期マスを定義します。
 function createToolSmithingTemplateItems(rows, columns, cells = null) {
   const items = [];
@@ -19,8 +10,9 @@ function createToolSmithingTemplateItems(rows, columns, cells = null) {
 
   gridCells.forEach(({ row, column }) => {
     items.push({
+      // マス名は占有マスの読み順(行→列)でA/B/C...を割り当てます。
       id: `part-${row}-${column}`,
-      name: getToolSmithingPositionName(row, column),
+      name: createDQ10ReadingOrderPositionName(gridCells, row, column),
       gridCell: { row, column },
       current: 0,
       successMin: 70,
@@ -69,7 +61,7 @@ registerDQ10Craft(createDQ10SmithingCraftConfig({
   ],
   items: [
     { id: "part-1", name: "A", gridCell: { row: 1, column: 1 }, current: 0, successMin: 70, successMax: 86 },
-    { id: "part-2", name: "C", gridCell: { row: 2, column: 1 }, current: 0, successMin: 70, successMax: 86 },
-    { id: "part-3", name: "E", gridCell: { row: 3, column: 1 }, current: 0, successMin: 70, successMax: 86 },
+    { id: "part-2", name: "B", gridCell: { row: 2, column: 1 }, current: 0, successMin: 70, successMax: 86 },
+    { id: "part-3", name: "C", gridCell: { row: 3, column: 1 }, current: 0, successMin: 70, successMax: 86 },
   ],
 }));

@@ -864,6 +864,61 @@ select:focus {
   cursor: pointer;
 }
 
+/* 木工セル: 順目/逆目を背景パターンで直感的に区別します。 */
+/* 順目(横目)=縦ストライプ。木目に沿って削れる方向を表します。 */
+/* 線幅はセル寸法に依らず割合で指定し、縦線を5本ずつ・太めに描きます。 */
+.board-cell.grain-parallel {
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(150, 105, 55, 0.18) 0,
+    rgba(150, 105, 55, 0.18) 6%,
+    transparent 6%,
+    transparent 20%
+  );
+}
+
+/* 逆目(縦目)=横ボーダー。木目に逆らう方向を表します。 */
+/* 横線を3本ずつ・太めに描きます。 */
+.board-cell.grain-against {
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(70, 100, 140, 0.2) 0,
+    rgba(70, 100, 140, 0.2) 6%,
+    transparent 6%,
+    transparent 33.34%
+  );
+}
+
+/* 木工セルは 見出し・木目ラベル・数値・光スロット・状態 の構成にします。 */
+.craft-board.woodworking-board .board-cell:not(.empty) {
+  grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+}
+
+/* 木目ラベル: 名称の下に順目/逆目を背景色付きの文字列で表示します(鍛冶の光バッジと同様)。 */
+.board-cell-grain {
+  display: flex;
+}
+
+.board-cell-grain .grain-label {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+/* 順目=木色、逆目=青系。背景パターンの色調と合わせます。 */
+.board-cell-grain .grain-label.grain-parallel {
+  background: #f2e2cb;
+  color: #7a4a12;
+}
+
+.board-cell-grain .grain-label.grain-against {
+  background: #d7e2f2;
+  color: #1e3a5f;
+}
+
 .board-cell.selected {
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.18);
