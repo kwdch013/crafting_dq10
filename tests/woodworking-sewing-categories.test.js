@@ -81,15 +81,23 @@ vm.createContext(context);
 	);
 }
 
+// カテゴリ順・テンプレート構造の固定検証は config(編集されない真実源)側へ集約する。
+// 本番レシピデータはアプリのボード編集で並び順や件数が変わり得るため、
+// ここでは「順序スナップショット」ではなく config 由来の不変条件のみを検証する。
 [
-	["api/data/crafts/woodworking/recipes.json", ["stick", "staff", "kon", "fan", "bow"]],
-	["api/data/crafts/sewing/recipes.json", ["head", "body-upper", "body-lower", "arm", "foot"]],
-].forEach(([file, categoryIds]) => {
+	["woodworking", "api/data/crafts/woodworking/recipes.json"],
+	["sewing", "api/data/crafts/sewing/recipes.json"],
+].forEach(([craftId, file]) => {
+	const validCategoryIds = context.DQ10CraftConfigs[craftId].recipeCategoryOptions.map(
+		(category) => category.id,
+	);
 	const recipes = JSON.parse(fs.readFileSync(file, "utf8"));
-	assert.deepEqual(recipes.map((recipe) => recipe.categoryId), categoryIds);
 	recipes.forEach((recipe) => {
-		assert.ok(categoryIds.includes(recipe.categoryId), `${recipe.id} の大項目IDを参照画像名由来にしてください`);
-		if (file.includes("woodworking")) {
+		assert.ok(
+			validCategoryIds.includes(recipe.categoryId),
+			`${recipe.id} の大項目IDは config のカテゴリ(${validCategoryIds.join(", ")})から選んでください`,
+		);
+		if (craftId === "woodworking") {
 			assert.ok(
 				recipe.items.every((item) => ["horizontal", "vertical"].includes(item.optionId)),
 				`${recipe.id} の木目は横または縦で設定してください`,
