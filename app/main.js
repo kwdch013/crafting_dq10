@@ -141,6 +141,20 @@ function loadState() {
   });
 }
 
+// 鍛冶職人のマス名は占有マスの読み順(A/B/C...)で一意に決まるため、
+// 旧仕様で保存された「1行1列」などの名前を無視し、常に読み順から再計算します。
+function applySmithingReadingOrderNames(ingredients) {
+  if (typeof createDQ10ReadingOrderPositionName !== "function") {
+    return ingredients;
+  }
+
+  const gridCells = ingredients.map((item) => item.gridCell);
+  return ingredients.map((item) => ({
+    ...item,
+    name: createDQ10ReadingOrderPositionName(gridCells, item.gridCell?.row, item.gridCell?.column),
+  }));
+}
+
 function normalizeState(value) {
   const config = getCraftConfig(value.craftType);
   const isSmithingConfig = ["weapon-smithing", "armor-smithing", "tool-smithing"].includes(config.id);
@@ -193,6 +207,8 @@ function normalizeState(value) {
       ingredientSize: numberOr(ingredient.ingredientSize, defaultItem?.ingredientSize ?? 1),
     };
   });
+  // 鍛冶職人は保存名に依存せず、常に占有マスの読み順でマス名を採番し直します。
+  const normalizedIngredients = isSmithingConfig ? applySmithingReadingOrderNames(ingredients) : ingredients;
   const defaultHeatId = getDefaultHeatId(config);
   const heat = config.heatStates.some((candidate) => candidate.id === value.heat)
     ? value.heat
@@ -242,7 +258,7 @@ function normalizeState(value) {
       recommendable: technique.recommendable,
       scoring: technique.scoring || undefined,
     })),
-    ingredients,
+    ingredients: normalizedIngredients,
     cookingCellEffects: normalizeCookingCellEffects(value.cookingCellEffects, config.layout),
     specialChargeState: normalizeSpecialChargeState(value.specialChargeState, config.id),
     miracleGrillUsed: value.miracleGrillUsed === true,
