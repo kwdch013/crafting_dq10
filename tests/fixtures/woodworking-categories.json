@@ -55,6 +55,17 @@
         { "row": 3, "column": 1 },
         { "row": 3, "column": 2 }
       ]
+    },
+    {
+      "id": "fishing_rod",
+      "label": "釣り竿",
+      "templateGridCells": [
+        { "row": 1, "column": 2 },
+        { "row": 2, "column": 1 },
+        { "row": 2, "column": 2 },
+        { "row": 3, "column": 1 },
+        { "row": 3, "column": 2 }
+      ]
     }
   ]
 }
