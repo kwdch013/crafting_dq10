@@ -8,11 +8,12 @@ function getWoodworkingPositionName(row, column) {
 }
 
 // 木工の参照画像に合わせた固定基準値テンプレートを作成します。
-function createWoodworkingTemplateItems(cells) {
+// optionId で木目の初期向き(横=順目/縦=逆目)を指定できるようにします。
+function createWoodworkingTemplateItems(cells, optionId = "horizontal") {
   return cells.map(({ row, column }, index) => ({
     id: `part-${index + 1}`,
     name: getWoodworkingPositionName(row, column),
-    optionId: "horizontal",
+    optionId,
     gridCell: { row, column },
     current: 0,
     target: 74,
@@ -83,6 +84,14 @@ registerDQ10Craft({
       { row: 3, column: 1 },
       { row: 3, column: 2 },
     ]) },
+    // 釣り竿は列2に縦(逆目)3マス、列1は行2-3の2マスを並べた計5マス形状です。
+    { id: "fishing_rod", label: "釣り竿", templateItems: createWoodworkingTemplateItems([
+      { row: 1, column: 2 },
+      { row: 2, column: 1 },
+      { row: 2, column: 2 },
+      { row: 3, column: 1 },
+      { row: 3, column: 2 },
+    ], "vertical") },
   ],
   techniquePreviewOptionId: "horizontal",
   heatStates: [
