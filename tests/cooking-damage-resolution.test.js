@@ -290,3 +290,20 @@ const engine = require("../app/engine.js");
 	assert.equal(result.status, "shortage");
 	assert.equal(result.statusLabel, "不足");
 }
+
+{
+	// 出典 (https://xn--10-yg4a1a3kyh.jp/dq10_artisan8.html) の位置別候補値と
+	// 分布データが一致することを検証します。上下左右・半減は転記誤りが
+	// 入りやすいため、min/max だけでなく候補値の並びごと固定します。
+	const distributions = globalThis.DQ10CookingDamage.distributions;
+
+	assert.deepEqual(distributions.center.normal, [12, 13, 14, 15, 16, 17, 18]);
+	assert.deepEqual(distributions.center.strong, [18, 20, 21, 23, 24, 26, 27]);
+	assert.deepEqual(distributions.center.half, [9, 10, 11, 12, 12, 13, 14]);
+	assert.deepEqual(distributions.cross.normal, [6, 7, 7, 8, 8, 9, 9]);
+	assert.deepEqual(distributions.cross.strong, [9, 10, 11, 12, 12, 13, 14]);
+	assert.deepEqual(distributions.cross.half, [5, 5, 6, 6, 6, 7, 7]);
+	assert.deepEqual(distributions.corner.normal, [3, 4, 4, 4, 4, 5, 5]);
+	assert.deepEqual(distributions.corner.strong, [5, 5, 6, 6, 6, 7, 7]);
+	assert.deepEqual(distributions.corner.half, [3, 3, 3, 3, 3, 4, 4]);
+}
