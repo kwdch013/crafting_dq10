@@ -20,6 +20,7 @@ assert.deepEqual(buttonLabels, [
 	"なし",
 	"上下左右が光る",
 	"四隅が戻る",
+	"光を一括切替",
 ]);
 assert.equal(commandPanel.includes("board-actions"), false);
 assert.ok(commandPanel.includes("miracleGrillResult"), "ミラクルグリル結果表示を持つこと");

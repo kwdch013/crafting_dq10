@@ -40,6 +40,8 @@ const elements = {
   boardActions: document.querySelector("#boardActions"),
   cookingCommandPanel: document.querySelector("#cookingCommandPanel"),
   cookingOnlyCommandGroups: document.querySelectorAll(".cooking-only-command"),
+  smithingOnlyCommandGroups: document.querySelectorAll(".smithing-only-command"),
+  toggleSmithingLightButton: document.querySelector("#toggleSmithingLightButton"),
   rotateWoodLeftButton: document.querySelector("#rotateWoodLeftButton"),
   rotateWoodRightButton: document.querySelector("#rotateWoodRightButton"),
   undoBoardButton: document.querySelector("#undoBoardButton"),
@@ -1239,6 +1241,14 @@ function syncBoardActionButtons() {
   elements.cookingOnlyCommandGroups.forEach((element) => {
     element.hidden = !isCooking;
   });
+  // 鍛冶専用グループの表示は職人種別 (基本設定) でのみ切り替え、
+  // 光地金特性でない間はボタンを非活性のまま表示領域を維持します。
+  elements.smithingOnlyCommandGroups.forEach((element) => {
+    element.hidden = !isSmithing;
+  });
+  if (elements.toggleSmithingLightButton) {
+    elements.toggleSmithingLightButton.disabled = !isSmithing || state.traitId !== "light";
+  }
   elements.undoBoardButton.disabled = !canRearrange || undoStack.length === 0;
   elements.redoBoardButton.disabled = !canRearrange || redoStack.length === 0;
   syncBoardSpecialState();
@@ -1516,6 +1526,23 @@ function formatMiracleGrillResult(targets, result) {
   }
 
   return `${targetLabel}: ミラクルグリル成功 / ${lockLabels.join("・") || "固定"}`;
+}
+
+// 鍛冶の光地金を全マス一括で切り替えます。
+// 全マスが光っている場合は全解除し、それ以外は全マスを光らせます。
+function toggleSmithingLightAll() {
+  if (!isCurrentCraftFamily("smithing") || state.traitId !== "light") {
+    return;
+  }
+
+  const nextGlow = !state.ingredients.every((ingredient) => ingredient.isGlowing === true);
+  pushBoardHistory();
+  state.ingredients.forEach((ingredient) => {
+    ingredient.isGlowing = nextGlow;
+  });
+  renderLayoutBoard();
+  renderAnalysis();
+  saveState();
 }
 
 function clearCookingLight() {
@@ -3187,6 +3214,7 @@ elements.normalHeatButton?.addEventListener("click", () => setCookingHeatMode("n
 elements.strongHeatButton?.addEventListener("click", () => setCookingHeatMode("strong"));
 elements.halfHeatButton?.addEventListener("click", () => setCookingHeatMode("half"));
 elements.clearCookingLightButton?.addEventListener("click", clearCookingLight);
+elements.toggleSmithingLightButton?.addEventListener("click", toggleSmithingLightAll);
 elements.clearCookingEffectButton?.addEventListener("click", () => setCookingEffectMode("none"));
 elements.crossGlowButton?.addEventListener("click", () => setCookingEffectMode("cross-glow"));
 elements.cornerReturnButton?.addEventListener("click", () => setCookingEffectMode("corner-return"));
