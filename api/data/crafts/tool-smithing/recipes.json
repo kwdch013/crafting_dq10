@@ -323,36 +323,6 @@
     ]
   },
   {
-    "id": "miracle-sewing-needle",
-    "name": "奇跡のさいほう針",
-    "category": "針",
-    "categoryId": "sewing-needle",
-    "items": [
-      {
-        "id": "part-1",
-        "name": "A",
-        "gridCell": {
-          "row": 1,
-          "column": 1
-        },
-        "current": 0,
-        "successMin": 314,
-        "successMax": 320
-      },
-      {
-        "id": "part-2",
-        "name": "B",
-        "gridCell": {
-          "row": 2,
-          "column": 1
-        },
-        "current": 0,
-        "successMin": 390,
-        "successMax": 404
-      }
-    ]
-  },
-  {
     "id": "miracle-frying-pan",
     "name": "奇跡のフライパン",
     "category": "フライパン",
@@ -1448,5 +1418,38 @@
       }
     ],
     "traitId": "return"
+  },
+  {
+    "id": "miracle-sewing-needle",
+    "name": "奇跡のさいほう針",
+    "category": "針",
+    "categoryId": "sewing-needle",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "A",
+        "current": 0,
+        "target": 317,
+        "successMin": 314,
+        "successMax": 320,
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-3",
+        "name": "B",
+        "current": 0,
+        "target": 397,
+        "successMin": 390,
+        "successMax": 404,
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        }
+      }
+    ],
+    "traitId": "none"
   }
 ]
