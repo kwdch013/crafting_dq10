@@ -40,6 +40,8 @@ const elements = {
   boardActions: document.querySelector("#boardActions"),
   cookingCommandPanel: document.querySelector("#cookingCommandPanel"),
   cookingOnlyCommandGroups: document.querySelectorAll(".cooking-only-command"),
+  smithingOnlyCommandGroups: document.querySelectorAll(".smithing-only-command"),
+  toggleSmithingLightButton: document.querySelector("#toggleSmithingLightButton"),
   rotateWoodLeftButton: document.querySelector("#rotateWoodLeftButton"),
   rotateWoodRightButton: document.querySelector("#rotateWoodRightButton"),
   undoBoardButton: document.querySelector("#undoBoardButton"),
@@ -1215,8 +1217,15 @@ function canRearrangeBoard(config = getCurrentCraftConfig()) {
   return component.canRearrangeBoard?.(config, state) === true;
 }
 
+// 盤面履歴 (戻る/進む) を操作できる職人かを判定します。
+// 配置替え可能な調理に加え、光地金一括切替や右クリック編集で履歴を積む鍛冶3職人も対象です。
+function canUseBoardHistory() {
+  return canRearrangeBoard() || isCurrentCraftFamily("smithing");
+}
+
 function syncBoardActionButtons() {
   const canRearrange = state ? canRearrangeBoard() : false;
+  const usesBoardHistory = state ? canUseBoardHistory() : false;
   const canRotateWoodworking = state ? canRotateWoodworkingGrain() : false;
   const isCooking = isCurrentCraftFamily("cooking");
   const isSmithing = isCurrentCraftFamily("smithing");
@@ -1224,7 +1233,7 @@ function syncBoardActionButtons() {
   const selectedIngredient = canRearrange
     ? state.ingredients.find((ingredient) => ingredient.id === selectedBoardIngredientId)
     : null;
-  elements.boardActions.hidden = !canRearrange && !canRotateWoodworking;
+  elements.boardActions.hidden = !canRearrange && !canRotateWoodworking && !isSmithing;
   if (elements.rotateWoodLeftButton) {
     elements.rotateWoodLeftButton.hidden = !canRotateWoodworking;
     elements.rotateWoodLeftButton.disabled = !canRotateWoodworking;
@@ -1239,8 +1248,16 @@ function syncBoardActionButtons() {
   elements.cookingOnlyCommandGroups.forEach((element) => {
     element.hidden = !isCooking;
   });
-  elements.undoBoardButton.disabled = !canRearrange || undoStack.length === 0;
-  elements.redoBoardButton.disabled = !canRearrange || redoStack.length === 0;
+  // 鍛冶専用グループの表示は職人種別 (基本設定) でのみ切り替え、
+  // 光地金特性でない間はボタンを非活性のまま表示領域を維持します。
+  elements.smithingOnlyCommandGroups.forEach((element) => {
+    element.hidden = !isSmithing;
+  });
+  if (elements.toggleSmithingLightButton) {
+    elements.toggleSmithingLightButton.disabled = !isSmithing || state.traitId !== "light";
+  }
+  elements.undoBoardButton.disabled = !usesBoardHistory || undoStack.length === 0;
+  elements.redoBoardButton.disabled = !usesBoardHistory || redoStack.length === 0;
   syncBoardSpecialState();
   syncMiracleGrillButton(canRearrange, selectedIngredient);
   syncCookingEffectButtons();
@@ -1516,6 +1533,28 @@ function formatMiracleGrillResult(targets, result) {
   }
 
   return `${targetLabel}: ミラクルグリル成功 / ${lockLabels.join("・") || "固定"}`;
+}
+
+// 鍛冶の光地金を全マス一括で切り替えます。
+// 全マスが光っている場合は全解除し、それ以外は全マスを光らせます。
+function toggleSmithingLightAll() {
+  if (!isCurrentCraftFamily("smithing") || state.traitId !== "light") {
+    return;
+  }
+
+  // マスが無い場合は変更対象が無いため、無駄な履歴を積まないようにします。
+  if (!Array.isArray(state.ingredients) || state.ingredients.length === 0) {
+    return;
+  }
+
+  const nextGlow = !state.ingredients.every((ingredient) => ingredient.isGlowing === true);
+  pushBoardHistory();
+  state.ingredients.forEach((ingredient) => {
+    ingredient.isGlowing = nextGlow;
+  });
+  renderLayoutBoard();
+  renderAnalysis();
+  saveState();
 }
 
 function clearCookingLight() {
@@ -3187,6 +3226,7 @@ elements.normalHeatButton?.addEventListener("click", () => setCookingHeatMode("n
 elements.strongHeatButton?.addEventListener("click", () => setCookingHeatMode("strong"));
 elements.halfHeatButton?.addEventListener("click", () => setCookingHeatMode("half"));
 elements.clearCookingLightButton?.addEventListener("click", clearCookingLight);
+elements.toggleSmithingLightButton?.addEventListener("click", toggleSmithingLightAll);
 elements.clearCookingEffectButton?.addEventListener("click", () => setCookingEffectMode("none"));
 elements.crossGlowButton?.addEventListener("click", () => setCookingEffectMode("cross-glow"));
 elements.cornerReturnButton?.addEventListener("click", () => setCookingEffectMode("corner-return"));
@@ -3221,7 +3261,7 @@ document.addEventListener("keydown", (event) => {
   }
 
   const usesShortcutModifier = event.ctrlKey || event.metaKey;
-  if (!usesShortcutModifier || !canRearrangeBoard()) {
+  if (!usesShortcutModifier || !canUseBoardHistory()) {
     return;
   }
 
