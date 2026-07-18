@@ -141,6 +141,30 @@ function loadState() {
   });
 }
 
+// 鍛冶3職人 (武器・防具・道具) かどうかを職人IDで判定します。
+function isSmithingCraftId(craftId) {
+  return ["weapon-smithing", "armor-smithing", "tool-smithing"].includes(craftId);
+}
+
+// localStorage 保存のユーザーレシピには旧仕様の「1行1列」などのマス名が残るため、
+// gridCellを持つマスだけを読み順(A/B/C...)へ再計算し、gridCellの無い項目は保存名を維持します。
+function normalizeSmithingRecipeNodeNames(recipe) {
+  if (typeof createDQ10ReadingOrderPositionName !== "function" || !Array.isArray(recipe?.items)) {
+    return recipe;
+  }
+
+  const gridCells = recipe.items
+    .filter((item) => item?.gridCell)
+    .map((item) => item.gridCell);
+
+  return {
+    ...recipe,
+    items: recipe.items.map((item) => (item?.gridCell
+      ? { ...item, name: createDQ10ReadingOrderPositionName(gridCells, item.gridCell.row, item.gridCell.column) }
+      : item)),
+  };
+}
+
 // 鍛冶職人のマス名は占有マスの読み順(A/B/C...)で一意に決まるため、
 // 旧仕様で保存された「1行1列」などの名前を無視し、常に読み順から再計算します。
 function applySmithingReadingOrderNames(ingredients) {
@@ -157,7 +181,7 @@ function applySmithingReadingOrderNames(ingredients) {
 
 function normalizeState(value) {
   const config = getCraftConfig(value.craftType);
-  const isSmithingConfig = ["weapon-smithing", "armor-smithing", "tool-smithing"].includes(config.id);
+  const isSmithingConfig = isSmithingCraftId(config.id);
   const isCookingConfig = getCraftComponent(config.id).craftFamily === "cooking";
   const techniques = config.techniques;
   const recipes = getCraftRecipes(config.id);
@@ -357,7 +381,12 @@ function getAllCraftRecipes(craftId) {
   const userRecipeMap = new Map(userRecipes.map((recipe) => [recipe.id, recipe]));
   const baseRecipes = (window.DQ10CraftRecipes?.[craftId] || [])
     .filter((recipe) => !deletedIds.has(recipe.id) && !userRecipeMap.has(recipe.id));
-  return [...baseRecipes, ...userRecipes];
+  const recipes = [...baseRecipes, ...userRecipes];
+
+  // 鍛冶3職人は保存名に依存せず、レシピ読込時点でマス名を読み順へ採番し直します。
+  return isSmithingCraftId(craftId)
+    ? recipes.map((recipe) => normalizeSmithingRecipeNodeNames(recipe))
+    : recipes;
 }
 
 function getCraftRecipes(craftId) {
