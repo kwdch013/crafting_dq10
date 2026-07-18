@@ -1217,8 +1217,15 @@ function canRearrangeBoard(config = getCurrentCraftConfig()) {
   return component.canRearrangeBoard?.(config, state) === true;
 }
 
+// 盤面履歴 (戻る/進む) を操作できる職人かを判定します。
+// 配置替え可能な調理に加え、光地金一括切替や右クリック編集で履歴を積む鍛冶3職人も対象です。
+function canUseBoardHistory() {
+  return canRearrangeBoard() || isCurrentCraftFamily("smithing");
+}
+
 function syncBoardActionButtons() {
   const canRearrange = state ? canRearrangeBoard() : false;
+  const usesBoardHistory = state ? canUseBoardHistory() : false;
   const canRotateWoodworking = state ? canRotateWoodworkingGrain() : false;
   const isCooking = isCurrentCraftFamily("cooking");
   const isSmithing = isCurrentCraftFamily("smithing");
@@ -1226,7 +1233,7 @@ function syncBoardActionButtons() {
   const selectedIngredient = canRearrange
     ? state.ingredients.find((ingredient) => ingredient.id === selectedBoardIngredientId)
     : null;
-  elements.boardActions.hidden = !canRearrange && !canRotateWoodworking;
+  elements.boardActions.hidden = !canRearrange && !canRotateWoodworking && !isSmithing;
   if (elements.rotateWoodLeftButton) {
     elements.rotateWoodLeftButton.hidden = !canRotateWoodworking;
     elements.rotateWoodLeftButton.disabled = !canRotateWoodworking;
@@ -1249,8 +1256,8 @@ function syncBoardActionButtons() {
   if (elements.toggleSmithingLightButton) {
     elements.toggleSmithingLightButton.disabled = !isSmithing || state.traitId !== "light";
   }
-  elements.undoBoardButton.disabled = !canRearrange || undoStack.length === 0;
-  elements.redoBoardButton.disabled = !canRearrange || redoStack.length === 0;
+  elements.undoBoardButton.disabled = !usesBoardHistory || undoStack.length === 0;
+  elements.redoBoardButton.disabled = !usesBoardHistory || redoStack.length === 0;
   syncBoardSpecialState();
   syncMiracleGrillButton(canRearrange, selectedIngredient);
   syncCookingEffectButtons();
@@ -1532,6 +1539,11 @@ function formatMiracleGrillResult(targets, result) {
 // 全マスが光っている場合は全解除し、それ以外は全マスを光らせます。
 function toggleSmithingLightAll() {
   if (!isCurrentCraftFamily("smithing") || state.traitId !== "light") {
+    return;
+  }
+
+  // マスが無い場合は変更対象が無いため、無駄な履歴を積まないようにします。
+  if (!Array.isArray(state.ingredients) || state.ingredients.length === 0) {
     return;
   }
 
@@ -3249,7 +3261,7 @@ document.addEventListener("keydown", (event) => {
   }
 
   const usesShortcutModifier = event.ctrlKey || event.metaKey;
-  if (!usesShortcutModifier || !canRearrangeBoard()) {
+  if (!usesShortcutModifier || !canUseBoardHistory()) {
     return;
   }
 

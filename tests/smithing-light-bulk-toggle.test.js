@@ -42,6 +42,33 @@ assert.match(
 	"一括切替ボタンのクリックで toggleSmithingLightAll を呼んでください",
 );
 
+// 鍛冶は配置替え不可でも履歴を積むため、戻る/進むを鍛冶でも使えることを確認します。
+assert.match(
+	mainJs,
+	/function canUseBoardHistory/,
+	"盤面履歴を使える職人の判定 (canUseBoardHistory) を実装してください",
+);
+assert.match(
+	syncSource,
+	/boardActions\.hidden = [^;]*isSmithing/s,
+	"鍛冶でもBOARD操作領域 (戻る/進む) を表示してください",
+);
+assert.match(
+	syncSource,
+	/canUseBoardHistory\(\)/,
+	"syncBoardActionButtons で履歴利用可否 (canUseBoardHistory) を参照してください",
+);
+assert.match(
+	syncSource,
+	/undoBoardButton\.disabled = !usesBoardHistory/,
+	"戻るボタンの活性は履歴利用可否で判定してください",
+);
+assert.match(
+	syncSource,
+	/redoBoardButton\.disabled = !usesBoardHistory/,
+	"進むボタンの活性は履歴利用可否で判定してください",
+);
+
 // 一括切替本体を抜き出して動作を検証します。
 const toggleStart = mainJs.indexOf("function toggleSmithingLightAll");
 assert.ok(toggleStart >= 0, "toggleSmithingLightAll を実装してください");
@@ -100,6 +127,15 @@ function runToggle(state, craftFamily = "smithing") {
 	});
 	assert.equal(state.ingredients[0].isGlowing, false);
 	assert.equal(calls.history, 0, "特性が光地金以外では履歴を積まないでください");
+}
+
+{
+	// マスが無い場合は履歴を積みません。
+	const { calls } = runToggle({
+		traitId: "light",
+		ingredients: [],
+	});
+	assert.equal(calls.history, 0, "空の盤面では履歴を積まないでください");
 }
 
 {
