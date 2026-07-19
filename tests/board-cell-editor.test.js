@@ -127,6 +127,15 @@ const mainJs = fs.readFileSync("app/main.js", "utf8");
 		"none",
 	);
 	assert.equal(
+		editor.resolvePointerDownAction({
+			isOpen: true,
+			containsTarget: false,
+			isToggleTarget: true,
+		}),
+		"none",
+		"切替UIの操作では右クリック編集を確定しないでください",
+	);
+	assert.equal(
 		editor.resolvePointerDownAction({ isOpen: false, containsTarget: false }),
 		"none",
 	);
