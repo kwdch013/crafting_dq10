@@ -93,4 +93,48 @@ const localOnly = { id: "user-tool-smithing-2", name: "ローカル限定レシ�
 	);
 }
 
+// 保存直後のセッション内でも編集内容が表示されるよう、
+// API読込済み職人ではメモリ上のAPI由来レシピを同一idで差し替えることを検証します。
+const upsertSource = extractFunction("upsertHydratedCraftRecipe");
+
+assert.match(
+	extractFunction("saveManagedRecipe"),
+	/upsertHydratedCraftRecipe/,
+	"saveManagedRecipe で保存内容をメモリ上のAPI由来レシピへも反映してください",
+);
+
+function runUpsert({ hydratedCraftIds, baseRecipes, recipe }) {
+	const context = {
+		window: { DQ10CraftRecipes: { "tool-smithing": baseRecipes } },
+		apiHydratedCraftIds: new Set(hydratedCraftIds),
+	};
+	vm.createContext(context);
+	vm.runInContext(`${upsertSource}\nupsertHydratedCraftRecipe("tool-smithing", ${JSON.stringify(recipe)});`, context);
+	return context.window.DQ10CraftRecipes["tool-smithing"];
+}
+
+const editedRecipe = { id: "user-tool-smithing-1", name: "マデュライトルアー", items: [{ id: "a" }] };
+
+// API読込済み: 同一idのAPI由来レシピが編集内容へ差し替わります。
+{
+	const baseRecipes = runUpsert({
+		hydratedCraftIds: ["tool-smithing"],
+		baseRecipes: [fixedBase, { id: "base-2", name: "別レシピ" }],
+		recipe: editedRecipe,
+	});
+	const lure = baseRecipes.find((recipe) => recipe.id === "user-tool-smithing-1");
+	assert.equal(lure.items.length, 1, "保存した編集内容でAPI由来レシピを差し替えてください");
+	assert.equal(baseRecipes.length, 2, "同一id以外のAPI由来レシピは維持してください");
+}
+
+// API未読込: メモリ上のレシピは変更しません (localStorage優先のため差し替え不要)。
+{
+	const baseRecipes = runUpsert({
+		hydratedCraftIds: [],
+		baseRecipes: [fixedBase],
+		recipe: editedRecipe,
+	});
+	assert.equal(baseRecipes[0].items.length, 3, "API未読込の職人ではメモリ上のレシピを変更しないでください");
+}
+
 console.log("user-recipe-api-priority.test.js: ok");

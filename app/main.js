@@ -372,6 +372,20 @@ async function deleteRecipeFromApi(craftId, recipeId) {
   }
 }
 
+// API読込済みの職人ではAPI側優先で表示するため、保存直後のセッション内でも
+// 編集内容が見えるよう、メモリ上のAPI由来レシピを同一idで差し替えます。
+function upsertHydratedCraftRecipe(craftId, recipe) {
+  if (!apiHydratedCraftIds.has(craftId)) {
+    return;
+  }
+
+  const baseRecipes = window.DQ10CraftRecipes?.[craftId] || [];
+  window.DQ10CraftRecipes = {
+    ...(window.DQ10CraftRecipes || {}),
+    [craftId]: [...baseRecipes.filter((candidate) => candidate.id !== recipe.id), recipe],
+  };
+}
+
 function getDeletedRecipeIds(craftId) {
   const ids = loadUserRecipeStore().deletedIds?.[craftId];
   return Array.isArray(ids) ? ids : [];
@@ -2967,6 +2981,8 @@ async function saveManagedRecipe(event) {
   ];
   store.deletedIds[config.id] = (store.deletedIds[config.id] || []).filter((id) => id !== recipe.id);
   saveUserRecipeStore(store);
+  // PUT失敗時もこのセッションでは編集内容が最新のため、成否によらず差し替えます。
+  upsertHydratedCraftRecipe(config.id, recipe);
   try {
     await persistRecipeToApi(config.id, recipe);
   } catch (error) {
