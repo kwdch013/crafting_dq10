@@ -82,7 +82,6 @@
       { id: "strong", label: "強い" },
       { id: "strongest", label: "最強" },
       { id: "critical_x2", label: "会心×2" },
-      { id: "regenerate", label: "再生布" },
     ],
   };
 })(window);

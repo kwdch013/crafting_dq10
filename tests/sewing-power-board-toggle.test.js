@@ -76,6 +76,7 @@ const powerStates = context.DQ10SewingDamage.powerStates;
 	const selectedPowers = [];
 	const elements = {
 		sewingPowerButtons: createButtonContainer(),
+		sewingRegenerateClothButton: createButton(),
 	};
 
 	component.renderPowerControls({
@@ -108,12 +109,14 @@ const powerStates = context.DQ10SewingDamage.powerStates;
 		"true",
 		"選択状態を支援技術にも伝えてください",
 	);
-
-	const regenerateButton = elements.sewingPowerButtons.children.find(
-		(button) => button.dataset.sewingPowerId === "regenerate",
+	assert.equal(
+		elements.sewingPowerButtons.children.some((button) => button.dataset.sewingPowerId === "regenerate"),
+		false,
+		"再生布をぬいパワーボタンとして表示しないでください",
 	);
-	regenerateButton.click();
-	assert.deepEqual(selectedPowers, ["regenerate"]);
+	assert.equal(elements.sewingRegenerateClothButton.attributes["aria-pressed"], "false");
+	assert.equal(elements.sewingRegenerateClothButton.classList.contains("active"), false);
+	assert.deepEqual(selectedPowers, []);
 }
 
 {
@@ -179,8 +182,8 @@ const mainJs = fs.readFileSync("app/main.js", "utf8");
 
 assert.match(
 	html,
-	/class="command-group sewing-only-command"[^>]*hidden[\s\S]*id="sewingPowerButtons"/,
-	"BOARD周辺に初期非表示の裁縫専用ぬいパワー領域を用意してください",
+	/class="command-group sewing-only-command"[^>]*hidden[\s\S]*id="sewingPowerButtons"[\s\S]*id="sewingRegenerateClothButton"[^>]*aria-pressed="false"/,
+	"BOARD周辺の裁縫専用領域にぬいパワーと再生布トグルを用意してください",
 );
 assert.match(
 	html,
@@ -191,6 +194,11 @@ assert.match(
 	mainJs,
 	/sewingPowerButtons: document\.querySelector\("#sewingPowerButtons"\)/,
 	"ぬいパワーボタン領域を画面要素として参照してください",
+);
+assert.match(
+	mainJs,
+	/sewingRegenerateClothButton: document\.querySelector\("#sewingRegenerateClothButton"\)/,
+	"再生布トグルを画面要素として参照してください",
 );
 assert.match(
 	mainJs,
@@ -214,8 +222,8 @@ assert.match(
 );
 assert.match(
 	mainJs,
-	/isToggleTarget: Boolean\(elements\.sewingPowerButtons\?\.contains\(event\.target\)\)/,
-	"ぬいパワーボタンのpointerdownを右クリック編集の確定対象から除外してください",
+	/isToggleTarget: Boolean\([\s\S]*elements\.sewingPowerButtons\?\.contains\(event\.target\)[\s\S]*elements\.sewingRegenerateClothButton\?\.contains\(event\.target\)[\s\S]*\)/,
+	"ぬいパワーと再生布トグルのpointerdownを右クリック編集の確定対象から除外してください",
 );
 const refreshAfterHeatChange = mainJs.match(
 	/function refreshAfterHeatChange\(\) \{([\s\S]*?)\n\}/,

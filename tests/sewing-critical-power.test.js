@@ -14,9 +14,25 @@ assert.deepEqual(
 		{ id: "strong", label: "強い" },
 		{ id: "strongest", label: "最強" },
 		{ id: "critical_x2", label: "会心×2" },
-		{ id: "regenerate", label: "再生布" },
 	],
-	"会心×2を最強の後、再生布の前へ表示してください",
+	"ぬいパワーは弱い・普通・強い・最強・会心×2の5種類にしてください",
+);
+
+assert.deepEqual(
+	sewingDamage.distributions.regenerate.regenerate,
+	[
+		{ value: -12, percent: 20 },
+		{ value: -13, percent: 20 },
+		{ value: -14, percent: 20 },
+		{ value: -15, percent: 20 },
+		{ value: -16, percent: 20 },
+	],
+	"再生布をぬいパワーから分離しても回復分布は保持してください",
+);
+assert.deepEqual(
+	sewingDamage.actions.regenerate,
+	{ label: "再生", multiplier: -1 },
+	"再生アクションの定義は保持してください",
 );
 
 assert.equal(

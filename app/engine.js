@@ -369,7 +369,7 @@
 
     if (technique.damageModel === "sewing-power") {
       const sewingDamage = global.DQ10SewingDamage;
-      const power = state.heat || "normal";
+      const power = technique.powerId || state.heat || "normal";
       const distribution = sewingDamage?.getDistribution?.(power, technique.actionId) ||
         sewingDamage?.distributions?.[power]?.[technique.actionId];
       const range = sewingDamage?.getRange(power, technique.actionId);

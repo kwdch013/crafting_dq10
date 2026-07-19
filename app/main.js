@@ -44,6 +44,7 @@ const elements = {
   specialOnlyCommandGroups: document.querySelectorAll(".special-only-command"),
   sewingOnlyCommandGroups: document.querySelectorAll(".sewing-only-command"),
   sewingPowerButtons: document.querySelector("#sewingPowerButtons"),
+  sewingRegenerateClothButton: document.querySelector("#sewingRegenerateClothButton"),
   toggleSmithingLightButton: document.querySelector("#toggleSmithingLightButton"),
   rotateWoodLeftButton: document.querySelector("#rotateWoodLeftButton"),
   rotateWoodRightButton: document.querySelector("#rotateWoodRightButton"),
@@ -191,6 +192,7 @@ function applySmithingReadingOrderNames(ingredients) {
 
 function normalizeState(value) {
   const config = getCraftConfig(value.craftType);
+  const normalizedCraftState = getCraftComponent(config.id).normalizeSavedState?.(value) || value;
   const isSmithingConfig = isSmithingCraftId(config.id);
   const isCookingConfig = getCraftComponent(config.id).craftFamily === "cooking";
   const techniques = config.techniques;
@@ -244,8 +246,8 @@ function normalizeState(value) {
   // 鍛冶職人は保存名に依存せず、常に占有マスの読み順でマス名を採番し直します。
   const normalizedIngredients = isSmithingConfig ? applySmithingReadingOrderNames(ingredients) : ingredients;
   const defaultHeatId = getDefaultHeatId(config);
-  const heat = config.heatStates.some((candidate) => candidate.id === value.heat)
-    ? value.heat
+  const heat = config.heatStates.some((candidate) => candidate.id === normalizedCraftState.heat)
+    ? normalizedCraftState.heat
     : defaultHeatId;
   const focusSelection = normalizeFocusSelection(config, value);
   const recipeTraitId = getRecipeTraitId(config, recipeId);
@@ -264,6 +266,7 @@ function normalizeState(value) {
     toolStars: focusSelection.toolStars,
     focus: calculateFocus(config, focusSelection),
     heat,
+    sewingRegenerateCloth: normalizedCraftState.sewingRegenerateCloth === true,
     targetMode: config.targetMode || "fixed",
     layoutSignature,
     techniques: techniques.map((technique, index) => ({
@@ -1722,6 +1725,18 @@ function changeSewingPowerFromBoard(nextPowerId) {
   refreshAfterHeatChange();
 }
 
+// 再生布の切替はぬいパワーを変えず、開いている右クリック判定と保存状態へ反映します。
+function toggleSewingRegenerateCloth() {
+  const component = getCurrentCraftComponent();
+  if (!isCurrentCraftFamily("sewing") || !component.toggleRegenerateCloth) {
+    return;
+  }
+
+  component.toggleRegenerateCloth({ state, elements });
+  renderOpenBoardCellJudgements();
+  saveState();
+}
+
 // 温度変更後に依存表示をまとめて更新します。
 function refreshAfterHeatChange() {
   renderSmithingTemperatureSelect();
@@ -2142,19 +2157,7 @@ function getCellJudgementEntries(ingredient) {
   }
 
   if (craftFamily === "sewing") {
-    const sewingDamage = window.DQ10SewingDamage || {};
-    return Object.entries(sewingDamage.actions || {})
-      .filter(([actionId]) => sewingDamage.getRange?.(state.heat || "normal", actionId))
-      .sort(([, a], [, b]) => Math.abs(a.multiplier ?? 0) - Math.abs(b.multiplier ?? 0))
-      .map(([actionId, action]) => ({
-        id: actionId,
-        label: action.label,
-        technique: {
-          damageModel: "sewing-power",
-          actionId,
-          criticalMultiplier: sewingDamage.criticalMultiplier || 2,
-        },
-      }));
+    return getCurrentCraftComponent().getCellJudgementEntries?.(state) || [];
   }
 
   return [];
@@ -3307,6 +3310,7 @@ elements.miracleGrillButton?.addEventListener("click", applyMiracleGrillToSelect
 elements.normalHeatButton?.addEventListener("click", () => setCookingHeatMode("normal"));
 elements.strongHeatButton?.addEventListener("click", () => setCookingHeatMode("strong"));
 elements.halfHeatButton?.addEventListener("click", () => setCookingHeatMode("half"));
+elements.sewingRegenerateClothButton?.addEventListener("click", toggleSewingRegenerateCloth);
 elements.clearCookingLightButton?.addEventListener("click", clearCookingLight);
 elements.toggleSmithingLightButton?.addEventListener("click", toggleSmithingLightAll);
 elements.clearCookingEffectButton?.addEventListener("click", () => setCookingEffectMode("none"));
@@ -3330,7 +3334,10 @@ document.addEventListener("pointerdown", (event) => {
   const action = DQ10BoardCellEditor.resolvePointerDownAction({
     isOpen: Boolean(boardCellEditorElement && !boardCellEditorElement.hidden),
     containsTarget: Boolean(boardCellEditorElement?.contains(event.target)),
-    isToggleTarget: Boolean(elements.sewingPowerButtons?.contains(event.target)),
+    isToggleTarget: Boolean(
+      elements.sewingPowerButtons?.contains(event.target) ||
+      elements.sewingRegenerateClothButton?.contains(event.target)
+    ),
   });
 
   if (action === "apply") {
