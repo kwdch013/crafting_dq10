@@ -370,7 +370,8 @@
     if (technique.damageModel === "sewing-power") {
       const sewingDamage = global.DQ10SewingDamage;
       const power = state.heat || "normal";
-      const distribution = sewingDamage?.distributions?.[power]?.[technique.actionId];
+      const distribution = sewingDamage?.getDistribution?.(power, technique.actionId) ||
+        sewingDamage?.distributions?.[power]?.[technique.actionId];
       const range = sewingDamage?.getRange(power, technique.actionId);
 
       if (!range) {
@@ -378,10 +379,13 @@
       }
 
       const criticalMultiplier = toNumber(technique.criticalMultiplier, sewingDamage.criticalMultiplier);
+      const criticalRateBoost = power === "critical_x2";
 
       return {
         ...technique,
         distribution,
+        criticalWeight: toNumber(technique.criticalWeight, 1) * (criticalRateBoost ? 2 : 1),
+        criticalRateBoost,
         normalMin: range[0],
         normalMax: range[1],
         criticalMin: Math.ceil(range[0] * criticalMultiplier),
