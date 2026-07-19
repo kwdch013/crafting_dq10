@@ -17,7 +17,8 @@ vm.runInContext(`
 	${boardTargetSummary}
 	const item = { target: 151, successMin: 148, successMax: 154 };
 	results.randomInRange = formatBoardTargetSummary(item, "random-in-range");
-	results.fixedTarget = formatBoardTargetSummary(item, undefined);
+	// 実際の state.targetMode は config.targetMode || "fixed" のため "fixed" が渡ります。
+	results.fixedTarget = formatBoardTargetSummary(item, "fixed");
 `, context);
 
 assert.equal(
