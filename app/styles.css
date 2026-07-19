@@ -866,6 +866,25 @@ select:focus {
   gap: 8px;
 }
 
+.sewing-next-power-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.sewing-next-power-control select {
+  min-height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  padding: 0 8px;
+  color: var(--ink);
+  font: inherit;
+}
+
 .command-group > span {
   min-width: 44px;
   color: var(--muted);
@@ -1236,6 +1255,13 @@ select:focus {
   font-family: ui-monospace, "SFMono-Regular", "Consolas", monospace;
   white-space: pre;
   overflow-x: auto;
+}
+
+.editor-next-damage-range {
+  display: block;
+  min-height: 1.3em;
+  color: var(--muted) !important;
+  font-weight: 800;
 }
 
 .board-cell-values span {

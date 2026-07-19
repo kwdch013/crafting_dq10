@@ -3,6 +3,7 @@
   function createSewingComponent() {
     return {
       craftFamily: "sewing",
+      advancePower,
       applyHeatChange,
       getCellJudgementEntries,
       // 裁縫BOARDでは右クリック編集で現在値と威力別判定を確認できます。
@@ -21,6 +22,7 @@
   // ぬいパワー定義を単一の情報源として、BOARD用の切替ボタンを描画します。
   function renderPowerControls({ state, elements, onPowerChange }) {
     syncRegenerateClothButton(state, elements);
+    renderNextPowerSelect(state, elements);
     const container = elements.sewingPowerButtons;
     if (!container) {
       return;
@@ -42,18 +44,57 @@
     });
   }
 
+  // 次パワーは現在パワーと同じ定義を使い、未確定だけを末尾へ追加します。
+  function renderNextPowerSelect(state, elements) {
+    const select = elements.sewingNextPowerSelect;
+    if (!select) {
+      return;
+    }
+
+    select.replaceChildren();
+    [...(global.DQ10SewingDamage?.powerStates || []), { id: "unknown", label: "?" }]
+      .forEach((powerState) => {
+        const option = global.document.createElement("option");
+        option.value = powerState.id;
+        option.textContent = powerState.label;
+        select.append(option);
+      });
+    select.value = state.sewingNextHeat;
+  }
+
   // BOARDで選んだぬいパワーを計算状態と基本設定へ同期します。
   function applyHeatChange({ state, elements }, nextPowerId) {
     state.heat = nextPowerId;
     elements.heatInput.value = nextPowerId;
   }
 
+  // 未確定のターンはゲーム上のパワーを確定できないため、現在状態を維持します。
+  function advancePower({ state, elements }) {
+    const isKnownPower = (global.DQ10SewingDamage?.powerStates || [])
+      .some(({ id }) => id === state.sewingNextHeat);
+    if (!isKnownPower) {
+      return false;
+    }
+
+    applyHeatChange({ state, elements }, state.sewingNextHeat);
+    state.sewingNextHeat = "unknown";
+    if (elements.sewingNextPowerSelect) {
+      elements.sewingNextPowerSelect.value = "unknown";
+    }
+    return true;
+  }
+
   // 旧版でぬいパワーとして保存された再生布を、独立した布状態へ移行します。
   function normalizeSavedState(value = {}) {
     const isLegacyRegenerate = value.heat === "regenerate";
+    const nextPowerIds = (global.DQ10SewingDamage?.powerStates || []).map(({ id }) => id);
+    const sewingNextHeat = [...nextPowerIds, "unknown"].includes(value.sewingNextHeat)
+      ? value.sewingNextHeat
+      : "unknown";
     return {
       ...value,
       heat: isLegacyRegenerate ? "normal" : value.heat,
+      sewingNextHeat,
       sewingRegenerateCloth: isLegacyRegenerate || value.sewingRegenerateCloth === true,
     };
   }
@@ -84,6 +125,9 @@
       .map(([actionId, action]) => ({
         id: actionId,
         label: action.label,
+        nextNormalRange: state.sewingNextHeat === "unknown"
+          ? null
+          : sewingDamage.getRange?.(state.sewingNextHeat, actionId) || null,
         technique: {
           damageModel: "sewing-power",
           actionId,
