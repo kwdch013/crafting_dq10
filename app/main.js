@@ -107,6 +107,10 @@ const specialChargeLabels = {
   active: "使用済み",
 };
 
+// API読込に成功した職人IDの記録。レシピ保存時は persistRecipeToApi でAPI側へも反映されるため、
+// 記録済みの職人では同一idのlocalStorage版 (旧データの可能性あり) よりAPI側を優先します。
+const apiHydratedCraftIds = new Set();
+
 async function hydrateRecipesFromApi() {
   try {
     const response = await fetch(`${apiBaseUrl}/api/recipes`, { cache: "no-store" });
@@ -121,6 +125,7 @@ async function hydrateRecipesFromApi() {
         ...(window.DQ10CraftRecipes || {}),
         ...payload.crafts,
       };
+      Object.keys(payload.crafts).forEach((craftId) => apiHydratedCraftIds.add(craftId));
     }
   } catch {
     // API停止時はローカルのレシピファイルを引き続き使用します。
@@ -367,6 +372,20 @@ async function deleteRecipeFromApi(craftId, recipeId) {
   }
 }
 
+// API読込済みの職人ではAPI側優先で表示するため、保存直後のセッション内でも
+// 編集内容が見えるよう、メモリ上のAPI由来レシピを同一idで差し替えます。
+function upsertHydratedCraftRecipe(craftId, recipe) {
+  if (!apiHydratedCraftIds.has(craftId)) {
+    return;
+  }
+
+  const baseRecipes = window.DQ10CraftRecipes?.[craftId] || [];
+  window.DQ10CraftRecipes = {
+    ...(window.DQ10CraftRecipes || {}),
+    [craftId]: [...baseRecipes.filter((candidate) => candidate.id !== recipe.id), recipe],
+  };
+}
+
 function getDeletedRecipeIds(craftId) {
   const ids = loadUserRecipeStore().deletedIds?.[craftId];
   return Array.isArray(ids) ? ids : [];
@@ -379,10 +398,15 @@ function getUserRecipes(craftId) {
 
 function getAllCraftRecipes(craftId) {
   const deletedIds = new Set(getDeletedRecipeIds(craftId));
-  const userRecipes = getUserRecipes(craftId).filter((recipe) => !deletedIds.has(recipe.id));
+  const baseSource = (window.DQ10CraftRecipes?.[craftId] || [])
+    .filter((recipe) => !deletedIds.has(recipe.id));
+  // API読込成功済みの職人ではAPI側が最新のため、同一idのlocalStorage版を採用しません。
+  const preferApiRecipes = apiHydratedCraftIds.has(craftId);
+  const baseRecipeIds = new Set(baseSource.map((recipe) => recipe.id));
+  const userRecipes = getUserRecipes(craftId).filter((recipe) =>
+    !deletedIds.has(recipe.id) && !(preferApiRecipes && baseRecipeIds.has(recipe.id)));
   const userRecipeMap = new Map(userRecipes.map((recipe) => [recipe.id, recipe]));
-  const baseRecipes = (window.DQ10CraftRecipes?.[craftId] || [])
-    .filter((recipe) => !deletedIds.has(recipe.id) && !userRecipeMap.has(recipe.id));
+  const baseRecipes = baseSource.filter((recipe) => !userRecipeMap.has(recipe.id));
   const recipes = [...baseRecipes, ...userRecipes];
 
   // 鍛冶3職人は保存名に依存せず、レシピ読込時点でマス名を読み順へ採番し直します。
@@ -2957,6 +2981,8 @@ async function saveManagedRecipe(event) {
   ];
   store.deletedIds[config.id] = (store.deletedIds[config.id] || []).filter((id) => id !== recipe.id);
   saveUserRecipeStore(store);
+  // PUT失敗時もこのセッションでは編集内容が最新のため、成否によらず差し替えます。
+  upsertHydratedCraftRecipe(config.id, recipe);
   try {
     await persistRecipeToApi(config.id, recipe);
   } catch (error) {
