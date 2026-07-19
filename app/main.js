@@ -1271,9 +1271,9 @@ function canRearrangeBoard(config = getCurrentCraftConfig()) {
 }
 
 // 盤面履歴 (戻る/進む) を操作できる職人かを判定します。
-// 配置替え可能な調理に加え、光地金一括切替や右クリック編集で履歴を積む鍛冶3職人も対象です。
+// 配置替え可能な調理に加え、盤面編集で履歴を積む鍛冶3職人と木工も対象です。
 function canUseBoardHistory() {
-  return canRearrangeBoard() || isCurrentCraftFamily("smithing");
+  return canRearrangeBoard() || isCurrentCraftFamily("smithing") || isCurrentCraftFamily("woodworking");
 }
 
 function syncBoardActionButtons() {
@@ -3385,9 +3385,14 @@ document.addEventListener("pointerdown", (event) => {
     applyBoardCellEditor(boardCellEditorElement);
   }
 });
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") {
-    closeBoardCellEditor();
+// テキスト編集中のブラウザ標準 Undo/Redo を盤面操作で横取りしないために判定します。
+function isBoardHistoryShortcutTarget(target) {
+  const tagName = String(target?.tagName || "").toLowerCase();
+  return tagName === "input" || tagName === "textarea" || target?.isContentEditable === true;
+}
+
+function handleBoardHistoryShortcut(event) {
+  if (isBoardHistoryShortcutTarget(event.target)) {
     return;
   }
 
@@ -3413,6 +3418,15 @@ document.addEventListener("keydown", (event) => {
     event.preventDefault();
     redoBoardAction();
   }
+}
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    closeBoardCellEditor();
+    return;
+  }
+
+  handleBoardHistoryShortcut(event);
 });
 
 async function initialize() {
