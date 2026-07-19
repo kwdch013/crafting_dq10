@@ -860,6 +860,12 @@ select:focus {
   padding: 10px;
 }
 
+.sewing-power-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .command-group > span {
   min-width: 44px;
   color: var(--muted);

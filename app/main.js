@@ -41,6 +41,9 @@ const elements = {
   cookingCommandPanel: document.querySelector("#cookingCommandPanel"),
   cookingOnlyCommandGroups: document.querySelectorAll(".cooking-only-command"),
   smithingOnlyCommandGroups: document.querySelectorAll(".smithing-only-command"),
+  specialOnlyCommandGroups: document.querySelectorAll(".special-only-command"),
+  sewingOnlyCommandGroups: document.querySelectorAll(".sewing-only-command"),
+  sewingPowerButtons: document.querySelector("#sewingPowerButtons"),
   toggleSmithingLightButton: document.querySelector("#toggleSmithingLightButton"),
   rotateWoodLeftButton: document.querySelector("#rotateWoodLeftButton"),
   rotateWoodRightButton: document.querySelector("#rotateWoodRightButton"),
@@ -733,6 +736,7 @@ function render() {
   renderFocusOptions();
   renderHeatOptions();
   renderSmithingTemperatureSelect();
+  renderSewingPowerControls();
   renderTechniqueEditor();
   renderSmithingDamageReference();
   renderCraftReference();
@@ -954,6 +958,25 @@ function renderSmithingTemperatureSelect() {
     config: getCurrentCraftConfig(),
     state,
     elements,
+  });
+}
+
+// 選択中の裁縫コンポーネントへBOARD用ぬいパワーボタンの描画を委譲します。
+function renderSewingPowerControls() {
+  if (!elements.sewingPowerButtons) {
+    return;
+  }
+
+  elements.sewingPowerButtons.replaceChildren();
+  const component = getCurrentCraftComponent();
+  if (!component.renderPowerControls) {
+    return;
+  }
+
+  component.renderPowerControls({
+    state,
+    elements,
+    onPowerChange: changeSewingPowerFromBoard,
   });
 }
 
@@ -1253,7 +1276,9 @@ function syncBoardActionButtons() {
   const canRotateWoodworking = state ? canRotateWoodworkingGrain() : false;
   const isCooking = isCurrentCraftFamily("cooking");
   const isSmithing = isCurrentCraftFamily("smithing");
-  const showsCommandPanel = isCooking || isSmithing;
+  const isSewing = isCurrentCraftFamily("sewing");
+  const supportsSpecial = isCooking || isSmithing;
+  const showsCommandPanel = supportsSpecial || isSewing;
   const selectedIngredient = canRearrange
     ? state.ingredients.find((ingredient) => ingredient.id === selectedBoardIngredientId)
     : null;
@@ -1269,6 +1294,9 @@ function syncBoardActionButtons() {
   if (elements.cookingCommandPanel) {
     elements.cookingCommandPanel.hidden = !showsCommandPanel;
   }
+  elements.specialOnlyCommandGroups.forEach((element) => {
+    element.hidden = !supportsSpecial;
+  });
   elements.cookingOnlyCommandGroups.forEach((element) => {
     element.hidden = !isCooking;
   });
@@ -1276,6 +1304,9 @@ function syncBoardActionButtons() {
   // 光地金特性でない間はボタンを非活性のまま表示領域を維持します。
   elements.smithingOnlyCommandGroups.forEach((element) => {
     element.hidden = !isSmithing;
+  });
+  elements.sewingOnlyCommandGroups.forEach((element) => {
+    element.hidden = !isSewing;
   });
   if (elements.toggleSmithingLightButton) {
     elements.toggleSmithingLightButton.disabled = !isSmithing || state.traitId !== "light";
@@ -1681,14 +1712,26 @@ function changeSmithingHeatFromBoard() {
   refreshAfterHeatChange();
 }
 
+// BOARDで選んだぬいパワーを裁縫の状態へ反映します。
+function changeSewingPowerFromBoard(nextPowerId) {
+  if (!isCurrentCraftFamily("sewing")) {
+    return;
+  }
+
+  applySmithingHeatChange(nextPowerId);
+  refreshAfterHeatChange();
+}
+
 // 温度変更後に依存表示をまとめて更新します。
 function refreshAfterHeatChange() {
   renderSmithingTemperatureSelect();
+  renderSewingPowerControls();
   renderTechniqueEditor();
   renderSmithingDamageReference();
   renderLayoutBoard();
   renderCraftReference();
   renderAnalysis();
+  renderOpenBoardCellJudgements();
   syncBoardActionButtons();
   saveState();
 }
@@ -2176,6 +2219,13 @@ function renderCraftCellJudgements(editor) {
     `;
     rows.append(row);
   });
+}
+
+// ぬいパワー変更中も右クリック判定を閉じず、現在のパワーで再計算します。
+function renderOpenBoardCellJudgements() {
+  if (boardCellEditorElement && !boardCellEditorElement.hidden) {
+    renderCraftCellJudgements(boardCellEditorElement);
+  }
 }
 
 // 木工・裁縫の特技別ダメージ分布を、値ごとの発生率としてバー付きで縦に整形します。
