@@ -51,7 +51,16 @@
 			: "none";
 	}
 
+	function formatJudgementRange(entry, analysis) {
+		if (entry?.kind === "recovery") {
+			return `回復量 ${analysis.normalMax}〜${analysis.normalMin}`;
+		}
+
+		return `${analysis.normalMin}-${analysis.normalMax} / 会心 ${analysis.criticalMin}-${analysis.criticalMax}`;
+	}
+
 	global.DQ10BoardCellEditor = {
+		formatJudgementRange,
 		isCurrentInSuccessRange,
 		normalizeEditValue,
 		resolvePointerDownAction,

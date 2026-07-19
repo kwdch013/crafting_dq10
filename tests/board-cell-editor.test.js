@@ -142,6 +142,25 @@ const sewingComponentJs = fs.readFileSync("app/crafts/sewing/component.js", "utf
 	);
 }
 
+{
+	assert.equal(
+		editor.formatJudgementRange(
+			{ kind: "recovery" },
+			{ normalMin: -16, normalMax: -12, criticalMin: -16, criticalMax: -12 },
+		),
+		"回復量 -12〜-16",
+		"再生行は回復量として表示し、会心欄を含めないでください",
+	);
+	assert.equal(
+		editor.formatJudgementRange(
+			{},
+			{ normalMin: 12, normalMax: 16, criticalMin: 24, criticalMax: 32 },
+		),
+		"12-16 / 会心 24-32",
+		"通常特技行のダメージ範囲表示は変更しないでください",
+	);
+}
+
 assert.match(mainJs, /editor-damage-judgements/, "右クリック編集に職人別ダメージ判定欄を追加してください");
 assert.match(mainJs, /function renderCraftCellJudgements\(editor\)/, "木工・裁縫を含む職人別ダメージ判定を描画してください");
 assert.match(mainJs, /function getCellJudgementEntries\(ingredient\)/, "職人別の威力別ダメージ候補を取得してください");

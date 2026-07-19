@@ -2215,9 +2215,12 @@ function renderCraftCellJudgements(editor) {
     );
 
     row.classList.add(`status-${analysis.status}`);
+    const judgementRange = entry.kind === "recovery"
+      ? DQ10BoardCellEditor.formatJudgementRange(entry, analysis)
+      : `${analysis.normalMin}-${analysis.normalMax} / 会心 ${analysis.criticalMin}-${analysis.criticalMax}`;
     row.innerHTML = `
       <strong>${escapeHtml(entry.label)}</strong>
-      <span class="numeric">${analysis.normalMin}-${analysis.normalMax} / 会心 ${analysis.criticalMin}-${analysis.criticalMax}</span>
+      <span class="numeric">${judgementRange}</span>
       <small>${escapeHtml([analysis.statusLabel, formatDamageDistribution(resolvedTechnique.distribution, { targetValue: analysis.targetDiff })].filter(Boolean).join("\n"))}</small>
     `;
     rows.append(row);

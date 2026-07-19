@@ -95,6 +95,7 @@
       entries.push({
         id: "regenerate",
         label: sewingDamage.actions.regenerate.label,
+        kind: "recovery",
         technique: {
           damageModel: "sewing-power",
           powerId: "regenerate",

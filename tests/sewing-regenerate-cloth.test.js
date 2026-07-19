@@ -92,6 +92,7 @@ const sewingDamage = context.DQ10SewingDamage;
 		{
 			id: "regenerate",
 			label: "再生",
+			kind: "recovery",
 			technique: {
 				damageModel: "sewing-power",
 				powerId: "regenerate",
