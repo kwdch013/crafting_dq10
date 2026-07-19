@@ -504,3 +504,7 @@ localStorage 保存のユーザーレシピに残る旧仕様の行列名を、�
 上下左右・半減の候補値を出典どおりへ修正し、cooking.md の会心時確定・偽会心の境界記述と数値例を実装へ整合させます。URL: https://github.com/kwdch013/crafting_dq10/issues/146
 ### #147 調理職人: 要確認 光マス強火の候補値56は実測では54の可能性
 光マス強火の候補値56が導出規則から外れるため、ゲーム内実測または公式ガイドブックでの確認を追跡します。URL: https://github.com/kwdch013/crafting_dq10/issues/147
+### #154 共通: ユーザーレシピがAPI修正後もブラウザ保存の旧版で表示される
+API読込に成功した職人では同一idのレシピをAPI側優先で解決し、localStorage の旧版 (マデュライトルアーの削除済みDマス等) が表示され続ける問題を解消します。保存直後はメモリ上のAPI由来レシピも差し替えます。URL: https://github.com/kwdch013/crafting_dq10/issues/154
+### #155 共通: 鍛冶職人と調理職人のBOARDノードに基準範囲を表示する
+基準値が範囲から抽選される職人 (鍛冶3職人・調理) のBOARDノードで、基準値表示をANALYSISと同じ「基準幅 下限 - 上限」表記へ変更します。木工・裁縫など固定基準値職人は従来どおり基準値のみ表示します。URL: https://github.com/kwdch013/crafting_dq10/issues/155
