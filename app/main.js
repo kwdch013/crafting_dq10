@@ -44,6 +44,8 @@ const elements = {
   specialOnlyCommandGroups: document.querySelectorAll(".special-only-command"),
   sewingOnlyCommandGroups: document.querySelectorAll(".sewing-only-command"),
   sewingPowerButtons: document.querySelector("#sewingPowerButtons"),
+  sewingNextPowerSelect: document.querySelector("#sewingNextPowerSelect"),
+  sewingAdvancePowerButton: document.querySelector("#sewingAdvancePowerButton"),
   sewingRegenerateClothButton: document.querySelector("#sewingRegenerateClothButton"),
   toggleSmithingLightButton: document.querySelector("#toggleSmithingLightButton"),
   rotateWoodLeftButton: document.querySelector("#rotateWoodLeftButton"),
@@ -266,6 +268,7 @@ function normalizeState(value) {
     toolStars: focusSelection.toolStars,
     focus: calculateFocus(config, focusSelection),
     heat,
+    sewingNextHeat: normalizedCraftState.sewingNextHeat,
     sewingRegenerateCloth: normalizedCraftState.sewingRegenerateCloth === true,
     targetMode: config.targetMode || "fixed",
     layoutSignature,
@@ -1725,6 +1728,30 @@ function changeSewingPowerFromBoard(nextPowerId) {
   refreshAfterHeatChange();
 }
 
+// 次パワー変更は現在の計算結果を変えず、右クリック判定の次ターン表示だけへ反映します。
+function changeSewingNextPowerFromBoard() {
+  if (!isCurrentCraftFamily("sewing") || !elements.sewingNextPowerSelect) {
+    return;
+  }
+
+  state.sewingNextHeat = elements.sewingNextPowerSelect.value;
+  renderOpenBoardCellJudgements();
+  saveState();
+}
+
+// 確定済みの次パワーだけを現在パワーへ繰り上げ、依存表示をまとめて更新します。
+function advanceSewingPower() {
+  const component = getCurrentCraftComponent();
+  if (!isCurrentCraftFamily("sewing") || !component.advancePower) {
+    return;
+  }
+
+  if (!component.advancePower({ state, elements })) {
+    return;
+  }
+  refreshAfterHeatChange();
+}
+
 // 再生布の切替はぬいパワーを変えず、開いている右クリック判定と保存状態へ反映します。
 function toggleSewingRegenerateCloth() {
   const component = getCurrentCraftComponent();
@@ -2218,9 +2245,16 @@ function renderCraftCellJudgements(editor) {
     const judgementRange = entry.kind === "recovery"
       ? DQ10BoardCellEditor.formatJudgementRange(entry, analysis)
       : `${analysis.normalMin}-${analysis.normalMax} / 会心 ${analysis.criticalMin}-${analysis.criticalMax}`;
+    const hasNextRange = Object.hasOwn(entry, "nextNormalRange");
+    const nextRangeLabel = entry.nextNormalRange
+      ? `${entry.nextNormalRange[0]}-${entry.nextNormalRange[1]}`
+      : "未確定";
+    const nextRange = hasNextRange
+      ? `<span class="editor-next-damage-range">次 ${nextRangeLabel}</span>`
+      : "";
     row.innerHTML = `
       <strong>${escapeHtml(entry.label)}</strong>
-      <span class="numeric">${judgementRange}</span>
+      <span class="numeric">${judgementRange}${nextRange}</span>
       <small>${escapeHtml([analysis.statusLabel, formatDamageDistribution(resolvedTechnique.distribution, { targetValue: analysis.targetDiff })].filter(Boolean).join("\n"))}</small>
     `;
     rows.append(row);
@@ -3313,6 +3347,8 @@ elements.miracleGrillButton?.addEventListener("click", applyMiracleGrillToSelect
 elements.normalHeatButton?.addEventListener("click", () => setCookingHeatMode("normal"));
 elements.strongHeatButton?.addEventListener("click", () => setCookingHeatMode("strong"));
 elements.halfHeatButton?.addEventListener("click", () => setCookingHeatMode("half"));
+elements.sewingNextPowerSelect?.addEventListener("change", changeSewingNextPowerFromBoard);
+elements.sewingAdvancePowerButton?.addEventListener("click", advanceSewingPower);
 elements.sewingRegenerateClothButton?.addEventListener("click", toggleSewingRegenerateCloth);
 elements.clearCookingLightButton?.addEventListener("click", clearCookingLight);
 elements.toggleSmithingLightButton?.addEventListener("click", toggleSmithingLightAll);
@@ -3339,6 +3375,8 @@ document.addEventListener("pointerdown", (event) => {
     containsTarget: Boolean(boardCellEditorElement?.contains(event.target)),
     isToggleTarget: Boolean(
       elements.sewingPowerButtons?.contains(event.target) ||
+      elements.sewingNextPowerSelect?.contains(event.target) ||
+      elements.sewingAdvancePowerButton?.contains(event.target) ||
       elements.sewingRegenerateClothButton?.contains(event.target)
     ),
   });
