@@ -1698,7 +1698,7 @@ function adjustSmithingHeat(delta) {
     return;
   }
 
-  applySmithingHeatChange(nextHeat);
+  applyHeatStateChange(nextHeat);
   refreshAfterHeatChange();
 }
 
@@ -1708,7 +1708,7 @@ function changeSmithingHeatFromBoard() {
     return;
   }
 
-  applySmithingHeatChange(elements.smithingTemperatureSelect.value);
+  applyHeatStateChange(elements.smithingTemperatureSelect.value);
   refreshAfterHeatChange();
 }
 
@@ -1718,7 +1718,7 @@ function changeSewingPowerFromBoard(nextPowerId) {
     return;
   }
 
-  applySmithingHeatChange(nextPowerId);
+  applyHeatStateChange(nextPowerId);
   refreshAfterHeatChange();
 }
 
@@ -1736,15 +1736,15 @@ function refreshAfterHeatChange() {
   saveState();
 }
 
-// 鍛冶の温度変更時に、温度表示と判定表示を同期します。
-function applySmithingHeatChange(nextHeat) {
+// 職人別の温度・ぬいパワー変更を計算状態と基本設定へ同期します。
+function applyHeatStateChange(nextStateId) {
   const component = getCurrentCraftComponent();
   if (component.applyHeatChange) {
-    component.applyHeatChange({ state, elements }, nextHeat);
+    component.applyHeatChange({ state, elements }, nextStateId);
     return;
   }
 
-  state.heat = nextHeat;
+  state.heat = nextStateId;
   elements.heatInput.value = state.heat;
 }
 
@@ -3292,7 +3292,7 @@ elements.levelSelect.addEventListener("change", updateFocusFromSelection);
 elements.toolSelect.addEventListener("change", updateFocusFromSelection);
 elements.toolStarsSelect.addEventListener("change", updateFocusFromSelection);
 elements.heatInput.addEventListener("change", () => {
-  applySmithingHeatChange(elements.heatInput.value);
+  applyHeatStateChange(elements.heatInput.value);
   refreshAfterHeatChange();
 });
 elements.undoBoardButton.addEventListener("click", undoBoardAction);
@@ -3330,6 +3330,7 @@ document.addEventListener("pointerdown", (event) => {
   const action = DQ10BoardCellEditor.resolvePointerDownAction({
     isOpen: Boolean(boardCellEditorElement && !boardCellEditorElement.hidden),
     containsTarget: Boolean(boardCellEditorElement?.contains(event.target)),
+    isToggleTarget: Boolean(elements.sewingPowerButtons?.contains(event.target)),
   });
 
   if (action === "apply") {

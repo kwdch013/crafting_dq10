@@ -38,7 +38,7 @@ assert.doesNotMatch(mainJs, /function renderSmithingTechniqueReference\(\)/, "�
 assert.match(mainJs, /function renderSmithingCellJudgements\(editor\)/, "鍛冶セル右クリック編集に倍率別判定を表示してください");
 assert.match(smithingComponentJs, /function getSmithingDamagePowerEntries\(\)/, "鍛冶ダメージ表は倍率順を鍛冶コンポーネントで整列してください");
 assert.match(mainJs, /function syncJudgementLegend\(\)/, "固定凡例は職人別に表示制御してください");
-assert.match(mainJs, /function applySmithingHeatChange\(nextHeat\)[\s\S]*applyHeatChange/, "鍛冶温度変更時に職人コンポーネントへ委譲してください");
+assert.match(mainJs, /function applyHeatStateChange\(nextStateId\)[\s\S]*applyHeatChange/, "温度・ぬいパワー変更時に職人コンポーネントへ委譲してください");
 assert.match(mainJs, /smithingTemperatureSelect: document\.querySelector\("#smithingTemperatureSelect"\)/);
 assert.match(smithingComponentJs, /function renderTemperatureSelect\(/, "BOARD内の温度プルダウンは鍛冶コンポーネントで描画してください");
 assert.match(mainJs, /getDefaultHeatId\(config\)/, "初期温度は職人設定の既定値を優先してください");

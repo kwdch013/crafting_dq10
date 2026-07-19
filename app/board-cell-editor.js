@@ -44,8 +44,11 @@
 		};
 	}
 
-	function resolvePointerDownAction({ isOpen, containsTarget }) {
-		return isOpen === true && containsTarget !== true ? "apply" : "none";
+	// 切替UIの操作中は入力値を保ったまま再描画できるよう、編集確定の対象外にします。
+	function resolvePointerDownAction({ isOpen, containsTarget, isToggleTarget }) {
+		return isOpen === true && containsTarget !== true && isToggleTarget !== true
+			? "apply"
+			: "none";
 	}
 
 	global.DQ10BoardCellEditor = {
