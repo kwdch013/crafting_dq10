@@ -1754,7 +1754,13 @@ function formatTargetSummary(item, targetMode) {
   return `基準 ${item.target} / ${item.successMin} - ${item.successMax}`;
 }
 
-function formatBoardTargetSummary(item) {
+// BOARDノードの基準表示。基準値が範囲から抽選される職人 (鍛冶3職人・調理) では
+// 単一の基準値表示が誤解を招くため、ANALYSISと同じ基準幅表記にします。
+function formatBoardTargetSummary(item, targetMode) {
+  if (targetMode === "random-in-range") {
+    return `基準幅 ${item.successMin} - ${item.successMax}`;
+  }
+
   return `基準 ${item.target}`;
 }
 
