@@ -4,9 +4,12 @@
     return {
       craftFamily: "sewing",
       applyHeatChange,
+      getCellJudgementEntries,
       // 裁縫BOARDでは右クリック編集で現在値と威力別判定を確認できます。
       isBoardCellEditable,
+      normalizeSavedState,
       renderPowerControls,
+      toggleRegenerateCloth,
     };
   }
 
@@ -17,6 +20,7 @@
 
   // ぬいパワー定義を単一の情報源として、BOARD用の切替ボタンを描画します。
   function renderPowerControls({ state, elements, onPowerChange }) {
+    syncRegenerateClothButton(state, elements);
     const container = elements.sewingPowerButtons;
     if (!container) {
       return;
@@ -42,6 +46,66 @@
   function applyHeatChange({ state, elements }, nextPowerId) {
     state.heat = nextPowerId;
     elements.heatInput.value = nextPowerId;
+  }
+
+  // 旧版でぬいパワーとして保存された再生布を、独立した布状態へ移行します。
+  function normalizeSavedState(value = {}) {
+    const isLegacyRegenerate = value.heat === "regenerate";
+    return {
+      ...value,
+      heat: isLegacyRegenerate ? "normal" : value.heat,
+      sewingRegenerateCloth: isLegacyRegenerate || value.sewingRegenerateCloth === true,
+    };
+  }
+
+  // 再生布はぬいパワーと独立しているため、専用ボタンだけで状態を切り替えます。
+  function toggleRegenerateCloth({ state, elements }) {
+    state.sewingRegenerateCloth = state.sewingRegenerateCloth !== true;
+    syncRegenerateClothButton(state, elements);
+  }
+
+  function syncRegenerateClothButton(state, elements) {
+    const button = elements.sewingRegenerateClothButton;
+    if (!button) {
+      return;
+    }
+
+    const isActive = state.sewingRegenerateCloth === true;
+    button.classList.toggle("active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  }
+
+  // 通常特技は選択中のぬいパワー、再生行は再生専用分布として判定候補を作ります。
+  function getCellJudgementEntries(state) {
+    const sewingDamage = global.DQ10SewingDamage || {};
+    const entries = Object.entries(sewingDamage.actions || {})
+      .filter(([actionId]) => actionId !== "regenerate" && sewingDamage.getRange?.(state.heat || "normal", actionId))
+      .sort(([, a], [, b]) => Math.abs(a.multiplier ?? 0) - Math.abs(b.multiplier ?? 0))
+      .map(([actionId, action]) => ({
+        id: actionId,
+        label: action.label,
+        technique: {
+          damageModel: "sewing-power",
+          actionId,
+          criticalMultiplier: sewingDamage.criticalMultiplier || 2,
+        },
+      }));
+
+    if (state.sewingRegenerateCloth === true && sewingDamage.getRange?.("regenerate", "regenerate")) {
+      entries.push({
+        id: "regenerate",
+        label: sewingDamage.actions.regenerate.label,
+        kind: "recovery",
+        technique: {
+          damageModel: "sewing-power",
+          powerId: "regenerate",
+          actionId: "regenerate",
+          criticalMultiplier: 1,
+        },
+      });
+    }
+
+    return entries;
   }
 
   global.registerDQ10CraftComponent("sewing", createSewingComponent());
