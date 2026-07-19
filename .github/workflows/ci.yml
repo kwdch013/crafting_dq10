@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [dev, main]
+
+# 同じブランチへの連続 push では古い実行を中止し、実行枠を節約する
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# CI 全体の既定権限を読み取り専用に制限する
+permissions:
+  contents: read
+
+jobs:
+  # Ruleset の required status check から参照するため、ジョブ ID は test に固定する
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # 本番 Dockerfile と同じベースイメージで Node の動作を検証する
+      - name: Node テスト
+        run: docker run --rm -v "$PWD":/work -w /work node:22-alpine sh -c 'node --test tests/*.test.js'
+
+      # 本番 Dockerfile と同じベースイメージで Python の動作を検証する
+      - name: Python テスト
+        run: docker run --rm -v "$PWD":/work -w /work python:3.14-alpine python tests/api_recipe_persistence.test.py
+
+      # 本番用 Dockerfile と Compose 設定がビルド可能であることを検証する
+      - name: アプリイメージのビルド検証
+        run: docker compose build

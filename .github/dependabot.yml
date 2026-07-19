@@ -1,0 +1,22 @@
+version: 2
+
+updates:
+  # GitHub Actions で使用する公式 action の更新を監視する
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+
+  # サブディレクトリにある API 用 Dockerfile のベースイメージを監視する
+  - package-ecosystem: docker
+    directory: /api
+    schedule:
+      interval: weekly
+
+  # サブディレクトリにあるフロント用 Dockerfile のベースイメージを監視する
+  - package-ecosystem: docker
+    directory: /frontend
+    schedule:
+      interval: weekly
+
+  # 依存管理ファイルが存在しないため、pip と npm は登録しない
