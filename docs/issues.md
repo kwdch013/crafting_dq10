@@ -85,3 +85,4 @@ issueには対象領域に応じてラベルを付与します。
 | #160 | 裁縫: ぬいパワー「会心×2」を追加する | [sewing-woodworking.md](issues/sewing-woodworking.md) |
 | #161 | 裁縫: 次ターンのぬいパワーを入力し候補手へ反映する | [sewing-woodworking.md](issues/sewing-woodworking.md) |
 | #162 | 裁縫: 再生布をぬいパワーから独立した布状態として扱う | [sewing-woodworking.md](issues/sewing-woodworking.md) |
+| #172 | 共通: GitHub Pages でフロントを静的サイトとして公開する | [common.md](issues/common.md) |
