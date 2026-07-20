@@ -1005,6 +1005,8 @@ function renderTechniqueEditor() {
       const resolvedTechnique = DQ10CraftEngine.resolveTechnique(state, technique, previewIngredient);
       const card = elements.techniqueTemplate.content.firstElementChild.cloneNode(true);
       const multiplierRow = card.querySelector(".tech-multiplier")?.closest(".technique-value");
+      // ほぐしぬいはマイナスダメージのため、減算と分かるよう数値を赤字にします。
+      const isLoosenDamage = technique.actionId === "loosen";
       card.dataset.id = technique.id;
       card.querySelector(".technique-title").textContent = technique.name;
       card.querySelector(".tech-focus").textContent = resolvedTechnique.focusCost;
@@ -1024,10 +1026,13 @@ function renderTechniqueEditor() {
         card.querySelector(".tech-critical-range").textContent = `${resolvedTechnique.criticalMin} - ${resolvedTechnique.criticalMax}`;
         card.querySelector(".tech-multiplier").textContent = `${resolvedTechnique.multiplier || 1}倍`;
       }
+      card.querySelector(".tech-normal-range").classList.toggle("negative-damage", isLoosenDamage);
+      card.querySelector(".tech-critical-range").classList.toggle("negative-damage", isLoosenDamage);
       const distribution = card.querySelector(".tech-distribution");
       if (distribution) {
         distribution.textContent = formatDamageDistribution(resolvedTechnique.distribution);
         distribution.hidden = !distribution.textContent;
+        distribution.classList.toggle("negative-damage", isLoosenDamage);
       }
       elements.techniqueEditor.append(card);
     });
@@ -2252,9 +2257,11 @@ function renderCraftCellJudgements(editor) {
     const nextRange = hasNextRange
       ? `<span class="editor-next-damage-range">次 ${nextRangeLabel}</span>`
       : "";
+    // ほぐしのマイナスダメージは減算と分かるよう赤字にします。
+    const isLoosenJudgement = entry.id === "loosen";
     row.innerHTML = `
       <strong>${escapeHtml(entry.label)}</strong>
-      <span class="numeric">${judgementRange}${nextRange}</span>
+      <span class="numeric${isLoosenJudgement ? " negative-damage" : ""}">${judgementRange}${nextRange}</span>
       <small>${escapeHtml([analysis.statusLabel, formatDamageDistribution(resolvedTechnique.distribution, { targetValue: analysis.targetDiff })].filter(Boolean).join("\n"))}</small>
     `;
     rows.append(row);

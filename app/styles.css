@@ -529,6 +529,11 @@ select:focus {
   font-variant-numeric: tabular-nums;
 }
 
+/* ほぐしぬいなどのマイナスダメージを減算と分かるよう赤字で表示します。 */
+.negative-damage {
+  color: #dc2626;
+}
+
 .capture-box {
   display: grid;
   gap: 12px;
@@ -1255,6 +1260,12 @@ select:focus {
 .editor-smithing-judgement-row small {
   color: inherit;
   font-size: 12px;
+}
+
+/* 上記の color: inherit (詳細度 0,1,1) に負けないよう、判定行内のマイナスダメージ赤字を後から上書きします。 */
+.editor-damage-judgement-row .negative-damage,
+.editor-smithing-judgement-row .negative-damage {
+  color: #dc2626;
 }
 
 .editor-damage-judgement-row small,
