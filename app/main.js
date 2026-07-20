@@ -2400,6 +2400,10 @@ function renderAnalysis() {
   elements.dangerCount.textContent = analysis.dangerCount;
 
   const recommendation = DQ10CraftEngine.recommendTechniques(state);
+  // 候補手パネルは一時非表示 (HTML側でコメントアウト中) のため、描画先がある場合のみ一覧を更新します。
+  if (!elements.recommendationList) {
+    return;
+  }
   elements.recommendationList.replaceChildren();
 
   recommendation.forEach((item, index) => {
