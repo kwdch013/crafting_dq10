@@ -62,41 +62,35 @@
     `;
   }
 
-  // 位置別と光マスの火力ダメージを参照欄に描画します。
+  // 位置別ダメージを火力4分類 (中央・上下左右・四隅・光マス) として範囲表記で描画します。
   function renderCookingDamageRanges({ cookingDamage, elements, escapeHtml }) {
-    const positionRows = cookingDamage.positions.map((position) => {
-      const ranges = ["normal", "strong", "half"].map((conditionId) => {
-        const range = cookingDamage.getRange(position.id, conditionId);
-        const values = cookingDamage.distributions?.[position.id]?.[conditionId] || range;
-        return `${cookingHeatLabels[conditionId]} ${values ? values.join("/") : "-"}`;
-      }).join(" / ");
-
-      return `
-        <div class="reference-row">
-          <strong>${escapeHtml(position.label)}</strong>
-          <span class="numeric">${escapeHtml(ranges)}</span>
-        </div>
-      `;
-    });
-    const specialRows = (cookingDamage.specialRanges || []).map((specialRange) => {
-      const ranges = ["normal", "strong", "half"].map((conditionId) => {
-        const values = cookingDamage.getSpecialValues?.(specialRange.id, conditionId);
-        const range = cookingDamage.getSpecialRange
+    // 光マスも4番目の火力分類として、位置と同列・同形式の行にまとめます。
+    const damageRows = [
+      ...cookingDamage.positions.map((position) => ({
+        label: position.label,
+        getConditionRange: (conditionId) => cookingDamage.getRange(position.id, conditionId),
+      })),
+      ...(cookingDamage.specialRanges || []).map((specialRange) => ({
+        label: specialRange.label,
+        getConditionRange: (conditionId) => cookingDamage.getSpecialRange
           ? cookingDamage.getSpecialRange(specialRange.id, conditionId)
-          : specialRange.ranges?.[conditionId] || specialRange.range;
-        return `${cookingHeatLabels[conditionId]} ${values ? values.join("/") : range ? `${range[0]}-${range[1]}` : "-"}`;
+          : specialRange.ranges?.[conditionId] || null,
+      })),
+    ];
+
+    elements.cookingDamageRanges.innerHTML = damageRows.map((damageRow) => {
+      const ranges = ["normal", "strong", "half"].map((conditionId) => {
+        const range = damageRow.getConditionRange(conditionId);
+        return `${cookingHeatLabels[conditionId]} ${range ? `${range[0]} - ${range[1]}` : "-"}`;
       }).join(" / ");
 
       return `
         <div class="reference-row">
-          <strong>${escapeHtml(specialRange.label)}</strong>
+          <strong>${escapeHtml(damageRow.label)}</strong>
           <span class="numeric">${escapeHtml(ranges)}</span>
-          <small>光マスの火力別ダメージ幅</small>
         </div>
       `;
-    });
-
-    elements.cookingDamageRanges.innerHTML = [...positionRows, ...specialRows].join("");
+    }).join("");
   }
 
   // 調理特性に応じた光・戻り状態を返します。
