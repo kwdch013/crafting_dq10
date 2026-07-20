@@ -15,6 +15,20 @@ docker compose up --build -d
 
 APIは `http://localhost:8000` で起動します。
 
+### ポート番号の変更
+
+ポート番号などは環境変数で上書きできます。`.env.example` を `.env` にコピーして値を変更してください (`.env` が無い場合は上記のデフォルトで起動します)。
+
+```bash
+cp .env.example .env
+```
+
+| 環境変数 | デフォルト | 説明 |
+| --- | --- | --- |
+| `FRONTEND_PORT` | `3000` | frontend のホスト側公開ポート |
+| `API_PORT` | `8000` | api のホスト側公開ポート |
+| `API_BASE_URL` | `http://localhost:${API_PORT}` | ブラウザから API へ到達する URL。`API_PORT` 変更時は自動で追従するため通常は指定不要 |
+
 ## 停止
 
 ```bash
