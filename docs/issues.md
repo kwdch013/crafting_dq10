@@ -87,3 +87,6 @@ issueには対象領域に応じてラベルを付与します。
 | #162 | 裁縫: 再生布をぬいパワーから独立した布状態として扱う | [sewing-woodworking.md](issues/sewing-woodworking.md) |
 | #172 | 共通: GitHub Pages でフロントを静的サイトとして公開する | [common.md](issues/common.md) |
 | #176 | 共通: ページアイコン (favicon) を追加する（2026-07-20 close済み） | [common.md](issues/common.md) |
+| #179 | 共通: パネル配置を変更し、特技データとダメージ表示を右側で大きく表示する（2026-07-20 close済み） | [common.md](issues/common.md) |
+| #180 | 裁縫: ほぐしのマイナスダメージを赤字で表示する（2026-07-20 close済み） | [sewing-woodworking.md](issues/sewing-woodworking.md) |
+| #183 | 共通: 候補手パネルを一時的に非表示にする（2026-07-20 close済み） | [common.md](issues/common.md) |
