@@ -529,6 +529,11 @@ select:focus {
   font-variant-numeric: tabular-nums;
 }
 
+/* ほぐしぬいなどのマイナスダメージを減算と分かるよう赤字で表示します。 */
+.negative-damage {
+  color: #dc2626;
+}
+
 .capture-box {
   display: grid;
   gap: 12px;
