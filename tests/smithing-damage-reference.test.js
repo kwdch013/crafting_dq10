@@ -8,10 +8,10 @@ const smithingComponentJs = fs.readFileSync("app/crafts/shared/smithing-componen
 
 const boardIndex = html.indexOf('id="layoutBoard"');
 const referenceIndex = html.indexOf('id="smithingDamagePanel"');
-const splitPanelIndex = html.indexOf('class="split-panel"');
+const recommendationIndex = html.indexOf('id="recommendationList"');
 
 assert.ok(referenceIndex > boardIndex, "鍛冶ダメージ表は鍛冶配置の後に配置してください");
-assert.ok(referenceIndex < splitPanelIndex, "鍛冶ダメージ表は判定パネルの前に配置してください");
+assert.ok(referenceIndex < recommendationIndex, "鍛冶ダメージ表は候補手パネルの前に配置してください");
 assert.doesNotMatch(html, /id="smithingTemperatureDamageLabel"/, "温度プルダウン横の現在温度表示は不要です");
 assert.match(html, /id="smithingTemperatureSelect"/, "BOARD内の温度プルダウンを追加してください");
 assert.match(html, /id="smithingHeatDownButton"/, "BOARD内の温度低下ボタンを追加してください");
