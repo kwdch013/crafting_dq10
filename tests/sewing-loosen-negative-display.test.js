@@ -44,3 +44,16 @@ assert.match(
   /\.negative-damage \{[^}]*color: #dc2626;[^}]*\}/,
   "マイナスダメージ用の赤字スタイルを定義してください",
 );
+
+// セル判定行の color: inherit (詳細度 0,1,1) は .negative-damage 単独 (0,1,0) より強いため、
+// 判定行スコープの上書きルールが inherit 定義より後に必要
+const inheritRuleIndex = css.indexOf(".editor-smithing-judgement-row span,");
+const overrideRuleMatch = css.match(
+  /\.editor-damage-judgement-row \.negative-damage,\s*\.editor-smithing-judgement-row \.negative-damage \{[^}]*color: #dc2626;[^}]*\}/,
+);
+assert.ok(inheritRuleIndex >= 0, "セル判定行の文字色定義が見つかりません");
+assert.ok(overrideRuleMatch, "セル判定行内のマイナスダメージ赤字を上書きするルールを定義してください");
+assert.ok(
+  css.indexOf(overrideRuleMatch[0]) > inheritRuleIndex,
+  "赤字の上書きルールはセル判定行の color: inherit より後に定義してください",
+);

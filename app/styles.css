@@ -1262,6 +1262,12 @@ select:focus {
   font-size: 12px;
 }
 
+/* 上記の color: inherit (詳細度 0,1,1) に負けないよう、判定行内のマイナスダメージ赤字を後から上書きします。 */
+.editor-damage-judgement-row .negative-damage,
+.editor-smithing-judgement-row .negative-damage {
+  color: #dc2626;
+}
+
 .editor-damage-judgement-row small,
 .editor-smithing-judgement-row small {
   grid-column: 2;
