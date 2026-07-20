@@ -142,3 +142,7 @@ API読込に成功した職人では同一idのレシピをAPI側優先で解決
 `app/` は静的構成でAPI停止時もフォールバック `recipes.js` で動作するため、GitHub Pages で公開可能。Pages 有効化 (Source: GitHub Actions) → `.github/workflows/deploy-pages.yml` 追加 (`upload-pages-artifact` で `path: app`) → main への push で自動デプロイ、という手順を記録。レシピ保存は localStorage のみとなる制約あり。着手は保留中。URL: https://github.com/kwdch013/crafting_dq10/issues/172
 ### #176 共通: ページアイコン (favicon) を追加する（2026-07-20 close済み）
 フロント画面にページアイコンが未設定だったため、DQ10 職人 (金床・ハンマー・火花) をイメージした自前 SVG を `app/assets/favicon.svg` へ追加し、`app/index.html` の head から参照。`frontend/server.js` は `.svg` の MIME 定義済みのため変更なし。PR #177 で dev へ merge 済み。URL: https://github.com/kwdch013/crafting_dq10/issues/176
+### #179 共通: パネル配置を変更し、特技データとダメージ表示を右側で大きく表示する（2026-07-20 close済み）
+左カラムを「基本設定 → 特性情報 → 判定基準 → キャプチャ接続」の縦並びへ変更し、情報量の多い特技データを右カラムの BOARD 直後へ移動。特技データは 2 列敷き詰め + 数値 17px、温度別・位置別ダメージは 16px へ拡大。候補手単独化に伴い split-panel を廃止。BOARD の位置は変更なし。PR #181 で dev へ merge 済み。URL: https://github.com/kwdch013/crafting_dq10/issues/179
+### #183 共通: 候補手パネルを一時的に非表示にする（2026-07-20 close済み）
+候補手 section を HTML コメントで残置し表示から除外。`renderAnalysis` の推奨ロジック (`recommendTechniques`) は残し、描画先が無い場合は一覧描画のみスキップするガードを追加 (サマリー更新には影響しない)。再表示時はコメントを外すだけで復元可能。PR #184 で dev へ merge 済み。URL: https://github.com/kwdch013/crafting_dq10/issues/183
