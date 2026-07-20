@@ -140,3 +140,5 @@ API読込に成功した職人では同一idのレシピをAPI側優先で解決
 基準値が範囲から抽選される職人 (鍛冶3職人・調理) のBOARDノードで、基準値表示をANALYSISと同じ「基準幅 下限 - 上限」表記へ変更します。木工・裁縫など固定基準値職人は従来どおり基準値のみ表示します。URL: https://github.com/kwdch013/crafting_dq10/issues/155
 ### #172 共通: GitHub Pages でフロントを静的サイトとして公開する
 `app/` は静的構成でAPI停止時もフォールバック `recipes.js` で動作するため、GitHub Pages で公開可能。Pages 有効化 (Source: GitHub Actions) → `.github/workflows/deploy-pages.yml` 追加 (`upload-pages-artifact` で `path: app`) → main への push で自動デプロイ、という手順を記録。レシピ保存は localStorage のみとなる制約あり。着手は保留中。URL: https://github.com/kwdch013/crafting_dq10/issues/172
+### #176 共通: ページアイコン (favicon) を追加する（2026-07-20 close済み）
+フロント画面にページアイコンが未設定だったため、DQ10 職人 (金床・ハンマー・火花) をイメージした自前 SVG を `app/assets/favicon.svg` へ追加し、`app/index.html` の head から参照。`frontend/server.js` は `.svg` の MIME 定義済みのため変更なし。PR #177 で dev へ merge 済み。URL: https://github.com/kwdch013/crafting_dq10/issues/176

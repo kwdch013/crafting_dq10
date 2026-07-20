@@ -86,3 +86,4 @@ issueには対象領域に応じてラベルを付与します。
 | #161 | 裁縫: 次ターンのぬいパワーを入力し候補手へ反映する | [sewing-woodworking.md](issues/sewing-woodworking.md) |
 | #162 | 裁縫: 再生布をぬいパワーから独立した布状態として扱う | [sewing-woodworking.md](issues/sewing-woodworking.md) |
 | #172 | 共通: GitHub Pages でフロントを静的サイトとして公開する | [common.md](issues/common.md) |
+| #176 | 共通: ページアイコン (favicon) を追加する（2026-07-20 close済み） | [common.md](issues/common.md) |
