@@ -6,7 +6,8 @@ COPY frontend/server.js ./server.js
 COPY app/ ./public/
 
 ENV PORT=3000
-ENV API_BASE_URL=http://localhost:8000
+# API_BASE_URL は固定せず、アクセス元のホスト名から導出する (別端末からの接続に対応)
+ENV API_PORT=8000
 
 EXPOSE 3000
 
