@@ -56,6 +56,11 @@
 			return `回復量 ${analysis.normalMax}〜${analysis.normalMin}`;
 		}
 
+		// ほぐしぬいは会心判定が存在しないため、通常レンジのみ表示します。
+		if (entry?.kind === "no-critical") {
+			return `${analysis.normalMin}-${analysis.normalMax}`;
+		}
+
 		return `${analysis.normalMin}-${analysis.normalMax} / 会心 ${analysis.criticalMin}-${analysis.criticalMax}`;
 	}
 

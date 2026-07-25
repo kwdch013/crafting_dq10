@@ -159,6 +159,14 @@ const sewingComponentJs = fs.readFileSync("app/crafts/sewing/component.js", "utf
 		"12-16 / 会心 24-32",
 		"通常特技行のダメージ範囲表示は変更しないでください",
 	);
+	assert.equal(
+		editor.formatJudgementRange(
+			{ kind: "no-critical" },
+			{ normalMin: -4, normalMax: -3, criticalMin: -8, criticalMax: -6 },
+		),
+		"-4--3",
+		"ほぐし行は会心判定が存在しないため通常レンジのみ表示してください",
+	);
 }
 
 assert.match(mainJs, /editor-damage-judgements/, "右クリック編集に職人別ダメージ判定欄を追加してください");
