@@ -5,6 +5,7 @@ const html = fs.readFileSync("app/index.html", "utf8");
 const mainJs = fs.readFileSync("app/main.js", "utf8");
 const smithingDamageJs = fs.readFileSync("app/crafts/shared/smithing-damage.js", "utf8");
 const smithingComponentJs = fs.readFileSync("app/crafts/shared/smithing-component.js", "utf8");
+const boardCellEditorJs = fs.readFileSync("app/board-cell-editor.js", "utf8");
 
 const boardIndex = html.indexOf('id="layoutBoard"');
 const referenceIndex = html.indexOf('id="smithingDamagePanel"');
@@ -51,7 +52,8 @@ assert.match(mainJs, /lockLabel\.textContent = isCurrentCraftFamily\("smithing"\
 assert.match(mainJs, /isCurrentCraftFamily\("smithing"\)[\s\S]*\? "確定済み"[\s\S]*: item\.lockJudgementLabel \|\| "固定"/, "鍛冶BOARDの固定バッジは確定済みとして表示してください");
 assert.match(mainJs, /row\.classList\.add\(`status-\$\{analysis\.status\}`\)/, "鍛冶倍率判定行は判定ステータスと同じ色にしてください");
 assert.match(mainJs, /isSmithingLightHeatActive\(\)[\s\S]*editor\.querySelector\("\.editor-glowing"\)\.checked/, "光地金の光状態は有効温度でのみ保存してください");
-assert.match(mainJs, /\$\{analysis\.normalMin\}-\$\{analysis\.normalMax\} \/ 会心/, "右クリック編集の鍛冶非会心ダメージは光地金などの倍率補正後を表示してください");
+assert.match(mainJs, /const judgementRange = DQ10BoardCellEditor\.formatJudgementRange\(entry, analysis\)/, "右クリック編集の判定表示は共通ヘルパーへ委譲してください");
+assert.match(boardCellEditorJs, /\$\{analysis\.normalMin\}-\$\{analysis\.normalMax\} \/ 会心/, "右クリック編集の鍛冶非会心ダメージは光地金などの倍率補正後を表示してください");
 assert.doesNotMatch(mainJs, /hydrateSmithingTechniquesFromJson/, "鍛冶特技の追加JSONは読み込まないでください");
 assert.match(mainJs, /function adjustSmithingHeat\(delta\)[\s\S]*getNextHeat/, "鍛冶温度の次値計算は職人コンポーネントへ委譲してください");
 assert.match(smithingComponentJs, /smithingDamage\.ranges\?\.\[state\.heat\]/);

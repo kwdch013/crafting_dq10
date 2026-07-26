@@ -125,13 +125,15 @@
       .map(([actionId, action]) => ({
         id: actionId,
         label: action.label,
+        // ほぐしぬいは実際のゲーム内で会心判定が存在しないため、判定候補からも除外します。
+        ...(actionId === "loosen" ? { kind: "no-critical" } : {}),
         nextNormalRange: state.sewingNextHeat === "unknown"
           ? null
           : sewingDamage.getRange?.(state.sewingNextHeat, actionId) || null,
         technique: {
           damageModel: "sewing-power",
           actionId,
-          criticalMultiplier: sewingDamage.criticalMultiplier || 2,
+          criticalMultiplier: actionId === "loosen" ? 1 : (sewingDamage.criticalMultiplier || 2),
         },
       }));
 

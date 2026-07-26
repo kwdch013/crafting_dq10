@@ -1023,7 +1023,10 @@ function renderTechniqueEditor() {
         card.querySelector(".tech-multiplier").textContent = "封じ";
       } else {
         card.querySelector(".tech-normal-range").textContent = `${resolvedTechnique.normalMin} - ${resolvedTechnique.normalMax}`;
-        card.querySelector(".tech-critical-range").textContent = `${resolvedTechnique.criticalMin} - ${resolvedTechnique.criticalMax}`;
+        // ほぐしぬいは会心判定が存在しないため、会心レンジの代わりに「-」を表示します。
+        card.querySelector(".tech-critical-range").textContent = isLoosenDamage
+          ? "-"
+          : `${resolvedTechnique.criticalMin} - ${resolvedTechnique.criticalMax}`;
         card.querySelector(".tech-multiplier").textContent = `${resolvedTechnique.multiplier || 1}倍`;
       }
       card.querySelector(".tech-normal-range").classList.toggle("negative-damage", isLoosenDamage);
@@ -2247,9 +2250,7 @@ function renderCraftCellJudgements(editor) {
     );
 
     row.classList.add(`status-${analysis.status}`);
-    const judgementRange = entry.kind === "recovery"
-      ? DQ10BoardCellEditor.formatJudgementRange(entry, analysis)
-      : `${analysis.normalMin}-${analysis.normalMax} / 会心 ${analysis.criticalMin}-${analysis.criticalMax}`;
+    const judgementRange = DQ10BoardCellEditor.formatJudgementRange(entry, analysis);
     const hasNextRange = Object.hasOwn(entry, "nextNormalRange");
     const nextRangeLabel = entry.nextNormalRange
       ? `${entry.nextNormalRange[0]}-${entry.nextNormalRange[1]}`

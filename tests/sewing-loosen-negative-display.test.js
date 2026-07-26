@@ -1,5 +1,6 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
+const vm = require("node:vm");
 
 const mainJs = fs.readFileSync("app/main.js", "utf8");
 const css = fs.readFileSync("app/styles.css", "utf8");
@@ -57,3 +58,50 @@ assert.ok(
   css.indexOf(overrideRuleMatch[0]) > inheritRuleIndex,
   "赤字の上書きルールはセル判定行の color: inherit より後に定義してください",
 );
+
+// 特技データパネル: ほぐしぬいは会心判定が存在しないため会心欄を「-」表示にする
+assert.match(
+  mainJs,
+  /card\.querySelector\("\.tech-critical-range"\)\.textContent = isLoosenDamage\s*\n\s*\? "-"/,
+  "ほぐしぬいの会心欄は「-」表示にしてください",
+);
+
+// BOARDセル右クリック判定: ほぐし行は会心判定が存在しないため候補から除外し、通常レンジのみ表示する
+{
+  const context = { window: {} };
+  context.window = context;
+  vm.createContext(context);
+  [
+    "app/crafts/registry.js",
+    "app/crafts/shared/sewing-damage.js",
+    "app/crafts/sewing/component.js",
+    "app/board-cell-editor.js",
+  ].forEach((file) => {
+    vm.runInContext(fs.readFileSync(file, "utf8"), context, { filename: file });
+  });
+
+  const component = context.DQ10CraftComponents.sewing;
+  const boardCellEditor = context.DQ10BoardCellEditor;
+
+  const entries = component.getCellJudgementEntries({ heat: "normal" });
+  const loosenEntry = entries.find((entry) => entry.id === "loosen");
+
+  assert.equal(loosenEntry.kind, "no-critical", "ほぐし行は会心なしの種別を付与してください");
+  assert.equal(
+    loosenEntry.technique.criticalMultiplier,
+    1,
+    "ほぐし行の会心倍率は実質会心なしとして1にしてください",
+  );
+
+  const otherEntry = entries.find((entry) => entry.id === "sew");
+  assert.equal(Object.hasOwn(otherEntry, "kind"), false, "他の特技行にはkindを付与しないでください");
+
+  assert.equal(
+    boardCellEditor.formatJudgementRange(
+      loosenEntry,
+      { normalMin: -4, normalMax: -3, criticalMin: -8, criticalMax: -6 },
+    ),
+    "-4--3",
+    "ほぐし行の判定表示は会心欄を含めないでください",
+  );
+}
