@@ -34,3 +34,7 @@ localStorage 保存のユーザーレシピに残る旧仕様の行列名を、�
 ### #192 鍛冶職人: BOARD上部に温度±200℃ボタンを追加
 
 鍛冶3職人のBOARD上部に `-200℃` と `+200℃` の温度変更ボタンを追加します。基本設定、温度別ダメージ、地金特性状態、BOARD判定と同期し、温度候補の上下限では対応するボタンを無効化します。URL: https://github.com/kwdch013/crafting_dq10/issues/192
+
+### #194 鍛冶職人: ±50℃の温度操作をBOARD温度欄へ移動する
+
+SMITHING DAMAGE見出しにある `-50℃`、温度プルダウン、`+50℃` 操作を、鍛冶3職人のBOARD上部にある温度欄へ移動します。URL: https://github.com/kwdch013/crafting_dq10/issues/194

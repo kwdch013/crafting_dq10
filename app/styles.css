@@ -643,10 +643,9 @@ select:focus {
 }
 
 .smithing-heat-controls {
-  display: grid;
-  grid-template-columns: auto minmax(96px, 120px) auto;
-  gap: 8px;
+  display: flex;
   align-items: center;
+  gap: 8px;
 }
 
 .smithing-temperature-select {
@@ -1487,8 +1486,7 @@ select:focus {
 
   .reference-grid,
   .reference-row,
-  .damage-reference .reference-row,
-  .smithing-heat-controls {
+  .damage-reference .reference-row {
     grid-template-columns: 1fr;
   }
 
