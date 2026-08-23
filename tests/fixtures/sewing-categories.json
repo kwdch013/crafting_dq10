@@ -1,0 +1,62 @@
+{
+  "recipeCategoryLabel": "大項目",
+  "recipeSubcategoryLabel": "装備名",
+  "categories": [
+    {
+      "id": "head",
+      "label": "アタマ",
+      "templateGridCells": [
+        { "row": 1, "column": 2 },
+        { "row": 2, "column": 1 },
+        { "row": 2, "column": 2 },
+        { "row": 2, "column": 3 }
+      ]
+    },
+    {
+      "id": "body-upper",
+      "label": "からだ上",
+      "templateGridCells": [
+        { "row": 1, "column": 1 },
+        { "row": 1, "column": 2 },
+        { "row": 1, "column": 3 },
+        { "row": 2, "column": 1 },
+        { "row": 2, "column": 2 },
+        { "row": 2, "column": 3 }
+      ]
+    },
+    {
+      "id": "body-lower",
+      "label": "からだ下",
+      "templateGridCells": [
+        { "row": 1, "column": 1 },
+        { "row": 1, "column": 2 },
+        { "row": 2, "column": 1 },
+        { "row": 2, "column": 2 },
+        { "row": 3, "column": 1 },
+        { "row": 3, "column": 2 }
+      ]
+    },
+    {
+      "id": "arm",
+      "label": "ウデ",
+      "templateGridCells": [
+        { "row": 1, "column": 1 },
+        { "row": 1, "column": 2 },
+        { "row": 1, "column": 3 },
+        { "row": 2, "column": 1 },
+        { "row": 2, "column": 2 },
+        { "row": 2, "column": 3 }
+      ]
+    },
+    {
+      "id": "foot",
+      "label": "足",
+      "templateGridCells": [
+        { "row": 1, "column": 1 },
+        { "row": 1, "column": 2 },
+        { "row": 2, "column": 1 },
+        { "row": 2, "column": 2 }
+      ]
+    }
+  ]
+}

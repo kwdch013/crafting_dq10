@@ -1,11 +1,1455 @@
 [
   {
+    "id": "super-smithing-hammer",
+    "name": "超鍛冶ハンマー",
+    "category": "ハンマー",
+    "categoryId": "smithing-hammer",
+    "items": [
+      {
+        "id": "part-1",
+        "name": "A",
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 130,
+        "successMax": 140
+      },
+      {
+        "id": "part-2",
+        "name": "B",
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        },
+        "current": 0,
+        "successMin": 105,
+        "successMax": 111
+      },
+      {
+        "id": "part-3",
+        "name": "C",
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 105,
+        "successMax": 113
+      },
+      {
+        "id": "part-4",
+        "name": "D",
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        },
+        "current": 0,
+        "successMin": 130,
+        "successMax": 140
+      },
+      {
+        "id": "part-5",
+        "name": "E",
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 90,
+        "successMax": 96
+      }
+    ]
+  },
+  {
+    "id": "super-woodworking-knife",
+    "name": "超木工刀",
+    "category": "木工刀",
+    "categoryId": "woodworking-knife",
+    "items": [
+      {
+        "id": "part-1",
+        "name": "A",
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 180,
+        "successMax": 186
+      },
+      {
+        "id": "part-2",
+        "name": "B",
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 140,
+        "successMax": 144
+      },
+      {
+        "id": "part-3",
+        "name": "C",
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 240,
+        "successMax": 256
+      }
+    ]
+  },
+  {
+    "id": "super-sewing-needle",
+    "name": "超さいほう針",
+    "category": "針",
+    "categoryId": "sewing-needle",
+    "items": [
+      {
+        "id": "part-1",
+        "name": "A",
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 310,
+        "successMax": 316
+      },
+      {
+        "id": "part-2",
+        "name": "B",
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 250,
+        "successMax": 254
+      }
+    ]
+  },
+  {
+    "id": "super-frying-pan",
+    "name": "超フライパン",
+    "category": "フライパン",
+    "categoryId": "frying-pan",
+    "items": [
+      {
+        "id": "part-1",
+        "name": "A",
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 65,
+        "successMax": 76
+      },
+      {
+        "id": "part-2",
+        "name": "B",
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        },
+        "current": 0,
+        "successMin": 65,
+        "successMax": 76
+      },
+      {
+        "id": "part-3",
+        "name": "C",
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 65,
+        "successMax": 76
+      },
+      {
+        "id": "part-4",
+        "name": "D",
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        },
+        "current": 0,
+        "successMin": 80,
+        "successMax": 88
+      },
+      {
+        "id": "part-5",
+        "name": "E",
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 109,
+        "successMax": 115
+      },
+      {
+        "id": "part-6",
+        "name": "F",
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        },
+        "current": 0,
+        "successMin": 96,
+        "successMax": 105
+      },
+      {
+        "id": "part-7",
+        "name": "G",
+        "gridCell": {
+          "row": 4,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 80,
+        "successMax": 88
+      }
+    ]
+  },
+  {
+    "id": "miracle-smithing-hammer",
+    "name": "奇跡の鍛冶ハンマー",
+    "category": "ハンマー",
+    "categoryId": "smithing-hammer",
+    "items": [
+      {
+        "id": "part-1",
+        "name": "A",
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 150,
+        "successMax": 156
+      },
+      {
+        "id": "part-2",
+        "name": "B",
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        },
+        "current": 0,
+        "successMin": 160,
+        "successMax": 170
+      },
+      {
+        "id": "part-3",
+        "name": "C",
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 80,
+        "successMax": 86
+      },
+      {
+        "id": "part-4",
+        "name": "D",
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        },
+        "current": 0,
+        "successMin": 130,
+        "successMax": 139
+      },
+      {
+        "id": "part-5",
+        "name": "E",
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 120,
+        "successMax": 129
+      }
+    ]
+  },
+  {
+    "id": "miracle-woodworking-knife",
+    "name": "奇跡の木工刀",
+    "category": "木工刀",
+    "categoryId": "woodworking-knife",
+    "items": [
+      {
+        "id": "part-1",
+        "name": "A",
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 230,
+        "successMax": 238
+      },
+      {
+        "id": "part-2",
+        "name": "B",
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 200,
+        "successMax": 206
+      },
+      {
+        "id": "part-3",
+        "name": "C",
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 274,
+        "successMax": 286
+      }
+    ]
+  },
+  {
+    "id": "miracle-frying-pan",
+    "name": "奇跡のフライパン",
+    "category": "フライパン",
+    "categoryId": "frying-pan",
+    "items": [
+      {
+        "id": "part-1",
+        "name": "A",
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 72,
+        "successMax": 82
+      },
+      {
+        "id": "part-2",
+        "name": "B",
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        },
+        "current": 0,
+        "successMin": 110,
+        "successMax": 120
+      },
+      {
+        "id": "part-3",
+        "name": "C",
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 134,
+        "successMax": 146
+      },
+      {
+        "id": "part-4",
+        "name": "D",
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        },
+        "current": 0,
+        "successMin": 90,
+        "successMax": 96
+      },
+      {
+        "id": "part-5",
+        "name": "E",
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 90,
+        "successMax": 96
+      },
+      {
+        "id": "part-6",
+        "name": "F",
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        },
+        "current": 0,
+        "successMin": 72,
+        "successMax": 82
+      },
+      {
+        "id": "part-7",
+        "name": "G",
+        "gridCell": {
+          "row": 4,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 72,
+        "successMax": 82
+      }
+    ]
+  },
+  {
+    "id": "light-woodworking-knife",
+    "name": "光の木工刀",
+    "category": "木工刀",
+    "categoryId": "woodworking-knife",
+    "items": [
+      {
+        "id": "part-1",
+        "name": "A",
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 249,
+        "successMax": 261
+      },
+      {
+        "id": "part-2",
+        "name": "B",
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 287,
+        "successMax": 293
+      },
+      {
+        "id": "part-3",
+        "name": "C",
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 224,
+        "successMax": 232
+      }
+    ]
+  },
+  {
+    "id": "light-frying-pan",
+    "name": "光のフライパン",
+    "category": "フライパン",
+    "categoryId": "frying-pan",
+    "items": [
+      {
+        "id": "part-1",
+        "name": "A",
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 92,
+        "successMax": 102
+      },
+      {
+        "id": "part-2",
+        "name": "B",
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        },
+        "current": 0,
+        "successMin": 110,
+        "successMax": 120
+      },
+      {
+        "id": "part-3",
+        "name": "C",
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 134,
+        "successMax": 146
+      },
+      {
+        "id": "part-4",
+        "name": "D",
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        },
+        "current": 0,
+        "successMin": 158,
+        "successMax": 164
+      },
+      {
+        "id": "part-5",
+        "name": "E",
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 158,
+        "successMax": 164
+      },
+      {
+        "id": "part-6",
+        "name": "F",
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        },
+        "current": 0,
+        "successMin": 92,
+        "successMax": 102
+      },
+      {
+        "id": "part-7",
+        "name": "G",
+        "gridCell": {
+          "row": 4,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 92,
+        "successMax": 102
+      }
+    ]
+  },
+  {
     "id": "tool-vertical-3",
     "name": "道具 3マステンプレート",
+    "archived": true,
     "items": [
-      { "id": "part-1", "name": "上", "gridCell": { "row": 1, "column": 1 }, "current": 0, "target": 78, "successMin": 70, "successMax": 86 },
-      { "id": "part-2", "name": "中", "gridCell": { "row": 2, "column": 1 }, "current": 0, "target": 78, "successMin": 70, "successMax": 86 },
-      { "id": "part-3", "name": "下", "gridCell": { "row": 3, "column": 1 }, "current": 0, "target": 78, "successMin": 70, "successMax": 86 }
+      {
+        "id": "part-1",
+        "name": "A",
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        },
+        "current": 0,
+        "target": 78,
+        "successMin": 70,
+        "successMax": 86
+      },
+      {
+        "id": "part-2",
+        "name": "B",
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        },
+        "current": 0,
+        "target": 78,
+        "successMin": 70,
+        "successMax": 86
+      },
+      {
+        "id": "part-3",
+        "name": "C",
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        },
+        "current": 0,
+        "target": 78,
+        "successMin": 70,
+        "successMax": 86
+      }
     ]
+  },
+  {
+    "id": "tool-2x2",
+    "name": "道具 2×2テンプレート",
+    "archived": true,
+    "items": [
+      {
+        "id": "part-1",
+        "name": "A",
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 70,
+        "successMax": 86
+      },
+      {
+        "id": "part-2",
+        "name": "B",
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        },
+        "current": 0,
+        "successMin": 70,
+        "successMax": 86
+      },
+      {
+        "id": "part-3",
+        "name": "C",
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        },
+        "current": 0,
+        "successMin": 70,
+        "successMax": 86
+      },
+      {
+        "id": "part-4",
+        "name": "D",
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        },
+        "current": 0,
+        "successMin": 70,
+        "successMax": 86
+      }
+    ]
+  },
+  {
+    "id": "user-tool-smithing-1783340235618",
+    "name": "マデュライトルアー",
+    "category": "ルアー",
+    "categoryId": "lure",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "A",
+        "current": 0,
+        "target": 151,
+        "successMin": 148,
+        "successMax": 154,
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-2",
+        "name": "C",
+        "current": 0,
+        "target": 220,
+        "successMin": 220,
+        "successMax": 220,
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-3",
+        "name": "B",
+        "current": 0,
+        "target": 225,
+        "successMin": 220,
+        "successMax": 230,
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        }
+      }
+    ],
+    "traitId": "double-half"
+  },
+  {
+    "id": "user-tool-smithing-1783340490734",
+    "name": "超ようせいのひだね",
+    "category": "素材",
+    "categoryId": "material",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "A",
+        "current": 0,
+        "target": 185,
+        "successMin": 180,
+        "successMax": 190,
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-2",
+        "name": "B",
+        "current": 0,
+        "target": 254,
+        "successMin": 250,
+        "successMax": 258,
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-3",
+        "name": "C",
+        "current": 0,
+        "target": 213,
+        "successMin": 210,
+        "successMax": 216,
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-4",
+        "name": "D",
+        "current": 0,
+        "target": 254,
+        "successMin": 250,
+        "successMax": 258,
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-5",
+        "name": "E",
+        "current": 0,
+        "target": 213,
+        "successMin": 210,
+        "successMax": 216,
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-6",
+        "name": "F",
+        "current": 0,
+        "target": 150,
+        "successMin": 145,
+        "successMax": 155,
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        }
+      }
+    ],
+    "traitId": "light"
+  },
+  {
+    "id": "user-tool-smithing-1783340540763",
+    "name": "超あまつゆのいと",
+    "category": "素材",
+    "categoryId": "material",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "A",
+        "current": 0,
+        "target": 185,
+        "successMin": 180,
+        "successMax": 190,
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-2",
+        "name": "B",
+        "current": 0,
+        "target": 248,
+        "successMin": 245,
+        "successMax": 251,
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-3",
+        "name": "C",
+        "current": 0,
+        "target": 153,
+        "successMin": 150,
+        "successMax": 156,
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-4",
+        "name": "D",
+        "current": 0,
+        "target": 185,
+        "successMin": 180,
+        "successMax": 190,
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-5",
+        "name": "E",
+        "current": 0,
+        "target": 185,
+        "successMin": 180,
+        "successMax": 190,
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-6",
+        "name": "F",
+        "current": 0,
+        "target": 248,
+        "successMin": 245,
+        "successMax": 251,
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        }
+      }
+    ],
+    "traitId": "double-half"
+  },
+  {
+    "id": "user-tool-smithing-1783340641826",
+    "name": "超かがやきの樹液",
+    "category": "素材",
+    "categoryId": "material",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "A",
+        "current": 0,
+        "target": 160,
+        "successMin": 155,
+        "successMax": 164,
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-2",
+        "name": "B",
+        "current": 0,
+        "target": 225,
+        "successMin": 220,
+        "successMax": 230,
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-3",
+        "name": "C",
+        "current": 0,
+        "target": 158,
+        "successMin": 155,
+        "successMax": 161,
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-4",
+        "name": "D",
+        "current": 0,
+        "target": 225,
+        "successMin": 220,
+        "successMax": 230,
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-5",
+        "name": "E",
+        "current": 0,
+        "target": 145,
+        "successMin": 140,
+        "successMax": 150,
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-6",
+        "name": "F",
+        "current": 0,
+        "target": 145,
+        "successMin": 140,
+        "successMax": 150,
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        }
+      }
+    ],
+    "traitId": "focus-change"
+  },
+  {
+    "id": "user-tool-smithing-1783340750206",
+    "name": "まおうのランプ",
+    "category": "ランプ",
+    "categoryId": "alchemy-lamp",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "A",
+        "current": 0,
+        "target": 204,
+        "successMin": 200,
+        "successMax": 208,
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-2",
+        "name": "B",
+        "current": 0,
+        "target": 253,
+        "successMin": 250,
+        "successMax": 256,
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-3",
+        "name": "C",
+        "current": 0,
+        "target": 253,
+        "successMin": 250,
+        "successMax": 256,
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-4",
+        "name": "D",
+        "current": 0,
+        "target": 204,
+        "successMin": 200,
+        "successMax": 208,
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        }
+      }
+    ],
+    "traitId": "focus-change"
+  },
+  {
+    "id": "light-alchemy-lamp",
+    "name": "光の錬金ランプ",
+    "category": "ランプ",
+    "categoryId": "alchemy-lamp",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "A",
+        "current": 0,
+        "target": 209,
+        "successMin": 205,
+        "successMax": 213,
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-2",
+        "name": "B",
+        "current": 0,
+        "target": 312,
+        "successMin": 306,
+        "successMax": 318,
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-3",
+        "name": "C",
+        "current": 0,
+        "target": 209,
+        "successMin": 205,
+        "successMax": 213,
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-4",
+        "name": "D",
+        "current": 0,
+        "target": 123,
+        "successMin": 120,
+        "successMax": 126,
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        }
+      }
+    ],
+    "traitId": "light"
+  },
+  {
+    "id": "light-smithing-hammer",
+    "name": "光の鍛冶ハンマー",
+    "category": "ハンマー",
+    "categoryId": "smithing-hammer",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "A",
+        "current": 0,
+        "target": 123,
+        "successMin": 120,
+        "successMax": 126,
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-2",
+        "name": "B",
+        "current": 0,
+        "target": 183,
+        "successMin": 180,
+        "successMax": 186,
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-3",
+        "name": "C",
+        "current": 0,
+        "target": 241,
+        "successMin": 236,
+        "successMax": 245,
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-4",
+        "name": "D",
+        "current": 0,
+        "target": 145,
+        "successMin": 140,
+        "successMax": 149,
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-5",
+        "name": "E",
+        "current": 0,
+        "target": 165,
+        "successMin": 160,
+        "successMax": 170,
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        }
+      }
+    ],
+    "traitId": "light"
+  },
+  {
+    "id": "light-alchemy-pot",
+    "name": "光の錬金ツボ",
+    "category": "ツボ",
+    "categoryId": "alchemy-pot",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "A",
+        "current": 0,
+        "target": 105,
+        "successMin": 100,
+        "successMax": 110,
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-2",
+        "name": "B",
+        "current": 0,
+        "target": 143,
+        "successMin": 140,
+        "successMax": 146,
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-3",
+        "name": "C",
+        "current": 0,
+        "target": 143,
+        "successMin": 140,
+        "successMax": 146,
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-4",
+        "name": "D",
+        "current": 0,
+        "target": 200,
+        "successMin": 196,
+        "successMax": 204,
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-5",
+        "name": "E",
+        "current": 0,
+        "target": 164,
+        "successMin": 160,
+        "successMax": 168,
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-6",
+        "name": "F",
+        "current": 0,
+        "target": 105,
+        "successMin": 100,
+        "successMax": 110,
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        }
+      }
+    ],
+    "traitId": "light"
+  },
+  {
+    "id": "light-sewing-needle",
+    "name": "光のさいほう針",
+    "category": "針",
+    "categoryId": "sewing-needle",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "A",
+        "current": 0,
+        "target": 467,
+        "successMin": 460,
+        "successMax": 474,
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-3",
+        "name": "B",
+        "current": 0,
+        "target": 379,
+        "successMin": 376,
+        "successMax": 382,
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        }
+      }
+    ],
+    "traitId": "double-half"
+  },
+  {
+    "id": "user-tool-smithing-1783348805719",
+    "name": "トゲトゲルアー",
+    "category": "ルアー",
+    "categoryId": "lure",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "A",
+        "current": 0,
+        "target": 185,
+        "successMin": 180,
+        "successMax": 190,
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-3",
+        "name": "C",
+        "current": 0,
+        "target": 259,
+        "successMin": 256,
+        "successMax": 262,
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-2",
+        "name": "B",
+        "current": 0,
+        "target": 185,
+        "successMin": 180,
+        "successMax": 190,
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        }
+      }
+    ],
+    "traitId": "double-half"
+  },
+  {
+    "id": "user-tool-smithing-1783340296938",
+    "name": "虹色のオーブ",
+    "category": "素材",
+    "categoryId": "material",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "A",
+        "current": 0,
+        "target": 91,
+        "successMin": 86,
+        "successMax": 95,
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-2",
+        "name": "B",
+        "current": 0,
+        "target": 144,
+        "successMin": 140,
+        "successMax": 148,
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-3",
+        "name": "C",
+        "current": 0,
+        "target": 118,
+        "successMin": 115,
+        "successMax": 121,
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-4",
+        "name": "D",
+        "current": 0,
+        "target": 144,
+        "successMin": 140,
+        "successMax": 148,
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-5",
+        "name": "E",
+        "current": 0,
+        "target": 118,
+        "successMin": 115,
+        "successMax": 121,
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-6",
+        "name": "F",
+        "current": 0,
+        "target": 90,
+        "successMin": 85,
+        "successMax": 95,
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        }
+      }
+    ],
+    "traitId": "return"
+  },
+  {
+    "id": "miracle-sewing-needle",
+    "name": "奇跡のさいほう針",
+    "category": "針",
+    "categoryId": "sewing-needle",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "A",
+        "current": 0,
+        "target": 317,
+        "successMin": 314,
+        "successMax": 320,
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-3",
+        "name": "B",
+        "current": 0,
+        "target": 397,
+        "successMin": 390,
+        "successMax": 404,
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        }
+      }
+    ],
+    "traitId": "none"
+  },
+  {
+    "id": "user-tool-smithing-1783341110554",
+    "name": "あくまのツボ",
+    "category": "ツボ",
+    "categoryId": "alchemy-pot",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "A",
+        "current": 0,
+        "target": 195,
+        "successMin": 190,
+        "successMax": 200,
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-2",
+        "name": "B",
+        "current": 0,
+        "target": 133,
+        "successMin": 130,
+        "successMax": 136,
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-3",
+        "name": "C",
+        "current": 0,
+        "target": 133,
+        "successMin": 130,
+        "successMax": 136,
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-4",
+        "name": "D",
+        "current": 0,
+        "target": 195,
+        "successMin": 190,
+        "successMax": 200,
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-5",
+        "name": "E",
+        "current": 0,
+        "target": 134,
+        "successMin": 130,
+        "successMax": 138,
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-6",
+        "name": "F",
+        "current": 0,
+        "target": 134,
+        "successMin": 130,
+        "successMax": 138,
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        }
+      }
+    ],
+    "traitId": "double-half"
   }
 ]

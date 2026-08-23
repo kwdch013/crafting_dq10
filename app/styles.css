@@ -20,6 +20,11 @@
   box-sizing: border-box;
 }
 
+/* hidden属性を作者CSSのdisplay指定より優先して、職人別の表示切替を確実にします。 */
+[hidden] {
+  display: none !important;
+}
+
 body {
   margin: 0;
   min-width: 320px;
@@ -84,6 +89,47 @@ button:disabled {
   text-transform: uppercase;
 }
 
+.command-title {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: var(--text);
+  font-weight: 900;
+}
+
+.command-title.active {
+  color: var(--amber);
+}
+
+.board-special-state {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-soft);
+  color: var(--muted);
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1.4;
+}
+
+.board-special-state[data-state="charging"] {
+  border-color: rgba(96, 165, 250, 0.45);
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.board-special-state[data-state="active"] {
+  border-color: rgba(217, 119, 6, 0.42);
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.board-special-state[data-state="using"] {
+  border-color: rgba(220, 38, 38, 0.36);
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
 .layout {
   display: grid;
   grid-template-columns: minmax(330px, 430px) minmax(0, 1fr);
@@ -146,6 +192,17 @@ button:disabled {
   color: var(--text);
 }
 
+.button.secondary.active {
+  border-color: var(--primary);
+  background: #ccfbf1;
+  color: var(--primary-dark);
+}
+
+.button.primary {
+  background: var(--primary);
+  color: #ffffff;
+}
+
 .icon-button {
   width: 40px;
   padding: 0;
@@ -159,12 +216,209 @@ button:disabled {
   display: none;
 }
 
+.recipe-dialog {
+  width: min(920px, calc(100% - 28px));
+  max-height: calc(100dvh - 28px);
+  border: 0;
+  border-radius: var(--radius);
+  padding: 0;
+  background: transparent;
+}
+
+.recipe-dialog::backdrop {
+  background: rgba(23, 32, 51, 0.42);
+}
+
+.dialog-panel {
+  display: grid;
+  gap: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  max-height: calc(100dvh - 28px);
+  overflow: auto;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 18px;
+}
+
+.dialog-heading,
+.dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dialog-heading h2 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.recipe-manager,
+.recipe-form {
+  display: grid;
+  gap: 14px;
+}
+
+.recipe-manager-categories {
+  display: grid;
+  gap: 8px;
+}
+
+.recipe-category-group {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-soft);
+  overflow: hidden;
+}
+
+.recipe-category-group summary {
+  cursor: pointer;
+  padding: 10px 12px;
+  font-weight: 900;
+}
+
+.recipe-manager-list {
+  display: grid;
+  gap: 8px;
+}
+
+.recipe-category-group .recipe-manager-list {
+  border-top: 1px solid var(--line);
+  padding: 10px;
+}
+
+.recipe-manager-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(120px, auto) auto;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #ffffff;
+  padding: 9px;
+}
+
+.recipe-manager-name {
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+.recipe-manager-row span,
+.recipe-empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.form-subheading {
+  margin: 0 0 8px;
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.recipe-item-editor {
+  display: grid;
+  gap: 10px;
+}
+
+.recipe-layout-editor {
+  align-items: stretch;
+  gap: 8px;
+}
+
+.recipe-item-add-button {
+  margin-top: 10px;
+}
+
+.recipe-item-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-soft);
+  padding: 10px;
+}
+
+.recipe-item-row legend {
+  padding: 0 4px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.recipe-layout-cell {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  min-height: 122px;
+  background: var(--surface-soft);
+  padding: 10px;
+}
+
+.recipe-layout-cell legend {
+  padding: 0 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.recipe-layout-cell input {
+  min-height: 36px;
+}
+
 label {
   display: grid;
   gap: 6px;
   color: var(--muted);
   font-size: 13px;
   font-weight: 800;
+}
+
+.field-note {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.field-help {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.trait-info {
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-soft);
+  padding: 10px;
+}
+
+.trait-info strong {
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.trait-info p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.45;
 }
 
 input,
@@ -183,6 +437,17 @@ input:focus,
 select:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.14);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .field-grid {
@@ -217,8 +482,10 @@ select:focus {
   color: #3730a3;
 }
 
+/* 特技データは幅の広い右カラムに置くため、カードを2列に敷き詰めて大きく表示します。 */
 .technique-editor {
   display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
   gap: 10px;
 }
 
@@ -230,11 +497,12 @@ select:focus {
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--surface-soft);
-  padding: 10px;
+  padding: 12px;
 }
 
 .technique-title {
   align-self: center;
+  font-size: 16px;
   font-weight: 900;
 }
 
@@ -248,12 +516,12 @@ select:focus {
 
 .technique-value span {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 900;
 }
 
 .technique-value strong {
-  font-size: 14px;
+  font-size: 17px;
   line-height: 1.2;
 }
 
@@ -261,9 +529,20 @@ select:focus {
   font-variant-numeric: tabular-nums;
 }
 
+/* ほぐしぬいなどのマイナスダメージを減算と分かるよう赤字で表示します。 */
+.negative-damage {
+  color: #dc2626;
+}
+
 .capture-box {
   display: grid;
   gap: 12px;
+}
+
+.capture-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .capture-box strong,
@@ -278,6 +557,38 @@ select:focus {
   line-height: 1.5;
 }
 
+.capture-status {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.capture-status div {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-soft);
+  padding: 8px;
+}
+
+.capture-status dt,
+.capture-status dd {
+  margin: 0;
+}
+
+.capture-status dt {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.capture-status dd {
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
 #capturePreview {
   width: 100%;
   max-height: 220px;
@@ -286,9 +597,144 @@ select:focus {
   background: #000000;
 }
 
+#captureFrameCanvas {
+  width: 100%;
+  max-height: 220px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #000000;
+  object-fit: contain;
+}
+
+.reference-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 14px;
+}
+
+.reference-grid h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.reference-list {
+  display: grid;
+  gap: 8px;
+}
+
+.reference-row {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: 6px 10px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-soft);
+  padding: 9px;
+}
+
+.damage-reference .reference-row {
+  grid-template-columns: 76px minmax(0, 1fr);
+}
+
+.smithing-damage-panel {
+  padding-top: 14px;
+}
+
+.smithing-heat-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.smithing-temperature-select {
+  min-width: 96px;
+}
+
+.smithing-damage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px;
+}
+
+.smithing-damage-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 8px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-soft);
+  padding: 9px;
+}
+
+/* 温度別ダメージは情報量が多いため、右カラムの幅を活かして大きく表示します。 */
+.smithing-damage-row strong,
+.smithing-damage-row span {
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+.smithing-damage-row span {
+  font-weight: 900;
+}
+
+.smithing-damage-row small {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 2px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.trait-reference {
+  grid-template-columns: 76px minmax(0, 1fr);
+}
+
+.trait-reference span {
+  line-height: 1.4;
+}
+
+.reference-row strong {
+  font-size: 13px;
+}
+
+.reference-row span {
+  font-size: 13px;
+  font-weight: 900;
+}
+
+/* 位置別ダメージは情報量が多いため、右カラムの幅を活かして大きく表示します。 */
+.damage-reference .reference-row strong,
+.damage-reference .reference-row span {
+  font-size: 16px;
+}
+
+.reference-row small {
+  grid-column: 2;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.tech-distribution {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.35;
+  /* バーと桁を縦に揃えて見せるため等幅で改行を保持し、はみ出しは横スクロールへ逃がす */
+  font-family: ui-monospace, "SFMono-Regular", "Consolas", monospace;
+  white-space: pre;
+  overflow-x: auto;
+}
+
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 12px;
 }
 
@@ -318,19 +764,245 @@ select:focus {
   overflow-x: auto;
 }
 
+.board-total-error {
+  min-height: 24px;
+  margin-bottom: 8px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 900;
+  text-align: right;
+}
+
+.board-total-error[hidden] {
+  display: none;
+}
+
 .board-cell {
   display: grid;
   grid-template-rows: auto 1fr auto;
-  gap: 10px;
+  gap: 8px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   min-height: 116px;
   background: var(--surface-soft);
   padding: 10px;
+  overflow: hidden;
+}
+
+.board-cell.has-ingredient-visual {
+  grid-template-rows: auto minmax(42px, 1fr) auto auto auto;
+}
+
+.craft-board.smithing-board .board-cell:not(.empty) {
+  grid-template-rows: auto minmax(0, 1fr) 24px auto;
+}
+
+/* 鍛冶セルは光バッジの追加でタイトル幅が変わらないよう、ヘッダーを2行に固定します。 */
+.craft-board.smithing-board .board-cell-head {
+  display: grid;
+  grid-template-rows: auto 20px;
+  gap: 4px;
+}
+
+.craft-board.smithing-board .board-cell-head strong {
+  min-height: 18px;
+}
+
+/* 鍛冶の光地金バッジ表示でBOARDノードの高さが変わらないよう、ヘッダー側の領域も固定します。 */
+.craft-board.smithing-board .board-cell-badges {
+  min-height: 20px;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: hidden;
+}
+
+.board-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.cooking-command-panel {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.cooking-command-panel[hidden] {
+  display: none;
+}
+
+.smithing-board-trait-state {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-bottom: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-soft);
+  min-height: 42px;
+  padding: 10px;
+}
+
+.smithing-board-trait-state[hidden] {
+  display: none;
+}
+
+.smithing-board-trait-state strong {
+  color: var(--primary-dark);
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.smithing-board-trait-state span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.command-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-soft);
+  padding: 10px;
+}
+
+.sewing-power-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sewing-next-power-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.sewing-next-power-control select {
+  min-height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  padding: 0 8px;
+  color: var(--ink);
+  font: inherit;
+}
+
+.command-group > span {
+  min-width: 44px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.command-result {
+  color: var(--primary-dark);
+  font-size: 13px;
+  line-height: 1.4;
 }
 
 .board-cell:not(.empty) {
   cursor: pointer;
+}
+
+/* 木工セル: 順目/逆目を背景パターンで直感的に区別します。 */
+/* 順目(横目)=縦ストライプ。木目に沿って削れる方向を表します。 */
+/* 線幅はセル寸法に依らず割合で指定し、縦線を5本ずつ・太めに描きます。 */
+.board-cell.grain-parallel {
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(150, 105, 55, 0.18) 0,
+    rgba(150, 105, 55, 0.18) 6%,
+    transparent 6%,
+    transparent 20%
+  );
+}
+
+/* 逆目(縦目)=横ボーダー。木目に逆らう方向を表します。 */
+/* 横線を3本ずつ・太めに描きます。 */
+.board-cell.grain-against {
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(70, 100, 140, 0.2) 0,
+    rgba(70, 100, 140, 0.2) 6%,
+    transparent 6%,
+    transparent 33.34%
+  );
+}
+
+/* 木工セルは 見出し・木目ラベル・数値・光スロット・状態 の構成にします。 */
+.craft-board.woodworking-board .board-cell:not(.empty) {
+  grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+}
+
+/* 木目ラベル: 名称の下に順目/逆目を背景色付きの文字列で表示します(鍛冶の光バッジと同様)。 */
+.board-cell-grain {
+  display: flex;
+}
+
+.board-cell-grain .grain-label {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+/* 順目=木色、逆目=青系。背景パターンの色調と合わせます。 */
+.board-cell-grain .grain-label.grain-parallel {
+  background: #f2e2cb;
+  color: #7a4a12;
+}
+
+.board-cell-grain .grain-label.grain-against {
+  background: #d7e2f2;
+  color: #1e3a5f;
+}
+
+.board-cell.selected {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.18);
+}
+
+.craft-board.special-active-board .board-cell.selected {
+  border-color: var(--amber);
+  box-shadow:
+    0 0 0 3px rgba(217, 119, 6, 0.24),
+    0 8px 24px rgba(217, 119, 6, 0.18);
+}
+
+.board-cell.glowing {
+  border-color: #f59e0b;
+  box-shadow: inset 0 0 0 2px rgba(245, 158, 11, 0.24);
+}
+
+.board-cell.returning {
+  border-color: #2563eb;
+  box-shadow: inset 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.board-cell.half-seal {
+  border-color: #8b5cf6;
+}
+
+.board-cell.full-seal {
+  border-color: #475569;
+}
+
+.board-cell.heat-return {
+  box-shadow: inset 0 0 0 2px rgba(20, 184, 166, 0.24);
 }
 
 .board-cell.empty {
@@ -339,6 +1011,25 @@ select:focus {
   color: var(--muted);
   font-size: 13px;
   font-weight: 800;
+}
+
+.skill-effect-badge {
+  border: 1px solid rgba(20, 184, 166, 0.35);
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.12);
+  color: #0f766e;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.board-cell.empty.interactive {
+  cursor: pointer;
+}
+
+.board-cell.empty.interactive:hover,
+.board-cell:not(.empty):hover {
+  border-color: var(--primary);
 }
 
 .board-cell-head {
@@ -364,8 +1055,233 @@ select:focus {
   white-space: nowrap;
 }
 
+.board-cell-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.board-cell-head .glow-badge {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.board-cell-head .return-badge {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.board-cell-head .locked-badge {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.board-cell-visual {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  width: 100%;
+  min-height: 44px;
+}
+
+.cooking-ingredient-image {
+  display: block;
+  width: auto;
+  max-width: 104px;
+  max-height: 54px;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 4px rgba(23, 32, 51, 0.22));
+}
+
+.cooking-ingredient-meat {
+  max-width: 112px;
+}
+
+.cooking-ingredient-fish {
+  max-height: 58px;
+  clip-path: inset(0 10px 0 0);
+}
+
+.cooking-ingredient-vegetable {
+  max-height: 52px;
+}
+
+.cooking-ingredient-noodle {
+  max-height: 52px;
+}
+
+.cooking-ingredient-egg {
+  max-height: 50px;
+}
+
+.cooking-ingredient-wheat {
+  max-height: 52px;
+}
+
 .board-cell-values {
   align-self: center;
+}
+
+.board-light-slot {
+  display: grid;
+}
+
+.board-light-toggle {
+  justify-self: stretch;
+  height: 24px;
+  min-height: 24px;
+  border: 1px solid #f59e0b;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #92400e;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.board-light-toggle.active {
+  background: #fef3c7;
+}
+
+.action-result {
+  align-self: center;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.board-cell-editor {
+  position: fixed;
+  z-index: 30;
+  width: min(260px, calc(100vw - 24px));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: 0 18px 44px rgba(23, 32, 51, 0.2);
+  padding: 12px;
+}
+
+.board-cell-editor[hidden] {
+  display: none;
+}
+
+/* 右クリック編集内の職人別フィールドを、表示指定に負けず確実に隠します。 */
+.board-cell-editor [hidden] {
+  display: none;
+}
+
+.board-cell-editor form {
+  display: grid;
+  gap: 10px;
+}
+
+.editor-title {
+  font-size: 14px;
+}
+
+.checkbox-field {
+  display: flex;
+  grid-template-columns: none;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkbox-field input {
+  width: 18px;
+  height: 18px;
+}
+
+.editor-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.editor-effect-mode,
+.editor-block-effect,
+.editor-cell-effect,
+.editor-damage-judgements,
+.editor-smithing-judgements {
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  margin: 0;
+  padding: 10px;
+}
+
+.editor-effect-mode[hidden],
+.editor-block-effect[hidden],
+.editor-cell-effect[hidden],
+.editor-damage-judgements[hidden],
+.editor-smithing-judgements[hidden] {
+  display: none;
+}
+
+.editor-effect-mode legend,
+.editor-block-effect legend,
+.editor-cell-effect legend,
+.editor-damage-judgements legend,
+.editor-smithing-judgements legend {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.editor-damage-judgement-rows,
+.editor-smithing-judgement-rows {
+  display: grid;
+  gap: 6px;
+}
+
+.editor-damage-judgement-row,
+.editor-smithing-judgement-row {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 4px 8px;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 6px;
+}
+
+.editor-damage-judgement-row:last-child,
+.editor-smithing-judgement-row:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.editor-damage-judgement-row strong,
+.editor-damage-judgement-row span,
+.editor-damage-judgement-row small,
+.editor-smithing-judgement-row strong,
+.editor-smithing-judgement-row span,
+.editor-smithing-judgement-row small {
+  color: inherit;
+  font-size: 12px;
+}
+
+/* 上記の color: inherit (詳細度 0,1,1) に負けないよう、判定行内のマイナスダメージ赤字を後から上書きします。 */
+.editor-damage-judgement-row .negative-damage,
+.editor-smithing-judgement-row .negative-damage {
+  color: #dc2626;
+}
+
+.editor-damage-judgement-row small,
+.editor-smithing-judgement-row small {
+  grid-column: 2;
+  font-weight: 800;
+  /* 判定名と値別発生率(バー)を縦に揃えて見せるため等幅で改行を保持する */
+  font-family: ui-monospace, "SFMono-Regular", "Consolas", monospace;
+  white-space: pre;
+  overflow-x: auto;
+}
+
+.editor-next-damage-range {
+  display: block;
+  min-height: 1.3em;
+  color: var(--muted) !important;
+  font-weight: 800;
 }
 
 .board-cell-values span {
@@ -383,76 +1299,79 @@ select:focus {
   font-weight: 800;
 }
 
-.table-scroll {
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  min-width: 1080px;
-  border-collapse: collapse;
-}
-
-th,
-td {
-  border-bottom: 1px solid var(--line);
-  padding: 10px 8px;
-  text-align: left;
-  vertical-align: middle;
-}
-
-th {
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 900;
-}
-
-td {
-  font-size: 14px;
-}
-
-td input {
-  min-height: 36px;
-}
-
-.lower-diff,
-.upper-diff,
-.normal-range,
-.critical-range {
-  font-variant-numeric: tabular-nums;
-  font-weight: 800;
-}
-
-.status-stable {
-  background: #dbeafe;
-  color: #1e40af;
-}
-
-.status-aim {
+.status-fake-critical-risk {
   background: #fef3c7;
   color: #92400e;
 }
 
 .status-guaranteed {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status-gauge-entry {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+.status-normal-chance {
   background: #dcfce7;
   color: #166534;
 }
 
-.status-warning {
+.status-over-risk {
   background: #ffedd5;
   color: #9a3412;
 }
 
-.status-danger,
+.status-target {
+  background: #ccfbf1;
+  color: #115e59;
+}
+
+.status-near-target {
+  background: #e0f2fe;
+  color: #075985;
+}
+
+.status-critical-only {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status-normal-over-risk {
+  background: #ffedd5;
+  color: #9a3412;
+}
+
+.status-over-guaranteed {
+  background: #fecaca;
+  color: #991b1b;
+}
+
 .status-over {
   background: #fee2e2;
   color: #991b1b;
 }
 
-.split-panel {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.8fr);
-  gap: 16px;
+.status-shortage {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-in-range {
+  background: #e0f2fe;
+  color: #075985;
+}
+
+.status-locked {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-locked-critical {
+  background: #d1fae5;
+  color: #065f46;
 }
 
 .recommendation-list {
@@ -519,8 +1438,11 @@ td input {
 }
 
 @media (max-width: 1160px) {
-  .layout,
-  .split-panel {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .technique-editor {
     grid-template-columns: 1fr;
   }
 }
@@ -560,5 +1482,15 @@ td input {
 
   .legend-grid {
     grid-template-columns: 1fr;
+  }
+
+  .reference-grid,
+  .reference-row,
+  .damage-reference .reference-row {
+    grid-template-columns: 1fr;
+  }
+
+  .reference-row small {
+    grid-column: 1;
   }
 }

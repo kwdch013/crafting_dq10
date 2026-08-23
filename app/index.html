@@ -3,23 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DQ10 職人支援ツール</title>
+    <title>DQ10 職人ダメージ計算</title>
+    <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <div class="app-shell">
       <header class="topbar">
         <div>
-          <p class="eyebrow" id="modeLabel">Craft Support MVP</p>
-          <h1>DQ10 職人支援ツール</h1>
+          <p class="eyebrow" id="modeLabel">Damage Calculator MVP</p>
+          <h1>DQ10 職人ダメージ計算</h1>
         </div>
         <div class="topbar-actions">
-          <button class="button secondary" id="exportButton" type="button" title="設定を書き出す">Export</button>
-          <button class="button secondary" id="resetButton" type="button" title="保存状態を初期化する">Reset</button>
-          <label class="button secondary file-button" title="設定を読み込む">
-            Import
-            <input id="importInput" type="file" accept="application/json" />
-          </label>
+          <button class="button secondary" id="recipeListButton" type="button" title="レシピを追加・削除する">レシピリスト</button>
+          <button class="button secondary" id="resetButton" type="button" title="数値と配置を初期化する">Reset</button>
         </div>
       </header>
 
@@ -39,13 +36,17 @@
                 職人種別
                 <select id="craftType"></select>
               </label>
-              <label id="recipeNameLabel">
-                <span>品目名</span>
-                <input id="recipeName" type="text" value="料理メモ" maxlength="60" />
+              <label id="recipeCategoryLabel" hidden>
+                <span>大項目</span>
+                <select id="recipeCategorySelect"></select>
               </label>
-              <label>
-                レシピ一覧
+              <label id="recipeSelectLabel">
+                <span id="recipeSelectTitle">制作物</span>
                 <select id="recipeSelect"></select>
+              </label>
+              <label id="recipeTraitLabel">
+                特性
+                <select id="recipeTraitInput"></select>
               </label>
               <label>
                 職人レベル
@@ -63,30 +64,67 @@
                 <span>集中力</span>
                 <input id="focusInput" type="number" value="120" min="0" max="999" readonly />
               </label>
-              <label id="turnLabel">
-                <span>残りターン</span>
-                <input id="turnInput" type="number" value="8" min="0" max="99" />
-              </label>
               <label id="stateLabel">
                 <span>火力状態</span>
                 <select id="heatInput">
                 </select>
               </label>
-              <label>
-                判定対象の特技
-                <select id="techniqueSelect"></select>
-              </label>
+              <p class="field-note" id="focusNote" hidden></p>
+            </div>
+          </div>
+
+          <div class="panel-section" id="traitInfoPanel">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Trait</p>
+                <h2>特性情報</h2>
+              </div>
+            </div>
+            <div class="trait-info">
+              <strong id="traitInfoName">-</strong>
+              <p id="traitInfoDescription">-</p>
             </div>
           </div>
 
           <div class="panel-section">
             <div class="section-heading">
               <div>
-                <p class="eyebrow">Technique</p>
-                <h2>特技データ</h2>
+                <p class="eyebrow">Details</p>
+                <h2>判定基準</h2>
               </div>
             </div>
-            <div id="techniqueEditor" class="technique-editor"></div>
+            <div class="legend-grid">
+              <span class="status status-guaranteed range-target-only-judgement">会心時確定</span>
+              <p class="range-target-only-judgement">現在値が基準下限未満で、会心最小値でも基準下限に届きます。鍛冶では本会心！として扱います。</p>
+              <span class="status status-gauge-entry smithing-only-judgement range-target-only-judgement">ゲージ突入</span>
+              <p class="smithing-only-judgement range-target-only-judgement">鍛冶で現在値が基準下限未満かつ、非会心の最大ダメージで基準範囲に入ります。</p>
+              <span class="status status-normal-chance fixed-target-only-judgement">チャンス!</span>
+              <p class="fixed-target-only-judgement">裁縫・木工で非会心ダメージのいずれかを加えると基準値ちょうどになります。</p>
+              <span class="status status-fake-critical-risk range-target-only-judgement">偽会心の可能性あり</span>
+              <p class="range-target-only-judgement">会心最大値なら基準下限へ届きますが、会心最小値では届かない状態です。</p>
+              <span class="status status-over-risk fixed-target-only-judgement">超過</span>
+              <p class="fixed-target-only-judgement">裁縫・木工で通常最大値を加えると基準値を超える状態です。</p>
+              <span class="status status-target fixed-target-only-judgement">基準値</span>
+              <p class="fixed-target-only-judgement">裁縫・木工で現在値が基準値ちょうどの状態です。</p>
+              <span class="status status-near-target fixed-target-only-judgement">基準値付近</span>
+              <p class="fixed-target-only-judgement">裁縫・木工で現在値と基準値の差が±1〜3の状態です。</p>
+              <span class="status status-critical-only fixed-target-only-judgement">会心時のみ確定</span>
+              <p class="fixed-target-only-judgement">裁縫・木工で通常時は基準値に届かず、会心最小値で基準値へ届く状態です。</p>
+              <span class="status status-normal-over-risk range-target-only-judgement">通常時超過の可能性あり</span>
+              <p class="range-target-only-judgement">通常最大値を加えると基準上限を超える可能性があります。</p>
+              <span class="status status-over-guaranteed fixed-target-only-judgement">超過確定</span>
+              <p class="fixed-target-only-judgement">裁縫・木工で通常最小値を加えても基準値を超える状態です。</p>
+              <span class="status status-over">超過中</span>
+              <p>現在値がすでに基準範囲の最大を超えています。</p>
+              <span class="status status-shortage">不足</span>
+              <p>会心最大値でも基準下限に届かない状態です。</p>
+              <span class="status status-in-range range-target-only-judgement">基準内</span>
+              <p class="range-target-only-judgement">現在値が基準範囲内で、通常最大値でも基準上限を超えない状態です。</p>
+              <span class="status status-locked cooking-only-judgement">固定</span>
+              <p class="cooking-only-judgement">固定済みのため、通常時も会心時も数値が変動しない状態です。</p>
+              <span class="status status-locked-critical cooking-only-judgement">本会心固定</span>
+              <p class="cooking-only-judgement">固定時の増加量が通常ダメージ候補の2倍では表せない状態です。</p>
+            </div>
           </div>
 
           <div class="panel-section">
@@ -99,11 +137,29 @@
             </div>
             <div class="capture-box">
               <div>
-                <strong>ブラウザ版MVPでは手入力を使用</strong>
-                <span>DQ10ウィンドウ選択、範囲キャリブレーション、OCRは次フェーズで接続します。</span>
+                <strong>画面共有から映像フレームを取得</strong>
+                <span>現時点では取得フレームの表示までを行い、OCRと範囲キャリブレーションは後続で接続します。</span>
               </div>
-              <button class="button secondary" id="captureButton" type="button">画面共有プレビュー</button>
+              <div class="capture-actions">
+                <button class="button secondary" id="captureButton" type="button">画面共有を開始</button>
+                <button class="button secondary" id="captureFrameButton" type="button" disabled>フレーム取得</button>
+              </div>
+              <dl class="capture-status" id="captureStatus">
+                <div>
+                  <dt>状態</dt>
+                  <dd id="captureStatusLabel">未接続</dd>
+                </div>
+                <div>
+                  <dt>入力</dt>
+                  <dd id="captureSourceLabel">-</dd>
+                </div>
+                <div>
+                  <dt>解像度</dt>
+                  <dd id="captureSizeLabel">-</dd>
+                </div>
+              </dl>
               <video id="capturePreview" muted autoplay playsinline hidden></video>
+              <canvas id="captureFrameCanvas" hidden></canvas>
             </div>
           </div>
         </section>
@@ -111,20 +167,16 @@
         <section class="main-panel">
           <div class="summary-grid">
             <article class="summary-card">
-              <span>確定会心候補</span>
+              <span>会心時確定</span>
               <strong id="guaranteedCount">0</strong>
             </article>
             <article class="summary-card">
-              <span>超過リスク</span>
+              <span>通常時超過</span>
               <strong id="warningCount">0</strong>
             </article>
             <article class="summary-card">
-              <span>危険マス</span>
+              <span>不足</span>
               <strong id="dangerCount">0</strong>
-            </article>
-            <article class="summary-card">
-              <span>選択特技</span>
-              <strong id="selectedTechniqueLabel">-</strong>
             </article>
           </div>
 
@@ -134,91 +186,118 @@
                 <p class="eyebrow">Board</p>
                 <h2 id="layoutSectionTitle">配置</h2>
               </div>
+              <div class="board-actions" id="boardActions">
+                <button class="button secondary" id="rotateWoodLeftButton" type="button" hidden>左90°</button>
+                <button class="button secondary" id="rotateWoodRightButton" type="button" hidden>右90°</button>
+                <button class="button secondary" id="undoBoardButton" type="button">戻る</button>
+                <button class="button secondary" id="redoBoardButton" type="button">進む</button>
+              </div>
             </div>
+            <div class="cooking-command-panel" id="cookingCommandPanel" hidden>
+              <div class="command-group special-only-command">
+                <span>必殺</span>
+                <button class="command-title special-charge-toggle" id="specialChargeToggle" type="button">ミラクルグリル</button>
+                <span class="board-special-state" id="boardSpecialStateLabel">未チャージ</span>
+                <button class="button secondary cooking-command-button" id="miracleGrillButton" type="button">適用</button>
+                <strong class="command-result" id="miracleGrillResult" hidden></strong>
+              </div>
+              <div class="command-group cooking-only-command">
+                <span>火力</span>
+                <button class="button secondary cooking-command-button" id="normalHeatButton" type="button">通常</button>
+                <button class="button secondary cooking-command-button" id="strongHeatButton" type="button">強火焼き</button>
+                <button class="button secondary cooking-command-button" id="halfHeatButton" type="button">弱火焼き</button>
+              </div>
+              <div class="command-group cooking-only-command">
+                <span>特性</span>
+                <button class="button secondary cooking-command-button" id="clearCookingLightButton" type="button">光を解除</button>
+                <button class="button secondary cooking-command-button" id="clearCookingEffectButton" type="button">なし</button>
+                <button class="button secondary cooking-command-button" id="crossGlowButton" type="button">上下左右が光る</button>
+                <button class="button secondary cooking-command-button" id="cornerReturnButton" type="button">四隅が戻る</button>
+              </div>
+              <div class="command-group smithing-only-command">
+                <span>光地金</span>
+                <button class="button secondary cooking-command-button" id="toggleSmithingLightButton" type="button">光を一括切替</button>
+              </div>
+              <div class="command-group smithing-only-command">
+                <span>温度</span>
+                <button class="button secondary cooking-command-button" id="smithingHeatDown200Button" type="button">-200℃</button>
+                <div class="smithing-heat-controls">
+                  <button class="button secondary" id="smithingHeatDownButton" type="button">-50℃</button>
+                  <label class="sr-only" for="smithingTemperatureSelect">BOARD内温度</label>
+                  <select class="smithing-temperature-select" id="smithingTemperatureSelect"></select>
+                  <button class="button secondary" id="smithingHeatUpButton" type="button">+50℃</button>
+                </div>
+                <button class="button secondary cooking-command-button" id="smithingHeatUp200Button" type="button">+200℃</button>
+              </div>
+              <div class="command-group sewing-only-command" hidden>
+                <span>ぬいパワー</span>
+                <div class="sewing-power-buttons" id="sewingPowerButtons"></div>
+                <label class="sewing-next-power-control" for="sewingNextPowerSelect">
+                  <span>次</span>
+                  <select id="sewingNextPowerSelect" aria-label="次ターンのぬいパワー"></select>
+                </label>
+                <button class="button secondary" id="sewingAdvancePowerButton" type="button">ターン送り</button>
+                <button class="button secondary sewing-regenerate-cloth-button" id="sewingRegenerateClothButton" type="button" aria-pressed="false">再生布</button>
+              </div>
+            </div>
+            <div class="smithing-board-trait-state" id="smithingBoardTraitState"></div>
+            <div class="board-total-error" id="boardTotalError" hidden></div>
             <div id="layoutBoard" class="craft-board"></div>
           </div>
 
-          <div class="panel-section">
+          <div class="panel-section" id="techniqueDataPanel">
             <div class="section-heading">
               <div>
-                <p class="eyebrow">Values</p>
-                <h2 id="itemSectionTitle">状態入力</h2>
+                <p class="eyebrow">Technique</p>
+                <h2>特技データ</h2>
               </div>
-              <button class="button secondary" id="addIngredientButton" type="button">項目を追加</button>
             </div>
-            <div class="table-scroll">
-              <table>
-                <thead>
-                  <tr>
-                    <th id="itemNameHeader">項目名</th>
-                    <th id="itemOptionHeader">種別</th>
-                    <th>現在値</th>
-                    <th>基準値</th>
-                    <th>成功下限</th>
-                    <th>成功上限</th>
-                    <th>下限まで</th>
-                    <th>上限まで</th>
-                    <th>通常後</th>
-                    <th>会心後</th>
-                    <th>判定</th>
-                    <th>操作</th>
-                  </tr>
-                </thead>
-                <tbody id="ingredientBody"></tbody>
-              </table>
+            <div id="techniqueEditor" class="technique-editor"></div>
+          </div>
+
+          <div class="panel-section smithing-damage-panel" id="smithingDamagePanel" hidden>
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Smithing Damage</p>
+                <h2>温度別ダメージ</h2>
+              </div>
+            </div>
+            <div class="smithing-damage-grid" id="smithingDamageRanges"></div>
+          </div>
+
+          <div class="panel-section" id="craftReferencePanel" hidden>
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Reference</p>
+                <h2>調理メモ</h2>
+              </div>
+            </div>
+            <div class="reference-grid">
+              <section>
+                <h3>レシピ特性</h3>
+                <div class="reference-list" id="recipeTraitReference"></div>
+              </section>
+              <section>
+                <h3>位置別ダメージ</h3>
+                <div class="reference-list damage-reference" id="cookingDamageRanges"></div>
+              </section>
             </div>
           </div>
 
-          <div class="split-panel">
-            <section class="panel-section">
-              <div class="section-heading">
-                <div>
-                  <p class="eyebrow">Recommendation</p>
-                  <h2>候補手</h2>
-                </div>
+          <!-- 候補手パネルは一時非表示 (推奨ロジックは main.js に残置)。再表示する際はこのコメントを外します。
+          <section class="panel-section">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Recommendation</p>
+                <h2>候補手</h2>
               </div>
-              <ol class="recommendation-list" id="recommendationList"></ol>
-            </section>
-
-            <section class="panel-section">
-              <div class="section-heading">
-                <div>
-                  <p class="eyebrow">Details</p>
-                  <h2>判定基準</h2>
-                </div>
-              </div>
-              <div class="legend-grid">
-                <span class="status status-guaranteed">確定会心</span>
-                <p>会心時の最小から最大までが成功範囲内に収まります。</p>
-                <span class="status status-aim">会心狙い</span>
-                <p>会心なら成功範囲に入る可能性があります。</p>
-                <span class="status status-warning">超過注意</span>
-                <p>通常または会心で成功上限を超えるリスクがあります。</p>
-                <span class="status status-danger">危険</span>
-                <p>選択中の特技では成功範囲に寄せにくい状態です。</p>
-              </div>
-            </section>
-          </div>
+            </div>
+            <ol class="recommendation-list" id="recommendationList"></ol>
+          </section>
+          -->
         </section>
       </main>
     </div>
-
-    <template id="ingredientRowTemplate">
-      <tr>
-        <td><input class="ingredient-name" type="text" maxlength="30" /></td>
-        <td><select class="ingredient-option"></select></td>
-        <td><input class="ingredient-current numeric" type="number" /></td>
-        <td><input class="ingredient-target numeric" type="number" /></td>
-        <td><input class="ingredient-min numeric" type="number" /></td>
-        <td><input class="ingredient-max numeric" type="number" /></td>
-        <td class="lower-diff"></td>
-        <td class="upper-diff"></td>
-        <td class="normal-range"></td>
-        <td class="critical-range"></td>
-        <td><span class="status"></span></td>
-        <td><button class="icon-button danger remove-ingredient" type="button" title="削除">×</button></td>
-      </tr>
-    </template>
 
     <template id="techniqueTemplate">
       <article class="technique-card">
@@ -239,15 +318,61 @@
           <span>威力</span>
           <strong class="tech-multiplier numeric"></strong>
         </div>
+        <small class="tech-distribution numeric"></small>
       </article>
     </template>
+
+    <dialog class="recipe-dialog" id="recipeListDialog">
+      <form class="dialog-panel" method="dialog">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">Recipes</p>
+            <h2>レシピリスト</h2>
+          </div>
+          <button class="icon-button" id="recipeListCloseButton" type="submit" value="close" aria-label="閉じる">×</button>
+        </div>
+        <div class="recipe-manager">
+          <label>
+            職人を選択
+            <select id="recipeManagerCraftSelect"></select>
+          </label>
+          <div class="recipe-manager-categories" id="recipeManagerCategories"></div>
+          <div class="recipe-manager-list" id="recipeManagerList"></div>
+          <button class="button primary" id="openAddRecipeButton" type="button">新規追加</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="recipe-dialog" id="addRecipeDialog">
+      <form class="dialog-panel recipe-form" id="addRecipeForm" method="dialog">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">New Recipe</p>
+            <h2 id="addRecipeDialogTitle">レシピ追加</h2>
+          </div>
+          <button class="icon-button" id="addRecipeCloseButton" type="button" aria-label="閉じる">×</button>
+        </div>
+        <div class="field-grid two" id="addRecipeFields"></div>
+        <div>
+          <h3 class="form-subheading">マス設定</h3>
+          <div class="recipe-item-editor" id="addRecipeItems"></div>
+          <button class="button secondary recipe-item-add-button" id="addRecipeItemButton" type="button">マスを追加</button>
+        </div>
+        <div class="dialog-actions">
+          <button class="button secondary" id="cancelAddRecipeButton" type="button">キャンセル</button>
+          <button class="button primary" id="saveRecipeButton" type="submit">追加</button>
+        </div>
+      </form>
+    </dialog>
 
     <script src="./config.js"></script>
     <script src="./crafts/registry.js"></script>
     <script src="./crafts/shared/smithing-damage.js"></script>
+    <script src="./crafts/shared/smithing-component.js"></script>
     <script src="./crafts/shared/sewing-damage.js"></script>
     <script src="./crafts/shared/woodworking-damage.js"></script>
     <script src="./crafts/shared/cooking-damage.js"></script>
+    <script src="./crafts/cooking/component.js"></script>
     <script src="./crafts/cooking/config.js"></script>
     <script src="./crafts/cooking/recipes.js"></script>
     <script src="./crafts/weapon-smithing/config.js"></script>
@@ -256,15 +381,21 @@
     <script src="./crafts/armor-smithing/recipes.js"></script>
     <script src="./crafts/tool-smithing/config.js"></script>
     <script src="./crafts/tool-smithing/recipes.js"></script>
+    <script src="./crafts/sewing/component.js"></script>
     <script src="./crafts/sewing/config.js"></script>
     <script src="./crafts/sewing/recipes.js"></script>
+    <script src="./crafts/woodworking/component.js"></script>
     <script src="./crafts/woodworking/config.js"></script>
     <script src="./crafts/woodworking/recipes.js"></script>
-    <script src="./crafts/lamp-alchemy/config.js"></script>
-    <script src="./crafts/lamp-alchemy/recipes.js"></script>
-    <script src="./crafts/pot-alchemy/config.js"></script>
-    <script src="./crafts/pot-alchemy/recipes.js"></script>
+    <script src="./recipe-archive.js"></script>
+    <script src="./state-reset.js"></script>
+    <script src="./board-cell-editor.js"></script>
+    <script src="./cooking-effects.js"></script>
+    <script src="./cooking-ingredients.js"></script>
+    <script src="./cooking-recipe-editor.js"></script>
+    <script src="./capture-reader.js"></script>
     <script src="./engine.js"></script>
+    <script src="./board-layout.js"></script>
     <script src="./main.js"></script>
   </body>
 </html>

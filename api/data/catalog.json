@@ -5,8 +5,6 @@
     { "id": "armor-smithing", "label": "防具鍛冶" },
     { "id": "tool-smithing", "label": "道具鍛冶" },
     { "id": "sewing", "label": "裁縫" },
-    { "id": "woodworking", "label": "木工" },
-    { "id": "lamp-alchemy", "label": "ランプ錬金" },
-    { "id": "pot-alchemy", "label": "ツボ錬金" }
+    { "id": "woodworking", "label": "木工" }
   ]
 }

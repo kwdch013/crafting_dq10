@@ -1,16 +1,39 @@
+// 設定単体で読み込まれるテストでも座標名を生成できるようにします。
+function getWoodworkingPositionName(row, column) {
+  if (typeof createDQ10CoordinatePositionName === "function") {
+    return createDQ10CoordinatePositionName(row, column, 3);
+  }
+
+  return String.fromCharCode(64 + ((Number(row) - 1) * 3 + Number(column)));
+}
+
+// 木工の参照画像に合わせた固定基準値テンプレートを作成します。
+// optionId で木目の初期向き(横=順目/縦=逆目)を指定できるようにします。
+function createWoodworkingTemplateItems(cells, optionId = "horizontal") {
+  return cells.map(({ row, column }, index) => ({
+    id: `part-${index + 1}`,
+    name: getWoodworkingPositionName(row, column),
+    optionId,
+    gridCell: { row, column },
+    current: 0,
+    target: 74,
+    successMin: 74,
+    successMax: 74,
+  }));
+}
+
 registerDQ10Craft({
   id: "woodworking",
   label: "木工",
   modeLabel: "Woodworking Settings",
   recipeLabel: "装備名",
-  itemSectionTitle: "木材マス入力",
+  recipeCategoryLabel: "大項目",
+  recipeSubcategoryLabel: "装備名",
   itemNameLabel: "マス名",
-  itemOptionLabel: "木目",
-  addItemLabel: "マスを追加",
   resourceLabel: "集中力",
-  turnLabel: "残り手数",
   stateLabel: "状態",
   defaultRecipeName: "木工メモ",
+  itemOptionLabel: "木目",
   defaultFocus: 135,
   focus: createDQ10FocusConfig({
     defaultFocus: 135,
@@ -19,7 +42,6 @@ registerDQ10Craft({
     defaultStars: 3,
     toolTypes: [{ id: "woodworking-knife", label: "木工刀" }],
   }),
-  defaultTurns: 9,
   layout: {
     label: "木材配置",
     columns: 3,
@@ -27,31 +49,65 @@ registerDQ10Craft({
     fixed: true,
   },
   itemOptions: [
-    { id: "parallel", label: "並行" },
-    { id: "vertical", label: "垂直" },
+    { id: "horizontal", label: "横" },
+    { id: "vertical", label: "縦" },
   ],
-  techniquePreviewOptionId: "parallel",
+  // 木工の大項目は参照画像ファイル名と同期します。
+  recipeCategoryOptions: [
+    { id: "stick", label: "スティック", templateItems: createWoodworkingTemplateItems([
+      { row: 1, column: 2 },
+      { row: 2, column: 2 },
+    ]) },
+    { id: "staff", label: "杖", templateItems: createWoodworkingTemplateItems([
+      { row: 1, column: 2 },
+      { row: 2, column: 2 },
+      { row: 3, column: 2 },
+    ]) },
+    { id: "kon", label: "昆", templateItems: createWoodworkingTemplateItems([
+      { row: 1, column: 1 },
+      { row: 1, column: 2 },
+      { row: 2, column: 1 },
+      { row: 2, column: 2 },
+      { row: 3, column: 1 },
+      { row: 3, column: 2 },
+    ]) },
+    { id: "fan", label: "扇", templateItems: createWoodworkingTemplateItems([
+      { row: 1, column: 1 },
+      { row: 1, column: 2 },
+      { row: 2, column: 1 },
+      { row: 2, column: 2 },
+    ]) },
+    { id: "bow", label: "弓", templateItems: createWoodworkingTemplateItems([
+      { row: 1, column: 1 },
+      { row: 1, column: 2 },
+      { row: 2, column: 1 },
+      { row: 3, column: 1 },
+      { row: 3, column: 2 },
+    ]) },
+    // 釣り竿は列2に縦(逆目)3マス、列1は行2-3の2マスを並べた計5マス形状です。
+    { id: "fishing_rod", label: "釣り竿", templateItems: createWoodworkingTemplateItems([
+      { row: 1, column: 2 },
+      { row: 2, column: 1 },
+      { row: 2, column: 2 },
+      { row: 3, column: 1 },
+      { row: 3, column: 2 },
+    ], "vertical") },
+  ],
+  techniquePreviewOptionId: "horizontal",
   heatStates: [
     { id: "normal", label: "通常" },
   ],
   techniques: [
     { id: "cut", name: "けずる", focusCost: 5, damageModel: "woodworking-grain", powerId: "normal", multiplier: 1, criticalMultiplier: 2, criticalWeight: 1 },
-    { id: "double", name: "2倍削り", focusCost: 8, damageModel: "woodworking-grain", powerId: "normal", repeat: 2, multiplier: 2, criticalMultiplier: 2, criticalWeight: 0.9 },
-    { id: "triple", name: "3倍削り", focusCost: 11, damageModel: "woodworking-grain", powerId: "normal", repeat: 3, multiplier: 3, criticalMultiplier: 2, criticalWeight: 0.85 },
+    { id: "double", name: "2倍削り", focusCost: 8, damageModel: "woodworking-grain", powerId: "power_2_0", multiplier: 2, criticalMultiplier: 2, criticalWeight: 0.9 },
+    { id: "triple", name: "3倍削り", focusCost: 11, damageModel: "woodworking-grain", powerId: "power_3_0", multiplier: 3, criticalMultiplier: 2, criticalWeight: 0.85 },
     { id: "plane", name: "カンナがけ", focusCost: 6, damageModel: "woodworking-grain", powerId: "plane", multiplier: 0.4, criticalMultiplier: 2, criticalWeight: 0.8 },
     { id: "aim", name: "ねらい削り", focusCost: 16, damageModel: "woodworking-grain", powerId: "normal", multiplier: 1, criticalMultiplier: 2, criticalWeight: 1.8 },
     { id: "rise", name: "昇竜彫り", focusCost: 7, damageModel: "woodworking-grain", powerId: "power_1_4", multiplier: 1.4, criticalMultiplier: 2, criticalWeight: 0.9 },
     { id: "river", name: "大河彫り", focusCost: 7, damageModel: "woodworking-grain", powerId: "power_1_4", multiplier: 1.4, criticalMultiplier: 2, criticalWeight: 0.9 },
   ],
   items: [
-    { id: "part-1", name: "左上", optionId: "parallel", gridCell: { row: 1, column: 1 }, current: 0, successMin: 65, successMax: 82 },
-    { id: "part-2", name: "上", optionId: "parallel", gridCell: { row: 1, column: 2 }, current: 0, successMin: 65, successMax: 82 },
-    { id: "part-3", name: "右上", optionId: "parallel", gridCell: { row: 1, column: 3 }, current: 0, successMin: 65, successMax: 82 },
-    { id: "part-4", name: "左", optionId: "vertical", gridCell: { row: 2, column: 1 }, current: 0, successMin: 65, successMax: 82 },
-    { id: "part-5", name: "中央", optionId: "parallel", gridCell: { row: 2, column: 2 }, current: 0, successMin: 65, successMax: 82 },
-    { id: "part-6", name: "右", optionId: "vertical", gridCell: { row: 2, column: 3 }, current: 0, successMin: 65, successMax: 82 },
-    { id: "part-7", name: "左下", optionId: "parallel", gridCell: { row: 3, column: 1 }, current: 0, successMin: 65, successMax: 82 },
-    { id: "part-8", name: "下", optionId: "parallel", gridCell: { row: 3, column: 2 }, current: 0, successMin: 65, successMax: 82 },
-    { id: "part-9", name: "右下", optionId: "parallel", gridCell: { row: 3, column: 3 }, current: 0, successMin: 65, successMax: 82 },
+    { id: "part-1", name: "B", optionId: "horizontal", gridCell: { row: 1, column: 2 }, current: 0, target: 74, successMin: 74, successMax: 74 },
+    { id: "part-2", name: "E", optionId: "horizontal", gridCell: { row: 2, column: 2 }, current: 0, target: 74, successMin: 74, successMax: 74 },
   ],
 });

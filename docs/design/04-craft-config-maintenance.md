@@ -12,47 +12,51 @@
 app/crafts/
   registry.js
   shared/cooking-damage.js
+  shared/smithing-component.js
   shared/smithing-damage.js
   shared/sewing-damage.js
   shared/woodworking-damage.js
+  cooking/component.js
   cooking/config.js
   weapon-smithing/config.js
   armor-smithing/config.js
   tool-smithing/config.js
+  sewing/component.js
   sewing/config.js
+  woodworking/component.js
   woodworking/config.js
-  lamp-alchemy/config.js
-  pot-alchemy/config.js
 ```
 
 ## 設定ファイルの役割
 
 各 `config.js` は `registerDQ10Craft()` を呼び出して職人設定を登録します。
 
-設定する主な項目:
+登録時に `app/crafts/registry.js` が設定キーを `settingGroups.common` と `settingGroups.individual` に分類します。
+未分類キーは `settingGroups.unknown` に入り、テストで検出します。
 
-- `id`: 職人ID
-- `label`: UI表示名
-- `modeLabel`: 画面上部の補足表示
-- `recipeLabel`: 品目名ラベル
-- `itemSectionTitle`: 入力表の見出し
-- `itemNameLabel`: マス名のラベル
-- `addItemLabel`: 追加ボタンの文言
-- `resourceLabel`: 集中力などのリソース名
-- `turnLabel`: 残りターンや残り手数のラベル
-- `defaultRecipeName`: 初期品目名
-- `defaultFocus`: 初期集中力
-- `focus`: レベル別集中力と道具補正
-- `defaultTurns`: 初期残り手数
-- `heatStates`: 火力や状態の選択肢
-- `techniques`: 特技一覧
-- `itemOptions`: マスや具材ごとの種別選択肢
-- `items`: 初期マス一覧
+共通設定はUIやエンジンで同じ意味を持つ設定です。
+対象キー: `resourceLabel`、`stateLabel`、`targetMode`、`defaultFocus`、`focus`、`focusNote`、`layout`、`heatStates`、`techniquePreviewOptionId`、`defaultHeatId`、`allowCustomRecipes`
+
+個別設定は職人やレシピ種別ごとに意味や値が変わる設定です。
+対象キー: `id`、`label`、`modeLabel`、`recipeLabel`、`recipeCategoryLabel`、`recipeSubcategoryLabel`、`recipeCategoryOptions`、`itemNameLabel`、`itemOptionLabel`、`itemOptions`、`defaultRecipeName`、`defaultTraitId`、`defaultTurns`、`traits`、`techniques`、`items`
+
+道具鍛冶の大項目は `refarence/tool` の画像種別と合わせ、針、木工刀、ハンマー、ツボ、ランプ、フライパン、ルアー、素材の8種類を `tool-smithing/config.js` に定義します。ハンマーのテンプレートは左列が縦3マス、右列が縦2マスの5マス配置として扱います。ルアーのテンプレートは左列が縦2マス、右列が上段1マスの3マス配置として扱います。素材のテンプレートは左列が縦3マス、右列も縦3マスの6マス配置として扱います。
+具体的な制作物名は道具名としてレシピJSONに登録します。
 
 調理の位置別ダメージは `shared/cooking-damage.js` に分離します。
 鍛冶系の温度別ダメージは `shared/smithing-damage.js` に分離します。
 各職人の `config.js` には、特技が参照するIDだけを設定します。
 裁縫と木工の基礎データも `shared/` 配下に分離します。
+
+## コンポーネントファイルの役割
+
+職人固有の画面差分は `app/crafts/<職人>/component.js` に分離します。
+例として、調理の特性メモ、食材画像、光・戻り、封じ効果、盤面右クリック編集は `cooking/component.js` が担当します。
+
+武器鍛冶、防具鍛冶、道具鍛冶は同じ鍛冶系の画面構造を使うため、`shared/smithing-component.js` で共通化します。
+各鍛冶職人の `config.js` は `createDQ10SmithingCraftConfig()` に職人固有のラベル、特技、初期マスを渡します。
+
+関数、定数、設定定義を追加または変更する場合は、日本語コメントで目的を記載します。
 
 ## 特技設定
 
@@ -129,6 +133,7 @@ center: {
 ```
 
 `powerId` は `shared/smithing-damage.js` の威力キーに対応します。
+鍛冶職人の選択特技は各 `app/crafts/*-smithing/config.js` で倍率の低い順に管理します。
 
 ## 鍛冶ダメージ設定
 
@@ -144,13 +149,15 @@ center: {
 
 配列は `[最小値, 最大値]` です。
 7通りの候補値は保持せず、判定に必要な最小値と最大値だけを保持します。
+威力は0.5倍、通常、1.2倍、2倍、2.5倍、3倍を倍率の低い順に表示し、0.8倍は鍛冶系の表示対象に含めません。会心時は通常ダメージの2倍として扱うため、鍛冶BOARDのダメージ表では通常最小値の2倍を会心時の最低ダメージとして表示します。光地金で有効温度の光マスは通常威力をさらに2倍にし、倍半は400℃の倍数で威力2倍、200℃の倍数かつ400℃の倍数でない時は威力半減、集中変化は威力を変えず消費集中を半減または1.5倍にします。戻りは200n+50℃の時に次が戻りターンであることだけを表示し、戻り値は手動入力します。鍛冶の必殺 `ヘパイトスの火種` は状態管理だけで扱い、特技設定には追加しません。状態が `使用中` の場合は、温度別ダメージと地金特性の威力補正を反映した後の会心範囲で判定します。
 
 現在の鍛冶ダメージ表は、極限攻略の「鍛冶職人の温度別数値ダメージ」を参照して作成しています。
 
 ## 裁縫ダメージ設定
 
 裁縫の基礎データは `shared/sewing-damage.js` に定義します。
-
+特技データとBOARDの右クリック編集では、現在のぬいパワーで使用できる威力別ダメージ、判定、値ごとの発生確率を表示します。
+裁縫は固定基準値職人として扱い、判定は不足、チャンス!、超過、基準値、基準値付近、会心時のみ確定、超過確定、超過中に分類します。
 ```js
 normal: {
   sew: [
@@ -161,12 +168,15 @@ normal: {
 ```
 
 `value` はダメージ量、`percent` は参考確率です。
+各威力の非会心分布に `target - current` と同じ `value` があれば、その威力を「チャンス!」と判定します。
 
 現在の裁縫データは `https://dqxx.xyz/dq10-sewing-numerical-table/` を参照して作成しています。
 
 ## 木工ダメージ設定
 
 木工の基礎データは `shared/woodworking-damage.js` に定義します。
+特技データとBOARDの右クリック編集では、マスの木目に応じた威力別ダメージ、判定、値ごとの発生確率を表示します。
+木工は固定基準値職人として扱い、判定は不足、チャンス!、超過、基準値、基準値付近、会心時のみ確定、超過確定、超過中に分類します。
 
 ```js
 parallel: {
@@ -177,12 +187,12 @@ parallel: {
 }
 ```
 
-`parallel` は順目です。
-`vertical` は逆目です。
-
-ユーザー向けには、順目を並行、逆目を垂直として扱います。
-
-現在の木工データは `https://xn--10-yg4a1a3kyh.jp/dq10_artisan4.html` を参照して作成しています。
+レシピ側の `optionId` は `horizontal` を横、`vertical` を縦として保存します。
+裁縫と同様に、各威力の非会心分布に `target - current` と同じ値があれば、その威力を「チャンス!」と判定します。
+ダメージ表の既存キーでは `horizontal` を順目の `parallel` へ解決し、`vertical` を逆目として扱います。
+2倍削りと3倍削りは通常削りの合算ではなく、参照画像に記載された専用の7候補を使います。
+くさび有効時も単純倍率ではなく、木目と威力に対応するくさび専用候補を使います。
+現在の木工データは `refarence/woodworking/木工ダメージ.png` を参照して作成しています。
 
 ## 集中力設定
 
@@ -218,6 +228,12 @@ focus: createDQ10FocusConfig({
 | `toolTypes` | 道具種類と★数ごとの集中力補正 |
 
 画面の集中力は `levels` の基礎集中力と `focusBonusByStars` の補正値を足して算出します。
+`focusBonus` を指定した道具は、全ての★で同じ集中力加算になります。
+
+鍛冶と調理の確認済み集中力は `app/crafts/registry.js` の共有表で管理します。
+奇跡の鍛冶ハンマーと奇跡のフライパンは、集中力補正を +50 として扱います。
+光の鍛冶ハンマーは鍛冶共通の使用道具として扱い、集中力補正は +45 です。
+鍛冶の Lv80 集中力は 208 として登録し、鍛冶の Lv76-79 と調理の Lv76-80 は未確認のため、暫定的に Lv75 以降を各レベル +2 として登録します。
 
 ## 初期マス設定
 
@@ -226,7 +242,8 @@ focus: createDQ10FocusConfig({
 ```js
 {
   id: "slot-1",
-  name: "具材 1",
+  name: "A",
+  gridCell: { row: 1, column: 1 },
   current: 0,
   successMin: 60,
   successMax: 75
@@ -238,10 +255,14 @@ focus: createDQ10FocusConfig({
 | 項目 | 意味 |
 | --- | --- |
 | `id` | マスの内部ID |
-| `name` | UI表示名 |
+| `name` | 盤面上の位置名。原則は空白セルを含む左上からの座標順、鍛冶系は占有マスだけの読み順でA/B/C...と数える |
+| `gridCell` | 1始まりの盤面座標 |
 | `current` | 初期現在値 |
 | `successMin` | 成功下限 |
 | `successMax` | 成功上限 |
+
+鍛冶系の初期マスは、`createDQ10ReadingOrderPositionName()` を使って、レシピが使用するマスだけを読み順（行→列）に並べたA/B/C...名にします。
+単一列テンプレートや実レシピでは、空白列を数えたA/C/Eではなく、画面に出るマスだけのA/B/Cを使います。
 
 ## 新しい職人を追加する手順
 
@@ -261,24 +282,18 @@ focus: createDQ10FocusConfig({
 6. 反映されない場合は、ブラウザキャッシュまたはlocalStorageを確認します。
 
 特技ダメージは画面上では編集できません。
-固定値の保守は設定ファイルに集約します。
-集中力も画面上では編集できません。
+固定値と集中力の保守は設定ファイルに集約します。
 
 ## 注意点
 
-- `id` は職人内で重複させないでください。
-- `normalMin` は `normalMax` 以下にしてください。
-- `criticalMin` は `criticalMax` 以下にしてください。
-- `levels` の `level` は重複させないでください。
-- `toolTypes` の `id` は職人内で重複させないでください。
+- `id`、`levels.level`、`toolTypes.id` は職人内で重複させないでください。
+- `normalMin` は `normalMax` 以下、`criticalMin` は `criticalMax` 以下にしてください。
 - 成功範囲の下限と上限を逆に入力しても共通エンジン側で補正しますが、設定ファイルでは正しい順序で書いてください。
-- Importファイルに古い特技数値や集中力が含まれていても、現在の実装では職人別 `config.js` の特技数値と集中力設定を優先します。
+- レシピリストで追加するレシピは、職人別 `config.js` の特技数値と集中力設定を使います。
 
 ## 将来の拡張
 
 職人固有の特殊ルールが増えた場合は、以下のどちらかで対応します。
 
 - 共通エンジンに設定可能な評価ルールを追加する
-- `app/crafts/<職人>/engine.js` を追加して職人別エンジンに分離する
-
-まずは設定で吸収し、共通化できない差分だけを職人別エンジンへ移します。
+- 共通化できない差分だけ `app/crafts/<職人>/engine.js` へ分離する

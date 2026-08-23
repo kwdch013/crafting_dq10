@@ -1,13 +1,34 @@
+// 設定単体で読み込まれるテストでも座標名を生成できるようにします。
+function getSewingPositionName(row, column) {
+  if (typeof createDQ10CoordinatePositionName === "function") {
+    return createDQ10CoordinatePositionName(row, column, 3);
+  }
+
+  return String.fromCharCode(64 + ((Number(row) - 1) * 3 + Number(column)));
+}
+
+// 裁縫の参照画像に合わせた固定基準値テンプレートを作成します。
+function createSewingTemplateItems(cells) {
+  return cells.map(({ row, column }, index) => ({
+    id: `part-${index + 1}`,
+    name: getSewingPositionName(row, column),
+    gridCell: { row, column },
+    current: 0,
+    target: 78,
+    successMin: 78,
+    successMax: 78,
+  }));
+}
+
 registerDQ10Craft({
   id: "sewing",
   label: "裁縫",
   modeLabel: "Sewing Settings",
   recipeLabel: "装備名",
-  itemSectionTitle: "布マス入力",
+  recipeCategoryLabel: "大項目",
+  recipeSubcategoryLabel: "装備名",
   itemNameLabel: "マス名",
-  addItemLabel: "マスを追加",
   resourceLabel: "集中力",
-  turnLabel: "残り手数",
   stateLabel: "ぬいパワー",
   defaultRecipeName: "裁縫メモ",
   defaultFocus: 145,
@@ -18,13 +39,51 @@ registerDQ10Craft({
     defaultStars: 3,
     toolTypes: [{ id: "sewing-needle", label: "さいほう針" }],
   }),
-  defaultTurns: 10,
   layout: {
     label: "布配置",
     columns: 3,
     rows: 3,
     fixed: false,
   },
+  // 裁縫の大項目は参照画像ファイル名と同期します。
+  recipeCategoryOptions: [
+    { id: "head", label: "アタマ", templateItems: createSewingTemplateItems([
+      { row: 1, column: 2 },
+      { row: 2, column: 1 },
+      { row: 2, column: 2 },
+      { row: 2, column: 3 },
+    ]) },
+    { id: "body-upper", label: "からだ上", templateItems: createSewingTemplateItems([
+      { row: 1, column: 1 },
+      { row: 1, column: 2 },
+      { row: 1, column: 3 },
+      { row: 2, column: 1 },
+      { row: 2, column: 2 },
+      { row: 2, column: 3 },
+    ]) },
+    { id: "body-lower", label: "からだ下", templateItems: createSewingTemplateItems([
+      { row: 1, column: 1 },
+      { row: 1, column: 2 },
+      { row: 2, column: 1 },
+      { row: 2, column: 2 },
+      { row: 3, column: 1 },
+      { row: 3, column: 2 },
+    ]) },
+    { id: "arm", label: "ウデ", templateItems: createSewingTemplateItems([
+      { row: 1, column: 1 },
+      { row: 1, column: 2 },
+      { row: 1, column: 3 },
+      { row: 2, column: 1 },
+      { row: 2, column: 2 },
+      { row: 2, column: 3 },
+    ]) },
+    { id: "foot", label: "足", templateItems: createSewingTemplateItems([
+      { row: 1, column: 1 },
+      { row: 1, column: 2 },
+      { row: 2, column: 1 },
+      { row: 2, column: 2 },
+    ]) },
+  ],
   heatStates: DQ10SewingDamage.powerStates,
   techniques: [
     { id: "sew", name: "ぬう", focusCost: 5, damageModel: "sewing-power", actionId: "sew", multiplier: 1, criticalMultiplier: 2, criticalWeight: 1 },
@@ -37,11 +96,11 @@ registerDQ10Craft({
     { id: "wind-around", name: "巻きこみ周り", focusCost: 10, damageModel: "sewing-power", actionId: "wind_around", multiplier: 0.75, criticalMultiplier: 2, criticalWeight: 0.8 },
   ],
   items: [
-    { id: "part-1", name: "左上", gridCell: { row: 1, column: 1 }, current: 0, successMin: 70, successMax: 85 },
-    { id: "part-2", name: "中央上", gridCell: { row: 1, column: 2 }, current: 0, successMin: 70, successMax: 85 },
-    { id: "part-3", name: "右上", gridCell: { row: 1, column: 3 }, current: 0, successMin: 70, successMax: 85 },
-    { id: "part-4", name: "左下", gridCell: { row: 3, column: 1 }, current: 0, successMin: 70, successMax: 85 },
-    { id: "part-5", name: "中央下", gridCell: { row: 3, column: 2 }, current: 0, successMin: 70, successMax: 85 },
-    { id: "part-6", name: "右下", gridCell: { row: 3, column: 3 }, current: 0, successMin: 70, successMax: 85 },
+    { id: "part-1", name: "A", gridCell: { row: 1, column: 1 }, current: 0, target: 78, successMin: 78, successMax: 78 },
+    { id: "part-2", name: "B", gridCell: { row: 1, column: 2 }, current: 0, target: 78, successMin: 78, successMax: 78 },
+    { id: "part-3", name: "C", gridCell: { row: 1, column: 3 }, current: 0, target: 78, successMin: 78, successMax: 78 },
+    { id: "part-4", name: "D", gridCell: { row: 2, column: 1 }, current: 0, target: 78, successMin: 78, successMax: 78 },
+    { id: "part-5", name: "E", gridCell: { row: 2, column: 2 }, current: 0, target: 78, successMin: 78, successMax: 78 },
+    { id: "part-6", name: "F", gridCell: { row: 2, column: 3 }, current: 0, target: 78, successMin: 78, successMax: 78 },
   ],
 });

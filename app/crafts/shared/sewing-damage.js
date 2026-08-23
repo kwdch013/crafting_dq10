@@ -52,8 +52,14 @@
     regenerate: { label: "再生", multiplier: -1 },
   };
 
+  // 会心×2は普通と同じダメージ分布を使うため、参照時にのみ普通へ読み替えます。
+  function getDistribution(powerId, actionId) {
+    const distributionPowerId = powerId === "critical_x2" ? "normal" : powerId;
+    return distributions[distributionPowerId]?.[actionId] || null;
+  }
+
   function getRange(powerId, actionId) {
-    const values = distributions[powerId]?.[actionId];
+    const values = getDistribution(powerId, actionId);
 
     if (!values) {
       return null;
@@ -68,13 +74,14 @@
     criticalMultiplier: 2,
     actions,
     distributions,
+    getDistribution,
     getRange,
     powerStates: [
       { id: "weak", label: "弱い" },
       { id: "normal", label: "普通" },
       { id: "strong", label: "強い" },
       { id: "strongest", label: "最強" },
-      { id: "regenerate", label: "再生布" },
+      { id: "critical_x2", label: "会心×2" },
     ],
   };
 })(window);
