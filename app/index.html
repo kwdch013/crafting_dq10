@@ -221,6 +221,12 @@
               <div class="command-group smithing-only-command">
                 <span>温度</span>
                 <button class="button secondary cooking-command-button" id="smithingHeatDown200Button" type="button">-200℃</button>
+                <div class="smithing-heat-controls">
+                  <button class="button secondary" id="smithingHeatDownButton" type="button">-50℃</button>
+                  <label class="sr-only" for="smithingTemperatureSelect">BOARD内温度</label>
+                  <select class="smithing-temperature-select" id="smithingTemperatureSelect"></select>
+                  <button class="button secondary" id="smithingHeatUpButton" type="button">+50℃</button>
+                </div>
                 <button class="button secondary cooking-command-button" id="smithingHeatUp200Button" type="button">+200℃</button>
               </div>
               <div class="command-group sewing-only-command" hidden>
@@ -254,12 +260,6 @@
               <div>
                 <p class="eyebrow">Smithing Damage</p>
                 <h2>温度別ダメージ</h2>
-              </div>
-              <div class="smithing-heat-controls">
-                <button class="button secondary" id="smithingHeatDownButton" type="button">-50℃</button>
-                <label class="sr-only" for="smithingTemperatureSelect">BOARD内温度</label>
-                <select class="smithing-temperature-select" id="smithingTemperatureSelect"></select>
-                <button class="button secondary" id="smithingHeatUpButton" type="button">+50℃</button>
               </div>
             </div>
             <div class="smithing-damage-grid" id="smithingDamageRanges"></div>

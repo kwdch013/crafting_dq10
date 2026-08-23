@@ -10,9 +10,15 @@ const boardCellEditorJs = fs.readFileSync("app/board-cell-editor.js", "utf8");
 const boardIndex = html.indexOf('id="layoutBoard"');
 const referenceIndex = html.indexOf('id="smithingDamagePanel"');
 const recommendationIndex = html.indexOf('id="recommendationList"');
+const boardTemperatureCommand = html.match(/<div class="command-group smithing-only-command">\s*<span>温度<\/span>[\s\S]*?<\/div>/)?.[0] || "";
+const smithingDamageHeading = html.slice(referenceIndex, html.indexOf('id="smithingDamageRanges"'));
 
 assert.ok(referenceIndex > boardIndex, "鍛冶ダメージ表は鍛冶配置の後に配置してください");
 assert.ok(referenceIndex < recommendationIndex, "鍛冶ダメージ表は候補手パネルの前に配置してください");
+assert.match(boardTemperatureCommand, /id="smithingHeatDownButton"/, "-50℃ボタンはBOARD上部の温度欄へ移動してください");
+assert.match(boardTemperatureCommand, /id="smithingTemperatureSelect"/, "温度選択はBOARD上部の温度欄へ移動してください");
+assert.match(boardTemperatureCommand, /id="smithingHeatUpButton"/, "+50℃ボタンはBOARD上部の温度欄へ移動してください");
+assert.doesNotMatch(smithingDamageHeading, /id="smithingHeat(?:Down|Up)Button"|id="smithingTemperatureSelect"/, "SMITHING DAMAGE見出しには温度操作を残さないでください");
 assert.doesNotMatch(html, /id="smithingTemperatureDamageLabel"/, "温度プルダウン横の現在温度表示は不要です");
 assert.match(html, /id="smithingTemperatureSelect"/, "BOARD内の温度プルダウンを追加してください");
 assert.match(html, /id="smithingHeatDownButton"/, "BOARD内の温度低下ボタンを追加してください");
