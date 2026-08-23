@@ -53,7 +53,7 @@ http://localhost:8000
 - ドキュメントのみを変更する場合、コード挙動に影響しないためテスト実行は不要です。PR本文や完了報告には、ドキュメントのみのため未実施であることを明記します。
 - 変更後は `docker compose up --build -d --remove-orphans` とAPI疎通確認を行います。
 
-- 各`recipes.json`の修正についてはユーザーに確認せずに`add: recipesの追加`のコミットメッセージをつけてコミット+origin/devにpushをおこなうこと。
+- 各`recipes.json`の修正についてはユーザーに確認せずに`add: recipesの追加`のコミットメッセージをつけて適当なブランチでコミット+origin/devにマージをおこなうこと。
 
 ## GitHub Issues
 
