@@ -23,13 +23,13 @@ def write_json(path, payload):
 
 # 職人IDから対象recipes.jsonを解決し、パストラバーサルを防ぎます。
 def get_recipe_path(craft_id):
-    if not craft_id or "/" in craft_id or "\\" in craft_id or craft_id in {".", ".."}:
-        raise ValueError("invalid_craft_id")
+	if not craft_id or "/" in craft_id or "\\" in craft_id or craft_id in {".", ".."}:
+		raise ValueError("invalid_craft_id")
 
-    recipe_path = DATA_DIR / "crafts" / craft_id / "recipes.json"
-    if not recipe_path.exists():
-        raise FileNotFoundError("recipe_file_not_found")
-    return recipe_path
+	for recipe_path in (DATA_DIR / "crafts").glob("*/recipes.json"):
+		if recipe_path.parent.name == craft_id:
+			return recipe_path
+	raise FileNotFoundError("recipe_file_not_found")
 
 
 # APIから受け取るレシピの最低限の必須項目を検証します。
@@ -72,27 +72,27 @@ def delete_recipe(craft_id, recipe_id):
 
 
 def response_payload(path):
-    if path == "/health":
-        return {"status": "ok"}
+	if path == "/health":
+		return {"status": "ok"}
 
-    if path == "/api/crafts":
-        return read_json(DATA_DIR / "catalog.json")
+	if path == "/api/crafts":
+		return read_json(DATA_DIR / "catalog.json")
 
-    if path == "/api/recipes":
-        result = {}
-        for recipe_file in sorted((DATA_DIR / "crafts").glob("*/recipes.json")):
-            result[recipe_file.parent.name] = read_json(recipe_file)
-        return {"crafts": result}
+	if path == "/api/recipes":
+		result = {}
+		for recipe_file in sorted((DATA_DIR / "crafts").glob("*/recipes.json")):
+			result[recipe_file.parent.name] = read_json(recipe_file)
+		return {"crafts": result}
 
-    prefix = "/api/crafts/"
-    if path.startswith(prefix) and path.endswith("/recipes"):
-        craft_id = unquote(path[len(prefix):-len("/recipes")]).strip("/")
-        recipe_path = DATA_DIR / "crafts" / craft_id / "recipes.json"
-        if recipe_path.exists():
-            return {"craftId": craft_id, "recipes": read_json(recipe_path)}
-        return None
+	prefix = "/api/crafts/"
+	if path.startswith(prefix) and path.endswith("/recipes"):
+		craft_id = unquote(path[len(prefix):-len("/recipes")]).strip("/")
+		try:
+			return {"craftId": craft_id, "recipes": read_json(get_recipe_path(craft_id))}
+		except (FileNotFoundError, ValueError):
+			return None
 
-    return None
+	return None
 
 
 class Handler(BaseHTTPRequestHandler):

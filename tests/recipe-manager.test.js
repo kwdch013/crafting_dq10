@@ -26,7 +26,7 @@ assert.match(html, /id="saveRecipeButton"/, "追加・編集ウィンドウの�
 	"function getRecipeCategoryTemplateItems(config, categoryId)",
 	"elements.recipeListButton.addEventListener(\"click\", openRecipeListDialog)",
 ].forEach((pattern) => {
-	assert.match(mainJs, new RegExp(pattern.replace(/[()]/g, "\\$&")), `${pattern} を実装してください`);
+	assert.match(mainJs, new RegExp(pattern.replaceAll("(", "\\(").replaceAll(")", "\\)")), `${pattern} を実装してください`);
 });
 
 assert.match(mainJs, /getRecipeCategoryOptions\(config\)/, "大項目ありの職人に対応してください");

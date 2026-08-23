@@ -148,3 +148,7 @@ API読込に成功した職人では同一idのレシピをAPI側優先で解決
 候補手 section を HTML コメントで残置し表示から除外。`renderAnalysis` の推奨ロジック (`recommendTechniques`) は残し、描画先が無い場合は一覧描画のみスキップするガードを追加 (サマリー更新には影響しない)。再表示時はコメントを外すだけで復元可能。PR #184 で dev へ merge 済み。URL: https://github.com/kwdch013/crafting_dq10/issues/183
 ### #188 共通: 別端末のブラウザから API へ接続できずレシピ登録・参照ができない（2026-07-23 対応）
 `frontend/server.js` が `/config.js` で返す `window.DQ10_API_BASE_URL` を起動時に固定 (`http://localhost:8000`) していたため、別端末のブラウザからは「その端末自身の 8000 番」を指してしまい、レシピの参照・登録・削除が失敗していた。API コンテナ自体は正常稼働 (CORS も `*` で許可済み) で、原因は接続先 URL の解決方法。リクエストの `Host` ヘッダからホスト名を取り出し `API_PORT` と組み合わせて毎回導出する方式へ変更し、`API_BASE_URL` を明示した場合のみ従来どおりその値を優先する。`frontend/Dockerfile` の `ENV API_BASE_URL` と `docker-compose.yml` の既定値も固定値を止めた。`Host` はスクリプト文脈へ埋め込むため、ドメイン・IPv4・角括弧付き IPv6 のみを許可し不正値は `localhost` へフォールバックする。URL: https://github.com/kwdch013/crafting_dq10/issues/188
+
+### #200 共通: PR #199 の CodeQL セキュリティ警告を解消する
+
+PR #199 の CodeQL が、利用者入力を含む職人IDからのパス構築 3 件と、テストの文字列処理 2 件を高重要度として検出しました。登録済みレシピファイルとの照合でパスを解決し、テストの不完全な文字列置換を除去して警告を解消します。URL: https://github.com/kwdch013/crafting_dq10/issues/200
