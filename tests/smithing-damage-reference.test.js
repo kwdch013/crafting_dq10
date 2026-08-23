@@ -17,6 +17,8 @@ assert.doesNotMatch(html, /id="smithingTemperatureDamageLabel"/, "温度プル�
 assert.match(html, /id="smithingTemperatureSelect"/, "BOARD内の温度プルダウンを追加してください");
 assert.match(html, /id="smithingHeatDownButton"/, "BOARD内の温度低下ボタンを追加してください");
 assert.match(html, /id="smithingHeatUpButton"/, "BOARD内の温度上昇ボタンを追加してください");
+assert.match(html, /id="smithingHeatDown200Button"[^>]*>-200℃<\/button>/, "BOARD上部に-200℃ボタンを追加してください");
+assert.match(html, /id="smithingHeatUp200Button"[^>]*>\+200℃<\/button>/, "BOARD上部に+200℃ボタンを追加してください");
 assert.match(html, /id="smithingDamageRanges"/, "温度別ダメージ表の描画先を追加してください");
 assert.match(html, /id="smithingBoardTraitState"/, "BOARD上部に鍛冶の現在特性状態を表示してください");
 assert.doesNotMatch(html, /id="smithingBoardTraitState" hidden/, "鍛冶特性状態欄は温度変更でBOARD位置が動かないよう初期表示領域を確保してください");
@@ -41,6 +43,8 @@ assert.match(smithingComponentJs, /function getSmithingDamagePowerEntries\(\)/, 
 assert.match(mainJs, /function syncJudgementLegend\(\)/, "固定凡例は職人別に表示制御してください");
 assert.match(mainJs, /function applyHeatStateChange\(nextStateId\)[\s\S]*applyHeatChange/, "温度・ぬいパワー変更時に職人コンポーネントへ委譲してください");
 assert.match(mainJs, /smithingTemperatureSelect: document\.querySelector\("#smithingTemperatureSelect"\)/);
+assert.match(mainJs, /smithingHeatDown200Button: document\.querySelector\("#smithingHeatDown200Button"\)/, "-200℃ボタンを操作対象として取得してください");
+assert.match(mainJs, /smithingHeatUp200Button: document\.querySelector\("#smithingHeatUp200Button"\)/, "+200℃ボタンを操作対象として取得してください");
 assert.match(smithingComponentJs, /function renderTemperatureSelect\(/, "BOARD内の温度プルダウンは鍛冶コンポーネントで描画してください");
 assert.match(mainJs, /getDefaultHeatId\(config\)/, "初期温度は職人設定の既定値を優先してください");
 assert.doesNotMatch(mainJs, /applySmithingReturn/, "戻り地金の戻り値は手動入力にしてください");
@@ -67,7 +71,11 @@ assert.match(mainJs, /renderSmithingDamageReference\(\);[\s\S]*renderLayoutBoard
 assert.match(mainJs, /syncJudgementLegend\(\);[\s\S]*renderAnalysis\(\);/);
 assert.match(mainJs, /smithingHeatDownButton\?\.addEventListener\("click", \(\) => adjustSmithingHeat\(-50\)\)/);
 assert.match(mainJs, /smithingHeatUpButton\?\.addEventListener\("click", \(\) => adjustSmithingHeat\(50\)\)/);
+assert.match(mainJs, /smithingHeatDown200Button\?\.addEventListener\("click", \(\) => adjustSmithingHeat\(-200\)\)/, "-200℃ボタンは200℃低下として同期してください");
+assert.match(mainJs, /smithingHeatUp200Button\?\.addEventListener\("click", \(\) => adjustSmithingHeat\(200\)\)/, "+200℃ボタンは200℃上昇として同期してください");
 assert.match(mainJs, /smithingTemperatureSelect\?\.addEventListener\("change", \(\) => changeSmithingHeatFromBoard\(\)\)/);
+assert.match(smithingComponentJs, /smithingHeatDown200Button\.disabled = currentHeat - 200 < minHeat/, "最小温度では-200℃ボタンを無効化してください");
+assert.match(smithingComponentJs, /smithingHeatUp200Button\.disabled = currentHeat \+ 200 > maxHeat/, "最大温度では+200℃ボタンを無効化してください");
 assert.match(smithingDamageJs, /power_1_2: \{ label: "1\.2倍"/, "1.2倍威力は倍率表記にしてください");
 assert.doesNotMatch(smithingDamageJs, /power_0_8/, "鍛冶ダメージ表から0.8倍威力を削除してください");
 const powersDefinition = smithingDamageJs.slice(smithingDamageJs.indexOf("const powers = {"));
