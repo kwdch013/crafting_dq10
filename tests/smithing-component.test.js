@@ -77,6 +77,27 @@ vm.createContext(context);
 
 {
 	const component = context.DQ10CraftComponents["weapon-smithing"];
+	const config = context.DQ10CraftConfigs["weapon-smithing"];
+	assert.equal(
+		component.getNextHeat(config, { heat: "1600" }, 200),
+		"1800",
+		"+200℃操作では基本設定と同じ温度候補へ同期してください",
+	);
+	assert.equal(
+		component.getNextHeat(config, { heat: "1600" }, -200),
+		"1400",
+		"-200℃操作では基本設定と同じ温度候補へ同期してください",
+	);
+	assert.equal(
+		component.getNextHeat(config, { heat: config.heatStates.at(-1).id }, -200),
+		"",
+		"温度候補の下限を超える-200℃操作は受け付けないでください",
+	);
+	assert.equal(
+		component.getNextHeat(config, { heat: config.heatStates[0].id }, 200),
+		"",
+		"温度候補の上限を超える+200℃操作は受け付けないでください",
+	);
 	assert.deepEqual(
 		JSON.parse(JSON.stringify(component.getHeatTraitState({ craftType: "weapon-smithing", traitId: "double-half", heat: "600" }))),
 		{

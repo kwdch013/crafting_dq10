@@ -32,6 +32,8 @@ const elements = {
   smithingTemperatureSelect: document.querySelector("#smithingTemperatureSelect"),
   smithingHeatDownButton: document.querySelector("#smithingHeatDownButton"),
   smithingHeatUpButton: document.querySelector("#smithingHeatUpButton"),
+  smithingHeatDown200Button: document.querySelector("#smithingHeatDown200Button"),
+  smithingHeatUp200Button: document.querySelector("#smithingHeatUp200Button"),
   smithingDamageRanges: document.querySelector("#smithingDamageRanges"),
   smithingBoardTraitState: document.querySelector("#smithingBoardTraitState"),
   specialChargeToggle: document.querySelector("#specialChargeToggle"),
@@ -3353,6 +3355,8 @@ elements.rotateWoodLeftButton?.addEventListener("click", () => rotateWoodworking
 elements.rotateWoodRightButton?.addEventListener("click", () => rotateWoodworkingGrain("right"));
 elements.smithingHeatDownButton?.addEventListener("click", () => adjustSmithingHeat(-50));
 elements.smithingHeatUpButton?.addEventListener("click", () => adjustSmithingHeat(50));
+elements.smithingHeatDown200Button?.addEventListener("click", () => adjustSmithingHeat(-200));
+elements.smithingHeatUp200Button?.addEventListener("click", () => adjustSmithingHeat(200));
 elements.smithingTemperatureSelect?.addEventListener("change", () => changeSmithingHeatFromBoard());
 elements.specialChargeToggle.addEventListener("click", toggleBoardSpecialState);
 elements.miracleGrillButton?.addEventListener("click", applyMiracleGrillToSelected);

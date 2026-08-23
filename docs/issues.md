@@ -91,3 +91,4 @@ issueには対象領域に応じてラベルを付与します。
 | #180 | 裁縫: ほぐしのマイナスダメージを赤字で表示する（2026-07-20 close済み） | [sewing-woodworking.md](issues/sewing-woodworking.md) |
 | #183 | 共通: 候補手パネルを一時的に非表示にする（2026-07-20 close済み） | [common.md](issues/common.md) |
 | #188 | 共通: 別端末のブラウザから API へ接続できずレシピ登録・参照ができない（2026-07-23 対応） | [common.md](issues/common.md) |
+| #192 | 鍛冶職人: BOARD上部に温度±200℃ボタンを追加 | [smithing.md](issues/smithing.md) |

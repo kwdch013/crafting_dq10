@@ -96,6 +96,12 @@
     if (elements.smithingHeatUpButton) {
       elements.smithingHeatUpButton.disabled = currentHeat >= maxHeat;
     }
+    if (elements.smithingHeatDown200Button) {
+      elements.smithingHeatDown200Button.disabled = currentHeat - 200 < minHeat;
+    }
+    if (elements.smithingHeatUp200Button) {
+      elements.smithingHeatUp200Button.disabled = currentHeat + 200 > maxHeat;
+    }
 
     elements.smithingDamageRanges.replaceChildren();
     getSmithingDamagePowerEntries().forEach(([powerId, power]) => {
