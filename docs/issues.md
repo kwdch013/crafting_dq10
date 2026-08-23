@@ -93,3 +93,4 @@ issueには対象領域に応じてラベルを付与します。
 | #188 | 共通: 別端末のブラウザから API へ接続できずレシピ登録・参照ができない（2026-07-23 対応） | [common.md](issues/common.md) |
 | #192 | 鍛冶職人: BOARD上部に温度±200℃ボタンを追加 | [smithing.md](issues/smithing.md) |
 | #194 | 鍛冶職人: ±50℃の温度操作をBOARD温度欄へ移動する | [smithing.md](issues/smithing.md) |
+| #196 | 防具・道具鍛冶: 獅子王の大盾とあくまのツボのレシピを登録する | [smithing.md](issues/smithing.md) |

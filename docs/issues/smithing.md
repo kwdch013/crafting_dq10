@@ -38,3 +38,7 @@ localStorage 保存のユーザーレシピに残る旧仕様の行列名を、�
 ### #194 鍛冶職人: ±50℃の温度操作をBOARD温度欄へ移動する
 
 SMITHING DAMAGE見出しにある `-50℃`、温度プルダウン、`+50℃` 操作を、鍛冶3職人のBOARD上部にある温度欄へ移動します。URL: https://github.com/kwdch013/crafting_dq10/issues/194
+
+### #196 防具・道具鍛冶: 獅子王の大盾とあくまのツボのレシピを登録する
+
+防具鍛冶へ光地金の「獅子王の大盾」を追加し、道具鍛冶の「あくまのツボ」を重複なく一覧末尾へ整理します。URL: https://github.com/kwdch013/crafting_dq10/issues/196
