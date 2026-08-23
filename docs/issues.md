@@ -94,3 +94,4 @@ issueには対象領域に応じてラベルを付与します。
 | #192 | 鍛冶職人: BOARD上部に温度±200℃ボタンを追加 | [smithing.md](issues/smithing.md) |
 | #194 | 鍛冶職人: ±50℃の温度操作をBOARD温度欄へ移動する | [smithing.md](issues/smithing.md) |
 | #196 | 防具・道具鍛冶: 獅子王の大盾とあくまのツボのレシピを登録する | [smithing.md](issues/smithing.md) |
+| #200 | 共通: PR #199 の CodeQL セキュリティ警告を解消する | [common.md](issues/common.md) |

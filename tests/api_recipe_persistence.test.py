@@ -70,6 +70,12 @@ class RecipePersistenceTest(unittest.TestCase):
 		with self.assertRaises(ValueError):
 			self.api.upsert_recipe("../cooking", {"id": "recipe-1", "name": "不正", "items": []})
 
+	def test_get_recipe_path_resolves_only_registered_craft(self):
+		self.assertEqual(self.api.get_recipe_path("cooking"), self.recipe_path)
+
+		with self.assertRaises(FileNotFoundError):
+			self.api.get_recipe_path("unknown")
+
 
 if __name__ == "__main__":
 	unittest.main()

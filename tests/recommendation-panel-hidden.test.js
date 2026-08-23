@@ -4,6 +4,26 @@ const fs = require("node:fs");
 const html = fs.readFileSync("app/index.html", "utf8");
 const mainJs = fs.readFileSync("app/main.js", "utf8");
 
+// コメント外のマークアップだけを検証するため、コメント部分を除外します。
+function removeHtmlComments(source) {
+  let result = "";
+  let cursor = 0;
+
+  while (true) {
+    const commentStart = source.indexOf("<!--", cursor);
+    if (commentStart === -1) {
+      return result + source.slice(cursor);
+    }
+
+    result += source.slice(cursor, commentStart);
+    const commentEnd = source.indexOf("-->", commentStart + 4);
+    if (commentEnd === -1) {
+      return result;
+    }
+    cursor = commentEnd + 3;
+  }
+}
+
 // 候補手パネルは一時非表示。マークアップは復元できるよう HTML コメントとして残す
 const commentedRecommendation = html.match(/<!--[\s\S]*?-->/g)?.some(
   (comment) => comment.includes('id="recommendationList"'),
@@ -11,7 +31,7 @@ const commentedRecommendation = html.match(/<!--[\s\S]*?-->/g)?.some(
 assert.ok(commentedRecommendation, "候補手パネルはコメントアウトして残してください");
 
 // コメント外に候補手のマークアップが残っていないこと (表示されないこと)
-const htmlWithoutComments = html.replace(/<!--[\s\S]*?-->/g, "");
+const htmlWithoutComments = removeHtmlComments(html);
 assert.ok(
   !htmlWithoutComments.includes('id="recommendationList"'),
   "候補手パネルはコメント外に残さないでください",
