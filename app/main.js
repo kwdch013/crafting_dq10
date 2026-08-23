@@ -1702,7 +1702,7 @@ function setCookingHeatMode(mode) {
   saveState();
 }
 
-// 鍛冶BOARD内の温度操作を50℃刻みの温度状態へ同期します。
+// 鍛冶BOARDの温度操作を指定した刻みの温度状態へ同期します。
 function adjustSmithingHeat(delta) {
   const component = getCurrentCraftComponent();
   if (!component.getNextHeat) {
