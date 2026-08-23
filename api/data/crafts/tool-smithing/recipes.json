@@ -916,87 +916,6 @@
     "traitId": "focus-change"
   },
   {
-    "id": "user-tool-smithing-1783341110554",
-    "name": "あくまのツボ",
-    "category": "ツボ",
-    "categoryId": "alchemy-pot",
-    "items": [
-      {
-        "id": "item-1",
-        "name": "A",
-        "current": 0,
-        "target": 195,
-        "successMin": 190,
-        "successMax": 200,
-        "gridCell": {
-          "row": 1,
-          "column": 1
-        }
-      },
-      {
-        "id": "item-2",
-        "name": "B",
-        "current": 0,
-        "target": 133,
-        "successMin": 130,
-        "successMax": 136,
-        "gridCell": {
-          "row": 1,
-          "column": 2
-        }
-      },
-      {
-        "id": "item-3",
-        "name": "C",
-        "current": 0,
-        "target": 133,
-        "successMin": 130,
-        "successMax": 136,
-        "gridCell": {
-          "row": 2,
-          "column": 1
-        }
-      },
-      {
-        "id": "item-4",
-        "name": "D",
-        "current": 0,
-        "target": 195,
-        "successMin": 190,
-        "successMax": 200,
-        "gridCell": {
-          "row": 2,
-          "column": 2
-        }
-      },
-      {
-        "id": "item-5",
-        "name": "E",
-        "current": 0,
-        "target": 134,
-        "successMin": 130,
-        "successMax": 138,
-        "gridCell": {
-          "row": 3,
-          "column": 1
-        }
-      },
-      {
-        "id": "item-6",
-        "name": "F",
-        "current": 0,
-        "target": 134,
-        "successMin": 130,
-        "successMax": 138,
-        "gridCell": {
-          "row": 3,
-          "column": 2
-        }
-      }
-    ],
-    "traitId": "double-half"
-  },
-  {
     "id": "user-tool-smithing-1783340750206",
     "name": "まおうのランプ",
     "category": "ランプ",
@@ -1451,5 +1370,86 @@
       }
     ],
     "traitId": "none"
+  },
+  {
+    "id": "user-tool-smithing-1783341110554",
+    "name": "あくまのツボ",
+    "category": "ツボ",
+    "categoryId": "alchemy-pot",
+    "items": [
+      {
+        "id": "item-1",
+        "name": "A",
+        "current": 0,
+        "target": 195,
+        "successMin": 190,
+        "successMax": 200,
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-2",
+        "name": "B",
+        "current": 0,
+        "target": 133,
+        "successMin": 130,
+        "successMax": 136,
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-3",
+        "name": "C",
+        "current": 0,
+        "target": 133,
+        "successMin": 130,
+        "successMax": 136,
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-4",
+        "name": "D",
+        "current": 0,
+        "target": 195,
+        "successMin": 190,
+        "successMax": 200,
+        "gridCell": {
+          "row": 2,
+          "column": 2
+        }
+      },
+      {
+        "id": "item-5",
+        "name": "E",
+        "current": 0,
+        "target": 134,
+        "successMin": 130,
+        "successMax": 138,
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        }
+      },
+      {
+        "id": "item-6",
+        "name": "F",
+        "current": 0,
+        "target": 134,
+        "successMin": 130,
+        "successMax": 138,
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        }
+      }
+    ],
+    "traitId": "double-half"
   }
 ]
