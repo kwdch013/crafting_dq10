@@ -65,15 +65,23 @@ function renderPanel(traitId, heat = "1600") {
   // 倍半では200℃ごとに威力補正(半減・倍加)を反映した会心最小値を表示します。
   const { hidden, rows } = renderPanel("double-half");
   assert.equal(hidden, false, "倍半では会心確定ラインパネルを表示してください");
-  assert.equal(rows.length, 10, "200℃〜2000℃の10段階を表示してください");
+  assert.equal(rows.length, 11, "200℃〜1800℃の9段階+2000℃以上の倍加・半減2段階を表示してください");
 
-  const row200 = rows.find((row) => row.innerHTML.includes("200℃"));
+  const row200 = rows.find((row) => row.innerHTML.includes("200℃ "));
   assert.match(row200.innerHTML, /200℃ 半減/);
   assert.match(row200.innerHTML, /通常: 残り8以下で会心確定/, "200℃(半減)の通常威力は会心最小8にしてください");
 
-  const row400 = rows.find((row) => row.innerHTML.includes("400℃"));
+  const row400 = rows.find((row) => row.innerHTML.includes("400℃ "));
   assert.match(row400.innerHTML, /400℃ 倍加/);
   assert.match(row400.innerHTML, /通常: 残り36以下で会心確定/, "400℃(倍加)の通常威力は会心最小36にしてください");
+
+  // 2000℃は「2000℃以上」を表す上限のため、倍加・半減の両フェーズを同じダメージ表(2000℃)で表示します。
+  const maxRows = rows.filter((row) => row.innerHTML.includes("2000℃以上"));
+  assert.equal(maxRows.length, 2, "2000℃以上は倍加・半減の2行を表示してください");
+  const maxHighRow = maxRows.find((row) => row.innerHTML.includes("倍加"));
+  const maxLowRow = maxRows.find((row) => row.innerHTML.includes("半減"));
+  assert.match(maxHighRow.innerHTML, /通常: 残り72以下で会心確定/, "2000℃以上(倍加)の通常威力は会心最小72にしてください");
+  assert.match(maxLowRow.innerHTML, /通常: 残り18以下で会心確定/, "2000℃以上(半減)の通常威力は会心最小18にしてください");
 }
 
 {
@@ -81,9 +89,18 @@ function renderPanel(traitId, heat = "1600") {
   const { hidden, rows } = renderPanel("focus-change");
   assert.equal(hidden, false, "集中変化では会心確定ラインパネルを表示してください");
 
-  const row200 = rows.find((row) => row.innerHTML.includes("200℃"));
+  const row200 = rows.find((row) => row.innerHTML.includes("200℃ "));
   assert.match(row200.innerHTML, /200℃ 集中増加/);
   assert.match(row200.innerHTML, /通常: 残り16以下で会心確定/, "200℃の通常威力の会心最小はダメージ表と同じ16にしてください");
+
+  // 2000℃以上でも、集中変化はダメージ表自体を変えないため通常時と同じ会心最小値になります。
+  const maxRows = rows.filter((row) => row.innerHTML.includes("2000℃以上"));
+  assert.equal(maxRows.length, 2, "2000℃以上は集中半減・集中増加の2行を表示してください");
+  assert.ok(maxRows.some((row) => row.innerHTML.includes("集中半減")));
+  assert.ok(maxRows.some((row) => row.innerHTML.includes("集中増加")));
+  maxRows.forEach((row) => {
+    assert.match(row.innerHTML, /通常: 残り36以下で会心確定/, "2000℃以上の通常威力の会心最小はダメージ表と同じ36にしてください");
+  });
 }
 
 console.log("smithing-critical-gauge-panel.test.js OK");
