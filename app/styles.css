@@ -690,6 +690,14 @@ select:focus {
 }
 
 /* 集中変化・倍半は200℃ごとに会心確定ラインが変わるため、温度単位でまとめて表示します。 */
+/* 見出し直下の補足注記(不等号表記の n の意味など)。 */
+.section-note {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .smithing-critical-gauge-grid {
   display: grid;
   gap: 8px;
@@ -711,19 +719,11 @@ select:focus {
 
 .smithing-critical-gauge-powers {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 4px 10px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 2px 10px;
   color: var(--muted);
   font-size: 12px;
   font-weight: 800;
-}
-
-/* 非会心時不足ラインは会心確定ラインの補足のため、同じ枠内で1段下げて弱く表示します。 */
-.smithing-critical-gauge-powers small {
-  display: block;
-  font-size: 11px;
-  font-weight: 700;
-  opacity: 0.85;
 }
 
 .trait-reference {

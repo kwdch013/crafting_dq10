@@ -9,6 +9,8 @@ const smithingComponentJs = fs.readFileSync("app/crafts/shared/smithing-componen
 
 assert.match(html, /id="smithingCriticalGaugePanel"[^>]*hidden/, "会心確定ラインパネルは初期非表示にしてください");
 assert.match(html, /id="smithingCriticalGaugeRows"/, "会心確定ラインパネルの描画先を追加してください");
+// 不等号表記の n が何を指すか分かるよう、パネル見出しに注記を置きます。
+assert.match(html, /n = 基準値までの残り数値/, "会心確定ラインパネルの見出しに n の説明を追加してください");
 const damageIndex = html.indexOf('id="smithingDamagePanel"');
 const gaugeIndex = html.indexOf('id="smithingCriticalGaugePanel"');
 assert.ok(gaugeIndex > damageIndex, "会心確定ラインパネルは温度別ダメージ表の後に配置してください");
@@ -69,24 +71,21 @@ function renderPanel(traitId, heat = "1600") {
 
   const row200 = rows.find((row) => row.innerHTML.includes("200℃ "));
   assert.match(row200.innerHTML, /200℃ 半減/);
-  assert.match(row200.innerHTML, /通常: 残り8以下で会心確定/, "200℃(半減)の通常威力は会心最小8にしてください");
-  // 非会心の最大ダメージでは基準値に届かない、ギリギリの残り数値(非会心最大+1)も併記します。
-  assert.match(row200.innerHTML, /残り7以上は非会心時不足\(非会心最大6\)/, "200℃(半減)の通常威力は非会心最大6・非会心不足ライン7にしてください");
+  // 非会心の最大ダメージでは届かない残り数値(非会心最大+1)を下限、会心最小値を上限として、
+  // 残り数値を n と置いた範囲の不等式で表示します。非会心側の数値そのものは表示しません。
+  assert.ok(row200.innerHTML.includes("通常: 会心確定 7 ≦ n ≦ 8</span>"), "200℃(半減)の通常威力は会心確定範囲7〜8にしてください");
 
   const row400 = rows.find((row) => row.innerHTML.includes("400℃ "));
   assert.match(row400.innerHTML, /400℃ 倍加/);
-  assert.match(row400.innerHTML, /通常: 残り36以下で会心確定/, "400℃(倍加)の通常威力は会心最小36にしてください");
-  assert.match(row400.innerHTML, /残り27以上は非会心時不足\(非会心最大26\)/, "400℃(倍加)の通常威力は非会心最大26・非会心不足ライン27にしてください");
+  assert.ok(row400.innerHTML.includes("通常: 会心確定 27 ≦ n ≦ 36</span>"), "400℃(倍加)の通常威力は会心確定範囲27〜36にしてください");
 
   // 2000℃は「2000℃以上」を表す上限のため、倍加・半減の両フェーズを同じダメージ表(2000℃)で表示します。
   const maxRows = rows.filter((row) => row.innerHTML.includes("2000℃以上"));
   assert.equal(maxRows.length, 2, "2000℃以上は倍加・半減の2行を表示してください");
   const maxHighRow = maxRows.find((row) => row.innerHTML.includes("倍加"));
   const maxLowRow = maxRows.find((row) => row.innerHTML.includes("半減"));
-  assert.match(maxHighRow.innerHTML, /通常: 残り72以下で会心確定/, "2000℃以上(倍加)の通常威力は会心最小72にしてください");
-  assert.match(maxLowRow.innerHTML, /通常: 残り18以下で会心確定/, "2000℃以上(半減)の通常威力は会心最小18にしてください");
-  assert.match(maxHighRow.innerHTML, /残り55以上は非会心時不足\(非会心最大54\)/, "2000℃以上(倍加)の通常威力は非会心最大54・非会心不足ライン55にしてください");
-  assert.match(maxLowRow.innerHTML, /残り15以上は非会心時不足\(非会心最大14\)/, "2000℃以上(半減)の通常威力は非会心最大14・非会心不足ライン15にしてください");
+  assert.ok(maxHighRow.innerHTML.includes("通常: 会心確定 55 ≦ n ≦ 72</span>"), "2000℃以上(倍加)の通常威力は会心確定範囲55〜72にしてください");
+  assert.ok(maxLowRow.innerHTML.includes("通常: 会心確定 15 ≦ n ≦ 18</span>"), "2000℃以上(半減)の通常威力は会心確定範囲15〜18にしてください");
 }
 
 {
@@ -96,8 +95,7 @@ function renderPanel(traitId, heat = "1600") {
 
   const row200 = rows.find((row) => row.innerHTML.includes("200℃ "));
   assert.match(row200.innerHTML, /200℃ 集中増加/);
-  assert.match(row200.innerHTML, /通常: 残り16以下で会心確定/, "200℃の通常威力の会心最小はダメージ表と同じ16にしてください");
-  assert.match(row200.innerHTML, /残り12以上は非会心時不足\(非会心最大11\)/, "集中変化はダメージ表と同じ非会心最大11・非会心不足ライン12にしてください");
+  assert.ok(row200.innerHTML.includes("通常: 会心確定 12 ≦ n ≦ 16</span>"), "集中変化はダメージ表と同じ会心確定範囲12〜16にしてください");
 
   // 2000℃以上でも、集中変化はダメージ表自体を変えないため通常時と同じ会心最小値になります。
   const maxRows = rows.filter((row) => row.innerHTML.includes("2000℃以上"));
@@ -105,9 +103,25 @@ function renderPanel(traitId, heat = "1600") {
   assert.ok(maxRows.some((row) => row.innerHTML.includes("集中半減")));
   assert.ok(maxRows.some((row) => row.innerHTML.includes("集中増加")));
   maxRows.forEach((row) => {
-    assert.match(row.innerHTML, /通常: 残り36以下で会心確定/, "2000℃以上の通常威力の会心最小はダメージ表と同じ36にしてください");
-    assert.match(row.innerHTML, /残り28以上は非会心時不足\(非会心最大27\)/, "2000℃以上の通常威力の非会心最大はダメージ表と同じ27にしてください");
+    assert.ok(row.innerHTML.includes("通常: 会心確定 28 ≦ n ≦ 36</span>"), "2000℃以上の通常威力は会心確定範囲28〜36にしてください");
   });
+}
+
+{
+  // 非会心最大+1が会心最小値を超えるダメージ表では範囲が成り立たないため、上限のみを表示します。
+  const originalRange = context.DQ10SmithingDamage.ranges[200];
+  context.DQ10SmithingDamage.ranges[200] = { ...originalRange, normal: [4, 20] };
+
+  try {
+    const { rows } = renderPanel("focus-change");
+    const row200 = rows.find((row) => row.innerHTML.includes("200℃ "));
+    assert.ok(
+      row200.innerHTML.includes("通常: 会心確定 n ≦ 8</span>"),
+      "会心確定範囲が成り立たない場合は上限のみを表示してください",
+    );
+  } finally {
+    context.DQ10SmithingDamage.ranges[200] = originalRange;
+  }
 }
 
 console.log("smithing-critical-gauge-panel.test.js OK");
