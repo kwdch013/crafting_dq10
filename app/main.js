@@ -2262,10 +2262,11 @@ function renderCraftCellJudgements(editor) {
       : "";
     // ほぐしのマイナスダメージは減算と分かるよう赤字にします。
     const isLoosenJudgement = entry.id === "loosen";
+    // 会心時確定の場合、非会心時に基準範囲へ入るか不足するかを補足表示します。
     row.innerHTML = `
       <strong>${escapeHtml(entry.label)}</strong>
       <span class="numeric${isLoosenJudgement ? " negative-damage" : ""}">${judgementRange}${nextRange}</span>
-      <small>${escapeHtml([analysis.statusLabel, formatDamageDistribution(resolvedTechnique.distribution, { targetValue: analysis.targetDiff })].filter(Boolean).join("\n"))}</small>
+      <small>${escapeHtml([analysis.statusLabel, analysis.nonCriticalOutcomeLabel, formatDamageDistribution(resolvedTechnique.distribution, { targetValue: analysis.targetDiff })].filter(Boolean).join("\n"))}</small>
     `;
     rows.append(row);
   });
