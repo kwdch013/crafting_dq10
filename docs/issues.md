@@ -31,8 +31,8 @@ issueには対象領域に応じてラベルを付与します。
 | ---: | --- | --- |
 | #1 | 実レシピ別の基準値と成功範囲を収集する | [common.md](issues/common.md) |
 | #2 | 集中力データを実値へ置き換える | [common.md](issues/common.md) |
-| #3 | 特技データの網羅性を確認する | [common.md](issues/common.md) |
-| #4 | APIへ計算処理を移すか判断する | [common.md](issues/common.md) |
+| #3 | 特技データの網羅性を確認する（2026-08-25 close済み） | [common.md](issues/common.md) |
+| #4 | APIへ計算処理を移すか判断する（2026-08-25 close済み） | [common.md](issues/common.md) |
 | #5 | ブラウザE2Eテストを追加する | [common.md](issues/common.md) |
 | #6 | 調理職人: 会心固定状態を管理する（2026-07-09 close済み） | [cooking-1-29.md](issues/cooking-1-29.md) |
 | #7 | 調理職人: ミラクルグリルの必殺処理を実装する | [cooking-1-29.md](issues/cooking-1-29.md) |
@@ -86,6 +86,7 @@ issueには対象領域に応じてラベルを付与します。
 | #161 | 裁縫: 次ターンのぬいパワーを入力し候補手へ反映する | [sewing-woodworking.md](issues/sewing-woodworking.md) |
 | #162 | 裁縫: 再生布をぬいパワーから独立した布状態として扱う | [sewing-woodworking.md](issues/sewing-woodworking.md) |
 | #172 | 共通: GitHub Pages でフロントを静的サイトとして公開する | [common.md](issues/common.md) |
+| #174 | 共通: ポート番号等を .env で設定可能にする（2026-08-25 close済み） | [common.md](issues/common.md) |
 | #176 | 共通: ページアイコン (favicon) を追加する（2026-07-20 close済み） | [common.md](issues/common.md) |
 | #179 | 共通: パネル配置を変更し、特技データとダメージ表示を右側で大きく表示する（2026-07-20 close済み） | [common.md](issues/common.md) |
 | #180 | 裁縫: ほぐしのマイナスダメージを赤字で表示する（2026-07-20 close済み） | [sewing-woodworking.md](issues/sewing-woodworking.md) |
