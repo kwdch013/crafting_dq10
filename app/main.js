@@ -1254,6 +1254,7 @@ function renderLayoutBoard() {
         <div class="board-cell-values">
           <span class="numeric">${item.current}</span>
           <small class="numeric">${escapeHtml(formatBoardTargetSummary(item, state.targetMode))}</small>
+          ${component.craftFamily === "smithing" ? formatSmithingRemainingToMin(item) : ""}
         </div>
         <div class="board-light-slot">
           ${formatCookingLightToggle(item, special)}
@@ -1869,6 +1870,16 @@ function formatBoardTargetSummary(item, targetMode) {
   }
 
   return `基準 ${item.target}`;
+}
+
+// 鍛冶BOARDでは現在ダメージと合わせて、基準下限までの残りダメージを小さく併記します。
+function formatSmithingRemainingToMin(item) {
+  if (!Number.isFinite(item.lowerDiff)) {
+    return "";
+  }
+
+  const label = item.lowerDiff > 0 ? `残り${item.lowerDiff}` : "基準到達";
+  return `<small class="numeric board-cell-remaining">${escapeHtml(label)}</small>`;
 }
 
 function getItemOptionLabel(config, optionId) {
