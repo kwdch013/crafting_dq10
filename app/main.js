@@ -35,6 +35,8 @@ const elements = {
   smithingHeatDown200Button: document.querySelector("#smithingHeatDown200Button"),
   smithingHeatUp200Button: document.querySelector("#smithingHeatUp200Button"),
   smithingDamageRanges: document.querySelector("#smithingDamageRanges"),
+  smithingCriticalGaugePanel: document.querySelector("#smithingCriticalGaugePanel"),
+  smithingCriticalGaugeRows: document.querySelector("#smithingCriticalGaugeRows"),
   smithingBoardTraitState: document.querySelector("#smithingBoardTraitState"),
   specialChargeToggle: document.querySelector("#specialChargeToggle"),
   boardSpecialStateLabel: document.querySelector("#boardSpecialStateLabel"),
@@ -1095,10 +1097,20 @@ function renderSmithingDamageReference() {
       elements.smithingBoardTraitState.hidden = true;
       elements.smithingBoardTraitState.replaceChildren();
     }
+    if (elements.smithingCriticalGaugePanel) {
+      elements.smithingCriticalGaugePanel.hidden = true;
+      elements.smithingCriticalGaugeRows.replaceChildren();
+    }
     return;
   }
 
   component.renderBoardReference({
+    config: getCurrentCraftConfig(),
+    state,
+    elements,
+    escapeHtml,
+  });
+  component.renderCriticalGaugeReference?.({
     config: getCurrentCraftConfig(),
     state,
     elements,
@@ -1242,6 +1254,7 @@ function renderLayoutBoard() {
         <div class="board-cell-values">
           <span class="numeric">${item.current}</span>
           <small class="numeric">${escapeHtml(formatBoardTargetSummary(item, state.targetMode))}</small>
+          ${component.craftFamily === "smithing" ? formatSmithingRemainingToMin(item) : ""}
         </div>
         <div class="board-light-slot">
           ${formatCookingLightToggle(item, special)}
@@ -1859,6 +1872,16 @@ function formatBoardTargetSummary(item, targetMode) {
   return `基準 ${item.target}`;
 }
 
+// 鍛冶BOARDでは現在ダメージと合わせて、基準下限までの残りダメージを小さく併記します。
+function formatSmithingRemainingToMin(item) {
+  if (!Number.isFinite(item.lowerDiff)) {
+    return "";
+  }
+
+  const label = item.lowerDiff > 0 ? `残り${item.lowerDiff}` : "基準到達";
+  return `<small class="numeric board-cell-remaining">${escapeHtml(label)}</small>`;
+}
+
 function getItemOptionLabel(config, optionId) {
   const option = config.itemOptions?.find((itemOption) => itemOption.id === optionId);
   return option?.label || "";
@@ -2262,10 +2285,11 @@ function renderCraftCellJudgements(editor) {
       : "";
     // ほぐしのマイナスダメージは減算と分かるよう赤字にします。
     const isLoosenJudgement = entry.id === "loosen";
+    // 会心時確定の場合、非会心時に基準範囲へ入るか不足するかを補足表示します。
     row.innerHTML = `
       <strong>${escapeHtml(entry.label)}</strong>
       <span class="numeric${isLoosenJudgement ? " negative-damage" : ""}">${judgementRange}${nextRange}</span>
-      <small>${escapeHtml([analysis.statusLabel, formatDamageDistribution(resolvedTechnique.distribution, { targetValue: analysis.targetDiff })].filter(Boolean).join("\n"))}</small>
+      <small>${escapeHtml([analysis.statusLabel, analysis.nonCriticalOutcomeLabel, formatDamageDistribution(resolvedTechnique.distribution, { targetValue: analysis.targetDiff })].filter(Boolean).join("\n"))}</small>
     `;
     rows.append(row);
   });

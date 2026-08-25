@@ -14,6 +14,7 @@
     },
     isLightHeatActive,
     renderBoardReference,
+    renderCriticalGaugeReference,
     renderHeatTraitState,
     renderTemperatureSelect,
     // 光地金の盤面表示は、現在温度が有効な時だけ光状態を返します。
@@ -134,6 +135,72 @@
     renderHeatTraitState({ state, elements, escapeHtml });
   }
 
+  // 集中変化(会心率上昇)・倍半は200℃ごとに数値が変わるため、
+  // 各温度で会心確定になる残り数値(会心最小値)を一覧表示します。
+  function renderCriticalGaugeReference({ config, state, elements, escapeHtml }) {
+    if (!elements.smithingCriticalGaugePanel || !elements.smithingCriticalGaugeRows) {
+      return;
+    }
+
+    const showsPanel = isSmithingCraftState(state) &&
+      ["double-half", "focus-change"].includes(state.traitId);
+    elements.smithingCriticalGaugePanel.hidden = !showsPanel;
+    elements.smithingCriticalGaugeRows.replaceChildren();
+
+    if (!showsPanel) {
+      return;
+    }
+
+    const smithingDamage = global.DQ10SmithingDamage || {};
+    const criticalMultiplier = toNumber(smithingDamage.criticalMultiplier, 2);
+    const powerEntries = getSmithingDamagePowerEntries();
+    const heats = (config.heatStates || [])
+      .map((heatState) => toNumber(heatState.id, NaN))
+      .filter((heat) => Number.isFinite(heat) && heat % 200 === 0)
+      .sort((a, b) => a - b);
+    const maxHeat = heats.length > 0 ? heats[heats.length - 1] : null;
+
+    const buildRow = (heatLabel, heat, phase, rangeSet) => {
+      const heatState = { ...state, heat };
+      const traitState = getHeatTraitState(heatState, phase);
+      const row = document.createElement("div");
+      row.className = "smithing-critical-gauge-row";
+
+      const powerLines = powerEntries.map(([powerId, power]) => {
+        const range = rangeSet?.[powerId];
+        if (!range) {
+          return `<span>${escapeHtml(power.label)}: 未設定</span>`;
+        }
+
+        const adjustedRange = getAdjustedDamageRange(range, heatState, phase);
+        const criticalMin = adjustedRange[0] * criticalMultiplier;
+        return `<span>${escapeHtml(power.label)}: 残り${criticalMin}以下で会心確定</span>`;
+      }).join("");
+
+      row.innerHTML = `
+        <strong>${heatLabel} ${escapeHtml(traitState.label)}</strong>
+        <div class="smithing-critical-gauge-powers">${powerLines}</div>
+      `;
+      elements.smithingCriticalGaugeRows.append(row);
+    };
+
+    heats.forEach((heat) => {
+      const rangeSet = smithingDamage.ranges?.[heat];
+
+      // 最高温度(2000℃)は「2000℃以上」を表す上限のため、実際の温度が上がっても
+      // ダメージ表はそのまま2000℃の値を使い続けます。ただし倍加・半減(集中変化なら
+      // 集中半減・集中増加)のフェーズは200℃単位で切り替わり続けるため、
+      // 同じダメージ表に対して両方のフェーズを表示します。
+      if (heat === maxHeat) {
+        buildRow(`${heat}℃以上`, heat, "high", rangeSet);
+        buildRow(`${heat}℃以上`, heat, "low", rangeSet);
+        return;
+      }
+
+      buildRow(`${heat}℃`, heat, heat % 400 === 0 ? "high" : "low", rangeSet);
+    });
+  }
+
   // 鍛冶BOARD上部に、200℃単位で発動する地金特性の現在状態を描画します。
   function renderHeatTraitState({ state, elements, escapeHtml }) {
     if (!elements.smithingBoardTraitState) {
@@ -156,9 +223,11 @@
   }
 
   // 温度条件から、鍛冶地金特性の現在状態と威力補正を返します。
-  function getHeatTraitState(state) {
+  // phaseOverrideを渡すと、実際の温度から求めたフェーズの代わりにそのフェーズとして扱います
+  // (2000℃以上の会心確定ライン表示で、倍加・半減の両フェーズを求めるために使用します)。
+  function getHeatTraitState(state, phaseOverride) {
     const heat = toNumber(state?.heat, NaN);
-    const phase = getSmithingHeatPhase(state);
+    const phase = phaseOverride || getSmithingHeatPhase(state);
     const inactiveState = {
       isActive: false,
       label: "通常",
@@ -230,12 +299,12 @@
   }
 
   // 温度別ダメージ表に、倍半などの現在温度補正を反映します。
-  function getAdjustedDamageRange(range, state) {
+  function getAdjustedDamageRange(range, state, phaseOverride) {
     if (!Array.isArray(range)) {
       return null;
     }
 
-    const multiplier = getHeatTraitState(state).damageMultiplier;
+    const multiplier = getHeatTraitState(state, phaseOverride).damageMultiplier;
     return [
       Math.ceil(toNumber(range[0], 0) * multiplier),
       Math.ceil(toNumber(range[1], 0) * multiplier),

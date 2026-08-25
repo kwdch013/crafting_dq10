@@ -16,6 +16,12 @@
     "in-range": "基準内",
     shortage: "不足",
   };
+  // 会心時確定(guaranteed)の際、非会心(通常)だった場合に基準範囲へ入るかどうかの補足表示。
+  const nonCriticalOutcomeLabels = {
+    "non-critical-in-range": "非会心時基準範囲突入",
+    "non-critical-in-range-chance": "非会心時基準範囲突入の可能性あり",
+    "non-critical-shortage": "非会心時不足",
+  };
   const statusRanks = {
     "locked-critical": 7,
     locked: 6,
@@ -824,6 +830,18 @@
       status = "fake-critical-risk";
     }
 
+    // 会心時確定(guaranteed)の場合のみ、非会心時に基準範囲へ入るか不足するかを補足します。
+    let nonCriticalOutcome = null;
+    if (guaranteedCritical) {
+      if (normalAfterMax < successMin) {
+        nonCriticalOutcome = "non-critical-shortage";
+      } else if (normalAfterMin >= successMin) {
+        nonCriticalOutcome = "non-critical-in-range";
+      } else {
+        nonCriticalOutcome = "non-critical-in-range-chance";
+      }
+    }
+
     return {
       ...ingredient,
       current,
@@ -859,6 +877,8 @@
       targetMode,
       status,
       statusLabel: statusLabels[status],
+      nonCriticalOutcome,
+      nonCriticalOutcomeLabel: nonCriticalOutcome ? nonCriticalOutcomeLabels[nonCriticalOutcome] : "",
     };
   }
 
@@ -1023,6 +1043,7 @@
 
   global.DQ10CraftEngine = {
     statusLabels,
+    nonCriticalOutcomeLabels,
     resolveTechnique,
     isSmithingReturnNextTurn,
     resolveIngredientTarget,
