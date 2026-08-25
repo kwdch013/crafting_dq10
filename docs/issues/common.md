@@ -36,7 +36,7 @@ URL:
 https://github.com/kwdch013/crafting_dq10/issues/2
 ```
 
-### #3 特技データの網羅性を確認する
+### #3 特技データの網羅性を確認する（2026-08-25 close済み）
 
 現状:
 
@@ -48,13 +48,18 @@ https://github.com/kwdch013/crafting_dq10/issues/2
 - 職人別に使用可能特技が一覧化されている。
 - 未対応特技の扱いがissue化されている。
 
+close理由: 完了条件が職人・特技の追加のたびに再度未達となる性質で、単一issueとして閉じられない。
+特技の設定方法は `docs/design/04-craft-config-maintenance.md` の「特技設定」に整理済みで、
+登録済み特技は各職人の `app/crafts/<職人>/config.js` で確認できる。
+以後は個別の未対応特技が判明した時点で職人ラベル付きの個別issueとして起票する。
+
 URL:
 
 ```text
 https://github.com/kwdch013/crafting_dq10/issues/3
 ```
 
-### #4 APIへ計算処理を移すか判断する
+### #4 APIへ計算処理を移すか判断する（2026-08-25 close済み）
 
 現状:
 
@@ -65,6 +70,10 @@ https://github.com/kwdch013/crafting_dq10/issues/3
 
 - フロント計算継続かAPI計算移行かを決める。
 - API移行する場合は `/api/analyze` の入出力仕様を作る。
+
+判断結果 (2026-08-25): フロント計算を継続する。
+全職人の判定計算を `app/engine.js` に集約する構成が定着し、APIはレシピJSON配信に専念している。
+このため `/api/analyze` の入出力仕様は作成しない。API移行を再検討する場合は新規issueとして起票する。
 
 URL:
 
@@ -140,6 +149,8 @@ API読込に成功した職人では同一idのレシピをAPI側優先で解決
 基準値が範囲から抽選される職人 (鍛冶3職人・調理) のBOARDノードで、基準値表示をANALYSISと同じ「基準幅 下限 - 上限」表記へ変更します。木工・裁縫など固定基準値職人は従来どおり基準値のみ表示します。URL: https://github.com/kwdch013/crafting_dq10/issues/155
 ### #172 共通: GitHub Pages でフロントを静的サイトとして公開する
 `app/` は静的構成でAPI停止時もフォールバック `recipes.js` で動作するため、GitHub Pages で公開可能。Pages 有効化 (Source: GitHub Actions) → `.github/workflows/deploy-pages.yml` 追加 (`upload-pages-artifact` で `path: app`) → main への push で自動デプロイ、という手順を記録。レシピ保存は localStorage のみとなる制約あり。着手は保留中。URL: https://github.com/kwdch013/crafting_dq10/issues/172
+### #174 共通: ポート番号等を .env で設定可能にする（2026-08-25 close済み）
+`docker-compose.yml` にホスト側ポート (3000 / 8000) と `API_BASE_URL` がハードコードされ、他サービスとポートが衝突する環境で変更しづらい問題。`.env` / `.env.example` を用意し、frontend を `${FRONTEND_PORT:-3000}`、api を `${API_PORT:-8000}`、接続先を `API_BASE_URL: ${API_BASE_URL:-}` (未指定時は #188 の対応によりアクセス元ホスト名から導出) として変数化済み。完了条件を満たしていることを確認したためクローズ。URL: https://github.com/kwdch013/crafting_dq10/issues/174
 ### #176 共通: ページアイコン (favicon) を追加する（2026-07-20 close済み）
 フロント画面にページアイコンが未設定だったため、DQ10 職人 (金床・ハンマー・火花) をイメージした自前 SVG を `app/assets/favicon.svg` へ追加し、`app/index.html` の head から参照。`frontend/server.js` は `.svg` の MIME 定義済みのため変更なし。PR #177 で dev へ merge 済み。URL: https://github.com/kwdch013/crafting_dq10/issues/176
 ### #179 共通: パネル配置を変更し、特技データとダメージ表示を右側で大きく表示する（2026-07-20 close済み）
