@@ -9,6 +9,8 @@ const smithingComponentJs = fs.readFileSync("app/crafts/shared/smithing-componen
 
 assert.match(html, /id="smithingCriticalGaugePanel"[^>]*hidden/, "会心確定ラインパネルは初期非表示にしてください");
 assert.match(html, /id="smithingCriticalGaugeRows"/, "会心確定ラインパネルの描画先を追加してください");
+// 不等号表記の n が何を指すか分かるよう、パネル見出しに注記を置きます。
+assert.match(html, /n = 基準値までの残り数値/, "会心確定ラインパネルの見出しに n の説明を追加してください");
 const damageIndex = html.indexOf('id="smithingDamagePanel"');
 const gaugeIndex = html.indexOf('id="smithingCriticalGaugePanel"');
 assert.ok(gaugeIndex > damageIndex, "会心確定ラインパネルは温度別ダメージ表の後に配置してください");
@@ -69,24 +71,25 @@ function renderPanel(traitId, heat = "1600") {
 
   const row200 = rows.find((row) => row.innerHTML.includes("200℃ "));
   assert.match(row200.innerHTML, /200℃ 半減/);
-  assert.match(row200.innerHTML, /通常: 残り8以下で会心確定/, "200℃(半減)の通常威力は会心最小8にしてください");
-  // 非会心の最大ダメージでは基準値に届かない、ギリギリの残り数値(非会心最大+1)も併記します。
-  assert.match(row200.innerHTML, /残り7以上は非会心時不足\(非会心最大6\)/, "200℃(半減)の通常威力は非会心最大6・非会心不足ライン7にしてください");
+  assert.match(row200.innerHTML, /通常: 会心確定 n ≦ 8/, "200℃(半減)の通常威力は会心最小8にしてください");
+  // 非会心の最大ダメージでは基準値に届かない、ギリギリの残り数値（非会心最大+1）も併記します。
+  // 残り数値は n と置き、不等号で読み取れる表記にします。
+  assert.match(row200.innerHTML, /非会心不足 n ≧ 7（非会心最大 6）/, "200℃(半減)の通常威力は非会心最大6・非会心不足ライン7にしてください");
 
   const row400 = rows.find((row) => row.innerHTML.includes("400℃ "));
   assert.match(row400.innerHTML, /400℃ 倍加/);
-  assert.match(row400.innerHTML, /通常: 残り36以下で会心確定/, "400℃(倍加)の通常威力は会心最小36にしてください");
-  assert.match(row400.innerHTML, /残り27以上は非会心時不足\(非会心最大26\)/, "400℃(倍加)の通常威力は非会心最大26・非会心不足ライン27にしてください");
+  assert.match(row400.innerHTML, /通常: 会心確定 n ≦ 36/, "400℃(倍加)の通常威力は会心最小36にしてください");
+  assert.match(row400.innerHTML, /非会心不足 n ≧ 27（非会心最大 26）/, "400℃(倍加)の通常威力は非会心最大26・非会心不足ライン27にしてください");
 
   // 2000℃は「2000℃以上」を表す上限のため、倍加・半減の両フェーズを同じダメージ表(2000℃)で表示します。
   const maxRows = rows.filter((row) => row.innerHTML.includes("2000℃以上"));
   assert.equal(maxRows.length, 2, "2000℃以上は倍加・半減の2行を表示してください");
   const maxHighRow = maxRows.find((row) => row.innerHTML.includes("倍加"));
   const maxLowRow = maxRows.find((row) => row.innerHTML.includes("半減"));
-  assert.match(maxHighRow.innerHTML, /通常: 残り72以下で会心確定/, "2000℃以上(倍加)の通常威力は会心最小72にしてください");
-  assert.match(maxLowRow.innerHTML, /通常: 残り18以下で会心確定/, "2000℃以上(半減)の通常威力は会心最小18にしてください");
-  assert.match(maxHighRow.innerHTML, /残り55以上は非会心時不足\(非会心最大54\)/, "2000℃以上(倍加)の通常威力は非会心最大54・非会心不足ライン55にしてください");
-  assert.match(maxLowRow.innerHTML, /残り15以上は非会心時不足\(非会心最大14\)/, "2000℃以上(半減)の通常威力は非会心最大14・非会心不足ライン15にしてください");
+  assert.match(maxHighRow.innerHTML, /通常: 会心確定 n ≦ 72/, "2000℃以上(倍加)の通常威力は会心最小72にしてください");
+  assert.match(maxLowRow.innerHTML, /通常: 会心確定 n ≦ 18/, "2000℃以上(半減)の通常威力は会心最小18にしてください");
+  assert.match(maxHighRow.innerHTML, /非会心不足 n ≧ 55（非会心最大 54）/, "2000℃以上(倍加)の通常威力は非会心最大54・非会心不足ライン55にしてください");
+  assert.match(maxLowRow.innerHTML, /非会心不足 n ≧ 15（非会心最大 14）/, "2000℃以上(半減)の通常威力は非会心最大14・非会心不足ライン15にしてください");
 }
 
 {
@@ -96,8 +99,8 @@ function renderPanel(traitId, heat = "1600") {
 
   const row200 = rows.find((row) => row.innerHTML.includes("200℃ "));
   assert.match(row200.innerHTML, /200℃ 集中増加/);
-  assert.match(row200.innerHTML, /通常: 残り16以下で会心確定/, "200℃の通常威力の会心最小はダメージ表と同じ16にしてください");
-  assert.match(row200.innerHTML, /残り12以上は非会心時不足\(非会心最大11\)/, "集中変化はダメージ表と同じ非会心最大11・非会心不足ライン12にしてください");
+  assert.match(row200.innerHTML, /通常: 会心確定 n ≦ 16/, "200℃の通常威力の会心最小はダメージ表と同じ16にしてください");
+  assert.match(row200.innerHTML, /非会心不足 n ≧ 12（非会心最大 11）/, "集中変化はダメージ表と同じ非会心最大11・非会心不足ライン12にしてください");
 
   // 2000℃以上でも、集中変化はダメージ表自体を変えないため通常時と同じ会心最小値になります。
   const maxRows = rows.filter((row) => row.innerHTML.includes("2000℃以上"));
@@ -105,8 +108,8 @@ function renderPanel(traitId, heat = "1600") {
   assert.ok(maxRows.some((row) => row.innerHTML.includes("集中半減")));
   assert.ok(maxRows.some((row) => row.innerHTML.includes("集中増加")));
   maxRows.forEach((row) => {
-    assert.match(row.innerHTML, /通常: 残り36以下で会心確定/, "2000℃以上の通常威力の会心最小はダメージ表と同じ36にしてください");
-    assert.match(row.innerHTML, /残り28以上は非会心時不足\(非会心最大27\)/, "2000℃以上の通常威力の非会心最大はダメージ表と同じ27にしてください");
+    assert.match(row.innerHTML, /通常: 会心確定 n ≦ 36/, "2000℃以上の通常威力の会心最小はダメージ表と同じ36にしてください");
+    assert.match(row.innerHTML, /非会心不足 n ≧ 28（非会心最大 27）/, "2000℃以上の通常威力の非会心最大はダメージ表と同じ27にしてください");
   });
 }
 

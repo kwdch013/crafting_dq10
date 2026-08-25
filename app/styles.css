@@ -690,6 +690,14 @@ select:focus {
 }
 
 /* 集中変化・倍半は200℃ごとに会心確定ラインが変わるため、温度単位でまとめて表示します。 */
+/* 見出し直下の補足注記(不等号表記の n の意味など)。 */
+.section-note {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .smithing-critical-gauge-grid {
   display: grid;
   gap: 8px;

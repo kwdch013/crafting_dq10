@@ -174,11 +174,12 @@
 
         const adjustedRange = getAdjustedDamageRange(range, heatState, phase);
         const criticalMin = adjustedRange[0] * criticalMultiplier;
-        // 非会心の最大ダメージでも基準値へ届かなくなる境界(非会心最大+1)を併記し、
+        // 非会心の最大ダメージでも基準値へ届かなくなる境界（非会心最大+1）を併記し、
         // 会心が必須になる残り数値を判断できるようにします。
         const normalMax = adjustedRange[1];
         const shortageMin = normalMax + 1;
-        return `<span>${escapeHtml(power.label)}: 残り${criticalMin}以下で会心確定<small>残り${shortageMin}以上は非会心時不足(非会心最大${normalMax})</small></span>`;
+        // 残り数値を n と置いた不等号表記にし、実戦中に一目で判断できるようにします。
+        return `<span>${escapeHtml(power.label)}: 会心確定 n ≦ ${criticalMin}<small>非会心不足 n ≧ ${shortageMin}（非会心最大 ${normalMax}）</small></span>`;
       }).join("");
 
       row.innerHTML = `
