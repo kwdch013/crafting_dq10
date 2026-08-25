@@ -18,8 +18,8 @@
   };
   // 会心時確定(guaranteed)の際、非会心(通常)だった場合に基準範囲へ入るかどうかの補足表示。
   const nonCriticalOutcomeLabels = {
-    "non-critical-in-range": "非会心時基準範囲突入",
-    "non-critical-in-range-chance": "非会心時基準範囲突入の可能性あり",
+    "non-critical-in-range": "非会心時基準範囲突入確定",
+    "non-critical-in-range-chance": "非会心時突入の可能性",
     "non-critical-shortage": "非会心時不足",
   };
   const statusRanks = {

@@ -20,7 +20,7 @@ function analyzeGuaranteed(current, overrides = {}) {
   const result = analyzeGuaranteed(52, { normalMin: 8, normalMax: 15, criticalMin: 20, criticalMax: 30 });
   assert.equal(result.status, "guaranteed");
   assert.equal(result.nonCriticalOutcome, "non-critical-in-range");
-  assert.equal(result.nonCriticalOutcomeLabel, "非会心時基準範囲突入");
+  assert.equal(result.nonCriticalOutcomeLabel, "非会心時基準範囲突入確定");
 }
 
 {
@@ -28,7 +28,7 @@ function analyzeGuaranteed(current, overrides = {}) {
   const result = analyzeGuaranteed(50, { normalMin: 8, normalMax: 15, criticalMin: 20, criticalMax: 30 });
   assert.equal(result.status, "guaranteed");
   assert.equal(result.nonCriticalOutcome, "non-critical-in-range-chance");
-  assert.equal(result.nonCriticalOutcomeLabel, "非会心時基準範囲突入の可能性あり");
+  assert.equal(result.nonCriticalOutcomeLabel, "非会心時突入の可能性");
 }
 
 {
