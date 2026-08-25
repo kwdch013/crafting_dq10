@@ -14,6 +14,7 @@
     },
     isLightHeatActive,
     renderBoardReference,
+    renderCriticalGaugeReference,
     renderHeatTraitState,
     renderTemperatureSelect,
     // 光地金の盤面表示は、現在温度が有効な時だけ光状態を返します。
@@ -132,6 +133,56 @@
     });
 
     renderHeatTraitState({ state, elements, escapeHtml });
+  }
+
+  // 集中変化(会心率上昇)・倍半は200℃ごとに数値が変わるため、
+  // 各温度で会心確定になる残り数値(会心最小値)を一覧表示します。
+  function renderCriticalGaugeReference({ config, state, elements, escapeHtml }) {
+    if (!elements.smithingCriticalGaugePanel || !elements.smithingCriticalGaugeRows) {
+      return;
+    }
+
+    const showsPanel = isSmithingCraftState(state) &&
+      ["double-half", "focus-change"].includes(state.traitId);
+    elements.smithingCriticalGaugePanel.hidden = !showsPanel;
+    elements.smithingCriticalGaugeRows.replaceChildren();
+
+    if (!showsPanel) {
+      return;
+    }
+
+    const smithingDamage = global.DQ10SmithingDamage || {};
+    const criticalMultiplier = toNumber(smithingDamage.criticalMultiplier, 2);
+    const powerEntries = getSmithingDamagePowerEntries();
+    const heats = (config.heatStates || [])
+      .map((heatState) => toNumber(heatState.id, NaN))
+      .filter((heat) => Number.isFinite(heat) && heat % 200 === 0)
+      .sort((a, b) => a - b);
+
+    heats.forEach((heat) => {
+      const heatState = { ...state, heat };
+      const traitState = getHeatTraitState(heatState);
+      const rangeSet = smithingDamage.ranges?.[heat];
+      const row = document.createElement("div");
+      row.className = "smithing-critical-gauge-row";
+
+      const powerLines = powerEntries.map(([powerId, power]) => {
+        const range = rangeSet?.[powerId];
+        if (!range) {
+          return `<span>${escapeHtml(power.label)}: 未設定</span>`;
+        }
+
+        const adjustedRange = getAdjustedDamageRange(range, heatState);
+        const criticalMin = adjustedRange[0] * criticalMultiplier;
+        return `<span>${escapeHtml(power.label)}: 残り${criticalMin}以下で会心確定</span>`;
+      }).join("");
+
+      row.innerHTML = `
+        <strong>${heat}℃ ${escapeHtml(traitState.label)}</strong>
+        <div class="smithing-critical-gauge-powers">${powerLines}</div>
+      `;
+      elements.smithingCriticalGaugeRows.append(row);
+    });
   }
 
   // 鍛冶BOARD上部に、200℃単位で発動する地金特性の現在状態を描画します。

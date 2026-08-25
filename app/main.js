@@ -35,6 +35,8 @@ const elements = {
   smithingHeatDown200Button: document.querySelector("#smithingHeatDown200Button"),
   smithingHeatUp200Button: document.querySelector("#smithingHeatUp200Button"),
   smithingDamageRanges: document.querySelector("#smithingDamageRanges"),
+  smithingCriticalGaugePanel: document.querySelector("#smithingCriticalGaugePanel"),
+  smithingCriticalGaugeRows: document.querySelector("#smithingCriticalGaugeRows"),
   smithingBoardTraitState: document.querySelector("#smithingBoardTraitState"),
   specialChargeToggle: document.querySelector("#specialChargeToggle"),
   boardSpecialStateLabel: document.querySelector("#boardSpecialStateLabel"),
@@ -1095,10 +1097,20 @@ function renderSmithingDamageReference() {
       elements.smithingBoardTraitState.hidden = true;
       elements.smithingBoardTraitState.replaceChildren();
     }
+    if (elements.smithingCriticalGaugePanel) {
+      elements.smithingCriticalGaugePanel.hidden = true;
+      elements.smithingCriticalGaugeRows.replaceChildren();
+    }
     return;
   }
 
   component.renderBoardReference({
+    config: getCurrentCraftConfig(),
+    state,
+    elements,
+    escapeHtml,
+  });
+  component.renderCriticalGaugeReference?.({
     config: getCurrentCraftConfig(),
     state,
     elements,
