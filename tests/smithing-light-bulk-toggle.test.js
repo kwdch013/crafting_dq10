@@ -48,10 +48,16 @@ assert.match(
 	/function canUseBoardHistory/,
 	"盤面履歴を使える職人の判定 (canUseBoardHistory) を実装してください",
 );
+// BOARD操作領域はReset常設のため常時表示になったので、戻る/進む側の表示制御で確認します。
 assert.match(
 	syncSource,
-	/boardActions\.hidden = [^;]*isSmithing/s,
-	"鍛冶でもBOARD操作領域 (戻る/進む) を表示してください",
+	/undoBoardButton\.hidden = !usesBoardHistory/,
+	"戻るボタンは履歴利用可否で表示制御してください",
+);
+assert.match(
+	mainJs,
+	/function canUseBoardHistory\(\) \{[^}]*isCurrentCraftFamily\("smithing"\)/s,
+	"鍛冶でも戻る/進むを使えるようにしてください",
 );
 assert.match(
 	syncSource,
