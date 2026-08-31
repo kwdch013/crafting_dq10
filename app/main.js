@@ -1311,7 +1311,8 @@ function syncBoardActionButtons() {
   const selectedIngredient = canRearrange
     ? state.ingredients.find((ingredient) => ingredient.id === selectedBoardIngredientId)
     : null;
-  elements.boardActions.hidden = !canRearrange && !canRotateWoodworking && !isSmithing;
+  // Resetは全職人で使うため、BOARD操作領域自体は常時表示し、個々のボタン側で表示を制御します。
+  elements.boardActions.hidden = false;
   if (elements.rotateWoodLeftButton) {
     elements.rotateWoodLeftButton.hidden = !canRotateWoodworking;
     elements.rotateWoodLeftButton.disabled = !canRotateWoodworking;
@@ -1340,6 +1341,9 @@ function syncBoardActionButtons() {
   if (elements.toggleSmithingLightButton) {
     elements.toggleSmithingLightButton.disabled = !isSmithing || state.traitId !== "light";
   }
+  // 盤面履歴を持たない職人 (裁縫など) では戻る/進むを隠し、Resetのみを残します。
+  elements.undoBoardButton.hidden = !usesBoardHistory;
+  elements.redoBoardButton.hidden = !usesBoardHistory;
   elements.undoBoardButton.disabled = !usesBoardHistory || undoStack.length === 0;
   elements.redoBoardButton.disabled = !usesBoardHistory || redoStack.length === 0;
   syncBoardSpecialState();

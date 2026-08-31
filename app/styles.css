@@ -860,6 +860,14 @@ select:focus {
   gap: 8px;
 }
 
+/* Resetは初期化という破壊的操作のため、赤系の配色で他ボタンと区別します。 */
+/* margin-rightで左端へ寄せ、職人種別で回転ボタンが増減しても位置と折返しの影響を受けないようにします。 */
+.button.secondary.board-reset-button {
+  margin-right: auto;
+  border-color: var(--red);
+  color: var(--red);
+}
+
 .cooking-command-panel {
   display: grid;
   gap: 10px;
