@@ -370,6 +370,7 @@ const recipeApiErrorMessages = Object.freeze({
   invalid_recipe: "レシピの入力内容が正しくありません。",
   invalid_craft_id: "職人の指定が正しくありません。",
   recipe_id_mismatch: "レシピIDの指定が一致していません。",
+  invalid_json: "送信内容の形式が正しくありません。もう一度保存してください。",
   not_found: "対象のレシピが見つかりません。既に削除された可能性があります。",
   internal_error: "APIの起動状態を確認してください。",
 });
@@ -401,8 +402,10 @@ function getRecipeApiFailureMessage(error, apiAction) {
     return `${prefix}${recipeApiErrorMessages[apiErrorCode]}`;
   }
   if (status >= 400 && status < 500 && apiErrorCode) {
+    // 未知の識別子はサーバー由来の文字列をそのまま画面へ出さない。
+    // 原因の特定にはconsoleへ出したエラーを使う。
     const detail = recipeApiErrorMessages[apiErrorCode]
-      || `入力内容に問題があります（${apiErrorCode}）。`;
+      || "入力内容を確認して、もう一度保存してください。";
     return `${prefix}${detail}`;
   }
 

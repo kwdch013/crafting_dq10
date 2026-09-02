@@ -102,6 +102,7 @@ test("既知の識別子にはすべて専用文言があり、未知の4xxは�
 		"invalid_recipe",
 		"invalid_craft_id",
 		"recipe_id_mismatch",
+		"invalid_json",
 		"not_found",
 		"internal_error",
 	];
@@ -110,8 +111,11 @@ test("既知の識別子にはすべて専用文言があり、未知の4xxは�
 		assert.equal(typeof recipeApiErrorMessages[errorCode], "string", `${errorCode} の文言を定義してください`);
 		assert.notEqual(recipeApiErrorMessages[errorCode], "", `${errorCode} の文言を空にしないでください`);
 	}
-	assert.match(
-		getRecipeApiFailureMessage({ status: 400, apiErrorCode: "unknown_error" }, "サーバーへの保存"),
-		/unknown_error/,
+	// 未知の識別子でも、サーバー由来の文字列を画面へ出さないこと
+	const unknownMessage = getRecipeApiFailureMessage(
+		{ status: 400, apiErrorCode: "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)" },
+		"サーバーへの保存",
 	);
+	assert.doesNotMatch(unknownMessage, /Expecting property name/);
+	assert.match(unknownMessage, /入力内容を確認して、もう一度保存してください。/);
 });
