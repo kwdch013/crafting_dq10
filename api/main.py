@@ -13,7 +13,7 @@ DATA_DIR = BASE_DIR / "data"
 if str(BASE_DIR) not in sys.path:
 	sys.path.insert(0, str(BASE_DIR))
 
-from repository import json_store
+from repository import create_store, json_store
 
 
 def read_json(path):
@@ -45,13 +45,13 @@ def response_payload(path):
 		return json_store.read_json(DATA_DIR / "catalog.json")
 
 	if path == "/api/recipes":
-		return {"crafts": json_store.JsonRecipeStore(DATA_DIR).load_all()}
+		return {"crafts": create_store(DATA_DIR).load_all()}
 
 	prefix = "/api/crafts/"
 	if path.startswith(prefix) and path.endswith("/recipes"):
 		craft_id = unquote(path[len(prefix):-len("/recipes")]).strip("/")
 		try:
-			return {"craftId": craft_id, "recipes": json_store.JsonRecipeStore(DATA_DIR).load_craft(craft_id)}
+			return {"craftId": craft_id, "recipes": create_store(DATA_DIR).load_craft(craft_id)}
 		except (FileNotFoundError, ValueError):
 			return None
 

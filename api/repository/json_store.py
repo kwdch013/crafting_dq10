@@ -3,6 +3,7 @@
 import json
 from pathlib import Path
 
+from .errors import UnknownCraftError
 from .validation import validate_recipe
 
 
@@ -66,4 +67,4 @@ class JsonRecipeStore:
 		for recipe_path in (self.data_dir / "crafts").glob("*/recipes.json"):
 			if recipe_path.parent.name == craft_id:
 				return recipe_path
-		raise FileNotFoundError("recipe_file_not_found")
+		raise UnknownCraftError("recipe_file_not_found")
