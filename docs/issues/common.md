@@ -163,3 +163,8 @@ API読込に成功した職人では同一idのレシピをAPI側優先で解決
 ### #200 共通: PR #199 の CodeQL セキュリティ警告を解消する
 
 PR #199 の CodeQL が、利用者入力を含む職人IDからのパス構築 3 件と、テストの文字列処理 2 件を高重要度として検出しました。登録済みレシピファイルとの照合でパスを解決し、テストの不完全な文字列置換を除去して警告を解消します。URL: https://github.com/kwdch013/crafting_dq10/issues/200
+
+### #227 API: 不正なJSONのPUTで invalid_json が返らない (except の順序で到達不能)
+
+`api/main.py` の `do_PUT` で `except json.JSONDecodeError` の分岐に到達できません。`json.JSONDecodeError` は `ValueError` のサブクラスであり、直前の `except ValueError` が先に捕捉するためです。結果として、不正なJSONをPUTすると `{"error": "invalid_json"}` ではなく `{"error": "Expecting property name enclosed in double quotes: ..."}` のようにPythonのパーサー内部の文言がそのまま返ります。ステータスは現状も 400 のため実害は小さいものの、文言がPythonのバージョンに依存し、クライアントが分岐に使えません。PR #226 (#217 の B2-1) でHTTPレベルの契約テストを追加した際に判明しました。移行前の `api/main.py` から同じ順序のため、リポジトリ層の分離で作り込んだものではありません。対応は `except json.JSONDecodeError` を `except ValueError` より前へ移すだけですが、#217 (レシピDB移行 段階2) は保存先の切り替えでAPIの挙動を変えないことが前提のため、段階2の完了後に着手します。修正時は `tests/api_http_contract.test.py` の `test_put_invalid_json_returns_decoder_error` (現在はPythonのバージョン差を吸収するためステータスと `error` キーの存在だけを検証) の期待値も更新します。URL: https://github.com/kwdch013/crafting_dq10/issues/227
+
