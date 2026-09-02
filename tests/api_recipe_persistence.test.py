@@ -1,7 +1,9 @@
 import importlib.util
+import os
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 
 def load_api_module():
@@ -13,6 +15,8 @@ def load_api_module():
 
 class RecipePersistenceTest(unittest.TestCase):
 	def setUp(self):
+		self.environment = patch.dict(os.environ, {"RECIPE_STORE": "json"}, clear=False)
+		self.environment.start()
 		self.api = load_api_module()
 		self.temp_dir = tempfile.TemporaryDirectory()
 		self.data_dir = Path(self.temp_dir.name)
@@ -34,6 +38,7 @@ class RecipePersistenceTest(unittest.TestCase):
 	def tearDown(self):
 		self.api.DATA_DIR = self.original_data_dir
 		self.temp_dir.cleanup()
+		self.environment.stop()
 
 	def test_upsert_recipe_appends_user_recipe(self):
 		recipe = {"id": "user-cooking-1", "name": "追加レシピ", "items": []}

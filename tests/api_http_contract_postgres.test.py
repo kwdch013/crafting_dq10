@@ -16,8 +16,10 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "api"))
 
 TEST_DATABASE_URL = os.environ.get("TEST_DATABASE_URL", "")
-DATA_DIR = REPO_ROOT / "api" / "data"
 MIGRATION_DIR = REPO_ROOT / "api" / "migrations"
+sys.path.insert(0, str(REPO_ROOT / "tests" / "helpers"))
+
+from recipe_loader import load_fallback_recipes
 
 
 def load_script(path, name):
@@ -36,16 +38,10 @@ class PostgresApiHttpContractTest(unittest.TestCase):
 		import psycopg
 
 		apply = load_script(MIGRATION_DIR / "apply.py", "dq10_postgres_http_apply")
-		importer = load_script(
-			REPO_ROOT / "api" / "scripts" / "import_recipes.py", "dq10_postgres_http_import"
-		)
 		self.conn = psycopg.connect(TEST_DATABASE_URL, autocommit=False)
 		self.conn.execute("DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public;")
 		self.conn.commit()
-		apply.ensure_schema_migration(self.conn)
-		for name in ("0001_init.sql", "0002_recipes.sql", "0003_seed_master.sql"):
-			apply.apply_migration(self.conn, MIGRATION_DIR / name)
-		importer.import_all(self.conn, DATA_DIR)
+		apply.apply_all(self.conn)
 
 		self.environment = patch.dict(os.environ, {
 			"RECIPE_STORE": "postgres",
@@ -84,7 +80,7 @@ class PostgresApiHttpContractTest(unittest.TestCase):
 
 	def recipe_copy(self):
 		"""既存の調理レシピを、書き込み用に独立した値として返します。"""
-		recipes = json.loads((DATA_DIR / "crafts" / "cooking" / "recipes.json").read_text())
+		recipes = load_fallback_recipes("cooking")
 		return copy.deepcopy(next(recipe for recipe in recipes if recipe["id"] == "cooking-003"))
 
 	def test_put_get_and_delete_use_postgres_store(self):
@@ -202,7 +198,7 @@ class PostgresApiHttpContractTest(unittest.TestCase):
 
 	def tool_recipe_copy(self, recipe_id):
 		"""道具鍛冶の既存レシピを、書き込み用に独立した値で返します。"""
-		recipes = json.loads((DATA_DIR / "crafts" / "tool-smithing" / "recipes.json").read_text())
+		recipes = load_fallback_recipes("tool-smithing")
 		return copy.deepcopy(next(recipe for recipe in recipes if recipe["id"] == recipe_id))
 
 

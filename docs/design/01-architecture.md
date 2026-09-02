@@ -5,7 +5,7 @@
 本アプリは、DQ10の職人ミニゲームを手入力または将来の画面認識で補助するWebアプリです。
 
 現在は `frontend` と `api` の2コンテナで起動します。
-フロントは静的ファイルを配信し、APIは職人データやレシピJSONを返します。
+フロントは静的ファイルを配信し、APIは職人データやPostgreSQLから復元したレシピを返します。
 
 ## 構成図
 
@@ -17,7 +17,7 @@ flowchart LR
   UI --> Engine[共通計算エンジン<br>app/engine.js]
   UI --> Config[職人設定<br>app/crafts/*/config.js]
   UI --> Component[職人別コンポーネント<br>app/crafts/*/component.js]
-  API --> Recipes[レシピJSON<br>api/data/crafts/*/recipes.json]
+  API --> Recipes[(PostgreSQL<br>レシピ真実源)]
   Config --> Layout[盤面設定<br>layout / gridCell]
   Engine --> Damage[共有ダメージ表<br>app/crafts/shared/*.js]
   UI --> Storage[localStorage]
@@ -54,14 +54,14 @@ flowchart LR
 
 - ヘルスチェック
 - 職人一覧のJSON返却
-- 職人別レシピJSON返却
+- 職人別レシピの返却
 - CORSヘッダ付与
 
 主なファイル:
 
 - `api/main.py`
 - `api/data/catalog.json`
-- `api/data/crafts/<職人>/recipes.json`
+- `api/repository/postgres_store.py`
 
 ### 計算エンジン層
 
@@ -112,10 +112,13 @@ flowchart LR
 
 主なファイル:
 
-- `api/data/crafts/<職人>/recipes.json`
+- PostgreSQL
+- `api/migrations/0004_seed_recipes.sql`
 - `app/crafts/<職人>/recipes.js`
 
-`app/crafts/<職人>/recipes.js` はAPIが使えない場合のフォールバックです。
+PostgreSQLがレシピの真実源です。`0004_seed_recipes.sql` は空のDBを初期化する唯一のレシピ入力で、
+`api/data/crafts/<職人>/recipes.json` はDBからの追跡対象外の生成物です。
+`app/crafts/<職人>/recipes.js` はAPIが使えない場合のコミット対象フォールバックです。
 
 ### 共有ダメージ表
 
@@ -176,6 +179,6 @@ APIのベースイメージは、PostgreSQLドライバのバイナリwheelを�
 - 共通判定は `app/engine.js` に集約します。
 - UI文言はできるだけ職人設定から渡します。
 - 盤面サイズとマス位置は職人設定から渡します。
-- レシピ別の基準値と成功範囲は `api/data/crafts/<職人>/recipes.json` に閉じ込めます。
-- API停止時のため、フロント側の `recipes.js` はフォールバックとして残します。
+- レシピ別の基準値と成功範囲はPostgreSQLで管理します。
+- 空のDBの初期化は `api/migrations/0004_seed_recipes.sql`、API停止時はコミット対象の `recipes.js` を使います。
 - 職人固有の計算が必要になったら、共通エンジンを拡張または職人別エンジンを追加します。

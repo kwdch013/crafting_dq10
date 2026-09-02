@@ -12,7 +12,6 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "api"))
 
 TEST_DATABASE_URL = os.environ.get("TEST_DATABASE_URL", "")
-DATA_DIR = REPO_ROOT / "api" / "data"
 MIGRATION_DIR = REPO_ROOT / "api" / "migrations"
 SEED_PATH = MIGRATION_DIR / "0004_seed_recipes.sql"
 
@@ -33,24 +32,20 @@ class ExportSeedTest(unittest.TestCase):
 		import psycopg
 
 		self.apply = load_script(MIGRATION_DIR / "apply.py", "dq10_export_seed_apply")
-		self.importer = load_script(REPO_ROOT / "api" / "scripts" / "import_recipes.py", "dq10_export_seed_import")
 		self.exporter = load_script(REPO_ROOT / "api" / "scripts" / "export_seed.py", "dq10_export_seed")
 		self.conn = psycopg.connect(TEST_DATABASE_URL, autocommit=False)
 		self.temporary_directory = tempfile.TemporaryDirectory()
 		self.output_path = Path(self.temporary_directory.name) / "0004_seed_recipes.sql"
-		self.reset_and_import()
+		self.reset_and_seed()
 
 	def tearDown(self):
 		self.conn.close()
 		self.temporary_directory.cleanup()
 
-	def reset_and_import(self):
+	def reset_and_seed(self):
 		self.conn.execute("DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public;")
 		self.conn.commit()
-		self.apply.ensure_schema_migration(self.conn)
-		for name in ("0001_init.sql", "0002_recipes.sql", "0003_seed_master.sql"):
-			self.apply.apply_migration(self.conn, MIGRATION_DIR / name)
-		self.importer.import_all(self.conn, DATA_DIR)
+		self.apply.apply_all(self.conn)
 
 	def export_seed(self, *extra_args):
 		return self.exporter.main([

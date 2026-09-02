@@ -1,5 +1,6 @@
 import importlib.util
 import json
+import os
 import tempfile
 import threading
 import unittest
@@ -7,6 +8,7 @@ import urllib.error
 import urllib.request
 from http.server import ThreadingHTTPServer
 from pathlib import Path
+from unittest.mock import patch
 
 
 def load_api_module():
@@ -21,6 +23,8 @@ class ApiHttpContractTest(unittest.TestCase):
 	"""実HTTP経由でJSON APIの応答形式とステータスを固定する。"""
 
 	def setUp(self):
+		self.environment = patch.dict(os.environ, {"RECIPE_STORE": "json"}, clear=False)
+		self.environment.start()
 		self.api = load_api_module()
 		self.temp_dir = tempfile.TemporaryDirectory()
 		self.data_dir = Path(self.temp_dir.name)
@@ -55,6 +59,7 @@ class ApiHttpContractTest(unittest.TestCase):
 		self.api.Handler.log_message = self.original_log_message
 		self.api.DATA_DIR = self.original_data_dir
 		self.temp_dir.cleanup()
+		self.environment.stop()
 
 	def request(self, method, path, payload=None):
 		"""4xxも本文・ヘッダとともに検証できる形で返す。"""

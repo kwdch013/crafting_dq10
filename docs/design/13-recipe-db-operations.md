@@ -56,7 +56,11 @@ docker compose exec api python migrations/apply.py --dry-run
 
 ## レシピの投入
 
-`api/data/crafts/<職人>/recipes.json` を配列順に読み、`sort_order` を採番して登録します。
+新規cloneの空DBには、まず `api/migrations/0004_seed_recipes.sql` を含むマイグレーションを適用します。
+これが空のDBを初期化する唯一のレシピ入力です。
+
+`import_recipes.py` は移行時、または `api/data/crafts/<職人>/recipes.json` が手元にある場合だけ使います。
+同ファイルを配列順に読み、`sort_order` を採番して登録します。
 UPSERTのため再実行できます。DDLで強制しない整合性は投入前に検証し、違反があれば
 何も書き込まずに終了します。
 
@@ -64,7 +68,7 @@ UPSERTのため再実行できます。DDLで強制しない整合性は投入�
 docker compose exec api python scripts/import_recipes.py
 ```
 
-`0004_seed_recipes.sql` を適用済みのDBに対して実行した場合は、同じ内容で上書きされます。
+`0004_seed_recipes.sql` を適用済みのDBに対して実行した場合は、JSONが手元にあれば同じ内容で上書きされます。
 
 ## レシピファイルのエクスポート
 

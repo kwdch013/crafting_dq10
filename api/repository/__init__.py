@@ -7,8 +7,8 @@ from .json_store import JsonRecipeStore
 
 
 def create_store(data_dir=None, store_name=None, database_url=None):
-	"""RECIPE_STORE に従って保存先を選ぶ。既定は json。"""
-	selected = os.environ.get("RECIPE_STORE", "json") if store_name is None else store_name
+	"""RECIPE_STORE に従って保存先を選ぶ。既定は postgres。"""
+	selected = os.environ.get("RECIPE_STORE", "postgres") if store_name is None else store_name
 	if selected == "json":
 		base_dir = data_dir or Path(__file__).resolve().parents[1] / "data"
 		return JsonRecipeStore(base_dir)

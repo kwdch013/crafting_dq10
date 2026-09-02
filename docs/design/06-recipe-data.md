@@ -2,23 +2,17 @@
 
 ## 目的
 
-主要なレシピの基準値と成功範囲を、職人ごとのJSONで管理します。
+主要なレシピの基準値と成功範囲をPostgreSQLで管理します。
 
 画面側はレシピを選ぶだけで、マス名、配置、基準値、成功下限、成功上限を読み込みます。
 
 ## ファイル配置
 
-API側:
+DB初期化と生成物:
 
 ```text
-api/data/
-  catalog.json
-  crafts/cooking/recipes.json
-  crafts/weapon-smithing/recipes.json
-  crafts/armor-smithing/recipes.json
-  crafts/tool-smithing/recipes.json
-  crafts/sewing/recipes.json
-  crafts/woodworking/recipes.json
+api/migrations/0004_seed_recipes.sql
+api/data/crafts/<職人>/recipes.json
 ```
 
 フロント側:
@@ -27,7 +21,9 @@ api/data/
 app/crafts/<職人>/recipes.js
 ```
 
-フロント側の `recipes.js` は、APIが使えない場合のフォールバックです。
+PostgreSQLが真実源で、`0004_seed_recipes.sql` は空のDBを初期化する唯一のレシピ入力です。
+`api/data/crafts/<職人>/recipes.json` は `export_recipes.py` の追跡対象外の生成物です。
+フロント側の `recipes.js` は、APIが使えない場合のコミット対象フォールバックです。
 
 ## API
 
@@ -37,8 +33,8 @@ app/crafts/<職人>/recipes.js
 | `GET /api/crafts` | 職人一覧 |
 | `GET /api/recipes` | 全職人のレシピ一覧 |
 | `GET /api/crafts/{craftId}/recipes` | 指定職人のレシピ一覧 |
-| `PUT /api/crafts/{craftId}/recipes/{recipeId}` | レシピ追加・編集内容を `recipes.json` へ一時反映 |
-| `DELETE /api/crafts/{craftId}/recipes/{recipeId}` | レシピ削除内容を `recipes.json` へ一時反映 |
+| `PUT /api/crafts/{craftId}/recipes/{recipeId}` | レシピ追加・編集内容をPostgreSQLへ反映 |
+| `DELETE /api/crafts/{craftId}/recipes/{recipeId}` | レシピ削除内容をPostgreSQLへ反映 |
 
 ## JSON形式
 
@@ -270,16 +266,16 @@ sequenceDiagram
 
 ## 保守ルール
 
-- 実レシピの数値は `api/data/crafts/<職人>/recipes.json` に記載します。
+- 実レシピの数値はPostgreSQLで管理します。
 - UIや計算エンジンにレシピ名を直書きしません。
 - 表示対象外だが履歴として残すレシピは削除せず、`archived: true` を付けます。
 - 実数値の出典がある場合は、対象JSONと同じディレクトリにメモを追加します。
 - 不明な実数値を断定しません。
 - テンプレート値は、実レシピ値に置き換える前提で管理します。
-- 道具鍛冶の大項目は `tool-smithing/config.js` の `recipeCategoryOptions` で管理し、具体的な制作物は道具名としてレシピJSONに追加します。
-- 武器鍛冶の大項目は `weapon-smithing/config.js` の `recipeCategoryOptions` で管理し、具体的な制作物は武器名としてレシピJSONに追加します。
-- 防具鍛冶の大項目は `armor-smithing/config.js` の `recipeCategoryOptions` で管理し、具体的な制作物は防具名としてレシピJSONに追加します。
+- 道具鍛冶の大項目は `tool-smithing/config.js` の `recipeCategoryOptions` で管理し、具体的な制作物は画面のレシピ管理からDBへ追加します。
+- 武器鍛冶の大項目は `weapon-smithing/config.js` の `recipeCategoryOptions` で管理し、具体的な制作物は画面のレシピ管理からDBへ追加します。
+- 防具鍛冶の大項目は `armor-smithing/config.js` の `recipeCategoryOptions` で管理し、具体的な制作物は画面のレシピ管理からDBへ追加します。
 - 道具鍛冶のテンプレートレシピは `archived: true` として非表示にし、実レシピを道具名の選択肢に表示します。
-- レシピ追加・編集・削除はブラウザの `localStorage` に保存し、API起動時は `api/data/crafts/<職人>/recipes.json` にも一時反映します。
+- レシピ追加・編集・削除はブラウザの `localStorage` に保存し、API起動時はPostgreSQLにも反映します。
 - API停止時や反映失敗時はブラウザ保存を優先し、画面上では従来どおりユーザー追加レシピを利用します。
-- 木工・裁縫のカテゴリ・テンプレート構造テストの正解は `tests/fixtures/<職人>-categories.json` に分離します。アプリのボード編集で `recipes.json` の並び順や件数が変わってもテストが壊れないよう、テストは config と本番データがこの fixture へ適合するかのみを検証します。
+- 木工・裁縫のカテゴリ・テンプレート構造テストの正解は `tests/fixtures/<職人>-categories.json` に分離します。レシピの並び順や件数が変わってもテストが壊れないよう、テストは config と本番データがこの fixture へ適合するかのみを検証します。
