@@ -3,72 +3,38 @@ from pathlib import Path
 from urllib.parse import unquote, urlparse
 import json
 import os
+import sys
 
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
 
+# 既存テストはmain.pyをパス指定で読み込むため、api配下もモジュール探索対象にします。
+if str(BASE_DIR) not in sys.path:
+	sys.path.insert(0, str(BASE_DIR))
+
+from repository import json_store
+
 
 def read_json(path):
-    with path.open(encoding="utf-8") as file:
-        return json.load(file)
+	"""既存テストとの互換性のため、JSON読込ヘルパを公開する。"""
+	return json_store.read_json(path)
 
 
-# レシピJSONを人が差分確認しやすい整形で保存します。
-def write_json(path, payload):
-    with path.open("w", encoding="utf-8") as file:
-        json.dump(payload, file, ensure_ascii=False, indent=2)
-        file.write("\n")
-
-
-# 職人IDから対象recipes.jsonを解決し、パストラバーサルを防ぎます。
+# 既存テストがmain.DATA_DIRを差し替えてから呼ぶため、読込時にストアを固定しません。
 def get_recipe_path(craft_id):
-	if not craft_id or "/" in craft_id or "\\" in craft_id or craft_id in {".", ".."}:
-		raise ValueError("invalid_craft_id")
-
-	for recipe_path in (DATA_DIR / "crafts").glob("*/recipes.json"):
-		if recipe_path.parent.name == craft_id:
-			return recipe_path
-	raise FileNotFoundError("recipe_file_not_found")
+	"""既存テストとの互換性のため、レシピパス解決を委譲する。"""
+	return json_store.JsonRecipeStore(DATA_DIR).recipe_path(craft_id)
 
 
-# APIから受け取るレシピの最低限の必須項目を検証します。
-def validate_recipe(recipe):
-    if not isinstance(recipe, dict):
-        raise ValueError("invalid_recipe")
-    recipe_id = recipe.get("id")
-    name = recipe.get("name")
-    items = recipe.get("items")
-    if not isinstance(recipe_id, str) or not recipe_id.strip():
-        raise ValueError("invalid_recipe_id")
-    if not isinstance(name, str) or not name.strip():
-        raise ValueError("invalid_recipe_name")
-    if not isinstance(items, list):
-        raise ValueError("invalid_recipe_items")
-
-
-# レシピIDをキーに追加または置換してrecipes.jsonへ反映します。
 def upsert_recipe(craft_id, recipe):
-    validate_recipe(recipe)
-    recipe_path = get_recipe_path(craft_id)
-    recipes = read_json(recipe_path)
-    recipe_id = recipe["id"]
-    next_recipes = [candidate for candidate in recipes if candidate.get("id") != recipe_id]
-    next_recipes.append(recipe)
-    write_json(recipe_path, next_recipes)
-    return {"craftId": craft_id, "recipe": recipe}
+	"""既存テストとの互換性のため、レシピ保存を委譲する。"""
+	return json_store.JsonRecipeStore(DATA_DIR).upsert(craft_id, recipe)
 
 
-# 指定レシピをrecipes.jsonから除外します。
 def delete_recipe(craft_id, recipe_id):
-    if not recipe_id:
-        raise ValueError("invalid_recipe_id")
-
-    recipe_path = get_recipe_path(craft_id)
-    recipes = read_json(recipe_path)
-    next_recipes = [recipe for recipe in recipes if recipe.get("id") != recipe_id]
-    write_json(recipe_path, next_recipes)
-    return {"craftId": craft_id, "deletedId": recipe_id}
+	"""既存テストとの互換性のため、レシピ削除を委譲する。"""
+	return json_store.JsonRecipeStore(DATA_DIR).delete(craft_id, recipe_id)
 
 
 def response_payload(path):
@@ -76,19 +42,16 @@ def response_payload(path):
 		return {"status": "ok"}
 
 	if path == "/api/crafts":
-		return read_json(DATA_DIR / "catalog.json")
+		return json_store.read_json(DATA_DIR / "catalog.json")
 
 	if path == "/api/recipes":
-		result = {}
-		for recipe_file in sorted((DATA_DIR / "crafts").glob("*/recipes.json")):
-			result[recipe_file.parent.name] = read_json(recipe_file)
-		return {"crafts": result}
+		return {"crafts": json_store.JsonRecipeStore(DATA_DIR).load_all()}
 
 	prefix = "/api/crafts/"
 	if path.startswith(prefix) and path.endswith("/recipes"):
 		craft_id = unquote(path[len(prefix):-len("/recipes")]).strip("/")
 		try:
-			return {"craftId": craft_id, "recipes": read_json(get_recipe_path(craft_id))}
+			return {"craftId": craft_id, "recipes": json_store.JsonRecipeStore(DATA_DIR).load_craft(craft_id)}
 		except (FileNotFoundError, ValueError):
 			return None
 
