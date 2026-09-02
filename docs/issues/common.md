@@ -168,3 +168,7 @@ PR #199 の CodeQL が、利用者入力を含む職人IDからのパス構築 3
 
 `api/main.py` の `do_PUT` で `except json.JSONDecodeError` の分岐に到達できません。`json.JSONDecodeError` は `ValueError` のサブクラスであり、直前の `except ValueError` が先に捕捉するためです。結果として、不正なJSONをPUTすると `{"error": "invalid_json"}` ではなく `{"error": "Expecting property name enclosed in double quotes: ..."}` のようにPythonのパーサー内部の文言がそのまま返ります。ステータスは現状も 400 のため実害は小さいものの、文言がPythonのバージョンに依存し、クライアントが分岐に使えません。PR #226 (#217 の B2-1) でHTTPレベルの契約テストを追加した際に判明しました。移行前の `api/main.py` から同じ順序のため、リポジトリ層の分離で作り込んだものではありません。対応は `except json.JSONDecodeError` を `except ValueError` より前へ移すだけですが、#217 (レシピDB移行 段階2) は保存先の切り替えでAPIの挙動を変えないことが前提のため、段階2の完了後に着手します。修正時は `tests/api_http_contract.test.py` の `test_put_invalid_json_returns_decoder_error` (現在はPythonのバージョン差を吸収するためステータスと `error` キーの存在だけを検証) の期待値も更新します。URL: https://github.com/kwdch013/crafting_dq10/issues/227
 
+### #230 共通: 保存失敗時のalert文言をエラーの種類に応じて分ける
+
+`app/main.js` は API 保存・削除が失敗すると、理由を問わず「ブラウザには保存しましたが、recipes.json への反映に失敗しました。APIの起動状態を確認してください。」と表示します (3128行付近と2721行付近)。PR #229 で保存先を PostgreSQL に切り替えられるようにしたところ、DB の `UNIQUE (class, name)` により同じ職人で同名のレシピを保存すると `400 recipe_name_already_exists` が返るようになりました。名前が重複しているだけなのに「APIの起動状態を確認してください」と出るため、利用者は原因にたどり着けません。エラーの種類に応じて文言を分け、通信失敗・API停止のときだけ現行の文言を出すようにします。#217 の B2-5 (既定を postgres へ変更) の前に対応が必要です。段階2は「フロント修正なし」が前提のため別issueとして分離しています。URL: https://github.com/kwdch013/crafting_dq10/issues/230
+
