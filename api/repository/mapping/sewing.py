@@ -42,7 +42,7 @@ def to_columns(items: list[dict[str, Any]]) -> dict[str, Any]:
 	"""items 配列からレシピ行のマス列を作ります。"""
 	columns = common.blank_columns(VALUE_TEMPLATES, CELLS)
 	for item in items:
-		columns[f"value_{item['name'].lower()}"] = item["target"]
+		columns[f"value_{item['name'].lower()}"] = item.get("target", item["successMin"])
 	return columns
 
 

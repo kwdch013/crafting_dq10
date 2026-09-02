@@ -50,7 +50,7 @@ def to_columns(items: list[dict[str, Any]]) -> dict[str, Any]:
 	columns = common.blank_columns(VALUE_TEMPLATES, CELLS)
 	for item in items:
 		key = item["name"].lower()
-		columns[f"value_{key}"] = item["target"]
+		columns[f"value_{key}"] = item.get("target", item["successMin"])
 		columns[f"grain_{key}"] = item.get("optionId") == GRAIN_VERTICAL
 	return columns
 
