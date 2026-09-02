@@ -103,3 +103,4 @@ issueには対象領域に応じてラベルを付与します。
 | #219 | レシピDB移行 段階3b: 分類の選択肢をAPI由来へ移す | [recipe-db.md](issues/recipe-db.md) |
 | #220 | レシピDB移行 段階3c: レシピ登録の入口をPOSTへ変更する | [recipe-db.md](issues/recipe-db.md) |
 | #221 | レシピDB移行 段階3d: 分類の新規作成と鍛冶の使用マス連動 | [recipe-db.md](issues/recipe-db.md) |
+| #224 | レシピDB: 素材・単価・使用道具と大成功損益計算のデータ設計を検討する | [recipe-db.md](issues/recipe-db.md) |
