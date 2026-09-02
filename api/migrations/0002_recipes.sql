@@ -4,7 +4,9 @@
 -- 道具鍛冶のマス別基準範囲
 -- 基準値が範囲で決まるため、マスごとに下限と上限を持ちます。
 CREATE TABLE tool_recipes (
-	id          integer PRIMARY KEY REFERENCES craft_master (id) ON DELETE CASCADE,
+	id          integer PRIMARY KEY,
+	-- 自職人に固定し、(id, class) で参照することで別職人の見出しへの紐付けを防ぎます。
+	class       smallint NOT NULL DEFAULT 1 CHECK (class = 1),
 	category_id integer NOT NULL DEFAULT 0 REFERENCES tool_category (category_id),
 	chara_id    smallint NOT NULL DEFAULT 0 REFERENCES smith_character (chara_id),
 	a_min integer,
@@ -23,6 +25,8 @@ CREATE TABLE tool_recipes (
 	g_max integer,
 	h_min integer,
 	h_max integer,
+	CONSTRAINT tool_recipes_craft_master_fkey FOREIGN KEY (id, class)
+		REFERENCES craft_master (id, class) ON DELETE CASCADE,
 	CONSTRAINT tool_recipes_a_range CHECK (a_min <= a_max),
 	CONSTRAINT tool_recipes_a_pair CHECK ((a_min IS NULL) = (a_max IS NULL)),
 	CONSTRAINT tool_recipes_b_range CHECK (b_min <= b_max),
@@ -50,7 +54,9 @@ CREATE TRIGGER tool_recipes_set_updated_at BEFORE UPDATE ON tool_recipes
 -- 武器鍛冶のマス別基準範囲
 -- 基準値が範囲で決まるため、マスごとに下限と上限を持ちます。
 CREATE TABLE weapon_recipes (
-	id          integer PRIMARY KEY REFERENCES craft_master (id) ON DELETE CASCADE,
+	id          integer PRIMARY KEY,
+	-- 自職人に固定し、(id, class) で参照することで別職人の見出しへの紐付けを防ぎます。
+	class       smallint NOT NULL DEFAULT 2 CHECK (class = 2),
 	category_id integer NOT NULL DEFAULT 0 REFERENCES weapon_category (category_id),
 	chara_id    smallint NOT NULL DEFAULT 0 REFERENCES smith_character (chara_id),
 	a_min integer,
@@ -69,6 +75,8 @@ CREATE TABLE weapon_recipes (
 	g_max integer,
 	h_min integer,
 	h_max integer,
+	CONSTRAINT weapon_recipes_craft_master_fkey FOREIGN KEY (id, class)
+		REFERENCES craft_master (id, class) ON DELETE CASCADE,
 	CONSTRAINT weapon_recipes_a_range CHECK (a_min <= a_max),
 	CONSTRAINT weapon_recipes_a_pair CHECK ((a_min IS NULL) = (a_max IS NULL)),
 	CONSTRAINT weapon_recipes_b_range CHECK (b_min <= b_max),
@@ -96,7 +104,9 @@ CREATE TRIGGER weapon_recipes_set_updated_at BEFORE UPDATE ON weapon_recipes
 -- 防具鍛冶のマス別基準範囲
 -- 基準値が範囲で決まるため、マスごとに下限と上限を持ちます。
 CREATE TABLE armor_recipes (
-	id          integer PRIMARY KEY REFERENCES craft_master (id) ON DELETE CASCADE,
+	id          integer PRIMARY KEY,
+	-- 自職人に固定し、(id, class) で参照することで別職人の見出しへの紐付けを防ぎます。
+	class       smallint NOT NULL DEFAULT 3 CHECK (class = 3),
 	category_id integer NOT NULL DEFAULT 0 REFERENCES armor_category (category_id),
 	chara_id    smallint NOT NULL DEFAULT 0 REFERENCES smith_character (chara_id),
 	a_min integer,
@@ -115,6 +125,8 @@ CREATE TABLE armor_recipes (
 	g_max integer,
 	h_min integer,
 	h_max integer,
+	CONSTRAINT armor_recipes_craft_master_fkey FOREIGN KEY (id, class)
+		REFERENCES craft_master (id, class) ON DELETE CASCADE,
 	CONSTRAINT armor_recipes_a_range CHECK (a_min <= a_max),
 	CONSTRAINT armor_recipes_a_pair CHECK ((a_min IS NULL) = (a_max IS NULL)),
 	CONSTRAINT armor_recipes_b_range CHECK (b_min <= b_max),
@@ -142,7 +154,9 @@ CREATE TRIGGER armor_recipes_set_updated_at BEFORE UPDATE ON armor_recipes
 -- 裁縫のマス別基準値
 -- 固定基準値のため、マスごとに1つの値だけを持ちます。
 CREATE TABLE sewing_recipes (
-	id          integer PRIMARY KEY REFERENCES craft_master (id) ON DELETE CASCADE,
+	id          integer PRIMARY KEY,
+	-- 自職人に固定し、(id, class) で参照することで別職人の見出しへの紐付けを防ぎます。
+	class       smallint NOT NULL DEFAULT 4 CHECK (class = 4),
 	category_id integer NOT NULL DEFAULT 0 REFERENCES sewing_category (category_id),
 	chara_id    smallint NOT NULL DEFAULT 0 REFERENCES sewing_character (chara_id),
 	value_a integer,
@@ -154,6 +168,8 @@ CREATE TABLE sewing_recipes (
 	value_g integer,
 	value_h integer,
 	value_i integer,
+	CONSTRAINT sewing_recipes_craft_master_fkey FOREIGN KEY (id, class)
+		REFERENCES craft_master (id, class) ON DELETE CASCADE,
 	created_at timestamptz NOT NULL DEFAULT now(),
 	updated_at timestamptz NOT NULL DEFAULT now(),
 	is_active  boolean NOT NULL DEFAULT true
@@ -165,7 +181,9 @@ CREATE TRIGGER sewing_recipes_set_updated_at BEFORE UPDATE ON sewing_recipes
 -- 木工のマス別基準値と木目
 -- 木目はレシピ内で混在するため、マス単位で持ちます。true が縦 (逆目)、false が横です。
 CREATE TABLE wood_recipes (
-	id          integer PRIMARY KEY REFERENCES craft_master (id) ON DELETE CASCADE,
+	id          integer PRIMARY KEY,
+	-- 自職人に固定し、(id, class) で参照することで別職人の見出しへの紐付けを防ぎます。
+	class       smallint NOT NULL DEFAULT 5 CHECK (class = 5),
 	category_id integer NOT NULL DEFAULT 0 REFERENCES wood_category (category_id),
 	chara_id    smallint NOT NULL DEFAULT 0 REFERENCES wood_character (chara_id),
 	value_a integer,
@@ -186,6 +204,8 @@ CREATE TABLE wood_recipes (
 	grain_h boolean,
 	value_i integer,
 	grain_i boolean,
+	CONSTRAINT wood_recipes_craft_master_fkey FOREIGN KEY (id, class)
+		REFERENCES craft_master (id, class) ON DELETE CASCADE,
 	CONSTRAINT wood_recipes_a_pair CHECK ((value_a IS NULL) = (grain_a IS NULL)),
 	CONSTRAINT wood_recipes_b_pair CHECK ((value_b IS NULL) = (grain_b IS NULL)),
 	CONSTRAINT wood_recipes_c_pair CHECK ((value_c IS NULL) = (grain_c IS NULL)),
@@ -208,7 +228,9 @@ CREATE TRIGGER wood_recipes_set_updated_at BEFORE UPDATE ON wood_recipes
 -- group_* は、同一レシピ内に同じ食材の2マスグループが複数ある場合に区別するための番号です。
 -- マスの使用有無は *_min で判定します。食材が未設定のマスが現行データに存在するためです。
 CREATE TABLE cooking_recipes (
-	id          integer PRIMARY KEY REFERENCES craft_master (id) ON DELETE CASCADE,
+	id          integer PRIMARY KEY,
+	-- 自職人に固定し、(id, class) で参照することで別職人の見出しへの紐付けを防ぎます。
+	class       smallint NOT NULL DEFAULT 6 CHECK (class = 6),
 	category_id integer NOT NULL DEFAULT 0 REFERENCES cooking_category (category_id),
 	chara_id    smallint NOT NULL DEFAULT 0 REFERENCES cooking_character (chara_id),
 	material_a integer REFERENCES cooking_materials (material_id),
@@ -238,6 +260,8 @@ CREATE TABLE cooking_recipes (
 	material_i integer REFERENCES cooking_materials (material_id),
 	group_i    smallint,
 	i_min      integer,
+	CONSTRAINT cooking_recipes_craft_master_fkey FOREIGN KEY (id, class)
+		REFERENCES craft_master (id, class) ON DELETE CASCADE,
 	created_at timestamptz NOT NULL DEFAULT now(),
 	updated_at timestamptz NOT NULL DEFAULT now(),
 	is_active  boolean NOT NULL DEFAULT true

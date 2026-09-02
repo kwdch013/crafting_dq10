@@ -31,6 +31,18 @@ JSONファイルは廃止せず、DBからの生成物 (シード兼フォール
 | Phase 3 | 既定を `postgres` に切替、JSONはエクスポートで自動生成 | DB |
 | Phase 4 | JSON手編集の廃止、運用ルールの決定とドキュメント更新 | DB |
 
+[レシピDB実装方針](./11-recipe-db-implementation.md) の段階との対応は以下です。
+
+| Phase | 段階 | 真実源 |
+| --- | --- | --- |
+| Phase 0-1 | 段階1 | JSON |
+| Phase 2 | 段階2 (B2-1 から B2-4) | JSON |
+| Phase 3 | 段階2 (B2-5) | DB。ただしブラウザ追加分は `localStorage` に残る |
+| Phase 4 | 段階3 | DB |
+
+Phase 3 の時点では、既存の `localStorage` に残るユーザー追加レシピがまだDBへ取り込まれていません。
+この期間は現行どおり `localStorage` の内容をAPI由来データへ重ねて表示し、取り込みは段階3cで行います。
+
 ## 接続先PostgreSQL
 
 本サーバー上の既存コンテナを利用し、新規にPostgreSQLコンテナは立てません。
@@ -79,7 +91,7 @@ networks:
 | 分類 | `tool_category`、`weapon_category`、`armor_category`、`sewing_category`、`wood_category`、`cooking_category` |
 | レシピ | `tool_recipes`、`weapon_recipes`、`armor_recipes`、`sewing_recipes`、`wood_recipes`、`cooking_recipes` |
 
-設計方針と現行JSONとのマッピングは [レシピDB設計](./09-recipe-db-schema.md)、列定義は [レシピDBテーブル定義](./10-recipe-db-tables.md) を参照します。
+設計方針は [レシピDB設計](./09-recipe-db-schema.md)、列定義は [レシピDBテーブル定義](./10-recipe-db-tables.md)、現行JSONとの相互変換は [レシピDB変換仕様](./12-recipe-db-conversion.md) を参照します。
 
 ## 既存データの適合性
 
@@ -124,8 +136,10 @@ tests/
 - `upsert_recipe(craft_id, recipe)`
 - `delete_recipe(craft_id, recipe_id)`
 
-`upsert_recipe` はレシピ行のUPSERTと、当該レシピのマス全削除・再挿入を1トランザクションで行います。
-マスの増減を伴う編集があるため、差分更新はせず総入れ替えとします。
+`upsert_recipe` は `craft_master` と対応する職人別レシピ1行のUPSERTを、同一トランザクションで行います。
+マスは列として同じ行に載るため、マス単位の差分更新は発生しません。使用しなくなったマスはNULLで上書きします。
+
+`delete_recipe` は `craft_master.is_active` を `false` に更新する論理削除です。詳細は [レシピDB設計](./09-recipe-db-schema.md) の削除方式を参照します。
 
 HTTPのエンドポイントとレスポンス形式は変更しません。フロント側の変更は不要です。
 
@@ -228,8 +242,20 @@ Phase 4 以降でDBに障害が出た場合は、最後にエクスポートし�
 `recipes.json` を `.gitignore` へ追加するのは Phase 3 です。
 それまではコミット対象のまま残し、DBを真実源に切り替えた時点で除外へ切り替えます。
 
-除外後は新規cloneでJSONが存在しなくなるため、`export_recipes.py` の実行を起動手順へ追加します。
 `recipes.js` も同じくエクスポート生成物ですが、API停止時のフォールバックとして配信されるため、除外の是非は Phase 4 で再検討します。
+
+### 初期化と復旧
+
+`recipes.json` を除外すると、新規cloneと空のDBには投入元がなくなります。
+`export_recipes.py` は空のDBからは出力できないため、初期化の入力をコミット対象として別に持ちます。
+
+| 用途 | 入力 |
+| --- | --- |
+| 新規cloneでの初期化 | `api/migrations/0004_seed_recipes.sql` (移行時点の全レシピ) |
+| 障害からの復旧 | `pg_dump` のバックアップ。無い場合は上記シードまで巻き戻す |
+
+シードSQLは移行時点のスナップショットです。移行後に追加したレシピは含まれないため、定期的な `pg_dump` を運用手順に加えます。
+シードSQLは初期化専用とし、レシピを追加するたびに更新することはしません。
 
 ## 未決事項
 

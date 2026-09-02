@@ -17,6 +17,7 @@ DQ10 職人ダメージ計算の設計ドキュメントです。
 - [レシピDB設計](./09-recipe-db-schema.md)
 - [レシピDBテーブル定義](./10-recipe-db-tables.md)
 - [レシピDB実装方針](./11-recipe-db-implementation.md)
+- [レシピDB変換仕様](./12-recipe-db-conversion.md)
 - [職人別メモ](../crafts/README.md)
 - [GitHub Issues](../issues.md)
 
