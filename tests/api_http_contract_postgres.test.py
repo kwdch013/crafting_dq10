@@ -147,6 +147,18 @@ class PostgresApiHttpContractTest(unittest.TestCase):
 		self.assertEqual(status, 400)
 		self.assertEqual(payload, {"error": "recipe_name_already_exists"})
 
+	def test_put_different_cells_for_existing_category_returns_bad_request(self):
+		recipe = self.tool_recipe_copy("super-smithing-hammer")
+		recipe.update({"id": "http-hammer-four-cells", "name": "HTTP 4マスハンマー"})
+		recipe["items"] = recipe["items"][:-1]
+
+		status, payload = self.request_json(
+			"PUT", "/api/crafts/tool-smithing/recipes/http-hammer-four-cells", recipe
+		)
+
+		self.assertEqual(status, 400)
+		self.assertEqual(payload, {"error": "recipe_cells_mismatch_category"})
+
 	def test_put_existing_recipe_with_its_own_name_succeeds(self):
 		recipe = self.recipe_copy()
 		recipe["items"][0]["successMin"] += 1
@@ -187,6 +199,11 @@ class PostgresApiHttpContractTest(unittest.TestCase):
 			).fetchone()[0]
 			for craft_id in craft_ids
 		}
+
+	def tool_recipe_copy(self, recipe_id):
+		"""道具鍛冶の既存レシピを、書き込み用に独立した値で返します。"""
+		recipes = json.loads((DATA_DIR / "crafts" / "tool-smithing" / "recipes.json").read_text())
+		return copy.deepcopy(next(recipe for recipe in recipes if recipe["id"] == recipe_id))
 
 
 if __name__ == "__main__":

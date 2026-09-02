@@ -239,6 +239,26 @@ class PostgresRecipeStoreTest(unittest.TestCase):
 
 		self.assertEqual(result, {"craftId": "cooking", "recipe": recipe})
 
+	def test_upsert_rejects_different_cells_for_existing_category_without_changing_recipes(self):
+		"""既存分類の盤面定義を、追加レシピで上書きさせません。"""
+		recipe = self.recipe_copy("tool-smithing", "super-smithing-hammer")
+		recipe.update({"id": "postgres-hammer-four-cells", "name": "4マスのハンマー"})
+		recipe["items"] = recipe["items"][:-1]
+		before = self.category_recipe_cells("tool-smithing", "ハンマー")
+
+		with self.assertRaisesRegex(IntegrityError, "^recipe_cells_mismatch_category$"):
+			self.store().upsert("tool-smithing", recipe)
+
+		self.assertEqual(self.category_recipe_cells("tool-smithing", "ハンマー"), before)
+
+	def test_upsert_allows_matching_cells_for_existing_category(self):
+		recipe = self.recipe_copy("tool-smithing", "super-smithing-hammer")
+		recipe.update({"id": "postgres-hammer-five-cells", "name": "5マスのハンマー"})
+
+		self.store().upsert("tool-smithing", recipe)
+
+		self.assertIn(recipe["id"], [item["id"] for item in self.store().load_craft("tool-smithing")])
+
 	def test_upsert_rejects_recipe_id_belonging_to_another_craft_without_changes(self):
 		recipe = self.recipe_copy("cooking", "cooking-003")
 		recipe.update({
@@ -282,6 +302,38 @@ class PostgresRecipeStoreTest(unittest.TestCase):
 			).fetchone()[0]
 		)
 		self.assertIn(recipe["id"], [item["id"] for item in self.store().load_craft("cooking")])
+
+	def test_upsert_revives_same_name_deleted_recipe_with_new_legacy_id_and_keeps_position(self):
+		recipe = self.recipe_copy("sewing", "sewing-head-template")
+		original_id, original_sort_order = self.conn.execute(
+			"SELECT id, sort_order FROM craft_master WHERE legacy_id = %s", (recipe["id"],)
+		).fetchone()
+		self.store().delete("sewing", recipe["id"])
+		recipe["id"] = "user-recreated-head-template"
+
+		self.store().upsert("sewing", recipe)
+
+		row = self.conn.execute(
+			"SELECT id, legacy_id, is_active, sort_order FROM craft_master WHERE id = %s", (original_id,)
+		).fetchone()
+		self.assertEqual(row, (original_id, recipe["id"], True, original_sort_order))
+		self.assertEqual(
+			self.conn.execute("SELECT count(*) FROM sewing_recipes WHERE id = %s", (original_id,)).fetchone()[0],
+			1,
+		)
+		self.assertEqual(
+			[item["id"] for item in self.store().load_craft("sewing")].index(recipe["id"]),
+			original_sort_order - 1,
+		)
+
+	def test_upsert_converts_name_unique_violation_to_integrity_error(self):
+		recipe = self.recipe_copy("cooking", "cooking-003")
+		recipe["id"] = "postgres-direct-duplicate-name"
+		store = self.store()
+
+		with patch.object(store, "_validate_upsert_conflicts", return_value=(None, None)):
+			with self.assertRaisesRegex(IntegrityError, "^recipe_name_already_exists$"):
+				store.upsert("cooking", recipe)
 
 	def test_delete_unknown_recipe_returns_deleted_id(self):
 		self.assertEqual(
@@ -354,6 +406,17 @@ class PostgresRecipeStoreTest(unittest.TestCase):
 				(mapping.CRAFT_CLASSES[craft_id],),
 			).fetchone()[0]
 			for craft_id in craft_ids
+		}
+
+	def category_recipe_cells(self, craft_id, category_name):
+		"""分類に属するレシピごとのマス名・座標を比較用に返します。"""
+		return {
+			recipe["id"]: [
+				(item["name"], (item["gridCell"]["row"], item["gridCell"]["column"]))
+				for item in recipe["items"]
+			]
+			for recipe in self.store().load_craft(craft_id)
+			if recipe.get("category") == category_name
 		}
 
 	def cooking_recipe_ids_in_sort_order(self):
