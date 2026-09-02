@@ -72,7 +72,7 @@ def upsert_category(conn, craft_id: str, plan: CategoryPlan) -> int:
 
 
 def upsert_recipe(conn, craft_id: str, plan: RecipePlan, category_id: int, chara_id: int) -> int:
-	"""見出しと職人別レシピ行を必ずセットで登録し、craft_master.id を返します。"""
+	"""見出しと職人別レシピ行をセットで登録し、論理削除済みなら復活させます。"""
 	recipe_id = conn.execute(
 		"""
 		INSERT INTO craft_master (legacy_id, name, class, sort_order, archived)
@@ -81,7 +81,8 @@ def upsert_recipe(conn, craft_id: str, plan: RecipePlan, category_id: int, chara
 			name = EXCLUDED.name,
 			class = EXCLUDED.class,
 			sort_order = EXCLUDED.sort_order,
-			archived = EXCLUDED.archived
+			archived = EXCLUDED.archived,
+			is_active = true
 		RETURNING id
 		""",
 		{

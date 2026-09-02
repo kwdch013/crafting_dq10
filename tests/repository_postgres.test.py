@@ -1,6 +1,7 @@
 """PostgreSQLレシピストアの読み取りテスト。"""
 
 import importlib.util
+import copy
 import json
 import os
 import sys
@@ -10,6 +11,8 @@ from unittest.mock import patch
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "api"))
+
+from repository.integrity import IntegrityError
 
 TEST_DATABASE_URL = os.environ.get("TEST_DATABASE_URL", "")
 DATA_DIR = REPO_ROOT / "api" / "data"
@@ -160,6 +163,198 @@ class PostgresRecipeStoreTest(unittest.TestCase):
 
 		self.assertEqual(connect.call_count, 1)
 		self.assertEqual(counter["execute"], 1)
+
+	def test_upsert_new_recipe_appends_sort_order_and_restores_values(self):
+		recipe = self.recipe_copy("cooking", "cooking-003")
+		recipe.update({
+			"id": "postgres-cooking-new",
+			"name": "PostgreSQL追加レシピ",
+			"category": "PostgreSQL追加分類",
+			"categoryId": "postgres-new-category",
+		})
+		max_sort_order = self.conn.execute(
+			"SELECT max(sort_order) FROM craft_master WHERE class = 6"
+		).fetchone()[0]
+
+		result = self.store().upsert("cooking", recipe)
+
+		self.assertEqual(result, {"craftId": "cooking", "recipe": recipe})
+		self.assertEqual(
+			self.conn.execute(
+				"SELECT sort_order FROM craft_master WHERE legacy_id = %s",
+				(recipe["id"],),
+			).fetchone()[0],
+			max_sort_order + 1,
+		)
+		self.assertEqual(
+			self.store().load_craft("cooking")[-1],
+			ROUND_TRIP.normalize(recipe, "cooking"),
+		)
+
+	def test_upsert_existing_recipe_keeps_sort_order(self):
+		recipe = self.recipe_copy("cooking", "cooking-003")
+		original_order = self.conn.execute(
+			"SELECT sort_order FROM craft_master WHERE legacy_id = %s", (recipe["id"],)
+		).fetchone()[0]
+		original_position = [item["id"] for item in self.store().load_craft("cooking")].index(recipe["id"])
+		recipe["items"][0]["successMin"] += 1
+		recipe["items"][0]["target"] += 1
+		recipe["items"][0]["successMax"] += 1
+
+		self.store().upsert("cooking", recipe)
+
+		self.assertEqual(
+			self.conn.execute(
+				"SELECT sort_order FROM craft_master WHERE legacy_id = %s", (recipe["id"],)
+			).fetchone()[0],
+			original_order,
+		)
+		loaded = self.store().load_craft("cooking")
+		self.assertEqual([item["id"] for item in loaded].index(recipe["id"]), original_position)
+		self.assertEqual(loaded[original_position], ROUND_TRIP.normalize(recipe, "cooking"))
+
+	def test_upsert_rejects_name_used_by_another_recipe_in_same_craft(self):
+		recipe = self.recipe_copy("cooking", "cooking-003")
+		recipe.update({
+			"id": "postgres-duplicate-name",
+			"name": "みかわしオムレツ",
+		})
+
+		with self.assertRaisesRegex(IntegrityError, "^recipe_name_already_exists$"):
+			self.store().upsert("cooking", recipe)
+
+		self.assertIsNone(
+			self.conn.execute(
+				"SELECT id FROM craft_master WHERE legacy_id = %s", (recipe["id"],)
+			).fetchone()
+		)
+
+	def test_upsert_allows_existing_recipe_to_keep_its_own_name(self):
+		recipe = self.recipe_copy("cooking", "cooking-003")
+		recipe["items"][0]["successMin"] += 1
+		recipe["items"][0]["target"] += 1
+		recipe["items"][0]["successMax"] += 1
+
+		result = self.store().upsert("cooking", recipe)
+
+		self.assertEqual(result, {"craftId": "cooking", "recipe": recipe})
+
+	def test_upsert_rejects_recipe_id_belonging_to_another_craft_without_changes(self):
+		recipe = self.recipe_copy("cooking", "cooking-003")
+		recipe.update({
+			"id": "woodworking-stick-template",
+			"name": "乗っ取りレシピ",
+		})
+		counts_before = self.recipe_counts("cooking", "woodworking")
+
+		with self.assertRaisesRegex(IntegrityError, "^recipe_id_belongs_to_other_craft$"):
+			self.store().upsert("cooking", recipe)
+
+		self.assertEqual(self.recipe_counts("cooking", "woodworking"), counts_before)
+
+	def test_delete_logically_deletes_recipe_and_keeps_subtype_row(self):
+		recipe_id = "cooking-003"
+		master_id = self.conn.execute(
+			"SELECT id FROM craft_master WHERE legacy_id = %s", (recipe_id,)
+		).fetchone()[0]
+
+		result = self.store().delete("cooking", recipe_id)
+
+		self.assertEqual(result, {"craftId": "cooking", "deletedId": recipe_id})
+		self.assertFalse(
+			self.conn.execute("SELECT is_active FROM craft_master WHERE id = %s", (master_id,)).fetchone()[0]
+		)
+		self.assertEqual(
+			self.conn.execute("SELECT count(*) FROM cooking_recipes WHERE id = %s", (master_id,)).fetchone()[0],
+			1,
+		)
+		self.assertNotIn(recipe_id, [recipe["id"] for recipe in self.store().load_craft("cooking")])
+
+	def test_upsert_revives_logically_deleted_recipe(self):
+		recipe = self.recipe_copy("cooking", "cooking-003")
+		self.store().delete("cooking", recipe["id"])
+
+		self.store().upsert("cooking", recipe)
+
+		self.assertTrue(
+			self.conn.execute(
+				"SELECT is_active FROM craft_master WHERE legacy_id = %s", (recipe["id"],)
+			).fetchone()[0]
+		)
+		self.assertIn(recipe["id"], [item["id"] for item in self.store().load_craft("cooking")])
+
+	def test_delete_unknown_recipe_returns_deleted_id(self):
+		self.assertEqual(
+			self.store().delete("cooking", "not-found"),
+			{"craftId": "cooking", "deletedId": "not-found"},
+		)
+
+	def test_delete_does_not_affect_recipe_in_another_craft(self):
+		recipe_id = "cooking-003"
+		self.store().delete("tool-smithing", recipe_id)
+
+		self.assertTrue(
+			self.conn.execute(
+				"SELECT is_active FROM craft_master WHERE legacy_id = %s", (recipe_id,)
+			).fetchone()[0]
+		)
+
+	def test_write_rejects_unknown_craft(self):
+		from repository.errors import UnknownCraftError
+
+		with self.assertRaisesRegex(UnknownCraftError, "^recipe_file_not_found$"):
+			self.store().upsert("unknown", {"id": "recipe-1", "name": "不正", "items": []})
+		with self.assertRaisesRegex(UnknownCraftError, "^recipe_file_not_found$"):
+			self.store().delete("unknown", "recipe-1")
+
+	def test_delete_rejects_empty_recipe_id(self):
+		with self.assertRaisesRegex(ValueError, "^invalid_recipe_id$"):
+			self.store().delete("cooking", "")
+
+	def test_upsert_rejects_invalid_recipe_items(self):
+		with self.assertRaisesRegex(ValueError, "^invalid_recipe_items$"):
+			self.store().upsert("cooking", {"id": "invalid", "name": "不正", "items": {}})
+
+	def test_upsert_rolls_back_when_trait_validation_fails(self):
+		recipe = self.recipe_copy("cooking", "cooking-003")
+		recipe.update({
+			"id": "postgres-rollback",
+			"name": "ロールバック確認",
+			"category": "ロールバック分類",
+			"categoryId": "rollback-category",
+			"traitId": "unregistered-trait",
+		})
+
+		with self.assertRaisesRegex(ValueError, "未登録の特性"):
+			self.store().upsert("cooking", recipe)
+
+		self.assertIsNone(
+			self.conn.execute("SELECT id FROM craft_master WHERE legacy_id = %s", (recipe["id"],)).fetchone()
+		)
+		self.assertIsNone(
+			self.conn.execute(
+				"SELECT category_id FROM cooking_category WHERE category_name = %s",
+				(recipe["category"],),
+			).fetchone()
+		)
+
+	def recipe_copy(self, craft_id, recipe_id):
+		"""投入済みのレシピを、書き込み用に独立した値として返します。"""
+		return copy.deepcopy(next(
+			recipe for recipe in self.original_recipes(craft_id) if recipe["id"] == recipe_id
+		))
+
+	def recipe_counts(self, *craft_ids):
+		"""指定職人の見出し件数を職人ごとに返します。"""
+		from repository import mapping
+
+		return {
+			craft_id: self.conn.execute(
+				"SELECT count(*) FROM craft_master WHERE class = %s",
+				(mapping.CRAFT_CLASSES[craft_id],),
+			).fetchone()[0]
+			for craft_id in craft_ids
+		}
 
 	def cooking_recipe_ids_in_sort_order(self):
 		"""調理レシピの正規の配列順をマスタの sort_order から取得します。"""
