@@ -101,6 +101,14 @@ class MigrationApplyTest(unittest.TestCase):
 		self.assertEqual(self.count("craft_master"), 70)
 		self.assertEqual(self.count("schema_migration"), 4)
 
+	def test_dry_run_does_not_create_migration_table(self):
+		"""--dry-run は記録テーブルを作らず、全件を未適用として扱います。"""
+		self.assertEqual(self.apply.applied_versions(self.conn), set())
+		exists = self.conn.execute(
+			"SELECT to_regclass('schema_migration') IS NOT NULL"
+		).fetchone()[0]
+		self.assertFalse(exists)
+
 	def test_failed_migration_is_not_recorded(self):
 		"""途中で失敗したSQLは適用済みに記録しません。"""
 		import psycopg

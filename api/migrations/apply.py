@@ -57,7 +57,14 @@ def ensure_schema_migration(conn) -> None:
 
 
 def applied_versions(conn) -> set[str]:
-	"""適用済みバージョンの集合を返します。"""
+	"""適用済みバージョンの集合を返します。
+
+	記録テーブルが未作成の場合は空集合を返します。--dry-run から
+	書き込みなしで参照できるようにするためです。
+	"""
+	exists = conn.execute("SELECT to_regclass('schema_migration') IS NOT NULL").fetchone()[0]
+	if not exists:
+		return set()
 	rows = conn.execute("SELECT version FROM schema_migration").fetchall()
 	return {row[0] for row in rows}
 
@@ -111,7 +118,7 @@ def main(argv: list[str] | None = None) -> int:
 	url = resolve_database_url(args.database_url)
 	with psycopg.connect(url, autocommit=False) as conn:
 		if args.dry_run:
-			ensure_schema_migration(conn)
+			# 記録テーブルの作成も行わず、読み取りだけで判定します。
 			for path in pending_migrations(applied_versions(conn)):
 				print(f"未適用: {path.name}")
 			return 0

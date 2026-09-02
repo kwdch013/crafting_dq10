@@ -15,9 +15,6 @@ CELLS = common.GRID_CELLS
 # マス値と木目の列
 VALUE_TEMPLATES = ("value_{cell}", "grain_{cell}")
 
-# 分類テーブルが持つ使用マスの列
-EXIST_TEMPLATES = ("exist_{cell}",)
-
 # 木目の真偽値と現行JSONの optionId の対応
 GRAIN_VERTICAL = "vertical"
 GRAIN_HORIZONTAL = "horizontal"

@@ -109,6 +109,59 @@ class GridCellTest(unittest.TestCase):
 		self.assertIn("存在しません", errors[0])
 
 
+class DuplicateCellTest(unittest.TestCase):
+	"""同一マス名の重複"""
+
+	def test_accepts_distinct_names(self):
+		items = [cell("A", 1, 1), cell("B", 1, 2)]
+		self.assertEqual(integrity.check_duplicate_cells(items, "ハンマー"), [])
+
+	def test_rejects_duplicated_name(self):
+		items = [cell("A", 1, 1), cell("A", 2, 1)]
+		errors = integrity.check_duplicate_cells(items, "ハンマー")
+		self.assertIn("重複", errors[0])
+
+
+class CellValueTest(unittest.TestCase):
+	"""使用マスが値を持つこと"""
+
+	def test_accepts_filled_smithing_cell(self):
+		items = [cell("A", 1, 1, successMin=130, successMax=140)]
+		self.assertEqual(integrity.check_cell_values(items, "ハンマー", is_smithing=True), [])
+
+	def test_rejects_missing_smithing_range(self):
+		items = [cell("A", 1, 1, successMin=130)]
+		errors = integrity.check_cell_values(items, "ハンマー", is_smithing=True)
+		self.assertIn("上限", errors[0])
+
+	def test_rejects_null_value(self):
+		items = [cell("B", 1, 2, successMin=None)]
+		errors = integrity.check_cell_values(items, "アタマ", is_smithing=False)
+		self.assertIn("下限", errors[0])
+
+
+class PairedMaterialTest(unittest.TestCase):
+	"""2マス食材がグループを持つこと"""
+
+	def test_accepts_paired_material_with_group(self):
+		items = [cell("B", 1, 2, ingredientGroupLabel="肉", ingredientGroupId="group-1")]
+		self.assertEqual(integrity.check_paired_materials(items, PAIR_DIRECTIONS, "架空"), [])
+
+	def test_accepts_single_cell_material_without_group(self):
+		items = [cell("B", 1, 2, ingredientGroupLabel="野菜")]
+		self.assertEqual(integrity.check_paired_materials(items, PAIR_DIRECTIONS, "架空"), [])
+
+	def test_rejects_paired_material_without_group(self):
+		items = [cell("B", 1, 2, ingredientGroupLabel="肉")]
+		errors = integrity.check_paired_materials(items, PAIR_DIRECTIONS, "架空")
+		self.assertIn("グループ", errors[0])
+
+	def test_rejects_unknown_material(self):
+		items = [cell("B", 1, 2, ingredientGroupLabel="謎の食材")]
+		errors = integrity.check_paired_materials(items, PAIR_DIRECTIONS, "架空")
+		self.assertIn("未登録", errors[0])
+
+
 class RaiseForErrorsTest(unittest.TestCase):
 	def test_raises_when_errors_exist(self):
 		with self.assertRaises(integrity.IntegrityError):

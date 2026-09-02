@@ -12,7 +12,7 @@ from psycopg import sql
 from psycopg.rows import dict_row
 
 from . import mapping
-from .import_plan import UNCATEGORIZED_ID, CategoryPlan, RecipePlan
+from .import_plan import CategoryPlan, RecipePlan
 from .mapping import SMITHING_CRAFTS
 
 # 特性なしを表す chara_id。0003_seed_master.sql が全職人に投入します。
@@ -152,14 +152,3 @@ def load_recipes(conn, craft_id: str) -> list[dict[str, Any]]:
 			items = mapping_module.to_items(row["recipe_row"])
 		recipes.append(mapping.common.build_recipe(row, items))
 	return recipes
-
-
-def category_id_of(conn, craft_id: str, category_name: str | None) -> int:
-	"""分類名から category_id を引きます。分類を持たない場合は未分類です。"""
-	if category_name is None:
-		return UNCATEGORIZED_ID
-	query = sql.SQL("SELECT category_id FROM {table} WHERE category_name = %s").format(
-		table=sql.Identifier(mapping.category_table(craft_id))
-	)
-	row = conn.execute(query, (category_name,)).fetchone()
-	return row[0] if row else UNCATEGORIZED_ID

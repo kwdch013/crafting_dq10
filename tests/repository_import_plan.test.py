@@ -171,5 +171,29 @@ class CookingPlanTest(unittest.TestCase):
 			import_plan.build_plan("cooking", recipes, MATERIALS)
 
 
+class CellValidationTest(unittest.TestCase):
+	"""マスの重複と値の欠落は投入前に弾きます。"""
+
+	def test_duplicated_cell_name_is_rejected(self):
+		recipes = [{"id": "r1", "name": "1", "items": [item("A", 1, 1, 10, 20), item("A", 2, 1, 30, 40)]}]
+		with self.assertRaises(IntegrityError):
+			import_plan.build_plan("tool-smithing", recipes, {})
+
+	def test_missing_smithing_maximum_is_rejected(self):
+		cell = item("A", 1, 1, 10, 20)
+		cell["successMax"] = None
+		recipes = [{"id": "r1", "name": "1", "items": [cell]}]
+		with self.assertRaises(IntegrityError):
+			import_plan.build_plan("tool-smithing", recipes, {})
+
+	def test_paired_material_without_group_is_rejected(self):
+		recipes = [{
+			"id": "cooking-x", "name": "架空",
+			"items": [item("B", 1, 2, 135, 165, ingredientGroupLabel="肉", ingredientSize=2)],
+		}]
+		with self.assertRaises(IntegrityError):
+			import_plan.build_plan("cooking", recipes, MATERIALS)
+
+
 if __name__ == "__main__":
 	unittest.main()

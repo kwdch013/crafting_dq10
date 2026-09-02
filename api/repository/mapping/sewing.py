@@ -15,9 +15,6 @@ CELLS = common.GRID_CELLS
 # マス値の列。固定基準値のためマスごとに1つです。
 VALUE_TEMPLATES = ("value_{cell}",)
 
-# 分類テーブルが持つ使用マスの列
-EXIST_TEMPLATES = ("exist_{cell}",)
-
 
 def to_items(columns: dict[str, Any]) -> list[dict[str, Any]]:
 	"""レシピ行から現行JSONの items 配列を組み立てます。"""

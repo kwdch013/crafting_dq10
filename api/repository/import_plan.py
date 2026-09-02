@@ -105,11 +105,14 @@ def build_plan(
 		context = f"{craft_id}/{recipe['id']}"
 		cells = integrity.cells_of_items(items)
 
+		errors += integrity.check_duplicate_cells(items, context)
+		errors += integrity.check_cell_values(items, context, is_smithing)
 		if is_smithing:
 			errors += integrity.check_unique_coordinates(cells, context)
 		else:
 			errors += integrity.check_grid_cells(items, context)
 		if is_cooking:
+			errors += integrity.check_paired_materials(items, pair_directions, context)
 			errors += integrity.check_ingredient_groups(items, pair_directions, context)
 
 		category = _resolve_category(recipe, cells, is_smithing)

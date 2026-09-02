@@ -5,9 +5,12 @@
 
 - 見出しに対応する職人別テーブルの行がちょうど1件あること
   → 投入スクリプトが常に両方を書くため、ここでは扱いません。
-- 鍛冶の分類内で同じ座標を複数のマスへ割り当てないこと → check_unique_coordinates
-- 分類の使用マスとレシピ側の値のNULL性が一致すること → check_category_cells
-- 調理の食材グループが同一食材の隣接2マスちょうどであること → check_ingredient_groups
+- 鍛冶の分類内で同じ座標を複数のマスへ割り当てないこと
+  → check_unique_coordinates、check_duplicate_cells
+- 分類の使用マスとレシピ側の値のNULL性が一致すること
+  → check_category_cells、check_cell_values
+- 調理の食材グループが同一食材の隣接2マスちょうどであること
+  → check_ingredient_groups、check_paired_materials
 
 いずれもDB接続を必要としない純粋関数です。
 """
@@ -93,6 +96,62 @@ def check_grid_cells(items: list[dict[str, Any]], context: str) -> list[str]:
 			errors.append(
 				f"{context}: マス {name} の座標が {item['gridCell']} で、"
 				f"想定 {expected} と異なります"
+			)
+	return errors
+
+
+def check_duplicate_cells(items: list[dict[str, Any]], context: str) -> list[str]:
+	"""同じマス名が複数回現れないことを確かめます。
+
+	マス名をキーに列へ展開するため、重複すると後の値で黙って上書きされます。
+	"""
+	seen: set[str] = set()
+	errors: list[str] = []
+	for item in items:
+		name = item["name"]
+		if name in seen:
+			errors.append(f"{context}: マス {name} が重複しています")
+			continue
+		seen.add(name)
+	return errors
+
+
+def check_cell_values(items: list[dict[str, Any]], context: str, is_smithing: bool) -> list[str]:
+	"""使用するマスが基準値を持つことを確かめます。
+
+	値が欠けたマスはNULLで登録され、復元時に使用マスから消えます。
+	"""
+	errors: list[str] = []
+	for item in items:
+		name = item["name"]
+		if item.get("successMin") is None:
+			errors.append(f"{context}: マス {name} に基準値の下限がありません")
+			continue
+		if is_smithing and item.get("successMax") is None:
+			errors.append(f"{context}: マス {name} に基準値の上限がありません")
+	return errors
+
+
+def check_paired_materials(
+	items: list[dict[str, Any]],
+	pair_directions: dict[str, str | None],
+	context: str,
+) -> list[str]:
+	"""2マス食材のマスがグループを持つことを確かめます。
+
+	グループが無いと2マスの組を復元できず、1マス食材と区別できなくなります。
+	"""
+	errors: list[str] = []
+	for item in items:
+		label = item.get("ingredientGroupLabel")
+		if not label:
+			continue
+		if label not in pair_directions:
+			errors.append(f"{context}: 未登録の食材 {label} が指定されています")
+			continue
+		if pair_directions[label] and item.get("ingredientGroupId") is None:
+			errors.append(
+				f"{context}: マス {item['name']} の2マス食材 {label} にグループがありません"
 			)
 	return errors
 
