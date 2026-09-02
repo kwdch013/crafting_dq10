@@ -59,6 +59,53 @@ class ExportSeedTest(unittest.TestCase):
 			*extra_args,
 		])
 
+	def seed_statements(self, sql_text):
+		"""生成SQLからINSERT文だけを出現順で取り出します。"""
+		return re.findall(r"(?m)^INSERT INTO .+;$", sql_text)
+
+	def assert_seed_structure(self, sql_text):
+		"""分類、見出し、職人別レシピの出力順とID解決方法を検証します。"""
+		from repository import mapping
+
+		statements = self.seed_statements(sql_text)
+		master_pattern = re.compile(
+			r"VALUES \('(?P<legacy_id>(?:''|[^'])*)', '(?:''|[^'])*', (?P<class_id>\d+), "
+		)
+		statement_index = 0
+		for craft_id, class_id in mapping.CRAFT_CLASSES.items():
+			category_table = mapping.category_table(craft_id)
+			recipe_table = mapping.recipe_table(craft_id)
+			category_pattern = re.compile(rf'INSERT INTO "?{category_table}"? ')
+			recipe_pattern = re.compile(rf'INSERT INTO "?{recipe_table}"? ')
+
+			category_start = statement_index
+			while statement_index < len(statements) and category_pattern.match(statements[statement_index]):
+				statement_index += 1
+			self.assertGreater(
+				statement_index,
+				category_start,
+				f"{craft_id} の分類INSERTが先頭にありません",
+			)
+
+			recipe_count = 0
+			while statement_index < len(statements):
+				master_match = master_pattern.search(statements[statement_index])
+				if master_match is None:
+					break
+				self.assertEqual(int(master_match.group("class_id")), class_id)
+				self.assertLess(statement_index + 1, len(statements))
+				legacy_id = master_match.group("legacy_id")
+				self.assertRegex(statements[statement_index + 1], recipe_pattern)
+				self.assertIn(
+					f"VALUES ((SELECT id FROM craft_master WHERE legacy_id = '{legacy_id}')",
+					statements[statement_index + 1],
+				)
+				statement_index += 2
+				recipe_count += 1
+			self.assertGreater(recipe_count, 0, f"{craft_id} のレシピINSERTがありません")
+
+		self.assertEqual(statement_index, len(statements))
+
 	def test_generated_seed_initializes_empty_schema_and_round_trips(self):
 		from repository import queries
 
@@ -76,6 +123,38 @@ class ExportSeedTest(unittest.TestCase):
 		self.conn.commit()
 		self.assertEqual(self.conn.execute("SELECT count(*) FROM craft_master").fetchone()[0], 70)
 		self.assertEqual(queries.load_all_recipes(self.conn), expected)
+
+	def test_generated_seed_has_required_statement_structure(self):
+		self.assert_seed_structure(SEED_PATH.read_text(encoding="utf-8"))
+		self.assertEqual(self.export_seed(), 0)
+		sql_text = self.output_path.read_text(encoding="utf-8")
+		self.assert_seed_structure(sql_text)
+
+		statements = self.seed_statements(sql_text)
+		first_category = next(
+			statement for statement in statements if re.match(r'INSERT INTO "?\w+_category"? ', statement)
+		)
+		first_master = next(statement for statement in statements if re.match(r'INSERT INTO "?craft_master"? ', statement))
+		broken_category_order = sql_text.replace(
+			first_category + "\n", "", 1
+		).replace(first_master + "\n", first_master + "\n" + first_category + "\n", 1)
+		with self.assertRaises(AssertionError):
+			self.assert_seed_structure(broken_category_order)
+
+		first_recipe = statements[statements.index(first_master) + 1]
+		broken_recipe_order = sql_text.replace(
+			first_master + "\n" + first_recipe,
+			first_recipe + "\n" + first_master,
+			1,
+		)
+		with self.assertRaises(AssertionError):
+			self.assert_seed_structure(broken_recipe_order)
+
+		broken_id_resolution = re.sub(
+			r"\(SELECT id FROM craft_master WHERE legacy_id = '[^']+'\)", "1", sql_text, count=1
+		)
+		with self.assertRaises(AssertionError):
+			self.assert_seed_structure(broken_id_resolution)
 
 	def test_escapes_recipe_name_and_dry_run_does_not_write(self):
 		from repository.postgres_store import PostgresRecipeStore
@@ -101,6 +180,28 @@ class ExportSeedTest(unittest.TestCase):
 		self.assertEqual(
 			self.conn.execute("SELECT name FROM craft_master WHERE legacy_id = %s", ("seed-quote",)).fetchone()[0],
 			"テスト'料理",
+		)
+
+	def test_escapes_category_name_when_seed_is_applied(self):
+		category_name = "テスト'分類\\確認"
+		self.conn.execute(
+			"UPDATE cooking_category SET category_name = %s WHERE category_id = 1",
+			(category_name,),
+		)
+		self.conn.commit()
+		self.assertEqual(self.export_seed(), 0)
+		sql_text = self.output_path.read_text(encoding="utf-8")
+		self.assertIn("テスト''分類", sql_text)
+		self.conn.execute("DROP SCHEMA public CASCADE; CREATE SCHEMA public;")
+		self.conn.commit()
+		self.apply.ensure_schema_migration(self.conn)
+		for name in ("0001_init.sql", "0002_recipes.sql", "0003_seed_master.sql"):
+			self.apply.apply_migration(self.conn, MIGRATION_DIR / name)
+		self.conn.execute(sql_text)
+		self.conn.commit()
+		self.assertEqual(
+			self.conn.execute("SELECT category_name FROM cooking_category WHERE category_id = 1").fetchone()[0],
+			category_name,
 		)
 
 
