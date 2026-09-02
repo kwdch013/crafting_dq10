@@ -21,8 +21,23 @@ services:
       context: .
       dockerfile: api/Dockerfile
     container_name: dq10-api
+    environment:
+      # レシピの保存先。段階2で postgres を選べるようにするまでは json のまま
+      RECIPE_STORE: ${RECIPE_STORE:-json}
+      # PostgreSQL への接続先。認証情報を含むため .env にのみ記載する
+      DATABASE_URL: ${DATABASE_URL:-}
     volumes:
       - ./api/data:/usr/src/app/data
     ports:
       - "${API_PORT:-8000}:8000"
+    networks:
+      - default
+      - database
     restart: unless-stopped
+
+# 既存の postgres_db コンテナが属するネットワークを外部参照する
+# (このプロジェクトでは PostgreSQL コンテナを新規に立てない)
+networks:
+  database:
+    external: true
+    name: database_default

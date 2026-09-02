@@ -1,0 +1,3 @@
+# PostgreSQL ドライバ。musl 向けバイナリwheelが無いためベースイメージは slim を使う
+# (docs/design/08-recipe-db-migration.md「ドライバとイメージ」の案A)
+psycopg[binary]==3.3.5

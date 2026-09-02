@@ -155,10 +155,15 @@ flowchart TB
   Compose[docker-compose.yml] --> Front[frontend service]
   Compose --> Api[api service]
   Front --> Node[node:22-alpine]
-  Api --> Python[python:3.14-alpine]
+  Api --> Python[python:3.14-slim + psycopg]
   Front --> PortFront[localhost:3000 -> container:3000]
   Api --> PortApi[localhost:8000 -> container:8000]
+  Api --> Db[(postgres_db: crafting_dq10)]
 ```
+
+APIのベースイメージは、PostgreSQLドライバのバイナリwheelを利用するため `slim` です。
+接続先は既存の `postgres_db` コンテナで、`database_default` ネットワークを外部参照します
+([レシピDB移行設計](./08-recipe-db-migration.md))。
 
 ## 保守方針
 
