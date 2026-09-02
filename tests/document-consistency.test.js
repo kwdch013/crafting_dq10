@@ -22,9 +22,9 @@ assert.match(roadmap, /Phase 6: 職人拡張の保守/);
 assert.doesNotMatch(roadmap, /他職人拡張/);
 
 assert.match(architecture, /職人別レシピデータを取得します/);
-assert.match(architecture, /Python\[python:3\.14-alpine\]/);
+assert.match(architecture, /Python\[python:3\.14-slim \+ psycopg\]/);
 assert.doesNotMatch(architecture, /料理データを取得します/);
-assert.doesNotMatch(architecture, /Python\[python:3\.12-alpine\]/);
+assert.doesNotMatch(architecture, /Python\[python:3\.14-alpine\]/);
 
 assert.match(designIndex, /コンテナ: `frontend\/Dockerfile`, `api\/Dockerfile`/);
 assert.doesNotMatch(designIndex, /コンテナ: `Dockerfile`/);
