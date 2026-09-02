@@ -1,5 +1,6 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
+const { loadFallbackRecipes } = require("./helpers/recipe-loader.js");
 
 const mainJs = fs.readFileSync("app/main.js", "utf8");
 
@@ -17,15 +18,15 @@ assert.match(fixedTargetCollector, /successMin: target/, "固定基準値職人�
 assert.match(fixedTargetCollector, /successMax: target/, "固定基準値職人は上限を基準値と同じにしてください");
 
 [
-	"api/data/crafts/woodworking/recipes.json",
-	"api/data/crafts/sewing/recipes.json",
-].forEach((file) => {
-	const recipes = JSON.parse(fs.readFileSync(file, "utf8"));
+	"woodworking",
+	"sewing",
+].forEach((craftId) => {
+	const recipes = loadFallbackRecipes(craftId);
 	recipes.forEach((recipe) => {
-		assert.equal(recipe.traitId, undefined, `${file} の特性は一旦空欄にしてください`);
+		assert.equal(recipe.traitId, undefined, `${craftId} の特性は一旦空欄にしてください`);
 		recipe.items.forEach((item) => {
-			assert.equal(item.successMin, item.target, `${file} ${recipe.id} ${item.id} の下限は固定基準値と同じにしてください`);
-			assert.equal(item.successMax, item.target, `${file} ${recipe.id} ${item.id} の上限は固定基準値と同じにしてください`);
+			assert.equal(item.successMin, item.target, `${craftId} ${recipe.id} ${item.id} の下限は固定基準値と同じにしてください`);
+			assert.equal(item.successMax, item.target, `${craftId} ${recipe.id} ${item.id} の上限は固定基準値と同じにしてください`);
 		});
 	});
 });

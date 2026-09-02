@@ -1,95 +1,12 @@
 registerDQ10CraftRecipes("cooking", [
   {
-    "id": "cooking-001",
-    "name": "きようさにくまん",
-    "category": "肉料理",
-    "categoryId": "meat-dishes",
-    "items": [
-      {
-        "id": "slot-3-2",
-        "name": "H",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 3,
-          "column": 2
-        },
-        "current": 0,
-        "target": 105,
-        "successMin": 90,
-        "successMax": 120
-      },
-      {
-        "id": "slot-3-3",
-        "name": "I",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 3,
-          "column": 3
-        },
-        "current": 0,
-        "target": 105,
-        "successMin": 90,
-        "successMax": 120
-      }
-    ],
-    "traitId": "light"
-  },
-  {
-    "id": "cooking-002",
-    "name": "パワフルステーキ",
-    "category": "肉料理",
-    "categoryId": "meat-dishes",
-    "items": [
-      {
-        "id": "slot-1-2",
-        "name": "B",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 1,
-          "column": 2
-        },
-        "current": 0,
-        "target": 85,
-        "successMin": 70,
-        "successMax": 100
-      },
-      {
-        "id": "slot-3-1",
-        "name": "G",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 3,
-          "column": 1
-        },
-        "current": 0,
-        "target": 125,
-        "successMin": 110,
-        "successMax": 140
-      },
-      {
-        "id": "slot-3-2",
-        "name": "H",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 3,
-          "column": 2
-        },
-        "current": 0,
-        "target": 125,
-        "successMin": 110,
-        "successMax": 140
-      }
-    ],
-    "traitId": "light"
-  },
-  {
     "id": "cooking-003",
     "name": "かいしんバーガー",
     "category": "肉料理",
     "categoryId": "meat-dishes",
     "items": [
       {
-        "id": "slot-1-1",
+        "id": "part-1",
         "name": "A",
         "optionId": "corner",
         "gridCell": {
@@ -102,7 +19,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 130
       },
       {
-        "id": "slot-1-2",
+        "id": "part-2",
         "name": "B",
         "optionId": "cross",
         "gridCell": {
@@ -115,7 +32,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 130
       },
       {
-        "id": "slot-3-1",
+        "id": "part-3",
         "name": "G",
         "optionId": "corner",
         "gridCell": {
@@ -138,7 +55,7 @@ registerDQ10CraftRecipes("cooking", [
     "categoryId": "meat-dishes",
     "items": [
       {
-        "id": "slot-1-2",
+        "id": "part-1",
         "name": "B",
         "optionId": "cross",
         "gridCell": {
@@ -151,7 +68,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 155
       },
       {
-        "id": "slot-1-3",
+        "id": "part-2",
         "name": "C",
         "optionId": "corner",
         "gridCell": {
@@ -164,7 +81,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 155
       },
       {
-        "id": "slot-2-3",
+        "id": "part-3",
         "name": "F",
         "optionId": "cross",
         "gridCell": {
@@ -177,7 +94,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 115
       },
       {
-        "id": "slot-3-3",
+        "id": "part-4",
         "name": "I",
         "optionId": "corner",
         "gridCell": {
@@ -200,7 +117,7 @@ registerDQ10CraftRecipes("cooking", [
     "categoryId": "meat-dishes",
     "items": [
       {
-        "id": "slot-1-3",
+        "id": "part-1",
         "name": "C",
         "optionId": "corner",
         "gridCell": {
@@ -213,7 +130,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 143
       },
       {
-        "id": "slot-2-2",
+        "id": "part-2",
         "name": "E",
         "optionId": "center",
         "gridCell": {
@@ -226,7 +143,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 185
       },
       {
-        "id": "slot-2-3",
+        "id": "part-3",
         "name": "F",
         "optionId": "cross",
         "gridCell": {
@@ -239,7 +156,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 185
       },
       {
-        "id": "slot-3-2",
+        "id": "part-4",
         "name": "H",
         "optionId": "cross",
         "gridCell": {
@@ -252,7 +169,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 165
       },
       {
-        "id": "slot-3-3",
+        "id": "part-5",
         "name": "I",
         "optionId": "corner",
         "gridCell": {
@@ -269,87 +186,13 @@ registerDQ10CraftRecipes("cooking", [
     "archived": true
   },
   {
-    "id": "cooking-006",
-    "name": "あいじょうオムレツ",
-    "category": "肉料理",
-    "categoryId": "meat-dishes",
-    "items": [
-      {
-        "id": "slot-1-1",
-        "name": "A",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 1,
-          "column": 1
-        },
-        "current": 0,
-        "target": 155,
-        "successMin": 140,
-        "successMax": 170
-      },
-      {
-        "id": "slot-2-1",
-        "name": "D",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 2,
-          "column": 1
-        },
-        "current": 0,
-        "target": 145,
-        "successMin": 130,
-        "successMax": 160
-      },
-      {
-        "id": "slot-3-1",
-        "name": "G",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 3,
-          "column": 1
-        },
-        "current": 0,
-        "target": 145,
-        "successMin": 130,
-        "successMax": 160
-      },
-      {
-        "id": "slot-3-2",
-        "name": "H",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 3,
-          "column": 2
-        },
-        "current": 0,
-        "target": 175,
-        "successMin": 160,
-        "successMax": 190
-      },
-      {
-        "id": "slot-3-3",
-        "name": "I",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 3,
-          "column": 3
-        },
-        "current": 0,
-        "target": 175,
-        "successMin": 160,
-        "successMax": 190
-      }
-    ],
-    "traitId": "light"
-  },
-  {
     "id": "cooking-007",
     "name": "バトルステーキ",
     "category": "肉料理",
     "categoryId": "meat-dishes",
     "items": [
       {
-        "id": "slot-1-2",
+        "id": "part-1",
         "name": "B",
         "optionId": "cross",
         "gridCell": {
@@ -360,12 +203,12 @@ registerDQ10CraftRecipes("cooking", [
         "target": 150,
         "successMin": 135,
         "successMax": 165,
-        "ingredientGroupId": "battle-steak-meat-top",
+        "ingredientGroupId": "group-1",
         "ingredientGroupLabel": "肉",
         "ingredientSize": 2
       },
       {
-        "id": "slot-1-3",
+        "id": "part-2",
         "name": "C",
         "optionId": "corner",
         "gridCell": {
@@ -376,12 +219,12 @@ registerDQ10CraftRecipes("cooking", [
         "target": 150,
         "successMin": 135,
         "successMax": 165,
-        "ingredientGroupId": "battle-steak-meat-top",
+        "ingredientGroupId": "group-1",
         "ingredientGroupLabel": "肉",
         "ingredientSize": 2
       },
       {
-        "id": "slot-2-3",
+        "id": "part-3",
         "name": "F",
         "optionId": "cross",
         "gridCell": {
@@ -395,7 +238,7 @@ registerDQ10CraftRecipes("cooking", [
         "ingredientGroupLabel": "野菜"
       },
       {
-        "id": "slot-3-1",
+        "id": "part-4",
         "name": "G",
         "optionId": "corner",
         "gridCell": {
@@ -406,12 +249,12 @@ registerDQ10CraftRecipes("cooking", [
         "target": 150,
         "successMin": 135,
         "successMax": 165,
-        "ingredientGroupId": "battle-steak-meat-bottom",
+        "ingredientGroupId": "group-2",
         "ingredientGroupLabel": "肉",
         "ingredientSize": 2
       },
       {
-        "id": "slot-3-2",
+        "id": "part-5",
         "name": "H",
         "optionId": "cross",
         "gridCell": {
@@ -422,12 +265,12 @@ registerDQ10CraftRecipes("cooking", [
         "target": 150,
         "successMin": 135,
         "successMax": 165,
-        "ingredientGroupId": "battle-steak-meat-bottom",
+        "ingredientGroupId": "group-2",
         "ingredientGroupLabel": "肉",
         "ingredientSize": 2
       },
       {
-        "id": "slot-3-3",
+        "id": "part-6",
         "name": "I",
         "optionId": "corner",
         "gridCell": {
@@ -450,7 +293,7 @@ registerDQ10CraftRecipes("cooking", [
     "categoryId": "fish-dishes",
     "items": [
       {
-        "id": "slot-1-2",
+        "id": "part-1",
         "name": "B",
         "optionId": "cross",
         "gridCell": {
@@ -461,12 +304,12 @@ registerDQ10CraftRecipes("cooking", [
         "target": 155,
         "successMin": 140,
         "successMax": 170,
-        "ingredientGroupId": "battle-pazza-fish-top",
+        "ingredientGroupId": "group-1",
         "ingredientGroupLabel": "魚",
         "ingredientSize": 2
       },
       {
-        "id": "slot-2-1",
+        "id": "part-2",
         "name": "D",
         "optionId": "cross",
         "gridCell": {
@@ -477,12 +320,12 @@ registerDQ10CraftRecipes("cooking", [
         "target": 155,
         "successMin": 140,
         "successMax": 170,
-        "ingredientGroupId": "battle-pazza-fish-left",
+        "ingredientGroupId": "group-2",
         "ingredientGroupLabel": "魚",
         "ingredientSize": 2
       },
       {
-        "id": "slot-2-2",
+        "id": "part-3",
         "name": "E",
         "optionId": "center",
         "gridCell": {
@@ -493,12 +336,12 @@ registerDQ10CraftRecipes("cooking", [
         "target": 155,
         "successMin": 140,
         "successMax": 170,
-        "ingredientGroupId": "battle-pazza-fish-top",
+        "ingredientGroupId": "group-1",
         "ingredientGroupLabel": "魚",
         "ingredientSize": 2
       },
       {
-        "id": "slot-2-3",
+        "id": "part-4",
         "name": "F",
         "optionId": "cross",
         "gridCell": {
@@ -512,7 +355,7 @@ registerDQ10CraftRecipes("cooking", [
         "ingredientGroupLabel": "野菜"
       },
       {
-        "id": "slot-3-1",
+        "id": "part-5",
         "name": "G",
         "optionId": "corner",
         "gridCell": {
@@ -523,12 +366,12 @@ registerDQ10CraftRecipes("cooking", [
         "target": 155,
         "successMin": 140,
         "successMax": 170,
-        "ingredientGroupId": "battle-pazza-fish-left",
+        "ingredientGroupId": "group-2",
         "ingredientGroupLabel": "魚",
         "ingredientSize": 2
       },
       {
-        "id": "slot-3-3",
+        "id": "part-6",
         "name": "I",
         "optionId": "corner",
         "gridCell": {
@@ -551,7 +394,7 @@ registerDQ10CraftRecipes("cooking", [
     "categoryId": "fish-dishes",
     "items": [
       {
-        "id": "slot-1-1",
+        "id": "part-1",
         "name": "A",
         "optionId": "corner",
         "gridCell": {
@@ -564,7 +407,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 130
       },
       {
-        "id": "slot-2-1",
+        "id": "part-2",
         "name": "D",
         "optionId": "cross",
         "gridCell": {
@@ -587,7 +430,7 @@ registerDQ10CraftRecipes("cooking", [
     "categoryId": "fish-dishes",
     "items": [
       {
-        "id": "slot-2-3",
+        "id": "part-1",
         "name": "F",
         "optionId": "cross",
         "gridCell": {
@@ -600,7 +443,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 115
       },
       {
-        "id": "slot-3-2",
+        "id": "part-2",
         "name": "H",
         "optionId": "cross",
         "gridCell": {
@@ -613,7 +456,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 115
       },
       {
-        "id": "slot-3-3",
+        "id": "part-3",
         "name": "I",
         "optionId": "corner",
         "gridCell": {
@@ -636,7 +479,7 @@ registerDQ10CraftRecipes("cooking", [
     "categoryId": "fish-dishes",
     "items": [
       {
-        "id": "slot-2-1",
+        "id": "part-1",
         "name": "D",
         "optionId": "cross",
         "gridCell": {
@@ -649,7 +492,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 140
       },
       {
-        "id": "slot-3-1",
+        "id": "part-2",
         "name": "G",
         "optionId": "corner",
         "gridCell": {
@@ -662,7 +505,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 140
       },
       {
-        "id": "slot-3-2",
+        "id": "part-3",
         "name": "H",
         "optionId": "cross",
         "gridCell": {
@@ -685,7 +528,7 @@ registerDQ10CraftRecipes("cooking", [
     "categoryId": "fish-dishes",
     "items": [
       {
-        "id": "slot-1-1",
+        "id": "part-1",
         "name": "A",
         "optionId": "corner",
         "gridCell": {
@@ -698,7 +541,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 175
       },
       {
-        "id": "slot-1-3",
+        "id": "part-2",
         "name": "C",
         "optionId": "corner",
         "gridCell": {
@@ -711,7 +554,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 175
       },
       {
-        "id": "slot-2-1",
+        "id": "part-3",
         "name": "D",
         "optionId": "cross",
         "gridCell": {
@@ -724,7 +567,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 175
       },
       {
-        "id": "slot-2-3",
+        "id": "part-4",
         "name": "F",
         "optionId": "cross",
         "gridCell": {
@@ -737,7 +580,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 175
       },
       {
-        "id": "slot-3-3",
+        "id": "part-5",
         "name": "I",
         "optionId": "corner",
         "gridCell": {
@@ -760,7 +603,7 @@ registerDQ10CraftRecipes("cooking", [
     "categoryId": "fish-dishes",
     "items": [
       {
-        "id": "slot-1-1",
+        "id": "part-1",
         "name": "A",
         "optionId": "corner",
         "gridCell": {
@@ -773,7 +616,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 140
       },
       {
-        "id": "slot-1-3",
+        "id": "part-2",
         "name": "C",
         "optionId": "corner",
         "gridCell": {
@@ -786,7 +629,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 140
       },
       {
-        "id": "slot-2-1",
+        "id": "part-3",
         "name": "D",
         "optionId": "cross",
         "gridCell": {
@@ -799,7 +642,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 190
       },
       {
-        "id": "slot-2-3",
+        "id": "part-4",
         "name": "F",
         "optionId": "cross",
         "gridCell": {
@@ -812,7 +655,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 160
       },
       {
-        "id": "slot-3-1",
+        "id": "part-5",
         "name": "G",
         "optionId": "corner",
         "gridCell": {
@@ -825,7 +668,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 190
       },
       {
-        "id": "slot-3-3",
+        "id": "part-6",
         "name": "I",
         "optionId": "corner",
         "gridCell": {
@@ -848,7 +691,7 @@ registerDQ10CraftRecipes("cooking", [
     "categoryId": "fish-dishes",
     "items": [
       {
-        "id": "slot-1-1",
+        "id": "part-1",
         "name": "A",
         "optionId": "corner",
         "gridCell": {
@@ -861,7 +704,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 170
       },
       {
-        "id": "slot-1-3",
+        "id": "part-2",
         "name": "C",
         "optionId": "corner",
         "gridCell": {
@@ -874,7 +717,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 200
       },
       {
-        "id": "slot-2-1",
+        "id": "part-3",
         "name": "D",
         "optionId": "cross",
         "gridCell": {
@@ -887,7 +730,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 170
       },
       {
-        "id": "slot-2-3",
+        "id": "part-4",
         "name": "F",
         "optionId": "cross",
         "gridCell": {
@@ -900,7 +743,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 170
       },
       {
-        "id": "slot-3-1",
+        "id": "part-5",
         "name": "G",
         "optionId": "corner",
         "gridCell": {
@@ -913,7 +756,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 180
       },
       {
-        "id": "slot-3-3",
+        "id": "part-6",
         "name": "I",
         "optionId": "corner",
         "gridCell": {
@@ -930,100 +773,13 @@ registerDQ10CraftRecipes("cooking", [
     "archived": true
   },
   {
-    "id": "cooking-014",
-    "name": "スマッシュポテト",
-    "category": "魚料理",
-    "categoryId": "fish-dishes",
-    "items": [
-      {
-        "id": "slot-1-1",
-        "name": "A",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 1,
-          "column": 1
-        },
-        "current": 0,
-        "target": 145,
-        "successMin": 130,
-        "successMax": 160
-      },
-      {
-        "id": "slot-1-2",
-        "name": "B",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 1,
-          "column": 2
-        },
-        "current": 0,
-        "target": 145,
-        "successMin": 130,
-        "successMax": 160
-      },
-      {
-        "id": "slot-1-3",
-        "name": "C",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 1,
-          "column": 3
-        },
-        "current": 0,
-        "target": 145,
-        "successMin": 130,
-        "successMax": 160
-      },
-      {
-        "id": "slot-3-1",
-        "name": "G",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 3,
-          "column": 1
-        },
-        "current": 0,
-        "target": 210,
-        "successMin": 195,
-        "successMax": 225
-      },
-      {
-        "id": "slot-3-2",
-        "name": "H",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 3,
-          "column": 2
-        },
-        "current": 0,
-        "target": 210,
-        "successMin": 195,
-        "successMax": 225
-      },
-      {
-        "id": "slot-3-3",
-        "name": "I",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 3,
-          "column": 3
-        },
-        "current": 0,
-        "target": 210,
-        "successMin": 195,
-        "successMax": 225
-      }
-    ],
-    "traitId": "light"
-  },
-  {
     "id": "cooking-015",
     "name": "グレイトグラタン",
     "category": "魚料理",
     "categoryId": "fish-dishes",
     "items": [
       {
-        "id": "slot-1-2",
+        "id": "part-1",
         "name": "B",
         "optionId": "cross",
         "gridCell": {
@@ -1036,7 +792,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 210
       },
       {
-        "id": "slot-1-3",
+        "id": "part-2",
         "name": "C",
         "optionId": "corner",
         "gridCell": {
@@ -1049,7 +805,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 170
       },
       {
-        "id": "slot-2-1",
+        "id": "part-3",
         "name": "D",
         "optionId": "cross",
         "gridCell": {
@@ -1062,7 +818,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 170
       },
       {
-        "id": "slot-2-3",
+        "id": "part-4",
         "name": "F",
         "optionId": "cross",
         "gridCell": {
@@ -1075,7 +831,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 170
       },
       {
-        "id": "slot-3-1",
+        "id": "part-5",
         "name": "G",
         "optionId": "corner",
         "gridCell": {
@@ -1088,7 +844,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 170
       },
       {
-        "id": "slot-3-2",
+        "id": "part-6",
         "name": "H",
         "optionId": "cross",
         "gridCell": {
@@ -1111,7 +867,7 @@ registerDQ10CraftRecipes("cooking", [
     "categoryId": "pasta-rice",
     "items": [
       {
-        "id": "slot-1-1",
+        "id": "part-1",
         "name": "A",
         "optionId": "corner",
         "gridCell": {
@@ -1124,7 +880,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 90
       },
       {
-        "id": "slot-1-2",
+        "id": "part-2",
         "name": "B",
         "optionId": "cross",
         "gridCell": {
@@ -1147,7 +903,7 @@ registerDQ10CraftRecipes("cooking", [
     "categoryId": "pasta-rice",
     "items": [
       {
-        "id": "slot-2-3",
+        "id": "part-1",
         "name": "F",
         "optionId": "cross",
         "gridCell": {
@@ -1160,7 +916,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 120
       },
       {
-        "id": "slot-3-1",
+        "id": "part-2",
         "name": "G",
         "optionId": "corner",
         "gridCell": {
@@ -1183,7 +939,7 @@ registerDQ10CraftRecipes("cooking", [
     "categoryId": "pasta-rice",
     "items": [
       {
-        "id": "slot-1-1",
+        "id": "part-1",
         "name": "A",
         "optionId": "corner",
         "gridCell": {
@@ -1196,7 +952,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 120
       },
       {
-        "id": "slot-1-2",
+        "id": "part-2",
         "name": "B",
         "optionId": "cross",
         "gridCell": {
@@ -1209,7 +965,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 165
       },
       {
-        "id": "slot-1-3",
+        "id": "part-3",
         "name": "C",
         "optionId": "corner",
         "gridCell": {
@@ -1222,7 +978,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 165
       },
       {
-        "id": "slot-2-1",
+        "id": "part-4",
         "name": "D",
         "optionId": "cross",
         "gridCell": {
@@ -1239,87 +995,13 @@ registerDQ10CraftRecipes("cooking", [
     "archived": true
   },
   {
-    "id": "cooking-019",
-    "name": "バランスパスタ",
-    "category": "パスタ＆ライス",
-    "categoryId": "pasta-rice",
-    "items": [
-      {
-        "id": "slot-1-3",
-        "name": "C",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 1,
-          "column": 3
-        },
-        "current": 0,
-        "target": 135,
-        "successMin": 120,
-        "successMax": 150
-      },
-      {
-        "id": "slot-2-3",
-        "name": "F",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 2,
-          "column": 3
-        },
-        "current": 0,
-        "target": 160,
-        "successMin": 145,
-        "successMax": 175
-      },
-      {
-        "id": "slot-3-1",
-        "name": "G",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 3,
-          "column": 1
-        },
-        "current": 0,
-        "target": 186,
-        "successMin": 171,
-        "successMax": 201
-      },
-      {
-        "id": "slot-3-2",
-        "name": "H",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 3,
-          "column": 2
-        },
-        "current": 0,
-        "target": 160,
-        "successMin": 145,
-        "successMax": 175
-      },
-      {
-        "id": "slot-3-3",
-        "name": "I",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 3,
-          "column": 3
-        },
-        "current": 0,
-        "target": 160,
-        "successMin": 145,
-        "successMax": 175
-      }
-    ],
-    "traitId": "light"
-  },
-  {
     "id": "cooking-020",
     "name": "スパイスカレー",
     "category": "パスタ＆ライス",
     "categoryId": "pasta-rice",
     "items": [
       {
-        "id": "slot-1-1",
+        "id": "part-1",
         "name": "A",
         "optionId": "corner",
         "gridCell": {
@@ -1332,7 +1014,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 195
       },
       {
-        "id": "slot-1-2",
+        "id": "part-2",
         "name": "B",
         "optionId": "cross",
         "gridCell": {
@@ -1345,7 +1027,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 195
       },
       {
-        "id": "slot-1-3",
+        "id": "part-3",
         "name": "C",
         "optionId": "corner",
         "gridCell": {
@@ -1358,7 +1040,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 170
       },
       {
-        "id": "slot-3-1",
+        "id": "part-4",
         "name": "G",
         "optionId": "corner",
         "gridCell": {
@@ -1371,7 +1053,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 150
       },
       {
-        "id": "slot-3-2",
+        "id": "part-5",
         "name": "H",
         "optionId": "cross",
         "gridCell": {
@@ -1384,7 +1066,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 150
       },
       {
-        "id": "slot-3-3",
+        "id": "part-6",
         "name": "I",
         "optionId": "corner",
         "gridCell": {
@@ -1407,7 +1089,7 @@ registerDQ10CraftRecipes("cooking", [
     "categoryId": "pasta-rice",
     "items": [
       {
-        "id": "slot-1-1",
+        "id": "part-1",
         "name": "A",
         "optionId": "corner",
         "gridCell": {
@@ -1420,7 +1102,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 160
       },
       {
-        "id": "slot-1-2",
+        "id": "part-2",
         "name": "B",
         "optionId": "cross",
         "gridCell": {
@@ -1433,7 +1115,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 160
       },
       {
-        "id": "slot-1-3",
+        "id": "part-3",
         "name": "C",
         "optionId": "corner",
         "gridCell": {
@@ -1446,7 +1128,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 195
       },
       {
-        "id": "slot-3-1",
+        "id": "part-4",
         "name": "G",
         "optionId": "corner",
         "gridCell": {
@@ -1459,7 +1141,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 195
       },
       {
-        "id": "slot-3-2",
+        "id": "part-5",
         "name": "H",
         "optionId": "cross",
         "gridCell": {
@@ -1472,7 +1154,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 210
       },
       {
-        "id": "slot-3-3",
+        "id": "part-6",
         "name": "I",
         "optionId": "corner",
         "gridCell": {
@@ -1489,35 +1171,13 @@ registerDQ10CraftRecipes("cooking", [
     "archived": true
   },
   {
-    "id": "cooking-022",
-    "name": "クイックケーキ",
-    "category": "スイーツ",
-    "categoryId": "sweets",
-    "items": [
-      {
-        "id": "slot-1-2",
-        "name": "B",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 1,
-          "column": 2
-        },
-        "current": 0,
-        "target": 75,
-        "successMin": 60,
-        "successMax": 90
-      }
-    ],
-    "traitId": "light"
-  },
-  {
     "id": "cooking-023",
     "name": "ゴージャスクッキー",
     "category": "スイーツ",
     "categoryId": "sweets",
     "items": [
       {
-        "id": "slot-1-2",
+        "id": "part-1",
         "name": "B",
         "optionId": "cross",
         "gridCell": {
@@ -1530,7 +1190,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 80
       },
       {
-        "id": "slot-2-1",
+        "id": "part-2",
         "name": "D",
         "optionId": "cross",
         "gridCell": {
@@ -1547,318 +1207,13 @@ registerDQ10CraftRecipes("cooking", [
     "archived": true
   },
   {
-    "id": "cooking-024",
-    "name": "ファイアタルト",
-    "category": "スイーツ",
-    "categoryId": "sweets",
-    "items": [
-      {
-        "id": "slot-1-1",
-        "name": "A",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 1,
-          "column": 1
-        },
-        "current": 0,
-        "target": 160,
-        "successMin": 145,
-        "successMax": 175
-      },
-      {
-        "id": "slot-1-2",
-        "name": "B",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 1,
-          "column": 2
-        },
-        "current": 0,
-        "target": 160,
-        "successMin": 145,
-        "successMax": 175
-      },
-      {
-        "id": "slot-3-2",
-        "name": "H",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 3,
-          "column": 2
-        },
-        "current": 0,
-        "target": 143,
-        "successMin": 128,
-        "successMax": 158
-      },
-      {
-        "id": "slot-3-3",
-        "name": "I",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 3,
-          "column": 3
-        },
-        "current": 0,
-        "target": 125,
-        "successMin": 110,
-        "successMax": 140
-      }
-    ],
-    "traitId": "light"
-  },
-  {
-    "id": "cooking-025",
-    "name": "アイスタルト",
-    "category": "スイーツ",
-    "categoryId": "sweets",
-    "items": [
-      {
-        "id": "slot-1-1",
-        "name": "A",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 1,
-          "column": 1
-        },
-        "current": 0,
-        "target": 135,
-        "successMin": 120,
-        "successMax": 150
-      },
-      {
-        "id": "slot-2-1",
-        "name": "D",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 2,
-          "column": 1
-        },
-        "current": 0,
-        "target": 135,
-        "successMin": 120,
-        "successMax": 150
-      },
-      {
-        "id": "slot-3-2",
-        "name": "H",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 3,
-          "column": 2
-        },
-        "current": 0,
-        "target": 115,
-        "successMin": 100,
-        "successMax": 130
-      },
-      {
-        "id": "slot-3-3",
-        "name": "I",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 3,
-          "column": 3
-        },
-        "current": 0,
-        "target": 155,
-        "successMin": 140,
-        "successMax": 170
-      }
-    ],
-    "traitId": "light"
-  },
-  {
-    "id": "cooking-026",
-    "name": "ライトタルト",
-    "category": "スイーツ",
-    "categoryId": "sweets",
-    "items": [
-      {
-        "id": "slot-1-2",
-        "name": "B",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 1,
-          "column": 2
-        },
-        "current": 0,
-        "target": 125,
-        "successMin": 110,
-        "successMax": 140
-      },
-      {
-        "id": "slot-3-1",
-        "name": "G",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 3,
-          "column": 1
-        },
-        "current": 0,
-        "target": 160,
-        "successMin": 145,
-        "successMax": 175
-      },
-      {
-        "id": "slot-3-2",
-        "name": "H",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 3,
-          "column": 2
-        },
-        "current": 0,
-        "target": 160,
-        "successMin": 145,
-        "successMax": 175
-      },
-      {
-        "id": "slot-3-3",
-        "name": "I",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 3,
-          "column": 3
-        },
-        "current": 0,
-        "target": 145,
-        "successMin": 130,
-        "successMax": 160
-      }
-    ],
-    "traitId": "light"
-  },
-  {
-    "id": "cooking-027",
-    "name": "ダークタルト",
-    "category": "スイーツ",
-    "categoryId": "sweets",
-    "items": [
-      {
-        "id": "slot-1-2",
-        "name": "B",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 1,
-          "column": 2
-        },
-        "current": 0,
-        "target": 135,
-        "successMin": 120,
-        "successMax": 150
-      },
-      {
-        "id": "slot-1-3",
-        "name": "C",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 1,
-          "column": 3
-        },
-        "current": 0,
-        "target": 135,
-        "successMin": 120,
-        "successMax": 150
-      },
-      {
-        "id": "slot-2-3",
-        "name": "F",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 2,
-          "column": 3
-        },
-        "current": 0,
-        "target": 165,
-        "successMin": 150,
-        "successMax": 180
-      },
-      {
-        "id": "slot-3-1",
-        "name": "G",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 3,
-          "column": 1
-        },
-        "current": 0,
-        "target": 175,
-        "successMin": 160,
-        "successMax": 190
-      }
-    ],
-    "traitId": "light"
-  },
-  {
-    "id": "cooking-028",
-    "name": "ストームタルト",
-    "category": "スイーツ",
-    "categoryId": "sweets",
-    "items": [
-      {
-        "id": "slot-1-3",
-        "name": "C",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 1,
-          "column": 3
-        },
-        "current": 0,
-        "target": 135,
-        "successMin": 120,
-        "successMax": 150
-      },
-      {
-        "id": "slot-2-3",
-        "name": "F",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 2,
-          "column": 3
-        },
-        "current": 0,
-        "target": 145,
-        "successMin": 130,
-        "successMax": 160
-      },
-      {
-        "id": "slot-3-2",
-        "name": "H",
-        "optionId": "cross",
-        "gridCell": {
-          "row": 3,
-          "column": 2
-        },
-        "current": 0,
-        "target": 165,
-        "successMin": 150,
-        "successMax": 180
-      },
-      {
-        "id": "slot-3-3",
-        "name": "I",
-        "optionId": "corner",
-        "gridCell": {
-          "row": 3,
-          "column": 3
-        },
-        "current": 0,
-        "target": 165,
-        "successMin": 150,
-        "successMax": 180
-      }
-    ],
-    "traitId": "light"
-  },
-  {
     "id": "cooking-029",
     "name": "スタースイーツ",
     "category": "スイーツ",
     "categoryId": "sweets",
     "items": [
       {
-        "id": "slot-1-1",
+        "id": "part-1",
         "name": "A",
         "optionId": "corner",
         "gridCell": {
@@ -1871,7 +1226,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 160
       },
       {
-        "id": "slot-1-2",
+        "id": "part-2",
         "name": "B",
         "optionId": "cross",
         "gridCell": {
@@ -1884,7 +1239,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 135
       },
       {
-        "id": "slot-1-3",
+        "id": "part-3",
         "name": "C",
         "optionId": "corner",
         "gridCell": {
@@ -1897,7 +1252,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 135
       },
       {
-        "id": "slot-3-1",
+        "id": "part-4",
         "name": "G",
         "optionId": "corner",
         "gridCell": {
@@ -1910,7 +1265,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 160
       },
       {
-        "id": "slot-3-2",
+        "id": "part-5",
         "name": "H",
         "optionId": "cross",
         "gridCell": {
@@ -1933,7 +1288,7 @@ registerDQ10CraftRecipes("cooking", [
     "categoryId": "sweets",
     "items": [
       {
-        "id": "slot-1-1",
+        "id": "part-1",
         "name": "A",
         "optionId": "corner",
         "gridCell": {
@@ -1946,7 +1301,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 120
       },
       {
-        "id": "slot-1-2",
+        "id": "part-2",
         "name": "B",
         "optionId": "cross",
         "gridCell": {
@@ -1959,7 +1314,7 @@ registerDQ10CraftRecipes("cooking", [
         "successMax": 120
       },
       {
-        "id": "slot-2-1",
+        "id": "part-3",
         "name": "D",
         "optionId": "cross",
         "gridCell": {
@@ -1982,11 +1337,8 @@ registerDQ10CraftRecipes("cooking", [
     "categoryId": "pasta-rice",
     "items": [
       {
-        "id": "slot-1-2",
+        "id": "part-1",
         "name": "B",
-        "ingredientGroupId": "heal-carbonara-meat",
-        "ingredientGroupLabel": "肉",
-        "ingredientSize": 2,
         "optionId": "cross",
         "gridCell": {
           "row": 1,
@@ -1995,14 +1347,14 @@ registerDQ10CraftRecipes("cooking", [
         "current": 0,
         "target": 195,
         "successMin": 180,
-        "successMax": 210
+        "successMax": 210,
+        "ingredientGroupId": "group-1",
+        "ingredientGroupLabel": "肉",
+        "ingredientSize": 2
       },
       {
-        "id": "slot-1-3",
+        "id": "part-2",
         "name": "C",
-        "ingredientGroupId": "heal-carbonara-meat",
-        "ingredientGroupLabel": "肉",
-        "ingredientSize": 2,
         "optionId": "corner",
         "gridCell": {
           "row": 1,
@@ -2011,12 +1363,14 @@ registerDQ10CraftRecipes("cooking", [
         "current": 0,
         "target": 195,
         "successMin": 180,
-        "successMax": 210
+        "successMax": 210,
+        "ingredientGroupId": "group-1",
+        "ingredientGroupLabel": "肉",
+        "ingredientSize": 2
       },
       {
-        "id": "slot-2-1",
+        "id": "part-3",
         "name": "D",
-        "ingredientGroupLabel": "麺",
         "optionId": "cross",
         "gridCell": {
           "row": 2,
@@ -2025,12 +1379,12 @@ registerDQ10CraftRecipes("cooking", [
         "current": 0,
         "target": 165,
         "successMin": 150,
-        "successMax": 180
+        "successMax": 180,
+        "ingredientGroupLabel": "麺"
       },
       {
-        "id": "slot-3-1",
+        "id": "part-4",
         "name": "G",
-        "ingredientGroupLabel": "麺",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -2039,12 +1393,12 @@ registerDQ10CraftRecipes("cooking", [
         "current": 0,
         "target": 165,
         "successMin": 150,
-        "successMax": 180
+        "successMax": 180,
+        "ingredientGroupLabel": "麺"
       },
       {
-        "id": "slot-3-2",
+        "id": "part-5",
         "name": "H",
-        "ingredientGroupLabel": "麺",
         "optionId": "cross",
         "gridCell": {
           "row": 3,
@@ -2053,12 +1407,12 @@ registerDQ10CraftRecipes("cooking", [
         "current": 0,
         "target": 165,
         "successMin": 150,
-        "successMax": 180
+        "successMax": 180,
+        "ingredientGroupLabel": "麺"
       },
       {
-        "id": "slot-3-3",
+        "id": "part-6",
         "name": "I",
-        "ingredientGroupLabel": "卵",
         "optionId": "corner",
         "gridCell": {
           "row": 3,
@@ -2067,9 +1421,695 @@ registerDQ10CraftRecipes("cooking", [
         "current": 0,
         "target": 85,
         "successMin": 70,
-        "successMax": 100
+        "successMax": 100,
+        "ingredientGroupLabel": "卵"
       }
     ],
     "traitId": "recovery"
+  },
+  {
+    "id": "cooking-001",
+    "name": "きようさにくまん",
+    "items": [
+      {
+        "id": "part-1",
+        "name": "H",
+        "optionId": "cross",
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        },
+        "current": 0,
+        "target": 105,
+        "successMin": 90,
+        "successMax": 120,
+        "ingredientGroupId": "group-1",
+        "ingredientGroupLabel": "肉",
+        "ingredientSize": 2
+      },
+      {
+        "id": "part-2",
+        "name": "I",
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 3
+        },
+        "current": 0,
+        "target": 105,
+        "successMin": 90,
+        "successMax": 120,
+        "ingredientGroupId": "group-1",
+        "ingredientGroupLabel": "肉",
+        "ingredientSize": 2
+      }
+    ],
+    "traitId": "light"
+  },
+  {
+    "id": "cooking-002",
+    "name": "パワフルステーキ",
+    "items": [
+      {
+        "id": "part-1",
+        "name": "B",
+        "optionId": "cross",
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        },
+        "current": 0,
+        "target": 85,
+        "successMin": 70,
+        "successMax": 100,
+        "ingredientGroupLabel": "野菜"
+      },
+      {
+        "id": "part-2",
+        "name": "G",
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        },
+        "current": 0,
+        "target": 125,
+        "successMin": 110,
+        "successMax": 140,
+        "ingredientGroupId": "group-1",
+        "ingredientGroupLabel": "肉",
+        "ingredientSize": 2
+      },
+      {
+        "id": "part-3",
+        "name": "H",
+        "optionId": "cross",
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        },
+        "current": 0,
+        "target": 125,
+        "successMin": 110,
+        "successMax": 140,
+        "ingredientGroupId": "group-1",
+        "ingredientGroupLabel": "肉",
+        "ingredientSize": 2
+      }
+    ],
+    "traitId": "light"
+  },
+  {
+    "id": "cooking-019",
+    "name": "バランスパスタ",
+    "items": [
+      {
+        "id": "part-1",
+        "name": "C",
+        "optionId": "corner",
+        "gridCell": {
+          "row": 1,
+          "column": 3
+        },
+        "current": 0,
+        "target": 135,
+        "successMin": 120,
+        "successMax": 150,
+        "ingredientGroupLabel": "卵"
+      },
+      {
+        "id": "part-2",
+        "name": "F",
+        "optionId": "cross",
+        "gridCell": {
+          "row": 2,
+          "column": 3
+        },
+        "current": 0,
+        "target": 160,
+        "successMin": 145,
+        "successMax": 175,
+        "ingredientGroupLabel": "麺"
+      },
+      {
+        "id": "part-3",
+        "name": "G",
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        },
+        "current": 0,
+        "target": 186,
+        "successMin": 171,
+        "successMax": 201,
+        "ingredientGroupLabel": "野菜"
+      },
+      {
+        "id": "part-4",
+        "name": "H",
+        "optionId": "cross",
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        },
+        "current": 0,
+        "target": 160,
+        "successMin": 145,
+        "successMax": 175,
+        "ingredientGroupLabel": "麺"
+      },
+      {
+        "id": "part-5",
+        "name": "I",
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 3
+        },
+        "current": 0,
+        "target": 160,
+        "successMin": 145,
+        "successMax": 175,
+        "ingredientGroupLabel": "麺"
+      }
+    ],
+    "traitId": "light"
+  },
+  {
+    "id": "cooking-006",
+    "name": "あいじょうオムレツ",
+    "items": [
+      {
+        "id": "part-1",
+        "name": "A",
+        "optionId": "corner",
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        },
+        "current": 0,
+        "target": 155,
+        "successMin": 140,
+        "successMax": 170,
+        "ingredientGroupLabel": "野菜"
+      },
+      {
+        "id": "part-2",
+        "name": "D",
+        "optionId": "cross",
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        },
+        "current": 0,
+        "target": 145,
+        "successMin": 130,
+        "successMax": 160,
+        "ingredientGroupLabel": "卵"
+      },
+      {
+        "id": "part-3",
+        "name": "G",
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        },
+        "current": 0,
+        "target": 145,
+        "successMin": 130,
+        "successMax": 160,
+        "ingredientGroupLabel": "卵"
+      },
+      {
+        "id": "part-4",
+        "name": "H",
+        "optionId": "cross",
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        },
+        "current": 0,
+        "target": 175,
+        "successMin": 160,
+        "successMax": 190,
+        "ingredientGroupId": "group-1",
+        "ingredientGroupLabel": "肉",
+        "ingredientSize": 2
+      },
+      {
+        "id": "part-5",
+        "name": "I",
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 3
+        },
+        "current": 0,
+        "target": 175,
+        "successMin": 160,
+        "successMax": 190,
+        "ingredientGroupId": "group-1",
+        "ingredientGroupLabel": "肉",
+        "ingredientSize": 2
+      }
+    ],
+    "traitId": "light"
+  },
+  {
+    "id": "cooking-024",
+    "name": "ファイアタルト",
+    "items": [
+      {
+        "id": "part-1",
+        "name": "A",
+        "optionId": "corner",
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        },
+        "current": 0,
+        "target": 160,
+        "successMin": 145,
+        "successMax": 175,
+        "ingredientGroupId": "group-1",
+        "ingredientGroupLabel": "肉",
+        "ingredientSize": 2
+      },
+      {
+        "id": "part-2",
+        "name": "B",
+        "optionId": "cross",
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        },
+        "current": 0,
+        "target": 160,
+        "successMin": 145,
+        "successMax": 175,
+        "ingredientGroupId": "group-1",
+        "ingredientGroupLabel": "肉",
+        "ingredientSize": 2
+      },
+      {
+        "id": "part-3",
+        "name": "H",
+        "optionId": "cross",
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        },
+        "current": 0,
+        "target": 143,
+        "successMin": 128,
+        "successMax": 158,
+        "ingredientGroupLabel": "卵"
+      },
+      {
+        "id": "part-4",
+        "name": "I",
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 3
+        },
+        "current": 0,
+        "target": 125,
+        "successMin": 110,
+        "successMax": 140,
+        "ingredientGroupLabel": "小麦"
+      }
+    ],
+    "traitId": "light"
+  },
+  {
+    "id": "cooking-027",
+    "name": "ダークタルト",
+    "items": [
+      {
+        "id": "part-1",
+        "name": "B",
+        "optionId": "cross",
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        },
+        "current": 0,
+        "target": 135,
+        "successMin": 120,
+        "successMax": 150,
+        "ingredientGroupLabel": "小麦"
+      },
+      {
+        "id": "part-2",
+        "name": "C",
+        "optionId": "corner",
+        "gridCell": {
+          "row": 1,
+          "column": 3
+        },
+        "current": 0,
+        "target": 135,
+        "successMin": 120,
+        "successMax": 150,
+        "ingredientGroupLabel": "小麦"
+      },
+      {
+        "id": "part-3",
+        "name": "F",
+        "optionId": "cross",
+        "gridCell": {
+          "row": 2,
+          "column": 3
+        },
+        "current": 0,
+        "target": 165,
+        "successMin": 150,
+        "successMax": 180,
+        "ingredientGroupLabel": "卵"
+      },
+      {
+        "id": "part-4",
+        "name": "G",
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        },
+        "current": 0,
+        "target": 175,
+        "successMin": 160,
+        "successMax": 190,
+        "ingredientGroupLabel": "野菜"
+      }
+    ],
+    "traitId": "light"
+  },
+  {
+    "id": "cooking-025",
+    "name": "アイスタルト",
+    "items": [
+      {
+        "id": "part-1",
+        "name": "A",
+        "optionId": "corner",
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        },
+        "current": 0,
+        "target": 135,
+        "successMin": 120,
+        "successMax": 150,
+        "ingredientGroupId": "group-1",
+        "ingredientGroupLabel": "魚",
+        "ingredientSize": 2
+      },
+      {
+        "id": "part-2",
+        "name": "D",
+        "optionId": "cross",
+        "gridCell": {
+          "row": 2,
+          "column": 1
+        },
+        "current": 0,
+        "target": 135,
+        "successMin": 120,
+        "successMax": 150,
+        "ingredientGroupId": "group-1",
+        "ingredientGroupLabel": "魚",
+        "ingredientSize": 2
+      },
+      {
+        "id": "part-3",
+        "name": "H",
+        "optionId": "cross",
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        },
+        "current": 0,
+        "target": 115,
+        "successMin": 100,
+        "successMax": 130,
+        "ingredientGroupLabel": "卵"
+      },
+      {
+        "id": "part-4",
+        "name": "I",
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 3
+        },
+        "current": 0,
+        "target": 155,
+        "successMin": 140,
+        "successMax": 170,
+        "ingredientGroupLabel": "小麦"
+      }
+    ],
+    "traitId": "light"
+  },
+  {
+    "id": "cooking-028",
+    "name": "ストームタルト",
+    "items": [
+      {
+        "id": "part-1",
+        "name": "C",
+        "optionId": "corner",
+        "gridCell": {
+          "row": 1,
+          "column": 3
+        },
+        "current": 0,
+        "target": 135,
+        "successMin": 120,
+        "successMax": 150,
+        "ingredientGroupLabel": "卵"
+      },
+      {
+        "id": "part-2",
+        "name": "F",
+        "optionId": "cross",
+        "gridCell": {
+          "row": 2,
+          "column": 3
+        },
+        "current": 0,
+        "target": 145,
+        "successMin": 130,
+        "successMax": 160,
+        "ingredientGroupLabel": "小麦"
+      },
+      {
+        "id": "part-3",
+        "name": "H",
+        "optionId": "cross",
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        },
+        "current": 0,
+        "target": 165,
+        "successMin": 150,
+        "successMax": 180,
+        "ingredientGroupLabel": "野菜"
+      },
+      {
+        "id": "part-4",
+        "name": "I",
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 3
+        },
+        "current": 0,
+        "target": 165,
+        "successMin": 150,
+        "successMax": 180,
+        "ingredientGroupLabel": "野菜"
+      }
+    ],
+    "traitId": "light"
+  },
+  {
+    "id": "cooking-014",
+    "name": "スマッシュポテト",
+    "items": [
+      {
+        "id": "part-1",
+        "name": "A",
+        "optionId": "corner",
+        "gridCell": {
+          "row": 1,
+          "column": 1
+        },
+        "current": 0,
+        "target": 145,
+        "successMin": 130,
+        "successMax": 160,
+        "ingredientGroupLabel": "卵"
+      },
+      {
+        "id": "part-2",
+        "name": "B",
+        "optionId": "cross",
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        },
+        "current": 0,
+        "target": 145,
+        "successMin": 130,
+        "successMax": 160,
+        "ingredientGroupLabel": "卵"
+      },
+      {
+        "id": "part-3",
+        "name": "C",
+        "optionId": "corner",
+        "gridCell": {
+          "row": 1,
+          "column": 3
+        },
+        "current": 0,
+        "target": 145,
+        "successMin": 130,
+        "successMax": 160,
+        "ingredientGroupLabel": "卵"
+      },
+      {
+        "id": "part-4",
+        "name": "G",
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        },
+        "current": 0,
+        "target": 210,
+        "successMin": 195,
+        "successMax": 225,
+        "ingredientGroupLabel": "野菜"
+      },
+      {
+        "id": "part-5",
+        "name": "H",
+        "optionId": "cross",
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        },
+        "current": 0,
+        "target": 210,
+        "successMin": 195,
+        "successMax": 225,
+        "ingredientGroupLabel": "野菜"
+      },
+      {
+        "id": "part-6",
+        "name": "I",
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 3
+        },
+        "current": 0,
+        "target": 210,
+        "successMin": 195,
+        "successMax": 225,
+        "ingredientGroupLabel": "野菜"
+      }
+    ],
+    "traitId": "light"
+  },
+  {
+    "id": "cooking-022",
+    "name": "クイックケーキ",
+    "items": [
+      {
+        "id": "part-1",
+        "name": "B",
+        "optionId": "cross",
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        },
+        "current": 0,
+        "target": 75,
+        "successMin": 60,
+        "successMax": 90,
+        "ingredientGroupLabel": "小麦"
+      }
+    ],
+    "traitId": "light"
+  },
+  {
+    "id": "cooking-026",
+    "name": "ライトタルト",
+    "items": [
+      {
+        "id": "part-1",
+        "name": "B",
+        "optionId": "cross",
+        "gridCell": {
+          "row": 1,
+          "column": 2
+        },
+        "current": 0,
+        "target": 125,
+        "successMin": 110,
+        "successMax": 140,
+        "ingredientGroupLabel": "野菜"
+      },
+      {
+        "id": "part-2",
+        "name": "G",
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 1
+        },
+        "current": 0,
+        "target": 160,
+        "successMin": 145,
+        "successMax": 175,
+        "ingredientGroupLabel": "卵"
+      },
+      {
+        "id": "part-3",
+        "name": "H",
+        "optionId": "cross",
+        "gridCell": {
+          "row": 3,
+          "column": 2
+        },
+        "current": 0,
+        "target": 160,
+        "successMin": 145,
+        "successMax": 175,
+        "ingredientGroupLabel": "卵"
+      },
+      {
+        "id": "part-4",
+        "name": "I",
+        "optionId": "corner",
+        "gridCell": {
+          "row": 3,
+          "column": 3
+        },
+        "current": 0,
+        "target": 145,
+        "successMin": 130,
+        "successMax": 160,
+        "ingredientGroupLabel": "小麦"
+      }
+    ],
+    "traitId": "light"
   }
 ]);

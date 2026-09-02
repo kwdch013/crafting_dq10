@@ -1,7 +1,7 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
-const path = require("node:path");
 const vm = require("node:vm");
+const { loadFallbackRecipes } = require("./helpers/recipe-loader.js");
 
 const craftIds = [
 	"cooking",
@@ -138,26 +138,8 @@ craftIds.forEach((craftId) => {
 		}
 	});
 
-	const apiRecipes = JSON.parse(
-		fs.readFileSync(path.join("api/data/crafts", craftId, "recipes.json"), "utf8"),
-	);
-	apiRecipes.forEach((recipe) => {
-		assertItemsHaveCoordinateNames(recipe.items, columns, `${craftId} API ${recipe.id}`, useReadingOrder);
-	});
-});
-
-craftIds.forEach((craftId) => {
-	vm.runInContext(
-		fs.readFileSync(path.join("app/crafts", craftId, "recipes.js"), "utf8"),
-		context,
-		{ filename: `app/crafts/${craftId}/recipes.js` },
-	);
-});
-
-craftIds.forEach((craftId) => {
-	const columns = Number(context.DQ10CraftConfigs[craftId].layout?.columns);
-	const useReadingOrder = READING_ORDER_CRAFTS.has(craftId);
-	context.DQ10CraftRecipes[craftId].forEach((recipe) => {
+	const recipes = loadFallbackRecipes(craftId);
+	recipes.forEach((recipe) => {
 		assertItemsHaveCoordinateNames(recipe.items, columns, `${craftId} fallback ${recipe.id}`, useReadingOrder);
 	});
 });

@@ -1,4 +1,4 @@
-"""現行JSON → DB → 復元 のラウンドトリップテスト
+"""現行フォールバック → DB → 復元 のラウンドトリップテスト
 
 移行の妥当性判定の基準です。値の差分が出た場合は移行を進めません。
 TEST_DATABASE_URL がある場合のみ実行し、CI ではスキップされます。
@@ -18,8 +18,10 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "api"))
 
 TEST_DATABASE_URL = os.environ.get("TEST_DATABASE_URL", "")
-DATA_DIR = REPO_ROOT / "api" / "data"
 MIGRATION_DIR = REPO_ROOT / "api" / "migrations"
+sys.path.insert(0, str(REPO_ROOT / "tests" / "helpers"))
+
+from recipe_loader import load_fallback_recipes
 
 # 現行データの総マス数。投入漏れを検知するための固定値です。
 TOTAL_CELLS = 303
@@ -37,7 +39,7 @@ def load_script(path, name):
 
 
 def original_recipes(craft_id):
-	return json.loads((DATA_DIR / "crafts" / craft_id / "recipes.json").read_text(encoding="utf-8"))
+	return load_fallback_recipes(craft_id)
 
 
 def normalize(recipe, craft_id):
@@ -75,16 +77,12 @@ def normalize_item(item, craft_id, groups):
 
 @unittest.skipUnless(TEST_DATABASE_URL, "TEST_DATABASE_URL が未設定のためスキップします")
 class RoundTripTestBase(unittest.TestCase):
-	"""マイグレーション適用の方法だけが異なる2通りの初期化を共有します。"""
-
-	#: 0004_seed_recipes.sql まで適用するか (False なら投入スクリプトを使う)
-	use_seed = False
+	"""空のテストDBへシードを適用し、復元結果を比較します。"""
 
 	def setUp(self):
 		import psycopg
 
 		self.apply = load_script(MIGRATION_DIR / "apply.py", "dq10_migration_apply")
-		self.importer = load_script(REPO_ROOT / "api" / "scripts" / "import_recipes.py", "dq10_import_recipes")
 		self.conn = psycopg.connect(TEST_DATABASE_URL, autocommit=False)
 		self.conn.execute("DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public;")
 		self.conn.commit()
@@ -106,15 +104,11 @@ class RoundTripTestBase(unittest.TestCase):
 			self.assertEqual(actual, want, f"{craft_id}/{want['id']} が一致しません")
 
 
-class ImportRoundTripTest(RoundTripTestBase):
-	"""投入スクリプト経由 (JSON → DB → 復元)"""
+class SeedRoundTripTest(RoundTripTestBase):
+	"""シードSQL経由 (0004_seed_recipes.sql → 復元)"""
 
 	def apply_migrations(self):
-		# シードは投入スクリプトの検証を兼ねるため適用しません。
-		self.apply.ensure_schema_migration(self.conn)
-		for name in ("0001_init.sql", "0002_recipes.sql", "0003_seed_master.sql"):
-			self.apply.apply_migration(self.conn, MIGRATION_DIR / name)
-		self.importer.import_all(self.conn, DATA_DIR)
+		self.apply.apply_all(self.conn)
 
 	def test_all_crafts_round_trip(self):
 		for craft_id in CRAFT_IDS:
@@ -131,30 +125,13 @@ class ImportRoundTripTest(RoundTripTestBase):
 		)
 		self.assertEqual(total, TOTAL_CELLS)
 
-	def test_import_is_idempotent(self):
+	def test_seed_is_idempotent(self):
 		before = self.conn.execute("SELECT count(*) FROM craft_master").fetchone()[0]
-		self.importer.import_all(self.conn, DATA_DIR)
+		self.apply.apply_all(self.conn)
 		after = self.conn.execute("SELECT count(*) FROM craft_master").fetchone()[0]
 		self.assertEqual((before, after), (70, 70))
 		for craft_id in CRAFT_IDS:
 			with self.subTest(craft=craft_id):
 				self.assertCraftRoundTrips(craft_id)
-
-
-class SeedRoundTripTest(RoundTripTestBase):
-	"""シードSQL経由 (0004_seed_recipes.sql → 復元)
-
-	コミット済みのシードが現行JSONと同じ内容であることを保証します。
-	"""
-
-	def apply_migrations(self):
-		self.apply.apply_all(self.conn)
-
-	def test_all_crafts_round_trip(self):
-		for craft_id in CRAFT_IDS:
-			with self.subTest(craft=craft_id):
-				self.assertCraftRoundTrips(craft_id)
-
-
 if __name__ == "__main__":
 	unittest.main()

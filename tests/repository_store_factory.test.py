@@ -17,11 +17,11 @@ from repository.postgres_store import PostgresRecipeStore
 class RecipeStoreFactoryTest(unittest.TestCase):
 	"""環境変数に応じて保存先を選べることを確認する。"""
 
-	def test_defaults_to_json_when_recipe_store_is_unset(self):
-		with patch.dict(os.environ, {}, clear=True):
+	def test_defaults_to_postgres_when_recipe_store_is_unset(self):
+		with patch.dict(os.environ, {"DATABASE_URL": "postgresql://example/test"}, clear=True):
 			store = create_store(Path("test-data"))
 
-		self.assertIsInstance(store, JsonRecipeStore)
+		self.assertIsInstance(store, PostgresRecipeStore)
 
 	def test_creates_json_store_when_recipe_store_is_json(self):
 		with patch.dict(os.environ, {"RECIPE_STORE": "json"}, clear=False):

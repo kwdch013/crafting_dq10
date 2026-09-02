@@ -12,12 +12,19 @@
 `.env` に接続先を書きます。認証情報を含むため `.env.example` にはプレースホルダのみを置きます。
 
 ```bash
-RECIPE_STORE=json
+RECIPE_STORE=postgres
 DATABASE_URL=postgresql://crafting_dq10:<password>@postgres_db:5432/crafting_dq10
 TEST_DATABASE_URL=postgresql://crafting_dq10:<password>@postgres_db:5432/crafting_dq10_test
 ```
 
 `api` サービスは `database_default` ネットワークを外部参照し、`postgres_db` へ接続します。
+
+`RECIPE_STORE` の既定は `postgres` です。JSONへ切り戻す場合のみ `json` を指定します。
+
+**切り戻す前に `export_recipes.py` を実行してください。** `api/data/crafts/<職人>/recipes.json` は
+生成物として追跡対象外のため、新規cloneの直後には存在しません。この状態で `json` を指定すると
+APIはレシピを0件で返します (画面はフォールバックの `app/crafts/<職人>/recipes.js` で動作します)。
+一度エクスポートすれば、以後はDBを停止していても `json` で従来どおり動作します。
 
 ## DBとロールの作成
 
@@ -49,7 +56,11 @@ docker compose exec api python migrations/apply.py --dry-run
 
 ## レシピの投入
 
-`api/data/crafts/<職人>/recipes.json` を配列順に読み、`sort_order` を採番して登録します。
+新規cloneの空DBには、まず `api/migrations/0004_seed_recipes.sql` を含むマイグレーションを適用します。
+これが空のDBを初期化する唯一のレシピ入力です。
+
+`import_recipes.py` は移行時、または `api/data/crafts/<職人>/recipes.json` が手元にある場合だけ使います。
+同ファイルを配列順に読み、`sort_order` を採番して登録します。
 UPSERTのため再実行できます。DDLで強制しない整合性は投入前に検証し、違反があれば
 何も書き込まずに終了します。
 
@@ -57,7 +68,7 @@ UPSERTのため再実行できます。DDLで強制しない整合性は投入�
 docker compose exec api python scripts/import_recipes.py
 ```
 
-`0004_seed_recipes.sql` を適用済みのDBに対して実行した場合は、同じ内容で上書きされます。
+`0004_seed_recipes.sql` を適用済みのDBに対して実行した場合は、JSONが手元にあれば同じ内容で上書きされます。
 
 ## レシピファイルのエクスポート
 

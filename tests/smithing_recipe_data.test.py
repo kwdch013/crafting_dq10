@@ -1,14 +1,23 @@
 import json
+import re
 import unittest
 from pathlib import Path
 
 
-DATA_DIR = Path("api/data/crafts")
+APP_CRAFTS_DIR = Path("app/crafts")
 
 
+# recipes.js の登録呼び出しからJSON配列だけを取り出します。
 def load_recipes(craft_id):
-	with (DATA_DIR / craft_id / "recipes.json").open(encoding="utf-8") as file:
-		return json.load(file)
+	contents = (APP_CRAFTS_DIR / craft_id / "recipes.js").read_text(encoding="utf-8")
+	match = re.fullmatch(
+		rf'\s*registerDQ10CraftRecipes\(\s*"{re.escape(craft_id)}"\s*,\s*(\[.*\])\s*\);\s*',
+		contents,
+		re.DOTALL,
+	)
+	if match is None:
+		raise ValueError(f"{craft_id} のフォールバックレシピ形式が不正です")
+	return json.loads(match.group(1))
 
 
 class SmithingRecipeDataTest(unittest.TestCase):

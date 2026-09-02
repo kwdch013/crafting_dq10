@@ -7,3 +7,7 @@ __pycache__/
 !.env.example
 dist/
 coverage/
+
+# レシピの真実源はPostgreSQL。JSONは export_recipes.py の生成物のため追跡しない
+# 空のDBを初期化する入力は api/migrations/0004_seed_recipes.sql (コミット対象)
+api/data/crafts/*/recipes.json

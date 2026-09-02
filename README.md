@@ -95,7 +95,9 @@ https://github.com/kwdch013/crafting_dq10
 
 職人固有の数値や表示名は `app/crafts/<職人>/config.js` に分離しています。
 
-API側のレシピJSONは `api/data/crafts/<職人>/recipes.json` に分離しています。
+レシピの真実源はPostgreSQLです。空のDBは `api/migrations/0004_seed_recipes.sql` で初期化します。
+`api/data/crafts/<職人>/recipes.json` はDBからの生成物で追跡対象外、
+`app/crafts/<職人>/recipes.js` はAPI停止時のコミット対象フォールバックです。
 調理職人の表示プリセットは主要レシピに絞り、表示対象外のレシピは `archived: true` で保持します。
 Docker起動時は `api/data` をAPIコンテナにマウントするため、画面で追加・編集・削除したレシピはAPI起動中に同JSONへ一時反映されます。
 
@@ -103,7 +105,7 @@ Docker起動時は `api/data` をAPIコンテナにマウントするため、�
 api/
   main.py
   data/catalog.json
-  data/crafts/<職人>/recipes.json
+  migrations/0004_seed_recipes.sql
 frontend/
   server.js
 app/
@@ -124,7 +126,7 @@ app/crafts/
 
 各 `config.js` では、職人名、入力ラベル、大項目、特技、特性、初期マスなどの職人個別設定を管理します。
 集中力、火力・状態候補、盤面サイズ、基準値モードなどUIとエンジンで同じ意味を持つ設定は共通設定として扱い、登録時に `settingGroups.common` と `settingGroups.individual` へ分類します。
-道具鍛冶の大項目は `app/crafts/tool-smithing/config.js` の `recipeCategoryOptions` に定義し、小項目の具体的な制作物はレシピJSONに追加します。
+道具鍛冶の大項目は `app/crafts/tool-smithing/config.js` の `recipeCategoryOptions` に定義し、小項目の具体的な制作物は画面のレシピ管理からDBへ追加します。
 
 鍛冶職人の選択特技は各 `app/crafts/*-smithing/config.js` で倍率の低い順に管理します。
 

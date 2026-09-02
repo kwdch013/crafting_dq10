@@ -16,6 +16,7 @@
 
 - 公式値や実測値が未確認のものは、未確認と明記します。
 - 実装済みか未実装かを分けて記載します。
-- レシピの実数値は `api/data/crafts/<職人>/recipes.json` を正とします。
-- フロント側の `app/crafts/<職人>/recipes.js` はAPI停止時のフォールバックです。
+- レシピの実数値の真実源はPostgreSQLです。空のDBは `api/migrations/0004_seed_recipes.sql` で初期化します。
+- `api/data/crafts/<職人>/recipes.json` はDBからの追跡対象外の生成物です。
+- フロント側の `app/crafts/<職人>/recipes.js` はコミット対象のAPI停止時フォールバックです。
 - 1ファイル300行で分割検討の警告、500行で要修正とし、長くなる場合は職人内で分割します。

@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
-"""現行JSONのレシピをDBへ投入します
+"""手元にあるレシピJSONをDBへ投入します
 
 `api/data/crafts/<職人>/recipes.json` を配列順に読み、sort_order を採番して
 分類・見出し・マス列を登録します。再実行しても重複しない冪等な処理です。
+
+移行時、または recipes.json が手元にある場合に使います。新規cloneの空DBは
+api/migrations/0004_seed_recipes.sql を適用して初期化してください。
 
 DDLで強制しない整合性は投入前に検証し、違反があれば何も書き込まずに終了します。
 変換規則は docs/design/12-recipe-db-conversion.md を参照します。
@@ -81,7 +84,7 @@ def import_all(conn, data_dir: Path) -> dict[str, int]:
 
 
 def main(argv: list[str] | None = None) -> int:
-	parser = argparse.ArgumentParser(description="現行JSONのレシピをDBへ投入します")
+	parser = argparse.ArgumentParser(description="手元にあるレシピJSONをDBへ投入します")
 	parser.add_argument("--database-url", help="接続先。未指定なら環境変数 DATABASE_URL を使います")
 	parser.add_argument("--data-dir", default=str(DEFAULT_DATA_DIR), help="レシピJSONの配置先")
 	args = parser.parse_args(argv)

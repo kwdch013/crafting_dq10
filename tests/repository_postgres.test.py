@@ -2,7 +2,6 @@
 
 import importlib.util
 import copy
-import json
 import os
 import sys
 import unittest
@@ -15,8 +14,10 @@ sys.path.insert(0, str(REPO_ROOT / "api"))
 from repository.integrity import IntegrityError
 
 TEST_DATABASE_URL = os.environ.get("TEST_DATABASE_URL", "")
-DATA_DIR = REPO_ROOT / "api" / "data"
 MIGRATION_DIR = REPO_ROOT / "api" / "migrations"
+sys.path.insert(0, str(REPO_ROOT / "tests" / "helpers"))
+
+from recipe_loader import load_fallback_recipes
 
 
 def load_script(path, name):
@@ -73,22 +74,16 @@ class CountingConnection:
 
 @unittest.skipUnless(TEST_DATABASE_URL, "TEST_DATABASE_URL が未設定のためスキップします")
 class PostgresRecipeStoreTest(unittest.TestCase):
-	"""JSONを投入したテスト用DBから復元できることを確認する。"""
+	"""シード済みテスト用DBから復元できることを確認する。"""
 
 	def setUp(self):
 		import psycopg
 
 		self.apply = load_script(MIGRATION_DIR / "apply.py", "dq10_postgres_store_apply")
-		self.importer = load_script(
-			REPO_ROOT / "api" / "scripts" / "import_recipes.py", "dq10_postgres_store_import"
-		)
 		self.conn = psycopg.connect(TEST_DATABASE_URL, autocommit=False)
 		self.conn.execute("DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public;")
 		self.conn.commit()
-		self.apply.ensure_schema_migration(self.conn)
-		for name in ("0001_init.sql", "0002_recipes.sql", "0003_seed_master.sql"):
-			self.apply.apply_migration(self.conn, MIGRATION_DIR / name)
-		self.importer.import_all(self.conn, DATA_DIR)
+		self.apply.apply_all(self.conn)
 
 	def tearDown(self):
 		self.conn.close()
@@ -99,7 +94,7 @@ class PostgresRecipeStoreTest(unittest.TestCase):
 		return PostgresRecipeStore(TEST_DATABASE_URL)
 
 	def original_recipes(self, craft_id):
-		return json.loads((DATA_DIR / "crafts" / craft_id / "recipes.json").read_text(encoding="utf-8"))
+		return load_fallback_recipes(craft_id)
 
 	def test_load_craft_matches_normalized_json_for_all_crafts(self):
 		for craft_id in ROUND_TRIP.CRAFT_IDS:
@@ -114,11 +109,9 @@ class PostgresRecipeStoreTest(unittest.TestCase):
 				self.assertEqual(all_recipes[craft_id], self.store().load_craft(craft_id))
 
 	def test_load_all_keeps_json_store_key_order(self):
-		from repository.json_store import JsonRecipeStore
-
 		self.assertEqual(
 			list(self.store().load_all()),
-			list(JsonRecipeStore(DATA_DIR).load_all()),
+			sorted(ROUND_TRIP.CRAFT_IDS),
 		)
 
 	def test_load_craft_keeps_sort_order_after_recipe_update(self):

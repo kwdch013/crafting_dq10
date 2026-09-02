@@ -2,9 +2,11 @@
 
 ## 目的
 
-レシピデータの真実源を `api/data/crafts/<職人>/recipes.json` から PostgreSQL へ移します。
+レシピデータの真実源はPostgreSQLです。
 
-JSONファイルは廃止せず、DBからの生成物 (シード兼フォールバック) として残します。
+`api/data/crafts/<職人>/recipes.json` はDBからの追跡対象外の生成物として残し、
+`app/crafts/<職人>/recipes.js` はAPI停止時のコミット対象フォールバックとして残します。
+空のDBを初期化する唯一のレシピ入力は `api/migrations/0004_seed_recipes.sql` です。
 
 現行のレシピ仕様そのものは [レシピデータ設計](./06-recipe-data.md) を真実源とし、本書は保存先の移行だけを扱います。
 
@@ -28,7 +30,7 @@ JSONファイルは廃止せず、DBからの生成物 (シード兼フォール
 | Phase 0 | DB・ロール作成、コンテナ間疎通確認 | JSON |
 | Phase 1 | スキーマ定義とマイグレーション基盤、投入スクリプト | JSON |
 | Phase 2 | リポジトリ層を抽象化し、`RECIPE_STORE` で保存先を切替 | JSON |
-| Phase 3 | 既定を `postgres` に切替、JSONはエクスポートで自動生成 | DB |
+| Phase 3 | 既定を `postgres` に切替、JSONはエクスポートで自動生成 | DB (対応済み) |
 | Phase 4 | JSON手編集の廃止、運用ルールの決定とドキュメント更新 | DB |
 
 [レシピDB実装方針](./11-recipe-db-implementation.md) の段階との対応は以下です。
@@ -63,7 +65,7 @@ Phase 3 の時点では、既存の `localStorage` に残るユーザー追加�
 services:
   api:
     environment:
-      RECIPE_STORE: ${RECIPE_STORE:-json}
+      RECIPE_STORE: ${RECIPE_STORE:-postgres}
       DATABASE_URL: ${DATABASE_URL:-}
     networks:
       - default
@@ -214,35 +216,33 @@ Phase 4
 | --- | --- | --- |
 | 単体 | JSON と行データの相互変換関数 | DB不要 |
 | 結合 | リポジトリのCRUD、制約違反時のエラー | テスト用DB `crafting_dq10_test` |
-| ラウンドトリップ | 現行JSON → DB → エクスポートの一致 (キー順序を除く) | テスト用DB |
+| ラウンドトリップ | フォールバック `recipes.js` とDBからの復元結果の一致 (キー順序を除く) | テスト用DB |
 | 既存 | `tests/*.test.js` の全件 | 変更なしで通ること |
 
 ラウンドトリップテストを移行の妥当性判定の基準とし、値の差分が出た場合は移行を進めません。
-現行JSONはキー順序が統一されていないため、比較はキー順序を無視した値の一致で行います。
+フォールバックのキー順序に依存しないよう、比較はキー順序を無視した値の一致で行います。
 Pythonテストは既存の `tests/api_recipe_persistence.test.py` と同じく `tests/` 直下へ置き、`python3 tests/<名前>.test.py` で直接実行します。ファイル名が `.test.py` のため `unittest discover` では読み込めません。
 テスト用DBは本番DBと同じマイグレーションを適用し、テストごとにトランザクションをロールバックします。
 
 ## ロールバック
 
-Phase 3 までは `RECIPE_STORE=json` へ戻すことで即座に復帰できます。
-Phase 4 以降でDBに障害が出た場合は、最後にエクスポートしたJSONを真実源として一時運用し、復旧後に再投入します。
+JSONへ切り戻す前に、DBから `export_recipes.py` を実行して生成物を用意し、APIを再起動します。
+DBに障害が出た場合は、最後にエクスポートしたJSONで一時運用し、復旧後にDBへ戻します。
 フロント側の `recipes.js` フォールバックは移行後も維持するため、API停止時の動作は変わりません。
 
 ## 運用ルール
 
-移行後のレシピ登録は以下とします。Phase 3 完了までは現行ルールのままで、`recipes.json` への追加はそのまま有効です。
+移行後のレシピ登録は以下とします。レシピ追加・更新・削除はPostgreSQLへ行い、`recipes.json` を手編集しません。
 
 | 項目 | 決定 |
 | --- | --- |
 | 登録の入口 | 画面のレシピ追加機能から登録する。API経由でDBへ反映する |
 | SQL直接登録 | 一括投入や修正手段として可とする。効くのはDDLの制約だけで、後述の4項目は事前検証が必要 |
-| `recipes.json` | 一旦コミット対象から除外し、エクスポートで生成する |
-| `recipes.js` | フォールバックとして機能するため、当面はコミット対象に残す |
+| `recipes.json` | DBからエクスポートする追跡対象外の生成物 |
+| `recipes.js` | DBからエクスポートするコミット対象のフォールバック |
 
-`recipes.json` を `.gitignore` へ追加するのは Phase 3 です。
-それまではコミット対象のまま残し、DBを真実源に切り替えた時点で除外へ切り替えます。
-
-`recipes.js` も同じくエクスポート生成物ですが、API停止時のフォールバックとして配信されるため、除外の是非は Phase 4 で再検討します。
+`recipes.json` は `.gitignore` で除外します。`recipes.js` は同じくエクスポート生成物ですが、
+API停止時にも画面を動作させるためコミット対象として維持します。
 
 ### 初期化と復旧
 
