@@ -96,3 +96,10 @@ issueには対象領域に応じてラベルを付与します。
 | #194 | 鍛冶職人: ±50℃の温度操作をBOARD温度欄へ移動する | [smithing.md](issues/smithing.md) |
 | #196 | 防具・道具鍛冶: 獅子王の大盾とあくまのツボのレシピを登録する | [smithing.md](issues/smithing.md) |
 | #200 | 共通: PR #199 の CodeQL セキュリティ警告を解消する | [common.md](issues/common.md) |
+| #215 | レシピデータのPostgreSQL移行設計を作成する | [recipe-db.md](issues/recipe-db.md) |
+| #216 | レシピDB移行 段階1: DB基盤の追加 | [recipe-db.md](issues/recipe-db.md) |
+| #217 | レシピDB移行 段階2: 保存先の切り替え | [recipe-db.md](issues/recipe-db.md) |
+| #218 | レシピDB移行 段階3a: 分類・特性・食材マスタの参照APIを追加する | [recipe-db.md](issues/recipe-db.md) |
+| #219 | レシピDB移行 段階3b: 分類の選択肢をAPI由来へ移す | [recipe-db.md](issues/recipe-db.md) |
+| #220 | レシピDB移行 段階3c: レシピ登録の入口をPOSTへ変更する | [recipe-db.md](issues/recipe-db.md) |
+| #221 | レシピDB移行 段階3d: 分類の新規作成と鍛冶の使用マス連動 | [recipe-db.md](issues/recipe-db.md) |
