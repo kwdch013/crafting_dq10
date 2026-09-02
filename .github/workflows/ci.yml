@@ -27,7 +27,7 @@ jobs:
 
       # 本番 Dockerfile と同じベースイメージで Python の動作を検証する
       - name: Python テスト
-        run: docker run --rm -v "$PWD":/work -w /work python:3.14-alpine python tests/api_recipe_persistence.test.py
+        run: docker run --rm -v "$PWD":/work -w /work python:3.14-slim python tests/api_recipe_persistence.test.py
 
       # 本番用 Dockerfile と Compose 設定がビルド可能であることを検証する
       - name: アプリイメージのビルド検証
