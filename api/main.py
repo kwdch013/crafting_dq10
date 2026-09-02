@@ -13,7 +13,8 @@ DATA_DIR = BASE_DIR / "data"
 if str(BASE_DIR) not in sys.path:
 	sys.path.insert(0, str(BASE_DIR))
 
-from repository import json_store
+from repository import create_store, json_store
+from repository.integrity import IntegrityError
 
 
 def read_json(path):
@@ -45,13 +46,13 @@ def response_payload(path):
 		return json_store.read_json(DATA_DIR / "catalog.json")
 
 	if path == "/api/recipes":
-		return {"crafts": json_store.JsonRecipeStore(DATA_DIR).load_all()}
+		return {"crafts": create_store(DATA_DIR).load_all()}
 
 	prefix = "/api/crafts/"
 	if path.startswith(prefix) and path.endswith("/recipes"):
 		craft_id = unquote(path[len(prefix):-len("/recipes")]).strip("/")
 		try:
-			return {"craftId": craft_id, "recipes": json_store.JsonRecipeStore(DATA_DIR).load_craft(craft_id)}
+			return {"craftId": craft_id, "recipes": create_store(DATA_DIR).load_craft(craft_id)}
 		except (FileNotFoundError, ValueError):
 			return None
 
@@ -59,94 +60,106 @@ def response_payload(path):
 
 
 class Handler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        parsed = urlparse(self.path)
-        payload = response_payload(parsed.path)
+	def do_GET(self):
+		try:
+			parsed = urlparse(self.path)
+			payload = response_payload(parsed.path)
 
-        if payload is None:
-            self.send_json({"error": "not_found"}, status=404)
-            return
+			if payload is None:
+				self.send_json({"error": "not_found"}, status=404)
+				return
 
-        self.send_json(payload)
+			self.send_json(payload)
+		except Exception as error:
+			self.log_message("内部エラー: %r", error)
+			self.send_json({"error": "internal_error"}, status=500)
 
-    # レシピ追加・編集をrecipes.jsonへ反映します。
-    def do_PUT(self):
-        parsed = urlparse(self.path)
-        prefix = "/api/crafts/"
-        suffix = "/recipes/"
+	# レシピ追加・編集を選択中のストアへ反映します。
+	def do_PUT(self):
+		try:
+			parsed = urlparse(self.path)
+			prefix = "/api/crafts/"
+			suffix = "/recipes/"
 
-        if not parsed.path.startswith(prefix) or suffix not in parsed.path:
-            self.send_json({"error": "not_found"}, status=404)
-            return
+			if not parsed.path.startswith(prefix) or suffix not in parsed.path:
+				self.send_json({"error": "not_found"}, status=404)
+				return
 
-        craft_id, recipe_id = parsed.path[len(prefix):].split(suffix, 1)
-        craft_id = unquote(craft_id).strip("/")
-        recipe_id = unquote(recipe_id).strip("/")
+			craft_id, recipe_id = parsed.path[len(prefix):].split(suffix, 1)
+			craft_id = unquote(craft_id).strip("/")
+			recipe_id = unquote(recipe_id).strip("/")
 
-        try:
-            recipe = self.read_request_json()
-            if not isinstance(recipe, dict):
-                raise ValueError("invalid_recipe")
-            if recipe.get("id") != recipe_id:
-                self.send_json({"error": "recipe_id_mismatch"}, status=400)
-                return
-            self.send_json(upsert_recipe(craft_id, recipe))
-        except FileNotFoundError:
-            self.send_json({"error": "not_found"}, status=404)
-        except ValueError as error:
-            self.send_json({"error": str(error)}, status=400)
-        except json.JSONDecodeError:
-            self.send_json({"error": "invalid_json"}, status=400)
+			recipe = self.read_request_json()
+			if not isinstance(recipe, dict):
+				raise ValueError("invalid_recipe")
+			if recipe.get("id") != recipe_id:
+				self.send_json({"error": "recipe_id_mismatch"}, status=400)
+				return
+			self.send_json(create_store(DATA_DIR).upsert(craft_id, recipe))
+		except FileNotFoundError:
+			self.send_json({"error": "not_found"}, status=404)
+		except IntegrityError as error:
+			self.send_json({"error": str(error)}, status=400)
+		except ValueError as error:
+			self.send_json({"error": str(error)}, status=400)
+		except json.JSONDecodeError:
+			self.send_json({"error": "invalid_json"}, status=400)
+		except Exception as error:
+			self.log_message("内部エラー: %r", error)
+			self.send_json({"error": "internal_error"}, status=500)
 
-    # レシピ削除をrecipes.jsonへ反映します。
-    def do_DELETE(self):
-        parsed = urlparse(self.path)
-        prefix = "/api/crafts/"
-        suffix = "/recipes/"
+	# レシピ削除を選択中のストアへ反映します。
+	def do_DELETE(self):
+		try:
+			parsed = urlparse(self.path)
+			prefix = "/api/crafts/"
+			suffix = "/recipes/"
 
-        if not parsed.path.startswith(prefix) or suffix not in parsed.path:
-            self.send_json({"error": "not_found"}, status=404)
-            return
+			if not parsed.path.startswith(prefix) or suffix not in parsed.path:
+				self.send_json({"error": "not_found"}, status=404)
+				return
 
-        craft_id, recipe_id = parsed.path[len(prefix):].split(suffix, 1)
-        craft_id = unquote(craft_id).strip("/")
-        recipe_id = unquote(recipe_id).strip("/")
+			craft_id, recipe_id = parsed.path[len(prefix):].split(suffix, 1)
+			craft_id = unquote(craft_id).strip("/")
+			recipe_id = unquote(recipe_id).strip("/")
 
-        try:
-            self.send_json(delete_recipe(craft_id, recipe_id))
-        except FileNotFoundError:
-            self.send_json({"error": "not_found"}, status=404)
-        except ValueError as error:
-            self.send_json({"error": str(error)}, status=400)
+			self.send_json(create_store(DATA_DIR).delete(craft_id, recipe_id))
+		except FileNotFoundError:
+			self.send_json({"error": "not_found"}, status=404)
+		except ValueError as error:
+			self.send_json({"error": str(error)}, status=400)
+		except Exception as error:
+			self.log_message("内部エラー: %r", error)
+			self.send_json({"error": "internal_error"}, status=500)
 
-    def do_OPTIONS(self):
-        self.send_response(204)
-        self.send_cors_headers()
-        self.end_headers()
+	def do_OPTIONS(self):
+		self.send_response(204)
+		self.send_cors_headers()
+		self.end_headers()
 
-    # リクエスト本文のJSONを読み込みます。
-    def read_request_json(self):
-        content_length = int(self.headers.get("Content-Length", "0"))
-        body = self.rfile.read(content_length).decode("utf-8")
-        return json.loads(body)
+	# リクエスト本文のJSONを読み込みます。
+	def read_request_json(self):
+		content_length = int(self.headers.get("Content-Length", "0"))
+		body = self.rfile.read(content_length).decode("utf-8")
+		return json.loads(body)
 
-    def send_json(self, payload, status=200):
-        body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
-        self.send_response(status)
-        self.send_cors_headers()
-        self.send_header("Content-Type", "application/json; charset=utf-8")
-        self.send_header("Cache-Control", "no-store")
-        self.send_header("Content-Length", str(len(body)))
-        self.end_headers()
-        self.wfile.write(body)
+	def send_json(self, payload, status=200):
+		body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+		self.send_response(status)
+		self.send_cors_headers()
+		self.send_header("Content-Type", "application/json; charset=utf-8")
+		self.send_header("Cache-Control", "no-store")
+		self.send_header("Content-Length", str(len(body)))
+		self.end_headers()
+		self.wfile.write(body)
 
-    def send_cors_headers(self):
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, PUT, DELETE, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+	def send_cors_headers(self):
+		self.send_header("Access-Control-Allow-Origin", "*")
+		self.send_header("Access-Control-Allow-Methods", "GET, PUT, DELETE, OPTIONS")
+		self.send_header("Access-Control-Allow-Headers", "Content-Type")
 
-    def log_message(self, format, *args):
-        print("%s - %s" % (self.address_string(), format % args))
+	def log_message(self, format, *args):
+		print("%s - %s" % (self.address_string(), format % args))
 
 
 def main():

@@ -71,27 +71,108 @@ def upsert_category(conn, craft_id: str, plan: CategoryPlan) -> int:
 	return conn.execute(query, values).fetchone()[0]
 
 
-def upsert_recipe(conn, craft_id: str, plan: RecipePlan, category_id: int, chara_id: int) -> int:
-	"""見出しと職人別レシピ行を必ずセットで登録し、craft_master.id を返します。"""
-	recipe_id = conn.execute(
-		"""
-		INSERT INTO craft_master (legacy_id, name, class, sort_order, archived)
-		VALUES (%(legacy_id)s, %(name)s, %(class_id)s, %(sort_order)s, %(archived)s)
-		ON CONFLICT (legacy_id) DO UPDATE SET
-			name = EXCLUDED.name,
-			class = EXCLUDED.class,
-			sort_order = EXCLUDED.sort_order,
-			archived = EXCLUDED.archived
-		RETURNING id
-		""",
-		{
-			"legacy_id": plan.legacy_id,
-			"name": plan.name,
-			"class_id": mapping.CRAFT_CLASSES[craft_id],
-			"sort_order": plan.sort_order,
-			"archived": plan.archived,
-		},
-	).fetchone()[0]
+def insert_category(conn, craft_id: str, plan: CategoryPlan) -> int:
+	"""新規分類を登録し、category_id を返します。"""
+	table = sql.Identifier(mapping.category_table(craft_id))
+	columns = ["category_name", "legacy_category_id", *plan.columns]
+	values: dict[str, Any] = {"category_name": plan.name, "legacy_category_id": plan.legacy_id}
+	values.update(plan.columns)
+	query = sql.SQL("""
+		INSERT INTO {table} (category_id, {columns})
+		VALUES ((SELECT coalesce(max(category_id), 0) + 1 FROM {table}), {placeholders})
+		RETURNING category_id
+	""").format(
+		table=table,
+		columns=sql.SQL(", ").join(sql.Identifier(name) for name in columns),
+		placeholders=sql.SQL(", ").join(sql.Placeholder(name) for name in columns),
+	)
+	return conn.execute(query, values).fetchone()[0]
+
+
+def load_category_cells(conn, craft_id: str, category_name: str) -> tuple[int, dict[str, tuple[int, int]]] | None:
+	"""既存分類の使用マスを、入力レシピとの照合用に復元します。"""
+	mapping_module = mapping.get_mapping(craft_id)
+	table = sql.Identifier(mapping.category_table(craft_id))
+	if craft_id in mapping.SMITHING_CRAFTS:
+		columns = [
+			column
+			for cell in mapping_module.CELLS
+			for column in (f"row_{cell.lower()}", f"col_{cell.lower()}")
+		]
+	else:
+		columns = [f"exist_{cell.lower()}" for cell in mapping_module.CELLS]
+	query = sql.SQL("SELECT category_id, {columns} FROM {table} WHERE category_name = %s").format(
+		table=table,
+		columns=sql.SQL(", ").join(sql.Identifier(column) for column in columns),
+	)
+	row = conn.execute(query, (category_name,)).fetchone()
+	if row is None:
+		return None
+
+	if craft_id in mapping.SMITHING_CRAFTS:
+		cells = {
+			cell: (row[index * 2 + 1], row[index * 2 + 2])
+			for index, cell in enumerate(mapping_module.CELLS)
+			if row[index * 2 + 1] is not None
+		}
+	else:
+		cells = {
+			cell: (
+				mapping.common.coordinate_of_cell(cell)["row"],
+				mapping.common.coordinate_of_cell(cell)["column"],
+			)
+			for index, cell in enumerate(mapping_module.CELLS)
+			if row[index + 1]
+		}
+	return row[0], cells
+
+
+def upsert_recipe(
+	conn,
+	craft_id: str,
+	plan: RecipePlan,
+	category_id: int,
+	chara_id: int,
+	revive_master_id: int | None = None,
+) -> int:
+	"""見出しと職人別レシピ行をセットで登録し、論理削除済みなら復活させます。"""
+	values = {
+		"legacy_id": plan.legacy_id,
+		"name": plan.name,
+		"class_id": mapping.CRAFT_CLASSES[craft_id],
+		"sort_order": plan.sort_order,
+		"archived": plan.archived,
+	}
+	if revive_master_id is None:
+		recipe_id = conn.execute(
+			"""
+			INSERT INTO craft_master (legacy_id, name, class, sort_order, archived)
+			VALUES (%(legacy_id)s, %(name)s, %(class_id)s, %(sort_order)s, %(archived)s)
+			ON CONFLICT (legacy_id) DO UPDATE SET
+				name = EXCLUDED.name,
+				class = EXCLUDED.class,
+				sort_order = EXCLUDED.sort_order,
+				archived = EXCLUDED.archived,
+				is_active = true
+			RETURNING id
+			""",
+			values,
+		).fetchone()[0]
+	else:
+		values["id"] = revive_master_id
+		recipe_id = conn.execute(
+			"""
+			UPDATE craft_master
+			SET legacy_id = %(legacy_id)s,
+				name = %(name)s,
+				class = %(class_id)s,
+				archived = %(archived)s,
+				is_active = true
+			WHERE id = %(id)s
+			RETURNING id
+			""",
+			values,
+		).fetchone()[0]
 
 	columns = ["category_id", "chara_id", *plan.columns]
 	values: dict[str, Any] = {"id": recipe_id, "category_id": category_id, "chara_id": chara_id}
@@ -118,30 +199,104 @@ def load_recipes(conn, craft_id: str) -> list[dict[str, Any]]:
 
 	鍛冶の座標は分類テーブルが持つため、分類行ごと取得して渡します。
 	"""
+	query = sql.SQL("{recipe_select} ORDER BY sort_order").format(
+		recipe_select=_recipe_select(craft_id, 0),
+	)
+	with conn.cursor(row_factory=dict_row) as cursor:
+		rows = cursor.execute(query).fetchall()
+	return _build_recipes(craft_id, rows, load_materials_by_id(conn) if craft_id == "cooking" else {})
+
+
+def load_all_recipes(conn) -> dict[str, list[dict[str, Any]]]:
+	"""全職人のレシピを1回のSQL実行で現行JSON形式へ復元します。"""
+	craft_ids = tuple(sorted(mapping.CRAFT_CLASSES))
+	parts = [
+		_recipe_select(
+			craft_id,
+			order,
+			materials=sql.SQL("materials.materials") if craft_id == "cooking" else sql.SQL("NULL::jsonb"),
+			materials_join=sql.SQL("CROSS JOIN cooking_material_data materials") if craft_id == "cooking" else sql.SQL(""),
+		)
+		for order, craft_id in enumerate(craft_ids)
+	]
 	query = sql.SQL("""
+		WITH cooking_material_data AS (
+			SELECT coalesce(
+				jsonb_object_agg(
+					material_id,
+					jsonb_build_object(
+						'material_id', material_id,
+						'material_name', material_name,
+						'pair_direction', pair_direction
+					)
+				),
+				'{{}}'::jsonb
+			) AS materials
+			FROM cooking_materials
+		)
+		{parts}
+		ORDER BY craft_order, sort_order
+	""").format(parts=sql.SQL(" UNION ALL ").join(parts))
+	with conn.cursor(row_factory=dict_row) as cursor:
+		rows = cursor.execute(query).fetchall()
+
+	loaded = {craft_id: [] for craft_id in craft_ids}
+	for craft_id in craft_ids:
+		craft_rows = [row for row in rows if row["craft_id"] == craft_id]
+		materials = _materials_from_json(craft_rows[0]["materials"]) if craft_id == "cooking" and craft_rows else {}
+		loaded[craft_id] = _build_recipes(craft_id, craft_rows, materials)
+	return loaded
+
+
+def _recipe_select(
+	craft_id: str,
+	craft_order: int,
+	materials=sql.SQL("NULL::jsonb"),
+	materials_join=sql.SQL(""),
+):
+	"""職人別テーブルを共通のJSONB行形式へ揃えるSELECTを作ります。"""
+	return sql.SQL("""
 		SELECT
+			{craft_id}::text AS craft_id,
+			{craft_order}::integer AS craft_order,
+			m.sort_order,
 			m.legacy_id, m.name, m.archived,
 			ch.legacy_trait_id AS trait_id,
 			cat.category_name AS category,
 			cat.legacy_category_id AS category_legacy_id,
 			to_jsonb(cat) AS category_row,
-			to_jsonb(r) AS recipe_row
+			to_jsonb(r) AS recipe_row,
+			{materials} AS materials
 		FROM craft_master m
 		JOIN {recipes} r ON r.id = m.id
 		JOIN {categories} cat ON cat.category_id = r.category_id
 		JOIN {characters} ch ON ch.chara_id = r.chara_id
-		WHERE m.class = %(class_id)s AND m.is_active
-		ORDER BY m.sort_order
+		{materials_join}
+		WHERE m.class = {class_id} AND m.is_active
 	""").format(
+		craft_id=sql.Literal(craft_id),
+		craft_order=sql.Literal(craft_order),
 		recipes=sql.Identifier(mapping.recipe_table(craft_id)),
 		categories=sql.Identifier(mapping.category_table(craft_id)),
 		characters=sql.Identifier(mapping.character_table(craft_id)),
+		materials=materials,
+		materials_join=materials_join,
+		class_id=sql.Literal(mapping.CRAFT_CLASSES[craft_id]),
 	)
-	with conn.cursor(row_factory=dict_row) as cursor:
-		rows = cursor.execute(query, {"class_id": mapping.CRAFT_CLASSES[craft_id]}).fetchall()
 
+
+def _materials_from_json(materials: dict[str, dict[str, Any]]) -> dict[int, dict[str, Any]]:
+	"""JSONBオブジェクトの文字列キーを食材IDの整数キーへ戻します。"""
+	return {int(material_id): value for material_id, value in materials.items()}
+
+
+def _build_recipes(
+	craft_id: str,
+	rows: list[dict[str, Any]],
+	materials: dict[int, dict[str, Any]],
+) -> list[dict[str, Any]]:
+	"""共通化したSELECTの行を、職人別の変換関数でレシピへ復元します。"""
 	mapping_module = mapping.get_mapping(craft_id)
-	materials = load_materials_by_id(conn) if craft_id == "cooking" else {}
 	recipes: list[dict[str, Any]] = []
 	for row in rows:
 		if craft_id in SMITHING_CRAFTS:
