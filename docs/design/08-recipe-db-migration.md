@@ -28,7 +28,7 @@ JSONファイルは廃止せず、DBからの生成物 (シード兼フォール
 | Phase 0 | DB・ロール作成、コンテナ間疎通確認 | JSON |
 | Phase 1 | スキーマ定義とマイグレーション基盤、投入スクリプト | JSON |
 | Phase 2 | リポジトリ層を抽象化し、`RECIPE_STORE` で保存先を切替 | JSON |
-| Phase 3 | 既定を `postgres` に切替、JSONはエクスポートで自動生成 | DB |
+| Phase 3 | 既定を `postgres` に切替、JSONはエクスポートで自動生成 | DB (対応済み) |
 | Phase 4 | JSON手編集の廃止、運用ルールの決定とドキュメント更新 | DB |
 
 [レシピDB実装方針](./11-recipe-db-implementation.md) の段階との対応は以下です。

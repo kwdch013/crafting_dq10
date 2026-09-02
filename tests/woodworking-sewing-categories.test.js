@@ -1,6 +1,7 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const vm = require("node:vm");
+const { loadFallbackRecipes } = require("./helpers/recipe-loader.js");
 
 const context = {
 	window: {},
@@ -25,19 +26,17 @@ vm.createContext(context);
 const crafts = [
 	{
 		id: "woodworking",
-		recipesFile: "api/data/crafts/woodworking/recipes.json",
 		fixture: require("./fixtures/woodworking-categories.json"),
 		hasGrain: true,
 	},
 	{
 		id: "sewing",
-		recipesFile: "api/data/crafts/sewing/recipes.json",
 		fixture: require("./fixtures/sewing-categories.json"),
 		hasGrain: false,
 	},
 ];
 
-crafts.forEach(({ id, recipesFile, fixture, hasGrain }) => {
+crafts.forEach(({ id, fixture, hasGrain }) => {
 	const config = context.DQ10CraftConfigs[id];
 
 	// --- config が fixture のカテゴリ定義に一致すること ---
@@ -82,7 +81,7 @@ crafts.forEach(({ id, recipesFile, fixture, hasGrain }) => {
 
 	// --- 本番レシピデータは fixture のカテゴリに属する等の不変条件のみ検証する ---
 	const validCategoryIds = fixture.categories.map((category) => category.id);
-	const recipes = JSON.parse(fs.readFileSync(recipesFile, "utf8"));
+	const recipes = loadFallbackRecipes(id);
 	recipes.forEach((recipe) => {
 		assert.ok(
 			validCategoryIds.includes(recipe.categoryId),

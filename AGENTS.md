@@ -41,8 +41,9 @@ http://localhost:8000
 - ただし、実行環境のサンドボックスがネットワーク操作や権限昇格を要求する場合は、その承認手順に従います。
 - 不具合対応は、issue作成または既存issue更新、修正、テスト、コミット、PR作成、`dev` へのsquash mergeまでを一連の流れで行います。
 - PRは作業内容、原因、影響、確認結果を詳細に記載します。
-- レシピの実数値は `api/data/crafts/<職人>/recipes.json` に追加します。
-- フロント側の `app/crafts/<職人>/recipes.js` はAPI停止時のフォールバックとして扱います。
+- レシピの真実源はPostgreSQLです。新しいレシピは画面のレシピ管理から追加し、APIを通じてDBへ保存します。
+- `api/data/crafts/<職人>/recipes.json` は `api/scripts/export_recipes.py` の生成物です。追跡対象外のため手編集もコミットもしません。
+- フロント側の `app/crafts/<職人>/recipes.js` はAPI停止時のフォールバックとして扱います。コミット対象のため、DBを更新したら `export_recipes.py` で再生成してコミットします。
 - `app/` の職人固有処理は、職人別コンポーネントとして可能な限り `app/crafts/<職人>/component.js` へ分割します。
 - 武器鍛冶・防具鍛冶・道具鍛冶で共通する処理は、`app/crafts/shared/smithing-component.js` で共通化し、レシピや職人固有の差分のみ各職人配下に置きます。
 - 関数、定数、設定定義を追加または変更する場合は、日本語コメントで目的を記載します。
@@ -53,7 +54,7 @@ http://localhost:8000
 - ドキュメントのみを変更する場合、コード挙動に影響しないためテスト実行は不要です。PR本文や完了報告には、ドキュメントのみのため未実施であることを明記します。
 - 変更後は `docker compose up --build -d --remove-orphans` とAPI疎通確認を行います。
 
-- 各`recipes.json`の修正についてはユーザーに確認せずに`add: recipesの追加`のコミットメッセージをつけて適当なブランチでコミット+origin/devにマージをおこなうこと。
+- レシピを追加してフォールバックを更新する場合は、ユーザーに確認せずに `export_recipes.py` を実行し、`add: recipesの追加` のコミットメッセージで `app/crafts/<職人>/recipes.js` を適当なブランチでコミット + origin/dev にマージします。
 
 ## GitHub Issues
 

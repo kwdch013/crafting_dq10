@@ -22,8 +22,9 @@ services:
       dockerfile: api/Dockerfile
     container_name: dq10-api
     environment:
-      # レシピの保存先。json または postgres を指定でき、既定は json
-      RECIPE_STORE: ${RECIPE_STORE:-json}
+      # レシピの保存先。真実源はPostgreSQLのため既定は postgres
+      # 切り戻す場合は RECIPE_STORE=json を指定する
+      RECIPE_STORE: ${RECIPE_STORE:-postgres}
       # PostgreSQL への接続先。認証情報を含むため .env にのみ記載する
       DATABASE_URL: ${DATABASE_URL:-}
     volumes:

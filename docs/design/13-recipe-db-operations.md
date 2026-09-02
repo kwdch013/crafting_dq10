@@ -12,12 +12,19 @@
 `.env` に接続先を書きます。認証情報を含むため `.env.example` にはプレースホルダのみを置きます。
 
 ```bash
-RECIPE_STORE=json
+RECIPE_STORE=postgres
 DATABASE_URL=postgresql://crafting_dq10:<password>@postgres_db:5432/crafting_dq10
 TEST_DATABASE_URL=postgresql://crafting_dq10:<password>@postgres_db:5432/crafting_dq10_test
 ```
 
 `api` サービスは `database_default` ネットワークを外部参照し、`postgres_db` へ接続します。
+
+`RECIPE_STORE` の既定は `postgres` です。JSONへ切り戻す場合のみ `json` を指定します。
+
+**切り戻す前に `export_recipes.py` を実行してください。** `api/data/crafts/<職人>/recipes.json` は
+生成物として追跡対象外のため、新規cloneの直後には存在しません。この状態で `json` を指定すると
+APIはレシピを0件で返します (画面はフォールバックの `app/crafts/<職人>/recipes.js` で動作します)。
+一度エクスポートすれば、以後はDBを停止していても `json` で従来どおり動作します。
 
 ## DBとロールの作成
 

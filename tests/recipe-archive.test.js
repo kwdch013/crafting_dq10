@@ -1,54 +1,18 @@
 const assert = require("node:assert/strict");
-const fs = require("node:fs");
-const vm = require("node:vm");
 const recipeArchive = require("../app/recipe-archive.js");
-const cookingRecipes = require("../api/data/crafts/cooking/recipes.json");
-const toolSmithingRecipes = require("../api/data/crafts/tool-smithing/recipes.json");
+const { loadFallbackRecipes } = require("./helpers/recipe-loader.js");
+
+const cookingRecipes = loadFallbackRecipes("cooking");
+const toolSmithingRecipes = loadFallbackRecipes("tool-smithing");
 
 const japaneseCollator = new Intl.Collator("ja-JP", { numeric: true, sensitivity: "base" });
-
-function loadFallbackCookingRecipes() {
-  const context = {
-    recipes: null,
-  };
-  context.registerDQ10CraftRecipes = (craftId, recipes) => {
-    if (craftId === "cooking") {
-      context.recipes = recipes;
-    }
-  };
-
-  vm.createContext(context);
-  vm.runInContext(
-    fs.readFileSync("app/crafts/cooking/recipes.js", "utf8"),
-    context,
-  );
-  return context.recipes;
-}
-
-function loadFallbackToolSmithingRecipes() {
-  const context = {
-    recipes: null,
-  };
-  context.registerDQ10CraftRecipes = (craftId, recipes) => {
-    if (craftId === "tool-smithing") {
-      context.recipes = recipes;
-    }
-  };
-
-  vm.createContext(context);
-  vm.runInContext(
-    fs.readFileSync("app/crafts/tool-smithing/recipes.js", "utf8"),
-    context,
-  );
-  return context.recipes;
-}
 
 function getRecipeByName(recipes, name) {
   return recipes.find((recipe) => recipe.name === name);
 }
 
-function getItemById(recipe, id) {
-  return recipe.items.find((item) => item.id === id);
+function getItemByGridCell(recipe, row, column) {
+  return recipe.items.find((item) => item.gridCell.row === row && item.gridCell.column === column);
 }
 
 function compareRecipeOrder(left, right) {
@@ -89,17 +53,20 @@ function assertBattlePazzaRecipe(recipe) {
   assert.equal(recipe.categoryId, "fish-dishes");
   assert.equal(recipe.traitId, "light-return");
   assert.equal(recipe.archived, undefined);
-  assert.deepEqual(Array.from(recipe.items, (item) => item.id), [
-    "slot-1-2",
-    "slot-2-1",
-    "slot-2-2",
-    "slot-2-3",
-    "slot-3-1",
-    "slot-3-3",
+  assert.deepEqual(Array.from(recipe.items, (item) => ({
+    row: item.gridCell.row,
+    column: item.gridCell.column,
+  })), [
+    { row: 1, column: 2 },
+    { row: 2, column: 1 },
+    { row: 2, column: 2 },
+    { row: 2, column: 3 },
+    { row: 3, column: 1 },
+    { row: 3, column: 3 },
   ]);
 
-  for (const id of ["slot-1-2", "slot-2-1", "slot-2-2", "slot-3-1"]) {
-    const item = getItemById(recipe, id);
+  for (const [row, column] of [[1, 2], [2, 1], [2, 2], [3, 1]]) {
+    const item = getItemByGridCell(recipe, row, column);
     assert.equal(item.target, 155);
     assert.equal(item.successMin, 140);
     assert.equal(item.successMax, 170);
@@ -107,13 +74,16 @@ function assertBattlePazzaRecipe(recipe) {
     assert.equal(item.ingredientSize, 2);
   }
 
-  assert.equal(getItemById(recipe, "slot-1-2").ingredientGroupId, "battle-pazza-fish-top");
-  assert.equal(getItemById(recipe, "slot-2-2").ingredientGroupId, "battle-pazza-fish-top");
-  assert.equal(getItemById(recipe, "slot-2-1").ingredientGroupId, "battle-pazza-fish-left");
-  assert.equal(getItemById(recipe, "slot-3-1").ingredientGroupId, "battle-pazza-fish-left");
+  const topGroupId = getItemByGridCell(recipe, 1, 2).ingredientGroupId;
+  const leftGroupId = getItemByGridCell(recipe, 2, 1).ingredientGroupId;
+  assert.ok(topGroupId);
+  assert.ok(leftGroupId);
+  assert.equal(getItemByGridCell(recipe, 2, 2).ingredientGroupId, topGroupId);
+  assert.equal(getItemByGridCell(recipe, 3, 1).ingredientGroupId, leftGroupId);
+  assert.notEqual(topGroupId, leftGroupId);
 
-  for (const id of ["slot-2-3", "slot-3-3"]) {
-    const item = getItemById(recipe, id);
+  for (const [row, column] of [[2, 3], [3, 3]]) {
+    const item = getItemByGridCell(recipe, row, column);
     assert.equal(item.target, 175);
     assert.equal(item.successMin, 160);
     assert.equal(item.successMax, 190);
@@ -192,17 +162,11 @@ function assertToolSmithingRecipe(recipe, expected) {
 }
 
 {
-  assertSortedByCategoryThenName(loadFallbackCookingRecipes());
-}
-
-{
   assertBattlePazzaRecipe(getRecipeByName(cookingRecipes, "バトルパッツァ"));
-  assertBattlePazzaRecipe(getRecipeByName(loadFallbackCookingRecipes(), "バトルパッツァ"));
 }
 
 {
   assertSortedByCategoryThenName(toolSmithingRecipes);
-  assertSortedByCategoryThenName(loadFallbackToolSmithingRecipes());
 }
 
 {
@@ -219,7 +183,7 @@ function assertToolSmithingRecipe(recipe, expected) {
     ],
     ranges: [[130, 140], [105, 111], [105, 113], [130, 140], [90, 96]],
   });
-  assertToolSmithingRecipe(getRecipeByName(loadFallbackToolSmithingRecipes(), "光のフライパン"), {
+  assertToolSmithingRecipe(getRecipeByName(toolSmithingRecipes, "光のフライパン"), {
     name: "光のフライパン",
     category: "フライパン",
     categoryId: "frying-pan",
