@@ -124,3 +124,8 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/221
 着手はレシピDB移行の段階3完了後を想定します。仕様確認とデータモデルの詳細化は先行できます。
 
 URL: https://github.com/kwdch013/crafting_dq10/issues/224
+
+### #231 共通: sort_order と category_id の採番が並行登録で衝突する
+
+`craft_master.sort_order` と分類テーブルの `category_id` は、いずれも既存の最大値 + 1 で採番しています。2つのリクエストが同時に新規登録すると双方が同じ値を採番し、一意制約により片方の保存が失敗します。PR #229 で DB の `UniqueViolation` を 400 の固定エラー識別子 (`recipe_sort_order_conflict` 等) へ変換したため 500 や空応答にはなりませんが、競合そのものは残っています。`craft_master_sort_order_unique` は DEFERRABLE INITIALLY DEFERRED のため、違反は `commit()` の時点で発生します。対応方針はテーブルロックによる直列化か、シーケンス / IDENTITY への移行です。`category_id` は #221 (段階3d) で分類の作成APIを実装する際に同じ判断が必要になるため、あわせて決めるのが効率的です。利用者が1人であれば実際には競合しないため優先度は低いです。URL: https://github.com/kwdch013/crafting_dq10/issues/231
+
