@@ -1,5 +1,5 @@
 -- 固定マスタの初期データ
--- 分類テーブルの実データと座標は、現行JSONから import_recipes.py が投入します。
+-- 分類の大項目と座標、レシピ本体は 0004_seed_recipes.sql が投入します。
 
 -- 鍛冶3職人 (class 1-3) 共通の特性
 INSERT INTO smith_character (chara_id, chara_name, chara_desc, legacy_trait_id) VALUES

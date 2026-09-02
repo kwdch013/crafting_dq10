@@ -2,8 +2,8 @@
 -- 新規cloneと空のDBを初期化するための入力データです。障害復旧では pg_dump のバックアップを優先します。
 -- 生成元: api/data/crafts/<職人>/recipes.json と app/crafts/<職人>/config.js
 -- 移行後に追加したレシピは含まれません。詳細は docs/design/08-recipe-db-migration.md を参照します。
+-- apply.py が各SQLをトランザクションで包むため、このファイルでは BEGIN / COMMIT を書きません。
 
-BEGIN;
 INSERT INTO tool_category (category_id, category_name, legacy_category_id, row_a, col_a, row_b, col_b, row_c, col_c, row_d, col_d, row_e, col_e, row_f, col_f, row_g, col_g, row_h, col_h) VALUES (1, 'ハンマー', 'smithing-hammer', 1, 1, 1, 2, 2, 1, 2, 2, 3, 1, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO tool_category (category_id, category_name, legacy_category_id, row_a, col_a, row_b, col_b, row_c, col_c, row_d, col_d, row_e, col_e, row_f, col_f, row_g, col_g, row_h, col_h) VALUES (2, '木工刀', 'woodworking-knife', 1, 1, 2, 1, 3, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO tool_category (category_id, category_name, legacy_category_id, row_a, col_a, row_b, col_b, row_c, col_c, row_d, col_d, row_e, col_e, row_f, col_f, row_g, col_g, row_h, col_h) VALUES (3, '針', 'sewing-needle', 1, 1, 2, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
@@ -187,4 +187,3 @@ INSERT INTO craft_master (legacy_id, name, class, sort_order, archived) VALUES (
 INSERT INTO cooking_recipes (id, category_id, chara_id, material_a, group_a, a_min, material_b, group_b, b_min, material_c, group_c, c_min, material_d, group_d, d_min, material_e, group_e, e_min, material_f, group_f, f_min, material_g, group_g, g_min, material_h, group_h, h_min, material_i, group_i, i_min) VALUES ((SELECT id FROM craft_master WHERE legacy_id = 'cooking-022'), 0, 1, NULL, NULL, NULL, 6, NULL, 60, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO craft_master (legacy_id, name, class, sort_order, archived) VALUES ('cooking-026', 'ライトタルト', 6, 32, false);
 INSERT INTO cooking_recipes (id, category_id, chara_id, material_a, group_a, a_min, material_b, group_b, b_min, material_c, group_c, c_min, material_d, group_d, d_min, material_e, group_e, e_min, material_f, group_f, f_min, material_g, group_g, g_min, material_h, group_h, h_min, material_i, group_i, i_min) VALUES ((SELECT id FROM craft_master WHERE legacy_id = 'cooking-026'), 0, 1, NULL, NULL, NULL, 3, NULL, 110, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 5, NULL, 145, 5, NULL, 145, 6, NULL, 130);
-COMMIT;

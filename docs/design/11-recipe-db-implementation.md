@@ -28,7 +28,7 @@ DBから現行JSON形式へ復元できることは、6職人70レシピで検�
 | ID | 内容 | 完了条件 |
 | --- | --- | --- |
 | B1-1 | ベースイメージを `python:3.14-slim` へ変更し `psycopg[binary]` を追加。`docker-compose.yml` に `database_default` を外部ネットワークとして追加し、`.env` に `DATABASE_URL` を設定する | `api` コンテナから `postgres_db:5432` へ接続できる |
-| B1-2 | `api/migrations/apply.py` を追加。`schema_migration` テーブルを作り、未適用のSQLを昇順にトランザクションで適用する | 3つのマイグレーションが適用でき、再実行しても二重適用されない |
+| B1-2 | `api/migrations/apply.py` を追加。`schema_migration` テーブルを作り、未適用のSQLを昇順にトランザクションで適用する | 4本のマイグレーションが適用でき、再実行しても二重適用されない。空のDBから70レシピが入る |
 | B1-3 | 職人ごとのマッピング関数を追加。列展開の行と現行JSONの `items` 配列を相互変換する | DB接続なしで単体テストが通る |
 | B1-4 | `api/scripts/import_recipes.py` を追加。現行JSONをDBへ投入する | 6職人70レシピが制約違反なく投入できる |
 | B1-5 | ラウンドトリップテストを追加。現行JSON → DB → 復元が一致することを検証する | 全6職人で一致する |
