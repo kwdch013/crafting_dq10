@@ -357,7 +357,62 @@ function saveUserRecipeStore(store) {
   localStorage.setItem(userRecipesStorageKey, JSON.stringify(store));
 }
 
-// レシピ追加・編集内容をAPI側のrecipes.jsonへ一時反映します。
+// APIのエラー識別子を利用者向けの説明へ変換し、保存・削除で同じ案内を使えるようにします。
+const recipeApiErrorMessages = Object.freeze({
+  recipe_name_already_exists: "同じ職人に同じ名前のレシピが既にあります。名前を変えて保存してください。",
+  recipe_id_belongs_to_other_craft: "このレシピIDは別の職人で使われています。",
+  recipe_cells_mismatch_category: "選んだ分類と使用マスの構成が合っていません。分類または使用マスを確認してください。",
+  recipe_id_already_exists: "このレシピIDは既に使われています。",
+  recipe_sort_order_conflict: "同時に登録されたため並び順が競合しました。もう一度やり直してください。",
+  invalid_recipe_name: "レシピ名を入力してください。",
+  invalid_recipe_items: "使用マスの入力内容が正しくありません。",
+  invalid_recipe_id: "レシピIDの指定が正しくありません。",
+  invalid_recipe: "レシピの入力内容が正しくありません。",
+  invalid_craft_id: "職人の指定が正しくありません。",
+  recipe_id_mismatch: "レシピIDの指定が一致していません。",
+  invalid_json: "送信内容の形式が正しくありません。もう一度保存してください。",
+  not_found: "対象のレシピが見つかりません。既に削除された可能性があります。",
+  internal_error: "APIの起動状態を確認してください。",
+});
+
+// JSON以外のエラー本文でも、元の通信エラーを隠さずに扱えるようにします。
+async function createRecipeApiResponseError(response, message) {
+  let apiErrorCode = "";
+  try {
+    const payload = await response.json();
+    if (typeof payload?.error === "string") {
+      apiErrorCode = payload.error;
+    }
+  } catch {
+    // プロキシなどが返すJSON以外の本文は、通信障害と同じ案内にします。
+  }
+
+  const error = new Error(`${message}: ${response.status}`);
+  error.status = response.status;
+  error.apiErrorCode = apiErrorCode;
+  return error;
+}
+
+// APIの失敗をステータスと識別子に応じて利用者への警告文に整えます。
+function getRecipeApiFailureMessage(error, apiAction) {
+  const prefix = `ブラウザには保存しましたが、${apiAction}に失敗しました。`;
+  const status = error?.status;
+  const apiErrorCode = error?.apiErrorCode;
+  if (apiErrorCode === "internal_error") {
+    return `${prefix}${recipeApiErrorMessages[apiErrorCode]}`;
+  }
+  if (status >= 400 && status < 500 && apiErrorCode) {
+    // 未知の識別子はサーバー由来の文字列をそのまま画面へ出さない。
+    // 原因の特定にはconsoleへ出したエラーを使う。
+    const detail = recipeApiErrorMessages[apiErrorCode]
+      || "入力内容を確認して、もう一度保存してください。";
+    return `${prefix}${detail}`;
+  }
+
+  return `${prefix}APIの起動状態を確認してください。`;
+}
+
+// レシピ追加・編集内容をAPIへ反映します。保存先はRECIPE_STOREに従います。
 async function persistRecipeToApi(craftId, recipe) {
   const response = await fetch(
     `${apiBaseUrl}/api/crafts/${encodeURIComponent(craftId)}/recipes/${encodeURIComponent(recipe.id)}`,
@@ -369,11 +424,11 @@ async function persistRecipeToApi(craftId, recipe) {
   );
 
   if (!response.ok) {
-    throw new Error(`レシピJSONへの反映に失敗しました: ${response.status}`);
+    throw await createRecipeApiResponseError(response, "サーバーへの保存に失敗しました");
   }
 }
 
-// レシピリストから削除したIDをAPI側のrecipes.jsonからも除外します。
+// レシピリストから削除したIDをAPI側の保存先からも除外します。
 async function deleteRecipeFromApi(craftId, recipeId) {
   const response = await fetch(
     `${apiBaseUrl}/api/crafts/${encodeURIComponent(craftId)}/recipes/${encodeURIComponent(recipeId)}`,
@@ -381,7 +436,7 @@ async function deleteRecipeFromApi(craftId, recipeId) {
   );
 
   if (!response.ok) {
-    throw new Error(`レシピJSONからの削除に失敗しました: ${response.status}`);
+    throw await createRecipeApiResponseError(response, "サーバーからの削除に失敗しました");
   }
 }
 
@@ -2718,7 +2773,7 @@ async function deleteManagedRecipe(craftId, recipeId, recipeName) {
     await deleteRecipeFromApi(craftId, recipeId);
   } catch (error) {
     console.warn(error);
-    alert("ブラウザには保存しましたが、recipes.jsonからの削除に失敗しました。APIの起動状態を確認してください。");
+    alert(getRecipeApiFailureMessage(error, "サーバーからの削除"));
   }
 
   if (state.craftType === craftId && state.recipeId === recipeId) {
@@ -3125,7 +3180,7 @@ async function saveManagedRecipe(event) {
     await persistRecipeToApi(config.id, recipe);
   } catch (error) {
     console.warn(error);
-    alert("ブラウザには保存しましたが、recipes.jsonへの反映に失敗しました。APIの起動状態を確認してください。");
+    alert(getRecipeApiFailureMessage(error, "サーバーへの保存"));
   }
 
   managedRecipeCategoryId = categoryId || managedRecipeCategoryId;
