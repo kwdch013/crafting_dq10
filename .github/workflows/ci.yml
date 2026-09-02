@@ -26,8 +26,12 @@ jobs:
         run: docker run --rm -v "$PWD":/work -w /work node:22-alpine sh -c 'node --test tests/*.test.js'
 
       # 本番 Dockerfile と同じベースイメージで Python の動作を検証する
+      # ファイル名が *.test.py のため unittest discover では拾えず、1件ずつ実行する
+      # DB を必要とするテストは TEST_DATABASE_URL 未設定でスキップされる
       - name: Python テスト
-        run: docker run --rm -v "$PWD":/work -w /work python:3.14-slim python tests/api_recipe_persistence.test.py
+        run: |
+          docker run --rm -v "$PWD":/work -w /work python:3.14-slim \
+            sh -c 'for f in tests/*.test.py; do echo "--- $f"; python "$f" || exit 1; done'
 
       # 本番用 Dockerfile と Compose 設定がビルド可能であることを検証する
       - name: アプリイメージのビルド検証
