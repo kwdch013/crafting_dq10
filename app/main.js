@@ -493,7 +493,8 @@ function getRecipeCategoryOptions(config) {
   if (config.id === "cooking") {
     return [];
   }
-  return Array.isArray(config.recipeCategoryOptions) ? config.recipeCategoryOptions : [];
+  const configOptions = Array.isArray(config.recipeCategoryOptions) ? config.recipeCategoryOptions : [];
+  return window.DQ10RecipeMasters?.getCategoryOptions(config.id, configOptions) || configOptions;
 }
 
 function normalizeRecipeCategoryId(config, categoryId) {
@@ -3529,7 +3530,16 @@ document.addEventListener("keydown", (event) => {
 });
 
 async function initialize() {
-  await hydrateRecipesFromApi();
+  // レシピ本体と分類マスタを同時に読み込み、どちらかのAPI停止時もフォールバックで起動します。
+  await Promise.all([
+    hydrateRecipesFromApi(),
+    window.DQ10RecipeMasters?.hydrateFromApi({
+      apiBaseUrl,
+      craftIds: Object.keys(window.DQ10CraftConfigs || {}),
+    }),
+  ]).catch(() => {
+    // 外部モジュールの予期しない失敗でも、既存の設定値で画面を起動します。
+  });
   state = loadState();
   render();
 }
