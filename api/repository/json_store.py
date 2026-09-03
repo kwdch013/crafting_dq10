@@ -3,7 +3,8 @@
 import json
 from pathlib import Path
 
-from .errors import UnknownCraftError
+from . import mapping
+from .errors import MastersUnavailableError, UnknownCraftError
 from .validation import validate_recipe
 
 
@@ -36,6 +37,12 @@ class JsonRecipeStore:
 	def load_craft(self, craft_id) -> list[dict]:
 		"""指定職人のレシピを読み込む。"""
 		return read_json(self.recipe_path(craft_id))
+
+	def load_masters(self, craft_id) -> dict:
+		"""JSONストアはマスタを保持しないため、専用エラーを返します。"""
+		if craft_id not in mapping.CRAFT_CLASSES:
+			raise UnknownCraftError("recipe_file_not_found")
+		raise MastersUnavailableError()
 
 	def upsert(self, craft_id, recipe) -> dict:
 		"""レシピIDをキーに追加または置換する。"""

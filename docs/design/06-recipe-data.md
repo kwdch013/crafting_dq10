@@ -33,6 +33,7 @@ PostgreSQLが真実源で、`0004_seed_recipes.sql` は空のDBを初期化す�
 | `GET /api/crafts` | 職人一覧 |
 | `GET /api/recipes` | 全職人のレシピ一覧 |
 | `GET /api/crafts/{craftId}/recipes` | 指定職人のレシピ一覧 |
+| `GET /api/crafts/{craftId}/masters` | 指定職人の分類・特性・食材マスタ一覧 ([マスタ参照API](./14-recipe-master-api.md)) |
 | `PUT /api/crafts/{craftId}/recipes/{recipeId}` | レシピ追加・編集内容をPostgreSQLへ反映 |
 | `DELETE /api/crafts/{craftId}/recipes/{recipeId}` | レシピ削除内容をPostgreSQLへ反映 |
 

@@ -5,3 +5,9 @@ class UnknownCraftError(FileNotFoundError):
 	"""指定された職人IDが存在しない。"""
 
 	pass
+
+
+class MastersUnavailableError(Exception):
+	"""選択中の保存先ではマスタ参照を提供できない。"""
+
+	pass
