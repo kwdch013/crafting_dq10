@@ -48,10 +48,10 @@ const apiCategories = [
 }
 
 {
-	assert.strictEqual(
+	assert.deepEqual(
 		recipeMasters.mergeCategoryOptions(fallbackOptions, []),
-		fallbackOptions,
-		"API分類が空ならフォールバックをそのまま返してください",
+		[],
+		"200応答のAPI分類が空配列なら、分類なしとして空配列を返してください",
 	);
 	assert.strictEqual(
 		recipeMasters.mergeCategoryOptions(fallbackOptions, null),
@@ -102,12 +102,15 @@ function createResponse(status, payload = {}) {
 
 	await recipeMasters.hydrateFromApi({
 		apiBaseUrl: "http://api.example.test/",
-		craftIds: ["successful-craft", "failed-craft"],
+		craftIds: ["successful-craft", "empty-craft", "failed-craft"],
 		fetchImpl: async (url) => {
 			if (url.includes("successful-craft")) {
 				return createResponse(200, {
 					categories: [{ categoryId: 1, legacyId: "fallback", name: "API成功", cells: [] }],
 				});
+			}
+			if (url.includes("empty-craft")) {
+				return createResponse(200, { categories: [] });
 			}
 			throw new Error("network failure");
 		},
@@ -116,6 +119,11 @@ function createResponse(status, payload = {}) {
 		recipeMasters.getCategoryOptions("successful-craft", unavailableFallback)[0].label,
 		"API成功",
 		"一職人が失敗しても、成功した職人の分類を保持してください",
+	);
+	assert.deepEqual(
+		recipeMasters.getCategoryOptions("empty-craft", unavailableFallback),
+		[],
+		"200応答でcategoriesが空配列の職人は、フォールバックせず分類なしにしてください",
 	);
 	assert.strictEqual(
 		recipeMasters.getCategoryOptions("failed-craft", unavailableFallback),

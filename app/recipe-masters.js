@@ -4,7 +4,9 @@
 
   // API分類を既存の画面用分類へ変換し、既存の選択順とテンプレートを維持します。
   function mergeCategoryOptions(fallbackOptions, apiCategories) {
-    if (!Array.isArray(apiCategories) || apiCategories.length === 0) {
+    // 通信失敗・非2xx応答・不正なペイロードでは通常setCraftCategoriesされず、配列でない値も取得失敗として扱います。
+    // 空配列は200応答による正当な「分類なし」なので、フォールバックせずそのまま返します。
+    if (!Array.isArray(apiCategories)) {
       return fallbackOptions;
     }
 
