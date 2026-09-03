@@ -1,6 +1,7 @@
 """JSONファイルを保存先とするレシピストア。"""
 
 import json
+import re
 from pathlib import Path
 
 from . import mapping
@@ -54,6 +55,22 @@ class JsonRecipeStore:
 		next_recipes.append(recipe)
 		write_json(recipe_path, next_recipes)
 		return {"craftId": craft_id, "recipe": recipe}
+
+	def create(self, craft_id, recipe) -> dict:
+		"""職人内で一意なサーバー発番IDを付けてレシピを追加する。"""
+		validate_recipe(recipe, require_id=False)
+		recipe_path = self.recipe_path(craft_id)
+		recipes = read_json(recipe_path)
+		pattern = re.compile(rf"^db-{re.escape(craft_id)}-(\d+)$")
+		sequence_numbers = [
+			int(match.group(1))
+			for candidate in recipes
+			if isinstance(candidate.get("id"), str)
+			and (match := pattern.fullmatch(candidate["id"]))
+		]
+		created_recipe = {**recipe, "id": f"db-{craft_id}-{max(sequence_numbers, default=0) + 1}"}
+		write_json(recipe_path, [*recipes, created_recipe])
+		return {"craftId": craft_id, "recipe": created_recipe}
 
 	def delete(self, craft_id, recipe_id) -> dict:
 		"""指定レシピをrecipes.jsonから除外する。"""

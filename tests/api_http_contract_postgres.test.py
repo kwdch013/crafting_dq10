@@ -109,6 +109,57 @@ class PostgresApiHttpContractTest(unittest.TestCase):
 		self.assertEqual(status, 200)
 		self.assertNotIn(recipe["id"], [item["id"] for item in payload["recipes"]])
 
+	def test_post_creates_master_assigned_legacy_id(self):
+		recipe = self.recipe_copy()
+		recipe.update({
+			"name": "HTTP POST PostgreSQLレシピ",
+			"category": "HTTP POST分類",
+			"categoryId": "http-post-category",
+		})
+		del recipe["id"]
+
+		status, payload = self.request_json("POST", "/api/crafts/cooking/recipes", recipe)
+
+		self.assertEqual(status, 201)
+		master_id, legacy_id = self.conn.execute(
+			"SELECT id, legacy_id FROM craft_master WHERE name = %s", (recipe["name"],)
+		).fetchone()
+		self.assertEqual(legacy_id, f"db-{master_id}")
+		self.assertEqual(payload["recipe"]["id"], legacy_id)
+
+	def test_post_duplicate_active_name_returns_bad_request(self):
+		recipe = self.recipe_copy()
+		recipe["name"] = "みかわしオムレツ"
+		del recipe["id"]
+
+		status, payload = self.request_json("POST", "/api/crafts/cooking/recipes", recipe)
+
+		self.assertEqual(status, 400)
+		self.assertEqual(payload, {"error": "recipe_name_already_exists"})
+
+	def test_post_revives_same_name_deleted_recipe_with_existing_legacy_id(self):
+		recipe = self.recipe_copy()
+		original_id, original_legacy_id, original_sort_order = self.conn.execute(
+			"SELECT id, legacy_id, sort_order FROM craft_master WHERE legacy_id = %s", (recipe["id"],)
+		).fetchone()
+		status, payload = self.request_json(
+			"DELETE", f"/api/crafts/cooking/recipes/{recipe['id']}"
+		)
+		self.assertEqual(status, 200)
+		self.assertEqual(payload, {"craftId": "cooking", "deletedId": recipe["id"]})
+		del recipe["id"]
+
+		status, payload = self.request_json("POST", "/api/crafts/cooking/recipes", recipe)
+
+		self.assertEqual(status, 201)
+		self.assertEqual(payload["recipe"]["id"], original_legacy_id)
+		self.assertEqual(
+			self.conn.execute(
+				"SELECT id, legacy_id, is_active, sort_order FROM craft_master WHERE id = %s", (original_id,)
+			).fetchone(),
+			(original_id, original_legacy_id, True, original_sort_order),
+		)
+
 	def test_put_integrity_error_returns_bad_request(self):
 		recipe = self.recipe_copy()
 		recipe.update({

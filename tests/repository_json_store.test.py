@@ -1,5 +1,6 @@
 """JSONレシピ保存先の単体テスト。"""
 
+import json
 import sys
 import tempfile
 import unittest
@@ -68,6 +69,33 @@ class JsonRecipeStoreTest(unittest.TestCase):
 				{"id": "cooking-001", "name": "編集後", "items": []},
 			],
 		)
+
+	def test_create_assigns_next_craft_scoped_id_and_ignores_input_id(self):
+		self.cooking_path.write_text(
+			json.dumps([
+				{"id": "db-cooking-2", "name": "既存2", "items": []},
+				{"id": "db-cooking-8", "name": "既存8", "items": []},
+				{"id": "db-other-99", "name": "別職人形式", "items": []},
+			], ensure_ascii=False),
+			encoding="utf-8",
+		)
+		input_recipe = {"id": "client-supplied", "name": "追加レシピ", "items": []}
+
+		result = self.store.create("cooking", input_recipe)
+
+		expected_recipe = {"id": "db-cooking-9", "name": "追加レシピ", "items": []}
+		self.assertEqual(result, {"craftId": "cooking", "recipe": expected_recipe})
+		self.assertEqual(self.store.load_craft("cooking")[-1], expected_recipe)
+		self.assertEqual(input_recipe["id"], "client-supplied")
+
+	def test_create_starts_craft_scoped_id_at_one(self):
+		result = self.store.create("weapon-smithing", {"name": "追加レシピ", "items": []})
+
+		self.assertEqual(result["recipe"]["id"], "db-weapon-smithing-1")
+
+	def test_create_rejects_unknown_craft(self):
+		with self.assertRaisesRegex(FileNotFoundError, "^recipe_file_not_found$"):
+			self.store.create("unknown", {"name": "不正", "items": []})
 
 	def test_delete_removes_recipe(self):
 		self.assertEqual(

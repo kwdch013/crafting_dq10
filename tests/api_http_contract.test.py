@@ -150,6 +150,48 @@ class ApiHttpContractTest(unittest.TestCase):
 		self.assert_common_success_headers(headers)
 		self.assertEqual(self.api.read_json(self.recipe_path)[-1], recipe)
 
+	def test_post_recipe_creates_server_assigned_id(self):
+		status, headers, payload = self.request_json(
+			"POST", "/api/crafts/cooking/recipes", {"name": "追加レシピ", "items": []}
+		)
+
+		recipe = {"id": "db-cooking-1", "name": "追加レシピ", "items": []}
+		self.assertEqual(status, 201)
+		self.assertEqual(payload, {"craftId": "cooking", "recipe": recipe})
+		self.assert_common_success_headers(headers)
+		self.assertEqual(self.api.read_json(self.recipe_path)[-1], recipe)
+
+	def test_post_recipe_rejects_client_assigned_id(self):
+		status, _, payload = self.request_json(
+			"POST", "/api/crafts/cooking/recipes",
+			{"id": "client-id", "name": "追加レシピ", "items": []},
+		)
+
+		self.assertEqual(status, 400)
+		self.assertEqual(payload, {"error": "recipe_id_not_allowed"})
+
+	def test_post_unknown_craft_returns_not_found(self):
+		status, _, payload = self.request_json(
+			"POST", "/api/crafts/unknown/recipes", {"name": "追加レシピ", "items": []}
+		)
+
+		self.assertEqual(status, 404)
+		self.assertEqual(payload, {"error": "not_found"})
+
+	def test_post_invalid_json_returns_bad_request(self):
+		status, _, body = self.request("POST", "/api/crafts/cooking/recipes", b"{")
+
+		self.assertEqual(status, 400)
+		self.assertEqual(json.loads(body), {"error": "invalid_json"})
+
+	def test_post_path_with_recipe_id_returns_not_found(self):
+		status, _, payload = self.request_json(
+			"POST", "/api/crafts/cooking/recipes/recipe-001", {"name": "追加レシピ", "items": []}
+		)
+
+		self.assertEqual(status, 404)
+		self.assertEqual(payload, {"error": "not_found"})
+
 	def test_put_recipe_id_mismatch_returns_bad_request(self):
 		status, _, payload = self.request_json(
 			"PUT",
@@ -226,7 +268,7 @@ class ApiHttpContractTest(unittest.TestCase):
 		self.assertEqual(status, 204)
 		self.assertEqual(body, b"")
 		self.assertEqual(headers["Access-Control-Allow-Origin"], "*")
-		self.assertEqual(headers["Access-Control-Allow-Methods"], "GET, PUT, DELETE, OPTIONS")
+		self.assertEqual(headers["Access-Control-Allow-Methods"], "GET, POST, PUT, DELETE, OPTIONS")
 		self.assertEqual(headers["Access-Control-Allow-Headers"], "Content-Type")
 
 

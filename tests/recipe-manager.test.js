@@ -20,6 +20,7 @@ assert.match(html, /id="saveRecipeButton"/, "追加・編集ウィンドウの�
 	"function openEditRecipeDialog(config, recipe)",
 	"function saveManagedRecipe(event)",
 	"function addManagedRecipe(event)",
+	"function createRecipeOnApi(craftId, recipe)",
 	"function persistRecipeToApi(craftId, recipe)",
 	"function deleteRecipeFromApi(craftId, recipeId)",
 	"function collectAddRecipeItems(config)",
@@ -36,6 +37,7 @@ assert.match(mainJs, /openEditRecipeDialog\(config, recipe\)/, "レシピ名ク�
 assert.match(mainJs, /managedRecipeEditId/, "編集中レシピIDを保持してください");
 assert.match(mainJs, /userRecipeMap/, "既存レシピをユーザー編集内容で上書きできるようにしてください");
 assert.match(mainJs, /method: "PUT"/, "レシピ保存時にAPI側のrecipes.jsonへ反映してください");
+assert.match(mainJs, /method: "POST"/, "新規レシピ保存時はAPI側でIDを発番してください");
 assert.match(mainJs, /method: "DELETE"/, "レシピ削除時にAPI側のrecipes.jsonから除外してください");
 assert.doesNotMatch(mainJs, /customOption\.textContent = "手入力"/, "全職人でレシピ選択欄に手入力項目を表示しないでください");
 assert.match(mainJs, /function isSmithingRecipeEditor\(config\)/, "鍛冶職人のレシピ追加は専用の配置入力にしてください");
