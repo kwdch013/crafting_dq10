@@ -83,6 +83,38 @@ class Handler(BaseHTTPRequestHandler):
 			self.log_message("内部エラー: %r", error)
 			self.send_json({"error": "internal_error"}, status=500)
 
+	def do_POST(self):
+		try:
+			parsed = urlparse(self.path)
+			prefix = "/api/crafts/"
+			suffix = "/recipes"
+			if not parsed.path.startswith(prefix) or not parsed.path.endswith(suffix):
+				self.send_json({"error": "not_found"}, status=404)
+				return
+
+			craft_id = unquote(parsed.path[len(prefix):-len(suffix)])
+			if not craft_id or "/" in craft_id:
+				self.send_json({"error": "not_found"}, status=404)
+				return
+			recipe = self.read_request_json()
+			if not isinstance(recipe, dict):
+				raise ValueError("invalid_recipe")
+			if "id" in recipe:
+				self.send_json({"error": "recipe_id_not_allowed"}, status=400)
+				return
+			self.send_json(create_store(DATA_DIR).create(craft_id, recipe), status=201)
+		except json.JSONDecodeError:
+			self.send_json({"error": "invalid_json"}, status=400)
+		except IntegrityError as error:
+			self.send_json({"error": str(error)}, status=400)
+		except FileNotFoundError:
+			self.send_json({"error": "not_found"}, status=404)
+		except ValueError as error:
+			self.send_json({"error": str(error)}, status=400)
+		except Exception as error:
+			self.log_message("内部エラー: %r", error)
+			self.send_json({"error": "internal_error"}, status=500)
+
 	# レシピ追加・編集を選択中のストアへ反映します。
 	def do_PUT(self):
 		try:
@@ -164,7 +196,7 @@ class Handler(BaseHTTPRequestHandler):
 
 	def send_cors_headers(self):
 		self.send_header("Access-Control-Allow-Origin", "*")
-		self.send_header("Access-Control-Allow-Methods", "GET, PUT, DELETE, OPTIONS")
+		self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		self.send_header("Access-Control-Allow-Headers", "Content-Type")
 
 	def log_message(self, format, *args):

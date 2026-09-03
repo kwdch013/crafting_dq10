@@ -158,6 +158,31 @@ function loadState() {
   });
 }
 
+// normalizeStateが未知のIDを既定レシピへ戻してしまうため、取り込みで変わったIDは保存状態の側で先に読み替えます。
+function applyImportedRecipeIds(importedRecipeIds) {
+  if (!(importedRecipeIds instanceof Map) || importedRecipeIds.size === 0) {
+    return;
+  }
+
+  const stored = localStorage.getItem(storageKey);
+  if (!stored) {
+    return;
+  }
+
+  try {
+    const savedState = JSON.parse(stored);
+    const importedRecipeId = importedRecipeIds.get(savedState.recipeId);
+    if (importedRecipeId) {
+      localStorage.setItem(storageKey, JSON.stringify({
+        ...savedState,
+        recipeId: importedRecipeId,
+      }));
+    }
+  } catch {
+    // 壊れた保存状態の復旧はloadStateに任せます。
+  }
+}
+
 // 鍛冶3職人 (武器・防具・道具) かどうかを職人IDで判定します。
 function isSmithingCraftId(craftId) {
   return ["weapon-smithing", "armor-smithing", "tool-smithing"].includes(craftId);
@@ -361,6 +386,7 @@ function saveUserRecipeStore(store) {
 const recipeApiErrorMessages = Object.freeze({
   recipe_name_already_exists: "同じ職人に同じ名前のレシピが既にあります。名前を変えて保存してください。",
   recipe_id_belongs_to_other_craft: "このレシピIDは別の職人で使われています。",
+  recipe_id_not_allowed: "レシピIDの指定は不要です。画面を再読み込みしてからもう一度保存してください。",
   recipe_cells_mismatch_category: "選んだ分類と使用マスの構成が合っていません。分類または使用マスを確認してください。",
   recipe_id_already_exists: "このレシピIDは既に使われています。",
   recipe_sort_order_conflict: "同時に登録されたため並び順が競合しました。もう一度やり直してください。",
@@ -394,8 +420,8 @@ async function createRecipeApiResponseError(response, message) {
 }
 
 // APIの失敗をステータスと識別子に応じて利用者への警告文に整えます。
-function getRecipeApiFailureMessage(error, apiAction) {
-  const prefix = `ブラウザには保存しましたが、${apiAction}に失敗しました。`;
+function getRecipeApiFailureMessage(error, apiAction, resultNote) {
+  const prefix = `${apiAction}に失敗しました。${resultNote}`;
   const status = error?.status;
   const apiErrorCode = error?.apiErrorCode;
   if (apiErrorCode === "internal_error") {
@@ -410,6 +436,29 @@ function getRecipeApiFailureMessage(error, apiAction) {
   }
 
   return `${prefix}APIの起動状態を確認してください。`;
+}
+
+// 新規レシピはサーバー発番IDを受け取ってから画面へ反映します。
+async function createRecipeOnApi(craftId, recipe) {
+  const { id: _id, ...recipePayload } = recipe;
+  const response = await fetch(
+    `${apiBaseUrl}/api/crafts/${encodeURIComponent(craftId)}/recipes`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(recipePayload),
+    },
+  );
+
+  if (!response.ok) {
+    throw await createRecipeApiResponseError(response, "サーバーへの保存に失敗しました");
+  }
+
+  const payload = await response.json();
+  if (typeof payload?.recipe?.id !== "string") {
+    throw new Error("サーバーへの保存に失敗しました: レシピIDが返されませんでした");
+  }
+  return payload.recipe;
 }
 
 // レシピ追加・編集内容をAPIへ反映します。保存先はRECIPE_STOREに従います。
@@ -462,6 +511,24 @@ function getDeletedRecipeIds(craftId) {
 function getUserRecipes(craftId) {
   const recipes = loadUserRecipeStore().recipes?.[craftId];
   return Array.isArray(recipes) ? recipes : [];
+}
+
+// APIから取得済みのIDだけを移行済みとし、古いlocalStorage控えだけをPOST対象にします。
+function getApiRecipeIds(craftId) {
+  return new Set((window.DQ10CraftRecipes?.[craftId] || []).map((recipe) => recipe.id));
+}
+
+// 取り込み成功時は旧控えをサーバー発番IDへ置き換え、以後のオフライン時にも同じIDを使います。
+function replaceUserRecipe(craftId, oldId, savedRecipe) {
+  const store = loadUserRecipeStore();
+  store.recipes[craftId] = [
+    ...(store.recipes[craftId] || []).filter((recipe) => recipe.id !== oldId && recipe.id !== savedRecipe.id),
+    savedRecipe,
+  ];
+  store.deletedIds[craftId] = (store.deletedIds[craftId] || [])
+    .filter((recipeId) => recipeId !== oldId && recipeId !== savedRecipe.id);
+  saveUserRecipeStore(store);
+  upsertHydratedCraftRecipe(craftId, savedRecipe);
 }
 
 function getAllCraftRecipes(craftId) {
@@ -2766,16 +2833,19 @@ async function deleteManagedRecipe(craftId, recipeId, recipeName) {
     return;
   }
 
-  const store = loadUserRecipeStore();
-  store.recipes[craftId] = (store.recipes[craftId] || []).filter((recipe) => recipe.id !== recipeId);
-  store.deletedIds[craftId] = Array.from(new Set([...(store.deletedIds[craftId] || []), recipeId]));
-  saveUserRecipeStore(store);
   try {
     await deleteRecipeFromApi(craftId, recipeId);
   } catch (error) {
     console.warn(error);
-    alert(getRecipeApiFailureMessage(error, "サーバーからの削除"));
+    alert(getRecipeApiFailureMessage(error, "サーバーからの削除", "レシピは削除されていません。"));
+    return;
   }
+
+  const store = loadUserRecipeStore();
+  store.recipes[craftId] = (store.recipes[craftId] || []).filter((recipe) => recipe.id !== recipeId);
+  store.deletedIds[craftId] = Array.from(new Set([...(store.deletedIds[craftId] || []), recipeId]));
+  // DB保存に成功した内容だけを、オフライン時の控えとして保持します。
+  saveUserRecipeStore(store);
 
   if (state.craftType === craftId && state.recipeId === recipeId) {
     clearBoardHistory();
@@ -3158,7 +3228,7 @@ async function saveManagedRecipe(event) {
 
   const recipe = {
     ...(existingRecipe || {}),
-    id: managedRecipeEditId || `user-${config.id}-${Date.now()}`,
+    ...(managedRecipeEditId ? { id: managedRecipeEditId } : {}),
     name,
     category: getRecipeCategoryLabel(config, categoryId),
     categoryId,
@@ -3168,28 +3238,35 @@ async function saveManagedRecipe(event) {
     recipe.traitId = normalizeTraitId(config, traitId);
   }
 
-  const store = loadUserRecipeStore();
-  store.recipes[config.id] = [
-    ...(store.recipes[config.id] || []).filter((candidate) => candidate.id !== recipe.id),
-    recipe,
-  ];
-  store.deletedIds[config.id] = (store.deletedIds[config.id] || []).filter((id) => id !== recipe.id);
-  saveUserRecipeStore(store);
-  // PUT失敗時もこのセッションでは編集内容が最新のため、成否によらず差し替えます。
-  upsertHydratedCraftRecipe(config.id, recipe);
+  let savedRecipe = recipe;
   try {
-    await persistRecipeToApi(config.id, recipe);
+    if (managedRecipeEditId) {
+      await persistRecipeToApi(config.id, recipe);
+    } else {
+      savedRecipe = await createRecipeOnApi(config.id, recipe);
+    }
   } catch (error) {
     console.warn(error);
-    alert(getRecipeApiFailureMessage(error, "サーバーへの保存"));
+    alert(getRecipeApiFailureMessage(error, "サーバーへの保存", "レシピは保存されていません。"));
+    return;
   }
+
+  const store = loadUserRecipeStore();
+  store.recipes[config.id] = [
+    ...(store.recipes[config.id] || []).filter((candidate) => candidate.id !== savedRecipe.id),
+    savedRecipe,
+  ];
+  store.deletedIds[config.id] = (store.deletedIds[config.id] || []).filter((id) => id !== savedRecipe.id);
+  // DB保存に成功した内容だけを、オフライン時の控えとして保持します。
+  saveUserRecipeStore(store);
+  upsertHydratedCraftRecipe(config.id, savedRecipe);
 
   managedRecipeCategoryId = categoryId || managedRecipeCategoryId;
   managedRecipeEditId = "";
   elements.addRecipeDialog.close();
   renderRecipeManager();
   if (state.craftType === config.id) {
-    applyRecipe(recipe.id);
+    applyRecipe(savedRecipe.id);
   }
 }
 
@@ -3540,6 +3617,20 @@ async function initialize() {
   ]).catch(() => {
     // 外部モジュールの予期しない失敗でも、既存の設定値で画面を起動します。
   });
+  let importedRecipeIds = new Map();
+  try {
+    importedRecipeIds = await window.DQ10RecipeSync?.importLocalRecipes({
+      craftIds: [...apiHydratedCraftIds],
+      getUserRecipes,
+      getApiRecipeIds,
+      createRecipe: createRecipeOnApi,
+      replaceUserRecipe,
+      onImported: () => {},
+    }) || importedRecipeIds;
+  } catch {
+    // 取り込み全体の予期しない失敗でも、既存のlocalStorage控えで画面を起動します。
+  }
+  applyImportedRecipeIds(importedRecipeIds);
   state = loadState();
   render();
 }

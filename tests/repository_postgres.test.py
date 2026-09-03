@@ -184,6 +184,66 @@ class PostgresRecipeStoreTest(unittest.TestCase):
 			ROUND_TRIP.normalize(recipe, "cooking"),
 		)
 
+	def test_create_assigns_master_id_based_legacy_id_and_appends_sort_order(self):
+		recipe = self.recipe_copy("cooking", "cooking-003")
+		recipe.update({
+			"id": "client-supplied-id",
+			"name": "PostgreSQL POST追加レシピ",
+			"category": "PostgreSQL POST追加分類",
+			"categoryId": "postgres-post-category",
+		})
+		max_sort_order = self.conn.execute(
+			"SELECT max(sort_order) FROM craft_master WHERE class = 6"
+		).fetchone()[0]
+
+		result = self.store().create("cooking", recipe)
+
+		master_id, legacy_id, sort_order = self.conn.execute(
+			"SELECT id, legacy_id, sort_order FROM craft_master WHERE name = %s",
+			(recipe["name"],),
+		).fetchone()
+		self.assertEqual(legacy_id, f"db-{master_id}")
+		self.assertEqual(sort_order, max_sort_order + 1)
+		self.assertEqual(result["recipe"]["id"], legacy_id)
+		self.assertEqual(recipe["id"], "client-supplied-id")
+
+	def test_create_rejects_name_used_by_active_recipe(self):
+		recipe = self.recipe_copy("cooking", "cooking-003")
+		recipe["name"] = "みかわしオムレツ"
+
+		with self.assertRaisesRegex(IntegrityError, "^recipe_name_already_exists$"):
+			self.store().create("cooking", recipe)
+
+	def test_create_revives_same_name_deleted_recipe_with_existing_legacy_id_and_sort_order(self):
+		recipe = self.recipe_copy("sewing", "sewing-head-template")
+		original_id, original_legacy_id, original_sort_order = self.conn.execute(
+			"SELECT id, legacy_id, sort_order FROM craft_master WHERE legacy_id = %s", (recipe["id"],)
+		).fetchone()
+		self.store().delete("sewing", recipe["id"])
+		recipe["id"] = "client-supplied-id"
+
+		result = self.store().create("sewing", recipe)
+
+		row = self.conn.execute(
+			"SELECT id, legacy_id, is_active, sort_order FROM craft_master WHERE id = %s", (original_id,)
+		).fetchone()
+		self.assertEqual(row, (original_id, original_legacy_id, True, original_sort_order))
+		self.assertEqual(result["recipe"]["id"], original_legacy_id)
+
+	def test_create_assigns_legacy_id_when_revived_row_has_none(self):
+		recipe = self.recipe_copy("sewing", "sewing-head-template")
+		original_id = self.conn.execute(
+			"SELECT id FROM craft_master WHERE legacy_id = %s", (recipe["id"],)
+		).fetchone()[0]
+		self.conn.execute(
+			"UPDATE craft_master SET legacy_id = NULL, is_active = false WHERE id = %s", (original_id,)
+		)
+		self.conn.commit()
+
+		result = self.store().create("sewing", recipe)
+
+		self.assertEqual(result["recipe"]["id"], f"db-{original_id}")
+
 	def test_upsert_existing_recipe_keeps_sort_order(self):
 		recipe = self.recipe_copy("cooking", "cooking-003")
 		original_order = self.conn.execute(
@@ -351,6 +411,8 @@ class PostgresRecipeStoreTest(unittest.TestCase):
 			self.store().upsert("unknown", {"id": "recipe-1", "name": "不正", "items": []})
 		with self.assertRaisesRegex(UnknownCraftError, "^recipe_file_not_found$"):
 			self.store().delete("unknown", "recipe-1")
+		with self.assertRaisesRegex(UnknownCraftError, "^recipe_file_not_found$"):
+			self.store().create("unknown", {"name": "不正", "items": []})
 
 	def test_delete_rejects_empty_recipe_id(self):
 		with self.assertRaisesRegex(ValueError, "^invalid_recipe_id$"):

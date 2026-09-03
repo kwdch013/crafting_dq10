@@ -91,6 +91,70 @@ class PostgresRecipeStore:
 				raise
 		return {"craftId": craft_id, "recipe": recipe}
 
+	def create(self, craft_id, recipe) -> dict:
+		"""DB発番IDをlegacy_idへ割り当ててレシピを追加または復活させる。"""
+		validate_recipe(recipe, require_id=False)
+		self._validate_craft_id(craft_id)
+
+		from . import queries
+
+		# build_planはIDを参照するため、永続化前だけ衝突しない仮値を渡します。
+		# 検証エラーの本文にそのまま出るため、利用者が読んでも意味の通る文言にします。
+		recipe_for_plan = {**recipe, "id": "(新規レシピ)"}
+		with self._connect() as conn:
+			try:
+				plan = build_plan(craft_id, [recipe_for_plan], queries.load_materials(conn))
+				recipe_plan = plan.recipes[0]
+				revive_master_id, revive_sort_order = self._validate_upsert_conflicts(
+					conn, craft_id, recipe_plan
+				)
+				if revive_master_id is not None:
+					existing_legacy_id = conn.execute(
+						"SELECT legacy_id FROM craft_master WHERE id = %s", (revive_master_id,)
+					).fetchone()[0]
+					recipe_plan.legacy_id = (
+						existing_legacy_id
+						or f"{queries.SERVER_LEGACY_ID_PREFIX}{revive_master_id}"
+					)
+					recipe_plan.sort_order = revive_sort_order
+					master_id = revive_master_id
+				else:
+					recipe_plan.sort_order = self._next_sort_order(conn, craft_id)
+					master_id = queries.insert_recipe_header(
+						conn,
+						craft_id,
+						recipe_plan.name,
+						recipe_plan.sort_order,
+						recipe_plan.archived,
+					)
+					recipe_plan.legacy_id = f"{queries.SERVER_LEGACY_ID_PREFIX}{master_id}"
+				category_ids = self._category_ids(
+					conn, craft_id, plan.categories, recipe_plan.legacy_id
+				)
+				traits = queries.load_traits(conn, craft_id)
+				if recipe_plan.trait_id is not None and recipe_plan.trait_id not in traits:
+					raise IntegrityError(
+						f"{craft_id}/{recipe_plan.legacy_id}: "
+						f"未登録の特性 {recipe_plan.trait_id} が指定されています"
+					)
+				queries.upsert_recipe(
+					conn,
+					craft_id,
+					recipe_plan,
+					category_ids.get(recipe_plan.category_name, UNCATEGORIZED_ID),
+					traits.get(recipe_plan.trait_id, queries.NO_TRAIT_ID)
+					if recipe_plan.trait_id else queries.NO_TRAIT_ID,
+					master_id,
+				)
+				conn.commit()
+			except Exception as error:
+				conn.rollback()
+				converted = self._unique_violation_to_integrity_error(error)
+				if converted is not None:
+					raise converted from error
+				raise
+		return {"craftId": craft_id, "recipe": {**recipe, "id": recipe_plan.legacy_id}}
+
 	def delete(self, craft_id, recipe_id) -> dict:
 		"""指定レシピを論理削除する。存在しないIDは成功として扱う。"""
 		if not recipe_id:
@@ -151,7 +215,7 @@ class PostgresRecipeStore:
 			"""
 			SELECT id, is_active, sort_order
 			FROM craft_master
-			WHERE class = %s AND name = %s AND legacy_id <> %s
+			WHERE class = %s AND name = %s AND legacy_id IS DISTINCT FROM %s
 			""",
 			(class_id, recipe_plan.name, recipe_plan.legacy_id),
 		).fetchone()
@@ -184,6 +248,13 @@ class PostgresRecipeStore:
 		).fetchone()
 		if existing is not None:
 			return existing[0]
+		return conn.execute(
+			"SELECT coalesce(max(sort_order), 0) + 1 FROM craft_master WHERE class = %s",
+			(mapping.CRAFT_CLASSES[craft_id],),
+		).fetchone()[0]
+
+	def _next_sort_order(self, conn, craft_id) -> int:
+		"""新規追加用に職人内の末尾の並び順を採番します。"""
 		return conn.execute(
 			"SELECT coalesce(max(sort_order), 0) + 1 FROM craft_master WHERE class = %s",
 			(mapping.CRAFT_CLASSES[craft_id],),

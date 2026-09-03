@@ -5,7 +5,9 @@ from .queries_read import load_all_recipes, load_materials_by_id, load_recipes
 from .queries_master import load_masters
 from .queries_write import (
 	NO_TRAIT_ID,
+	SERVER_LEGACY_ID_PREFIX,
 	insert_category,
+	insert_recipe_header,
 	load_category_cells,
 	load_materials,
 	load_traits,
@@ -15,7 +17,9 @@ from .queries_write import (
 
 __all__ = [
 	"NO_TRAIT_ID",
+	"SERVER_LEGACY_ID_PREFIX",
 	"insert_category",
+	"insert_recipe_header",
 	"load_all_recipes",
 	"load_category_cells",
 	"load_materials",

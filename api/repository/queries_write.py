@@ -12,6 +12,9 @@ from .import_plan import CategoryPlan, RecipePlan
 # 特性なしを表す chara_id。0003_seed_master.sql が全職人に投入します。
 NO_TRAIT_ID = 0
 
+# craft_master.id と1対1で対応する、POST用のサーバー発番 legacy_id の接頭辞。
+SERVER_LEGACY_ID_PREFIX = "db-"
+
 
 def load_materials(conn) -> dict[str, dict[str, Any]]:
 	"""調理の食材マスタを食材名で引ける形にします。"""
@@ -31,6 +34,18 @@ def load_traits(conn, craft_id: str) -> dict[str, int]:
 		"SELECT legacy_trait_id, chara_id FROM {table} WHERE legacy_trait_id IS NOT NULL"
 	).format(table=table)
 	return {row[0]: row[1] for row in conn.execute(query).fetchall()}
+
+
+def insert_recipe_header(conn, craft_id: str, name: str, sort_order: int, archived: bool) -> int:
+	"""legacy_id未設定の見出しを登録し、DB発番されたIDを返します。"""
+	return conn.execute(
+		"""
+		INSERT INTO craft_master (name, class, sort_order, archived)
+		VALUES (%s, %s, %s, %s)
+		RETURNING id
+		""",
+		(name, mapping.CRAFT_CLASSES[craft_id], sort_order, archived),
+	).fetchone()[0]
 
 
 def upsert_category(conn, craft_id: str, plan: CategoryPlan) -> int:
