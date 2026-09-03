@@ -51,6 +51,8 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/217
 
 ### #218 レシピDB移行 段階3a: 分類・特性・食材マスタの参照APIを追加する
 
+2026-09-03 に PR #236 で対応済みです。仕様は [マスタ参照API](../design/14-recipe-master-api.md) を参照します。
+
 現状:
 
 - 分類や特性の一覧を返すAPIがありません。
