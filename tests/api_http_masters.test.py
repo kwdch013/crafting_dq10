@@ -166,6 +166,14 @@ class JsonMastersApiHttpTest(ApiHttpTestCase):
 		self.assertEqual(status, 503)
 		self.assertEqual(payload, {"error": "masters_unavailable"})
 
+	# UnknownCraftError は FileNotFoundError の派生のため、except の順序を誤ると
+	# 素通りして500になります。DB無しのCIでも動くよう、JSONストア側でも検証します。
+	def test_unknown_craft_returns_not_found(self):
+		status, payload = self.request_json("/api/crafts/unknown/masters")
+
+		self.assertEqual(status, 404)
+		self.assertEqual(payload, {"error": "not_found"})
+
 
 if __name__ == "__main__":
 	unittest.main()
