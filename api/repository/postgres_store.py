@@ -38,6 +38,15 @@ class PostgresRecipeStore:
 		with self._connect() as conn:
 			return queries.load_recipes(conn, craft_id)
 
+	def load_masters(self, craft_id) -> dict:
+		"""指定職人の分類・特性・食材マスタを読み込みます。"""
+		self._validate_craft_id(craft_id)
+
+		from . import queries
+
+		with self._connect() as conn:
+			return queries.load_masters(conn, craft_id)
+
 	def upsert(self, craft_id, recipe) -> dict:
 		"""レシピを追加または更新し、論理削除済みなら復活させる。"""
 		validate_recipe(recipe)

@@ -14,6 +14,7 @@ if str(BASE_DIR) not in sys.path:
 	sys.path.insert(0, str(BASE_DIR))
 
 from repository import create_store, json_store
+from repository.errors import MastersUnavailableError, UnknownCraftError
 from repository.integrity import IntegrityError
 
 
@@ -56,6 +57,10 @@ def response_payload(path):
 		except (FileNotFoundError, ValueError):
 			return None
 
+	if path.startswith(prefix) and path.endswith("/masters"):
+		craft_id = unquote(path[len(prefix):-len("/masters")]).strip("/")
+		return create_store(DATA_DIR).load_masters(craft_id)
+
 	return None
 
 
@@ -70,6 +75,10 @@ class Handler(BaseHTTPRequestHandler):
 				return
 
 			self.send_json(payload)
+		except MastersUnavailableError:
+			self.send_json({"error": "masters_unavailable"}, status=503)
+		except UnknownCraftError:
+			self.send_json({"error": "not_found"}, status=404)
 		except Exception as error:
 			self.log_message("内部エラー: %r", error)
 			self.send_json({"error": "internal_error"}, status=500)
