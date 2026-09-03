@@ -31,6 +31,44 @@ test("API側に存在するIDはPOSTせず、未登録レシピだけを置き�
 	assert.deepEqual([...result], [["user-1", "db-2"]]);
 });
 
+test("削除済みIDの控えはPOSTせず、取り込み成功として置き換えない", async () => {
+	const created = [];
+	const replaced = [];
+	const result = await recipeSync.importLocalRecipes({
+		craftIds: ["cooking"],
+		getUserRecipes: () => [{ id: "deleted-1", name: "削除済み" }],
+		getDeletedRecipeIds: () => ["deleted-1"],
+		getApiRecipeIds: () => new Set(),
+		createRecipe: async (craftId, recipe) => {
+			created.push([craftId, recipe.id]);
+			return { ...recipe, id: "db-deleted-1" };
+		},
+		replaceUserRecipe: (craftId, oldId) => replaced.push([craftId, oldId]),
+		onImported: () => {},
+	});
+
+	assert.deepEqual(created, []);
+	assert.deepEqual(replaced, []);
+	assert.deepEqual([...result], []);
+});
+
+test("削除済みID取得関数を渡さない場合は控えを従来どおり取り込む", async () => {
+	const created = [];
+	await recipeSync.importLocalRecipes({
+		craftIds: ["cooking"],
+		getUserRecipes: () => [{ id: "user-1", name: "未取込" }],
+		getApiRecipeIds: () => new Set(),
+		createRecipe: async (craftId, recipe) => {
+			created.push([craftId, recipe.id]);
+			return { ...recipe, id: "db-1" };
+		},
+		replaceUserRecipe: () => {},
+		onImported: () => {},
+	});
+
+	assert.deepEqual(created, [["cooking", "user-1"]]);
+});
+
 test("失敗したレシピを残し、他のレシピと職人の取り込みを続ける", async () => {
 	const created = [];
 	const replaced = [];
@@ -101,6 +139,7 @@ function extractFunction(name) {
 
 const applyImportedRecipeIdsSource = extractFunction("applyImportedRecipeIds");
 const initializeSource = extractFunction("initialize");
+const replaceUserRecipeSource = extractFunction("replaceUserRecipe");
 
 function createLocalStorage(initialValues = {}) {
 	const values = new Map(Object.entries(initialValues));
@@ -169,6 +208,25 @@ test("保存状態がない場合や壊れたJSONでもレシピID読み替え�
 	));
 });
 
+test("replaceUserRecipeは削除済みIDを保持する", () => {
+	const store = {
+		recipes: { cooking: [{ id: "deleted-1", name: "削除済み" }] },
+		deletedIds: { cooking: ["deleted-1"] },
+	};
+	const context = vm.createContext({
+		loadUserRecipeStore: () => store,
+		saveUserRecipeStore: () => {},
+		upsertHydratedCraftRecipe: () => {},
+	});
+
+	vm.runInContext(`
+		${replaceUserRecipeSource}
+		replaceUserRecipe("cooking", "deleted-1", { id: "db-deleted-1", name: "削除済み" });
+	`, context);
+
+	assert.deepEqual(store.deletedIds.cooking, ["deleted-1"]);
+});
+
 async function runInitializeWithStoredRecipe(initializeImplementation) {
 	const localStorage = createLocalStorage({
 		"dq10-craft-support-mvp": JSON.stringify({
@@ -185,6 +243,7 @@ async function runInitializeWithStoredRecipe(initializeImplementation) {
 		apiHydratedCraftIds: new Set(["tool-smithing"]),
 		hydrateRecipesFromApi: async () => {},
 		getUserRecipes: () => [],
+		getDeletedRecipeIds: () => [],
 		getApiRecipeIds: () => new Set(),
 		createRecipeOnApi: async () => ({}),
 		replaceUserRecipe: () => {},

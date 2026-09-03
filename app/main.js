@@ -525,8 +525,7 @@ function replaceUserRecipe(craftId, oldId, savedRecipe) {
     ...(store.recipes[craftId] || []).filter((recipe) => recipe.id !== oldId && recipe.id !== savedRecipe.id),
     savedRecipe,
   ];
-  store.deletedIds[craftId] = (store.deletedIds[craftId] || [])
-    .filter((recipeId) => recipeId !== oldId && recipeId !== savedRecipe.id);
+  // 旧保存データで控えと削除記録が共存しても、取り込みで削除記録を消して復活させないようにします。
   saveUserRecipeStore(store);
   upsertHydratedCraftRecipe(craftId, savedRecipe);
 }
@@ -3622,6 +3621,7 @@ async function initialize() {
     importedRecipeIds = await window.DQ10RecipeSync?.importLocalRecipes({
       craftIds: [...apiHydratedCraftIds],
       getUserRecipes,
+      getDeletedRecipeIds,
       getApiRecipeIds,
       createRecipe: createRecipeOnApi,
       replaceUserRecipe,

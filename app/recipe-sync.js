@@ -3,6 +3,7 @@
   async function importLocalRecipes({
     craftIds,
     getUserRecipes,
+    getDeletedRecipeIds,
     getApiRecipeIds,
     createRecipe,
     replaceUserRecipe,
@@ -13,9 +14,11 @@
 
     for (const craftId of targetCraftIds) {
       let userRecipes;
+      let deletedRecipeIds;
       let apiRecipeIds;
       try {
         userRecipes = getUserRecipes(craftId);
+        deletedRecipeIds = typeof getDeletedRecipeIds === "function" ? getDeletedRecipeIds(craftId) : [];
         apiRecipeIds = getApiRecipeIds(craftId);
       } catch (error) {
         console.warn("localStorageレシピの取り込み準備に失敗しました", { craftId, error });
@@ -23,8 +26,13 @@
       }
 
       const recipes = Array.isArray(userRecipes) ? userRecipes : [];
+      const deletedIds = new Set(Array.isArray(deletedRecipeIds) ? deletedRecipeIds : []);
       const existingIds = apiRecipeIds instanceof Set ? apiRecipeIds : new Set();
       for (const recipe of recipes) {
+        // 現行の保存処理では作成されない、旧版の保存データや壊れたlocalStorageの共存状態でも削除を優先します。
+        if (deletedIds.has(recipe?.id)) {
+          continue;
+        }
         if (existingIds.has(recipe?.id)) {
           continue;
         }
