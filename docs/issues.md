@@ -101,10 +101,11 @@ issueには対象領域に応じてラベルを付与します。
 | #217 | レシピDB移行 段階2: 保存先の切り替え | [recipe-db.md](issues/recipe-db.md) |
 | #218 | レシピDB移行 段階3a: 分類・特性・食材マスタの参照APIを追加する（2026-09-03 close済み） | [recipe-db.md](issues/recipe-db.md) |
 | #219 | レシピDB移行 段階3b: 分類の選択肢をAPI由来へ移す (2026-09-03 close済み) | [recipe-db.md](issues/recipe-db.md) |
-| #220 | レシピDB移行 段階3c: レシピ登録の入口をPOSTへ変更する | [recipe-db.md](issues/recipe-db.md) |
+| #220 | レシピDB移行 段階3c: レシピ登録の入口をPOSTへ変更する (2026-09-03 close済み) | [recipe-db.md](issues/recipe-db.md) |
 | #221 | レシピDB移行 段階3d: 分類の新規作成と鍛冶の使用マス連動 | [recipe-db.md](issues/recipe-db.md) |
 | #224 | レシピDB: 素材・単価・使用道具と大成功損益計算のデータ設計を検討する | [recipe-db.md](issues/recipe-db.md) |
 | #227 | API: 不正なJSONのPUTで invalid_json が返らない (except の順序で到達不能) | [common.md](issues/common.md) |
 | #230 | 共通: 保存失敗時のalert文言をエラーの種類に応じて分ける | [common.md](issues/common.md) |
 | #231 | 共通: sort_order と category_id の採番が並行登録で衝突する | [recipe-db.md](issues/recipe-db.md) |
 | #239 | 共通: DB移行時の変換用分類と未分類レシピの扱いを決める | [recipe-db.md](issues/recipe-db.md) |
+| #242 | 共通: 別ブラウザで削除したレシピが起動時の取り込みで復活する | [recipe-db.md](issues/recipe-db.md) |
