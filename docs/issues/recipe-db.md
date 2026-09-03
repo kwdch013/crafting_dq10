@@ -66,6 +66,10 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/218
 
 ### #219 レシピDB移行 段階3b: 分類の選択肢をAPI由来へ移す
 
+2026-09-03 に PR #238 で対応済みです。マージ規則は [マスタ参照API](../design/14-recipe-master-api.md) を参照します。
+
+分類の選択肢は `GET /api/crafts/{craftId}/masters` 由来になり、`config.js` はAPI停止時のフォールバックと、表示順・使用マステンプレートの供給元として残ります。`legacyId` を持たない分類 (未分類・DB移行時の変換用テンプレート) は選択肢に出しません。残課題は #239 で扱います。
+
 現状:
 
 - 大項目は `app/crafts/<職人>/config.js` の `recipeCategoryOptions` が真実源です。
@@ -131,3 +135,19 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/224
 
 `craft_master.sort_order` と分類テーブルの `category_id` は、いずれも既存の最大値 + 1 で採番しています。2つのリクエストが同時に新規登録すると双方が同じ値を採番し、一意制約により片方の保存が失敗します。PR #229 で DB の `UniqueViolation` を 400 の固定エラー識別子 (`recipe_sort_order_conflict` 等) へ変換したため 500 や空応答にはなりませんが、競合そのものは残っています。`craft_master_sort_order_unique` は DEFERRABLE INITIALLY DEFERRED のため、違反は `commit()` の時点で発生します。対応方針はテーブルロックによる直列化か、シーケンス / IDENTITY への移行です。`category_id` は #221 (段階3d) で分類の作成APIを実装する際に同じ判断が必要になるため、あわせて決めるのが効率的です。利用者が1人であれば実際には競合しないため優先度は低いです。URL: https://github.com/kwdch013/crafting_dq10/issues/231
 
+
+### #239 共通: DB移行時の変換用分類と未分類レシピの扱いを決める
+
+現状:
+
+- DB移行時に、既存の大項目に当てはまらない盤面形状のレシピ用として `legacy_category_id` が NULL の変換用分類が作られています。
+- 該当レシピの `categoryId` は `null` になり、大項目で絞り込む画面には表示されません。
+- 段階3bでは、選んでも0件になる空の大項目が増えるのを避けるため、`legacyId` を持たない分類を選択肢から除外しています。
+
+完了条件:
+
+- 変換用分類と変換用レシピの扱いが決まっている。
+- `未分類` を画面の大項目として出すかどうかが決まっている。
+- 決定内容が設計ドキュメントへ反映されている。
+
+URL: https://github.com/kwdch013/crafting_dq10/issues/239
