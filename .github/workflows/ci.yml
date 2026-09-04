@@ -23,7 +23,7 @@ jobs:
 
       # 本番 Dockerfile と同じベースイメージで Node の動作を検証する
       - name: Node テスト
-        run: docker run --rm -v "$PWD":/work -w /work node:22-alpine sh -c 'node --test tests/*.test.js'
+        run: docker run --rm -v "$PWD":/work -w /work node:26-alpine sh -c 'node --test tests/*.test.js'
 
       # 本番 Dockerfile と同じベースイメージで Python の動作を検証する
       # ファイル名が *.test.py のため unittest discover では拾えず、1件ずつ実行する

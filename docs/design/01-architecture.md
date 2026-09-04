@@ -157,7 +157,7 @@ PostgreSQLがレシピの真実源です。`0004_seed_recipes.sql` は空のDB�
 flowchart TB
   Compose[docker-compose.yml] --> Front[frontend service]
   Compose --> Api[api service]
-  Front --> Node[node:22-alpine]
+  Front --> Node[node:26-alpine]
   Api --> Python[python:3.14-slim + psycopg]
   Front --> PortFront[localhost:3000 -> container:3000]
   Api --> PortApi[localhost:8000 -> container:8000]
