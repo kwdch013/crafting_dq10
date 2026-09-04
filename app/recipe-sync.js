@@ -46,13 +46,13 @@
         if (deletedIds.has(recipe?.id)) {
           continue;
         }
-        if (existingIds.has(recipe?.id)) {
-          continue;
-        }
         if (serverDeletedIds.has(recipe?.id)) {
           if (typeof removeUserRecipe === "function") {
             removeUserRecipe(craftId, recipe.id);
           }
+          continue;
+        }
+        if (existingIds.has(recipe?.id)) {
           continue;
         }
 

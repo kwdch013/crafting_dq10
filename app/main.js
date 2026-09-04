@@ -472,7 +472,10 @@ async function fetchDeletedRecipeIdsFromApi(craftId) {
   }
 
   const payload = await response.json();
-  return Array.isArray(payload?.deletedIds) ? payload.deletedIds : [];
+  if (!Array.isArray(payload?.deletedIds) || !payload.deletedIds.every((recipeId) => typeof recipeId === "string")) {
+    throw new Error("削除済みレシピIDの応答形式が正しくありません");
+  }
+  return payload.deletedIds;
 }
 
 // レシピ追加・編集内容をAPIへ反映します。保存先はRECIPE_STOREに従います。
