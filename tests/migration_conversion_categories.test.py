@@ -36,6 +36,14 @@ INACTIVE_CONVERSION_CATEGORIES = {
 	"tool_category": {"テンプレート (縦3マス)", "テンプレート (2×2)"},
 }
 
+CONVERSION_MIGRATION_NAME = "0005_reassign_conversion_categories.sql"
+OUTSIDE_COOKING_RECIPE_LEGACY_ID = "test-cooking-outside-conversion"
+OUTSIDE_CONVERSION_CATEGORIES = (
+	("weapon_category", 999, "対象外の未分類武器分類"),
+	("armor_category", 999, "対象外の未分類防具分類"),
+	("tool_category", 999, "対象外の未分類道具分類"),
+)
+
 
 def load_apply_module():
 	"""apply.py はパッケージ配下ではないためファイル指定で読み込みます。"""
@@ -159,22 +167,23 @@ class ConversionCategoryMigrationTest(unittest.TestCase):
 
 	def test_only_expected_conversion_categories_are_inactive(self):
 		for table, expected_names in INACTIVE_CONVERSION_CATEGORIES.items():
-			with self.subTest(table=table):
-				inactive_categories = self.conn.execute(
-					f"""
-					SELECT category_name, legacy_category_id
-					FROM {table}
-					WHERE NOT is_active
-					ORDER BY category_name
-					"""
-				).fetchall()
+			for category_name in expected_names:
+				with self.subTest(table=table, category_name=category_name):
+					is_active = self.conn.execute(
+						f"""
+						SELECT is_active
+						FROM {table}
+						WHERE legacy_category_id IS NULL
+							AND category_name = %s
+						""",
+						(category_name,),
+					).fetchone()[0]
+					self.assertFalse(is_active)
+
+			with self.subTest(table=table, category_name="未分類"):
 				uncategorized_is_active = self.conn.execute(
 					f"SELECT is_active FROM {table} WHERE category_id = 0"
 				).fetchone()[0]
-				self.assertEqual(
-					inactive_categories,
-					[(name, None) for name in sorted(expected_names)],
-				)
 				self.assertTrue(uncategorized_is_active)
 
 	def test_template_recipes_keep_archived_state(self):
@@ -199,6 +208,83 @@ class ConversionCategoryMigrationTest(unittest.TestCase):
 				"tool-2x2": True,
 			},
 		)
+
+
+@unittest.skipUnless(TEST_DATABASE_URL, "TEST_DATABASE_URL が未設定のためスキップします")
+class ConversionCategoryScopeMigrationTest(unittest.TestCase):
+	"""0005の更新対象を、0004までのデータに追加した対象外レコードで検証します。"""
+
+	def setUp(self):
+		import psycopg
+
+		self.apply = load_apply_module()
+		self.conn = psycopg.connect(TEST_DATABASE_URL, autocommit=False)
+		self.conn.execute("DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public;")
+		self.conn.commit()
+		self.apply.ensure_schema_migration(self.conn)
+		migration_files = self.apply.migration_files()
+		self.conversion_migration = next(
+			path for path in migration_files if path.name == CONVERSION_MIGRATION_NAME
+		)
+		for path in migration_files:
+			if path.name < CONVERSION_MIGRATION_NAME:
+				self.apply.apply_migration(self.conn, path)
+
+		self.add_outside_conversion_records()
+		self.apply.apply_migration(self.conn, self.conversion_migration)
+
+	def tearDown(self):
+		self.conn.close()
+
+	def add_outside_conversion_records(self):
+		"""広いWHERE句で巻き込まれるデータを、0005適用前に明示的に用意します。"""
+		recipe_id = self.conn.execute(
+			"""
+			INSERT INTO craft_master (legacy_id, name, class, sort_order)
+			VALUES (%s, %s, 6, 999)
+			RETURNING id
+			""",
+			(OUTSIDE_COOKING_RECIPE_LEGACY_ID, "対象外の未分類調理レシピ"),
+		).fetchone()[0]
+		self.conn.execute(
+			"INSERT INTO cooking_recipes (id, category_id) VALUES (%s, 0)",
+			(recipe_id,),
+		)
+		for table, category_id, category_name in OUTSIDE_CONVERSION_CATEGORIES:
+			self.conn.execute(
+				f"""
+				INSERT INTO {table} (category_id, category_name, legacy_category_id)
+				VALUES (%s, %s, NULL)
+				""",
+				(category_id, category_name),
+			)
+		self.conn.commit()
+
+	def test_outside_uncategorized_cooking_recipe_is_not_reassigned(self):
+		category_id = self.conn.execute(
+			"""
+			SELECT recipe.category_id
+			FROM craft_master AS master
+			JOIN cooking_recipes AS recipe ON recipe.id = master.id
+			WHERE master.legacy_id = %s
+			""",
+			(OUTSIDE_COOKING_RECIPE_LEGACY_ID,),
+		).fetchone()[0]
+		self.assertEqual(category_id, 0)
+
+	def test_outside_null_legacy_categories_remain_active(self):
+		for table, category_id, category_name in OUTSIDE_CONVERSION_CATEGORIES:
+			with self.subTest(table=table, category_name=category_name):
+				is_active = self.conn.execute(
+					f"""
+					SELECT is_active
+					FROM {table}
+					WHERE category_id = %s
+						AND legacy_category_id IS NULL
+					""",
+					(category_id,),
+				).fetchone()[0]
+				self.assertTrue(is_active)
 
 
 if __name__ == "__main__":
