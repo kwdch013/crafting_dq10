@@ -122,6 +122,19 @@ class ApiHttpContractTest(unittest.TestCase):
 		)
 		self.assert_common_success_headers(headers)
 
+	def test_get_deleted_recipes_returns_empty_list_for_json_store(self):
+		status, headers, payload = self.request_json("GET", "/api/crafts/cooking/deleted-recipes")
+
+		self.assertEqual(status, 200)
+		self.assertEqual(payload, {"craftId": "cooking", "deletedIds": []})
+		self.assert_common_success_headers(headers)
+
+	def test_get_deleted_recipes_for_unknown_craft_returns_not_found(self):
+		status, _, payload = self.request_json("GET", "/api/crafts/unknown/deleted-recipes")
+
+		self.assertEqual(status, 404)
+		self.assertEqual(payload, {"error": "not_found"})
+
 	def test_get_unknown_craft_returns_not_found(self):
 		status, _, payload = self.request_json("GET", "/api/crafts/unknown/recipes")
 

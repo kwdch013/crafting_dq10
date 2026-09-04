@@ -69,6 +69,67 @@ test("削除済みID取得関数を渡さない場合は控えを従来どおり
 	assert.deepEqual(created, [["cooking", "user-1"]]);
 });
 
+test("サーバーで削除済みの控えはPOSTせず、ローカルの削除記録へ移す", async () => {
+	const created = [];
+	const removed = [];
+	const result = await recipeSync.importLocalRecipes({
+		craftIds: ["cooking"],
+		getUserRecipes: () => [{ id: "db-71", name: "削除済み" }],
+		getApiRecipeIds: () => new Set(),
+		getServerDeletedRecipeIds: async () => ["db-71"],
+		createRecipe: async (craftId, recipe) => {
+			created.push([craftId, recipe.id]);
+			return { ...recipe, id: "db-72" };
+		},
+		replaceUserRecipe: () => {},
+		removeUserRecipe: (craftId, recipeId) => removed.push([craftId, recipeId]),
+		onImported: () => {},
+	});
+
+	assert.deepEqual(created, []);
+	assert.deepEqual(removed, [["cooking", "db-71"]]);
+	assert.deepEqual([...result], []);
+});
+
+test("削除済みIDの取得に失敗した職人を見送り、他職人の取り込みは続ける", async () => {
+	const created = [];
+	await recipeSync.importLocalRecipes({
+		craftIds: ["cooking", "woodworking"],
+		getUserRecipes: (craftId) => [{ id: `${craftId}-user-1`, name: "未取込" }],
+		getApiRecipeIds: () => new Set(),
+		getServerDeletedRecipeIds: async (craftId) => {
+			if (craftId === "cooking") throw new Error("deleted IDs unavailable");
+			return [];
+		},
+		createRecipe: async (craftId, recipe) => {
+			created.push([craftId, recipe.id]);
+			return { ...recipe, id: `db-${recipe.id}` };
+		},
+		replaceUserRecipe: () => {},
+		onImported: () => {},
+	});
+
+	assert.deepEqual(created, [["woodworking", "woodworking-user-1"]]);
+});
+
+test("控え削除関数がなくてもサーバーで削除済みのレシピをPOSTしない", async () => {
+	const created = [];
+	await recipeSync.importLocalRecipes({
+		craftIds: ["cooking"],
+		getUserRecipes: () => [{ id: "db-71", name: "削除済み" }],
+		getApiRecipeIds: () => new Set(),
+		getServerDeletedRecipeIds: async () => ["db-71"],
+		createRecipe: async (craftId, recipe) => {
+			created.push([craftId, recipe.id]);
+			return { ...recipe, id: "db-72" };
+		},
+		replaceUserRecipe: () => {},
+		onImported: () => {},
+	});
+
+	assert.deepEqual(created, []);
+});
+
 test("失敗したレシピを残し、他のレシピと職人の取り込みを続ける", async () => {
 	const created = [];
 	const replaced = [];
@@ -246,7 +307,9 @@ async function runInitializeWithStoredRecipe(initializeImplementation) {
 		getDeletedRecipeIds: () => [],
 		getApiRecipeIds: () => new Set(),
 		createRecipeOnApi: async () => ({}),
+		fetchDeletedRecipeIdsFromApi: async () => [],
 		replaceUserRecipe: () => {},
+		removeUserRecipeAsDeleted: () => {},
 		render: () => {},
 		window: {
 			DQ10RecipeSync: {

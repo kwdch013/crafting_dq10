@@ -10,6 +10,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "api"))
 
 from repository.json_store import JsonRecipeStore
+from repository.errors import UnknownCraftError
 
 
 class JsonRecipeStoreTest(unittest.TestCase):
@@ -50,6 +51,11 @@ class JsonRecipeStoreTest(unittest.TestCase):
 			self.store.load_craft("cooking"),
 			[{"id": "cooking-001", "name": "既存レシピ", "items": []}],
 		)
+
+	def test_load_deleted_ids_returns_empty_list_and_validates_craft(self):
+		self.assertEqual(self.store.load_deleted_ids("cooking"), [])
+		with self.assertRaisesRegex(UnknownCraftError, "^recipe_file_not_found$"):
+			self.store.load_deleted_ids("unknown")
 
 	def test_upsert_appends_then_replaces_recipe(self):
 		added_recipe = {"id": "user-cooking-1", "name": "追加レシピ", "items": []}

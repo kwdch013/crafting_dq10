@@ -81,6 +81,8 @@ DBが真実源になるため、「ブラウザには保存しました」とい
 
 - 対象はAPI取得に成功した職人のみ (`apiHydratedCraftIds`)
 - API側に同じIDが存在するレシピは取り込み済みとして飛ばします
+- 職人ごとに `GET /api/crafts/{craftId}/deleted-recipes` で論理削除済みIDを確認し、一致する控えはPOSTせず、控えとフォールバック表示を除外するローカル削除記録からも消します
+- 削除済みIDの取得に失敗した職人は、安全のためその回の取り込みを見送りします
 - `sort_order` の採番競合 (#231) を避けるため、`POST` は1件ずつ直列に実行します
 - 失敗しても他の職人・他のレシピの取り込みは続けます。`alert` は出さず警告ログのみです
 - **失敗したレシピは `localStorage` から消しません。** 名前重複も同様です
@@ -98,13 +100,13 @@ DBが真実源になるため、「ブラウザには保存しました」とい
 
 | ファイル | 役割 |
 | --- | --- |
-| `api/main.py` | `do_POST`。ルーティングと応答コードの割り当て |
-| `api/repository/postgres_store.py` | `create()`。発番と復活の判定 |
-| `api/repository/json_store.py` | `create()`。ファイル内での発番 |
+| `api/main.py` | `do_POST` と削除済みID取得のルーティング・応答コードの割り当て |
+| `api/repository/postgres_store.py` | `create()` の発番と復活の判定、`load_deleted_ids()` の論理削除済みID取得 |
+| `api/repository/json_store.py` | `create()` のファイル内発番、`load_deleted_ids()` の空配列応答 |
 | `api/repository/queries_write.py` | `insert_recipe_header()`、`SERVER_LEGACY_ID_PREFIX` |
 | `api/repository/validation.py` | `validate_recipe(recipe, require_id=False)` |
-| `app/main.js` | `createRecipeOnApi`、`saveManagedRecipe`、`applyImportedRecipeIds` |
-| `app/recipe-sync.js` | `importLocalRecipes()`。起動時の取り込み |
+| `app/main.js` | `createRecipeOnApi`、削除済みID取得、控えの削除、`saveManagedRecipe`、`applyImportedRecipeIds` |
+| `app/recipe-sync.js` | `importLocalRecipes()`。削除済みIDを確認して行う起動時の取り込み |
 
 ## 対象外
 

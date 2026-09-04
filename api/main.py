@@ -61,6 +61,10 @@ def response_payload(path):
 		craft_id = unquote(path[len(prefix):-len("/masters")]).strip("/")
 		return create_store(DATA_DIR).load_masters(craft_id)
 
+	if path.startswith(prefix) and path.endswith("/deleted-recipes"):
+		craft_id = unquote(path[len(prefix):-len("/deleted-recipes")]).strip("/")
+		return {"craftId": craft_id, "deletedIds": create_store(DATA_DIR).load_deleted_ids(craft_id)}
+
 	return None
 
 
