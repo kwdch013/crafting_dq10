@@ -110,3 +110,4 @@ issueには対象領域に応じてラベルを付与します。
 | #239 | 共通: 変換用分類を実分類へ再割当し、未分類レシピを肉料理へ暫定分類する (対応中) | [recipe-db.md](issues/recipe-db.md) |
 | #242 | 共通: 別ブラウザで削除したレシピが起動時の取り込みで復活する (2026-09-04 close済み) | [recipe-db.md](issues/recipe-db.md) |
 | #247 | 調理職人: 暫定で肉料理へ寄せたレシピ11件を正しい料理区分へ割り当てる | [recipe-db.md](issues/recipe-db.md) |
+| #249 | 共通: export_recipes.py をコンテナ内で実行してもホストの recipes.js が更新されない | [recipe-db.md](issues/recipe-db.md) |

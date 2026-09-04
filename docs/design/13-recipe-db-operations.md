@@ -88,9 +88,15 @@ docker compose exec api python scripts/export_recipes.py --craft cooking
 出力先を検証用ディレクトリへ変える場合は、`--data-dir` と `--app-dir` を指定します。
 `--database-url` を省略すると `DATABASE_URL` を使います。
 
-`api/data` はホストの `./api/data` をマウントしているため `recipes.json` はホストへ直接反映されますが、
-`app/` はマウントしていないため `app/crafts/<職人>/recipes.js` はコンテナ内にしか出力されません。
-コミット対象のフォールバックを更新するには、実行後にホストへ取り出します。
+`api/data` はホストの `./api/data` をマウントしているため、`recipes.json` はホストへ直接反映されます。
+
+一方 `app/` はAPIイメージへ含めていません。`--app-dir` の既定値は `export_recipes.py` から見た
+リポジトリ直下の `app` ですが、コンテナ内ではこれが `/usr/src/app` を指すため、
+`recipes.js` は既存内容と比較されないまま `/usr/src/app/crafts/<職人>/` へ新規生成されます。
+出力内容はDB由来のため正しいものの、ホストのコミット対象ファイルへは反映されず、
+`--dry-run` の「変更」表示もホスト側との差分ではないため当てになりません。
+
+コミット対象のフォールバックを更新するには、実行後にホストへ取り出して `git diff` で差分を確認します。
 
 ```bash
 for craft in tool-smithing weapon-smithing armor-smithing sewing woodworking cooking; do

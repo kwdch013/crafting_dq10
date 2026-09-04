@@ -170,3 +170,13 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/242
 ゲーム内の実際の料理区分 (肉料理 / 魚料理 / パスタ＆ライス / スイーツ) を確認したうえで、新しいマイグレーションで `cooking_recipes.category_id` を更新し、`export_recipes.py` でフォールバックを再生成します。
 
 URL: https://github.com/kwdch013/crafting_dq10/issues/247
+
+### #249 共通: export_recipes.py をコンテナ内で実行してもホストの recipes.js が更新されない
+
+`api/Dockerfile` は `COPY api/ ./` のみで `app/` をイメージへ含めていません。`export_recipes.py` の `DEFAULT_APP_DIR` は `Path(__file__).resolve().parents[2] / "app"` で、コンテナ内ではこれが `WORKDIR` と同じ `/usr/src/app` を指します。
+
+このため `docker compose exec api python scripts/export_recipes.py` を実行しても、`recipes.js` は既存内容と比較されないまま `/usr/src/app/crafts/<職人>/` へ新規生成され、ホストのコミット対象ファイルへは反映されません。`--dry-run` の「変更」表示もホストとの差分ではないため当てになりません。出力内容自体はDB由来のため正しいものです。
+
+暫定対応として、PR #248 で `docker cp` による取り出し手順を [運用手順](../design/13-recipe-db-operations.md) へ追記しました。恒久対応の案は compose へのマウント追加、`APP_DIR` 環境変数の追加、ホスト側実行への変更です。
+
+URL: https://github.com/kwdch013/crafting_dq10/issues/249
