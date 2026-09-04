@@ -47,27 +47,43 @@ WHERE id = (
 	WHERE legacy_id = 'tool-2x2'
 );
 
--- 正しい料理区分の再分類は別issueで行うため、未分類は一律で肉料理へ仮置きします。
+-- 正しい料理区分の再分類は別issueで行うため、決定済みの未分類レシピだけを肉料理へ仮置きします。
 UPDATE cooking_recipes
 SET category_id = (
 	SELECT category_id
 	FROM cooking_category
 	WHERE legacy_category_id = 'meat-dishes'
 )
-WHERE category_id = 0;
+WHERE id IN (
+	SELECT id
+	FROM craft_master
+	WHERE legacy_id IN (
+		'cooking-001',
+		'cooking-002',
+		'cooking-006',
+		'cooking-014',
+		'cooking-019',
+		'cooking-022',
+		'cooking-024',
+		'cooking-025',
+		'cooking-026',
+		'cooking-027',
+		'cooking-028'
+	)
+);
 
 -- category_id = 0 の未分類は登録時の既定値として残します。
 UPDATE weapon_category
 SET is_active = false
 WHERE legacy_category_id IS NULL
-	AND category_id <> 0;
+	AND category_name = 'テンプレート (縦3マス)';
 
 UPDATE armor_category
 SET is_active = false
 WHERE legacy_category_id IS NULL
-	AND category_id <> 0;
+	AND category_name = 'テンプレート (2×2)';
 
 UPDATE tool_category
 SET is_active = false
 WHERE legacy_category_id IS NULL
-	AND category_id <> 0;
+	AND category_name IN ('テンプレート (縦3マス)', 'テンプレート (2×2)');

@@ -9,6 +9,33 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 MIGRATION_DIR = REPO_ROOT / "api" / "migrations"
 TEST_DATABASE_URL = os.environ.get("TEST_DATABASE_URL", "")
 
+CONVERSION_RECIPE_DESTINATIONS = (
+	("weapon-vertical-3", "weapon_recipes", "weapon_category", "one-handed-sword"),
+	("armor-2x2", "armor_recipes", "armor_category", "shield"),
+	("tool-vertical-3", "tool_recipes", "tool_category", "woodworking-knife"),
+	("tool-2x2", "tool_recipes", "tool_category", "smithing-hammer"),
+)
+
+COOKING_RECIPE_DESTINATIONS = {
+	"cooking-001": "meat-dishes",
+	"cooking-002": "meat-dishes",
+	"cooking-006": "meat-dishes",
+	"cooking-014": "meat-dishes",
+	"cooking-019": "meat-dishes",
+	"cooking-022": "meat-dishes",
+	"cooking-024": "meat-dishes",
+	"cooking-025": "meat-dishes",
+	"cooking-026": "meat-dishes",
+	"cooking-027": "meat-dishes",
+	"cooking-028": "meat-dishes",
+}
+
+INACTIVE_CONVERSION_CATEGORIES = {
+	"weapon_category": {"テンプレート (縦3マス)"},
+	"armor_category": {"テンプレート (2×2)"},
+	"tool_category": {"テンプレート (縦3マス)", "テンプレート (2×2)"},
+}
+
 
 def load_apply_module():
 	"""apply.py はパッケージ配下ではないためファイル指定で読み込みます。"""
@@ -88,22 +115,66 @@ class ConversionCategoryMigrationTest(unittest.TestCase):
 		).fetchall()
 		self.assertEqual(invalid_recipes, [])
 
-	def test_conversion_categories_are_inactive_and_uncategorized_remains_active(self):
-		for table in ("weapon_category", "armor_category", "tool_category"):
-			with self.subTest(table=table):
-				active_conversion_categories = self.conn.execute(
+	def test_conversion_recipes_are_reassigned_to_expected_categories(self):
+		for legacy_id, recipe_table, category_table, expected_category_id in CONVERSION_RECIPE_DESTINATIONS:
+			with self.subTest(legacy_id=legacy_id):
+				actual_category_id = self.conn.execute(
 					f"""
-					SELECT category_id
+					SELECT category.legacy_category_id
+					FROM craft_master AS master
+					JOIN {recipe_table} AS recipe ON recipe.id = master.id
+					JOIN {category_table} AS category ON category.category_id = recipe.category_id
+					WHERE master.legacy_id = %s
+					""",
+					(legacy_id,),
+				).fetchone()[0]
+				self.assertEqual(actual_category_id, expected_category_id)
+
+	def test_cooking_recipes_are_reassigned_to_meat_dishes(self):
+		legacy_ids = list(COOKING_RECIPE_DESTINATIONS)
+		meat_dishes_count = self.conn.execute(
+			"""
+			SELECT count(*)
+			FROM craft_master AS master
+			JOIN cooking_recipes AS recipe ON recipe.id = master.id
+			JOIN cooking_category AS category ON category.category_id = recipe.category_id
+			WHERE master.legacy_id = ANY(%s)
+				AND category.legacy_category_id = 'meat-dishes'
+			""",
+			(legacy_ids,),
+		).fetchone()[0]
+		actual_destinations = dict(self.conn.execute(
+			"""
+			SELECT master.legacy_id, category.legacy_category_id
+			FROM craft_master AS master
+			JOIN cooking_recipes AS recipe ON recipe.id = master.id
+			JOIN cooking_category AS category ON category.category_id = recipe.category_id
+			WHERE master.legacy_id = ANY(%s)
+			ORDER BY master.legacy_id
+			""",
+			(legacy_ids,),
+		).fetchall())
+		self.assertEqual(meat_dishes_count, 11)
+		self.assertEqual(actual_destinations, COOKING_RECIPE_DESTINATIONS)
+
+	def test_only_expected_conversion_categories_are_inactive(self):
+		for table, expected_names in INACTIVE_CONVERSION_CATEGORIES.items():
+			with self.subTest(table=table):
+				inactive_categories = self.conn.execute(
+					f"""
+					SELECT category_name, legacy_category_id
 					FROM {table}
-					WHERE legacy_category_id IS NULL
-						AND category_id <> 0
-						AND is_active
+					WHERE NOT is_active
+					ORDER BY category_name
 					"""
 				).fetchall()
 				uncategorized_is_active = self.conn.execute(
 					f"SELECT is_active FROM {table} WHERE category_id = 0"
 				).fetchone()[0]
-				self.assertEqual(active_conversion_categories, [])
+				self.assertEqual(
+					inactive_categories,
+					[(name, None) for name in sorted(expected_names)],
+				)
 				self.assertTrue(uncategorized_is_active)
 
 	def test_template_recipes_keep_archived_state(self):
