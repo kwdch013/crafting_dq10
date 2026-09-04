@@ -108,4 +108,4 @@ issueには対象領域に応じてラベルを付与します。
 | #230 | 共通: 保存失敗時のalert文言をエラーの種類に応じて分ける | [common.md](issues/common.md) |
 | #231 | 共通: sort_order と category_id の採番が並行登録で衝突する | [recipe-db.md](issues/recipe-db.md) |
 | #239 | 共通: DB移行時の変換用分類と未分類レシピの扱いを決める | [recipe-db.md](issues/recipe-db.md) |
-| #242 | 共通: 別ブラウザで削除したレシピが起動時の取り込みで復活する | [recipe-db.md](issues/recipe-db.md) |
+| #242 | 共通: 別ブラウザで削除したレシピが起動時の取り込みで復活する (2026-09-04 close済み) | [recipe-db.md](issues/recipe-db.md) |
