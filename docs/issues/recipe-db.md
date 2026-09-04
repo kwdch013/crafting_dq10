@@ -97,7 +97,7 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/219
 
 2026-09-03 に PR #241 で対応済みです。仕様は [レシピ登録API](../design/15-recipe-post-api.md) を参照します。
 
-サーバーが `craft_master.id` を発番し `legacy_id` へ `db-<id>` を書きます。APIが返すレシピの `id` は従来どおり文字列のままです。保存に失敗した場合は `localStorage` にも書かず、ダイアログを閉じずにエラーを表示します。`localStorage` の控えは成功時のみ更新します。起動時の取り込みは `app/recipe-sync.js` が担当し、削除済みIDのレシピは対象から外します。別ブラウザで削除したレシピが復活する経路は #242 で扱います。
+サーバーが `craft_master.id` を発番し `legacy_id` へ `db-<id>` を書きます。APIが返すレシピの `id` は従来どおり文字列のままです。保存に失敗した場合は `localStorage` にも書かず、ダイアログを閉じずにエラーを表示します。`localStorage` の控えは成功時のみ更新します。起動時の取り込みは `app/recipe-sync.js` が担当し、削除済みIDのレシピは対象から外します。別ブラウザで削除したレシピが復活する経路は #242 (PR #245) で対応済みです。
 
 URL: https://github.com/kwdch013/crafting_dq10/issues/220
 
@@ -156,15 +156,14 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/224
 
 URL: https://github.com/kwdch013/crafting_dq10/issues/239
 
-### #242 共通: 別ブラウザで削除したレシピが起動時の取り込みで復活する
+### #242 共通: 別ブラウザで削除したレシピが起動時の取り込みで復活する (2026-09-04 close済み)
 
 段階3c (#220 / PR #241) の取り込みは「API側のレシピ一覧に同じIDが無いもの」を対象にします。`GET /api/recipes` は論理削除済みのレシピを返さないため、DBで削除済みのレシピと未取り込みのレシピをIDだけでは区別できません。
 
 ブラウザAで削除したレシピはブラウザBの `localStorage` に残るため、B の起動時に取り込み対象となり、`PostgresRecipeStore.create()` が同名の論理削除済み行を復活させます。削除の記録 (`deletedIds`) はブラウザごとに独立しているため、PR #241 で入れた防御では防げません。
 
-完了条件:
+対応 (PR #245): 削除済みIDだけを返す `GET /api/crafts/{craftId}/deleted-recipes` を追加し、取り込みで一致する控えは `POST` せず、控えを除去してローカル削除記録へ追加します。判定順は ローカル削除記録 → サーバー削除済みID → API一覧の既存ID とし、一覧取得後に別ブラウザが削除した場合の取りこぼしを防ぎます。削除済みIDを取得できなかった職人は、その回の取り込みを見送ります。
 
-- 削除済みIDを返すAPIの追加、取り込みの手動化、`POST` での復活の見直しのいずれかで方針が決まっている。
-- 決定内容が設計ドキュメントへ反映されている。
+`PostgresRecipeStore.create()` の復活処理は、利用者が同名で作り直す経路 (#217) を維持するため残しています。
 
 URL: https://github.com/kwdch013/crafting_dq10/issues/242
