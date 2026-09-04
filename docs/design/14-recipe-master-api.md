@@ -42,7 +42,7 @@ GET /api/crafts/{craftId}/masters
 | 項目 | 由来 | 意味 |
 | --- | --- | --- |
 | `categories[].categoryId` | `*_category.category_id` | DBの主キー。分類を一意に指す安定キー |
-| `categories[].legacyId` | `*_category.legacy_category_id` | 現行JSONの `categoryId`。移行後に追加した分類では `null` |
+| `categories[].legacyId` | `*_category.legacy_category_id` | 現行JSONの `categoryId`。未分類や移行後に追加した分類では `null` |
 | `categories[].name` | `*_category.category_name` | 画面に出す分類名 |
 | `categories[].cells` | 職人別 (下表) | その分類が使うマスの座標 |
 | `traits[].charaId` | `*_character.chara_id` | DBの主キー。特性を一意に指す安定キー |
@@ -78,9 +78,9 @@ GET /api/crafts/{craftId}/masters
 - 並び順は `category_id` / `chara_id` / `material_id` の昇順です。
 - `未分類` (`category_id` 0) と特性の `なし` (`chara_id` 0) も返します。
   API側では暗黙に絞り込みません。
-- ただし段階3b時点のフロントは、`legacyId` を持たない分類 (未分類・DB移行時の変換用テンプレート) を大項目の選択肢に出しません。
-  レシピ側の `categoryId` は `legacyId` の文字列であり、`legacyId` のない分類を選んでも該当レシピが0件になるためです。
-  未分類を画面で選べるようにするかは、レシピ登録経路を変更する段階3cと、分類の新規作成を扱う段階3dで決めます。
+- フロントは `未分類` (`category_id` 0) を画面の大項目として出しません。登録時の既定値としてDBには残しますが、既存レシピは有効な `legacyId` を持つ実分類へ属する必要があります。
+- DB移行時には、既存の大項目にない盤面形状を収容するため `legacy_category_id` が `NULL` の変換用分類を作成していました。調査の結果、使用マスは同一職人の既存分類と完全に一致したため、0005で該当レシピを実分類へ再割り当てし、変換用分類を無効化しました。
+- `legacyId` を持たない新規分類を画面で扱う方法は、分類の新規作成を扱う段階3dで決めます。
 
 ## エラー
 
@@ -108,6 +108,6 @@ JSONストアはマスタを保持しません。404や空配列ではなく専�
 | 段階 | 用途 |
 | --- | --- |
 | 3a (本ドキュメント) | APIの追加のみ。フロントは未使用 |
-| 3b | 分類の選択肢をAPI由来へ移行済み。`config.js` はAPI停止時のフォールバックとテンプレートの引継ぎに残し、並び順は `config.js` を維持する。`legacyId` を持たない分類 (未分類・DB移行時の変換用テンプレート) は選択肢に出さず、分類の新規作成を扱う3dで扱う |
+| 3b | 分類の選択肢をAPI由来へ移行済み。`config.js` はAPI停止時のフォールバックとテンプレートの引継ぎに残し、並び順は `config.js` を維持する。`未分類` (`category_id` 0) は選択肢に出さない。変換用分類は0005で廃止済みであり、`legacyId` を持たない新規分類は3dで扱う |
 | 3c | レシピ登録をPOSTへ変更 (実装済み)。仕様は [レシピ登録API](./15-recipe-post-api.md) |
 | 3d | 分類の新規作成APIを追加し、鍛冶では `cells` が使用マスを決める |
