@@ -343,6 +343,15 @@ class PostgresRecipeStoreTest(unittest.TestCase):
 		)
 		self.assertNotIn(recipe_id, [recipe["id"] for recipe in self.store().load_craft("cooking")])
 
+	def test_load_deleted_ids_returns_only_logically_deleted_recipe_ids(self):
+		deleted_recipe_id = "cooking-003"
+		active_recipe_id = "cooking-002"
+
+		self.store().delete("cooking", deleted_recipe_id)
+
+		self.assertIn(deleted_recipe_id, self.store().load_deleted_ids("cooking"))
+		self.assertNotIn(active_recipe_id, self.store().load_deleted_ids("cooking"))
+
 	def test_upsert_revives_logically_deleted_recipe(self):
 		recipe = self.recipe_copy("cooking", "cooking-003")
 		self.store().delete("cooking", recipe["id"])

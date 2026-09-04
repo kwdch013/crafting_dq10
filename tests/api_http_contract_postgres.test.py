@@ -160,6 +160,28 @@ class PostgresApiHttpContractTest(unittest.TestCase):
 			(original_id, original_legacy_id, True, original_sort_order),
 		)
 
+	def test_get_deleted_recipes_returns_id_after_post_and_delete(self):
+		recipe = self.recipe_copy()
+		recipe.update({
+			"name": "HTTP削除済みID確認レシピ",
+			"category": "HTTP削除済みID確認分類",
+			"categoryId": "http-deleted-ids-category",
+		})
+		del recipe["id"]
+
+		status, payload = self.request_json("POST", "/api/crafts/cooking/recipes", recipe)
+		self.assertEqual(status, 201)
+		recipe_id = payload["recipe"]["id"]
+		status, payload = self.request_json(
+			"DELETE", f"/api/crafts/cooking/recipes/{recipe_id}"
+		)
+		self.assertEqual(status, 200)
+		status, payload = self.request_json("GET", "/api/crafts/cooking/deleted-recipes")
+
+		self.assertEqual(status, 200)
+		self.assertEqual(payload["craftId"], "cooking")
+		self.assertIn(recipe_id, payload["deletedIds"])
+
 	def test_put_integrity_error_returns_bad_request(self):
 		recipe = self.recipe_copy()
 		recipe.update({

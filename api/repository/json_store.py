@@ -45,6 +45,11 @@ class JsonRecipeStore:
 			raise UnknownCraftError("recipe_file_not_found")
 		raise MastersUnavailableError()
 
+	def load_deleted_ids(self, craft_id) -> list[str]:
+		"""JSONストアは論理削除を持たないため、職人検証後に空配列を返します。"""
+		self.recipe_path(craft_id)
+		return []
+
 	def upsert(self, craft_id, recipe) -> dict:
 		"""レシピIDをキーに追加または置換する。"""
 		validate_recipe(recipe)

@@ -47,6 +47,22 @@ class PostgresRecipeStore:
 		with self._connect() as conn:
 			return queries.load_masters(conn, craft_id)
 
+	def load_deleted_ids(self, craft_id) -> list[str]:
+		"""指定職人で論理削除されたレシピのlegacy_idだけを読み込みます。"""
+		self._validate_craft_id(craft_id)
+
+		with self._connect() as conn:
+			rows = conn.execute(
+				"""
+				SELECT legacy_id
+				FROM craft_master
+				WHERE class = %s AND NOT is_active AND legacy_id IS NOT NULL
+				ORDER BY sort_order
+				""",
+				(mapping.CRAFT_CLASSES[craft_id],),
+			).fetchall()
+		return [row[0] for row in rows]
+
 	def upsert(self, craft_id, recipe) -> dict:
 		"""レシピを追加または更新し、論理削除済みなら復活させる。"""
 		validate_recipe(recipe)

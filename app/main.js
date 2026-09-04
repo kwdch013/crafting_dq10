@@ -461,6 +461,23 @@ async function createRecipeOnApi(craftId, recipe) {
   return payload.recipe;
 }
 
+// 別ブラウザで削除された控えを再登録しないため、論理削除済みIDだけを取得します。
+async function fetchDeletedRecipeIdsFromApi(craftId) {
+  const response = await fetch(
+    `${apiBaseUrl}/api/crafts/${encodeURIComponent(craftId)}/deleted-recipes`,
+    { cache: "no-store" },
+  );
+  if (!response.ok) {
+    throw new Error(`削除済みレシピIDの取得に失敗しました: ${response.status}`);
+  }
+
+  const payload = await response.json();
+  if (!Array.isArray(payload?.deletedIds) || !payload.deletedIds.every((recipeId) => typeof recipeId === "string")) {
+    throw new Error("削除済みレシピIDの応答形式が正しくありません");
+  }
+  return payload.deletedIds;
+}
+
 // レシピ追加・編集内容をAPIへ反映します。保存先はRECIPE_STOREに従います。
 async function persistRecipeToApi(craftId, recipe) {
   const response = await fetch(
@@ -528,6 +545,14 @@ function replaceUserRecipe(craftId, oldId, savedRecipe) {
   // 旧保存データで控えと削除記録が共存しても、取り込みで削除記録を消して復活させないようにします。
   saveUserRecipeStore(store);
   upsertHydratedCraftRecipe(craftId, savedRecipe);
+}
+
+// サーバーで削除済みと判明した控えを除き、フォールバック表示も抑止します。
+function removeUserRecipeAsDeleted(craftId, recipeId) {
+  const store = loadUserRecipeStore();
+  store.recipes[craftId] = (store.recipes[craftId] || []).filter((recipe) => recipe.id !== recipeId);
+  store.deletedIds[craftId] = Array.from(new Set([...(store.deletedIds[craftId] || []), recipeId]));
+  saveUserRecipeStore(store);
 }
 
 function getAllCraftRecipes(craftId) {
@@ -3623,8 +3648,10 @@ async function initialize() {
       getUserRecipes,
       getDeletedRecipeIds,
       getApiRecipeIds,
+      getServerDeletedRecipeIds: fetchDeletedRecipeIdsFromApi,
       createRecipe: createRecipeOnApi,
       replaceUserRecipe,
+      removeUserRecipe: removeUserRecipeAsDeleted,
       onImported: () => {},
     }) || importedRecipeIds;
   } catch {

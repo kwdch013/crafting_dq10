@@ -69,6 +69,88 @@ test("削除済みID取得関数を渡さない場合は控えを従来どおり
 	assert.deepEqual(created, [["cooking", "user-1"]]);
 });
 
+test("サーバーで削除済みの控えはPOSTせず、ローカルの削除記録へ移す", async () => {
+	const created = [];
+	const removed = [];
+	const result = await recipeSync.importLocalRecipes({
+		craftIds: ["cooking"],
+		getUserRecipes: () => [{ id: "db-71", name: "削除済み" }],
+		getApiRecipeIds: () => new Set(),
+		getServerDeletedRecipeIds: async () => ["db-71"],
+		createRecipe: async (craftId, recipe) => {
+			created.push([craftId, recipe.id]);
+			return { ...recipe, id: "db-72" };
+		},
+		replaceUserRecipe: () => {},
+		removeUserRecipe: (craftId, recipeId) => removed.push([craftId, recipeId]),
+		onImported: () => {},
+	});
+
+	assert.deepEqual(created, []);
+	assert.deepEqual(removed, [["cooking", "db-71"]]);
+	assert.deepEqual([...result], []);
+});
+
+test("API一覧にもあるサーバー削除済みの控えは、削除記録へ移してPOSTしない", async () => {
+  const created = [];
+  const removed = [];
+  await recipeSync.importLocalRecipes({
+    craftIds: ["cooking"],
+    getUserRecipes: () => [{ id: "db-71", name: "削除済み" }],
+    getApiRecipeIds: () => new Set(["db-71"]),
+    getServerDeletedRecipeIds: async () => ["db-71"],
+    createRecipe: async (craftId, recipe) => {
+      created.push([craftId, recipe.id]);
+      return { ...recipe, id: "db-72" };
+    },
+    replaceUserRecipe: () => {},
+    removeUserRecipe: (craftId, recipeId) => removed.push([craftId, recipeId]),
+    onImported: () => {},
+  });
+
+  assert.deepEqual(created, []);
+  assert.deepEqual(removed, [["cooking", "db-71"]]);
+});
+
+test("削除済みIDの取得に失敗した職人を見送り、他職人の取り込みは続ける", async () => {
+	const created = [];
+	await recipeSync.importLocalRecipes({
+		craftIds: ["cooking", "woodworking"],
+		getUserRecipes: (craftId) => [{ id: `${craftId}-user-1`, name: "未取込" }],
+		getApiRecipeIds: () => new Set(),
+		getServerDeletedRecipeIds: async (craftId) => {
+			if (craftId === "cooking") throw new Error("deleted IDs unavailable");
+			return [];
+		},
+		createRecipe: async (craftId, recipe) => {
+			created.push([craftId, recipe.id]);
+			return { ...recipe, id: `db-${recipe.id}` };
+		},
+		replaceUserRecipe: () => {},
+		onImported: () => {},
+	});
+
+	assert.deepEqual(created, [["woodworking", "woodworking-user-1"]]);
+});
+
+test("控え削除関数がなくてもサーバーで削除済みのレシピをPOSTしない", async () => {
+	const created = [];
+	await recipeSync.importLocalRecipes({
+		craftIds: ["cooking"],
+		getUserRecipes: () => [{ id: "db-71", name: "削除済み" }],
+		getApiRecipeIds: () => new Set(),
+		getServerDeletedRecipeIds: async () => ["db-71"],
+		createRecipe: async (craftId, recipe) => {
+			created.push([craftId, recipe.id]);
+			return { ...recipe, id: "db-72" };
+		},
+		replaceUserRecipe: () => {},
+		onImported: () => {},
+	});
+
+	assert.deepEqual(created, []);
+});
+
 test("失敗したレシピを残し、他のレシピと職人の取り込みを続ける", async () => {
 	const created = [];
 	const replaced = [];
@@ -138,6 +220,7 @@ function extractFunction(name) {
 }
 
 const applyImportedRecipeIdsSource = extractFunction("applyImportedRecipeIds");
+const fetchDeletedRecipeIdsFromApiSource = extractFunction("fetchDeletedRecipeIdsFromApi");
 const initializeSource = extractFunction("initialize");
 const replaceUserRecipeSource = extractFunction("replaceUserRecipe");
 
@@ -227,6 +310,21 @@ test("replaceUserRecipeは削除済みIDを保持する", () => {
 	assert.deepEqual(store.deletedIds.cooking, ["deleted-1"]);
 });
 
+test("削除済みID取得APIの成功応答が不正なら例外にする", async () => {
+  for (const payload of [{}, { deletedIds: null }, { deletedIds: ["db-71", 71] }]) {
+    const context = vm.createContext({
+      apiBaseUrl: "http://localhost:8000",
+      fetch: async () => ({ ok: true, json: async () => payload }),
+    });
+    vm.runInContext(fetchDeletedRecipeIdsFromApiSource, context);
+
+    await assert.rejects(
+      () => vm.runInContext('fetchDeletedRecipeIdsFromApi("cooking")', context),
+      /削除済みレシピIDの応答形式が正しくありません/,
+    );
+  }
+});
+
 async function runInitializeWithStoredRecipe(initializeImplementation) {
 	const localStorage = createLocalStorage({
 		"dq10-craft-support-mvp": JSON.stringify({
@@ -246,7 +344,9 @@ async function runInitializeWithStoredRecipe(initializeImplementation) {
 		getDeletedRecipeIds: () => [],
 		getApiRecipeIds: () => new Set(),
 		createRecipeOnApi: async () => ({}),
+		fetchDeletedRecipeIdsFromApi: async () => [],
 		replaceUserRecipe: () => {},
+		removeUserRecipeAsDeleted: () => {},
 		render: () => {},
 		window: {
 			DQ10RecipeSync: {
