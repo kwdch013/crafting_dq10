@@ -29,22 +29,54 @@ def load_script(path, name):
 	return module
 
 
-def api_service_block(compose: str) -> str:
-	"""docker-compose.yml から api サービスの定義部分だけを取り出します。"""
+def api_service_lines(compose: str) -> list[str]:
+	"""docker-compose.yml から api サービスの有効な設定行だけを取り出します。
+
+	コメント行を落とすことで、設定を無効化しても検証が通る抜け道を防ぎます。
+	"""
 	lines = compose.splitlines()
 	start = lines.index("  api:") + 1
 	end = start
 	while end < len(lines) and (not lines[end].strip() or lines[end].startswith("    ")):
 		end += 1
-	return "\n".join(lines[start:end])
+	return [line.strip() for line in lines[start:end] if line.strip() and not line.strip().startswith("#")]
+
+
+def compose_value(lines: list[str], key: str) -> str:
+	"""api サービスの `キー: 値` から値を取り出します。"""
+	for line in lines:
+		if line.startswith(f"{key}:"):
+			return line.removeprefix(f"{key}:").strip()
+	return ""
+
+
+def compose_mounts(lines: list[str]) -> dict[str, str]:
+	"""api サービスのバインドマウントを {ホスト側: コンテナ側} で返します。"""
+	mounts = {}
+	for line in lines:
+		if not line.startswith("- ./"):
+			continue
+		source, _, target = line.removeprefix("- ").partition(":")
+		mounts[source] = target
+	return mounts
 
 
 def dockerfile_workdir(path: Path) -> str:
-	"""Dockerfile の WORKDIR を読み取り、マウント先との衝突判定に使います。"""
+	"""Dockerfile で最後に有効な WORKDIR を返します。
+
+	マルチステージ化された場合に最終ステージの値を見落とさないよう、最後の指定を採ります。
+	"""
+	workdir = ""
 	for line in path.read_text(encoding="utf-8").splitlines():
 		if line.startswith("WORKDIR "):
-			return line.removeprefix("WORKDIR ").strip()
-	return ""
+			workdir = line.removeprefix("WORKDIR ").strip()
+	return workdir
+
+
+def is_nested(inner: str, outer: str) -> bool:
+	"""inner が outer と同一、または outer の配下かを判定します。"""
+	outer = outer.rstrip("/")
+	return inner == outer or inner.startswith(outer + "/")
 
 
 @unittest.skipUnless(TEST_DATABASE_URL, "TEST_DATABASE_URL が未設定のためスキップします")
@@ -212,24 +244,30 @@ class ComposeAppMountTest(unittest.TestCase):
 
 	def setUp(self):
 		compose = (REPO_ROOT / "docker-compose.yml").read_text(encoding="utf-8")
-		self.api_service = api_service_block(compose)
+		self.api_lines = api_service_lines(compose)
+		self.mounts = compose_mounts(self.api_lines)
 		self.workdir = dockerfile_workdir(REPO_ROOT / "api" / "Dockerfile")
 
 	def test_api_service_mounts_repository_crafts_directory(self):
-		self.assertIn(f"- ./app/crafts:{CONTAINER_CRAFTS_DIR}", self.api_service)
+		self.assertEqual(self.mounts.get("./app/crafts"), CONTAINER_CRAFTS_DIR)
 
 	def test_api_service_passes_app_dir_to_container(self):
-		self.assertIn(f"APP_DIR: {CONTAINER_APP_DIR}", self.api_service)
+		self.assertEqual(compose_value(self.api_lines, "APP_DIR"), CONTAINER_APP_DIR)
 
 	def test_mount_target_matches_app_dir_layout(self):
 		# export_recipes.py は app_dir/crafts/<職人> へ書き出すため、両者がずれてはいけない
-		self.assertEqual(CONTAINER_CRAFTS_DIR, f"{CONTAINER_APP_DIR}/crafts")
+		self.assertEqual(self.mounts.get("./app/crafts"), f"{CONTAINER_APP_DIR}/crafts")
 
-	def test_container_app_dir_does_not_collide_with_workdir(self):
-		# WORKDIR は api/ の配置先。ここへ重ねるとAPIのソースが隠れて起動できなくなる
+	def test_mount_targets_do_not_collide_with_workdir(self):
+		"""WORKDIR は api/ の配置先。重なるとAPIのソースが隠れて起動できなくなります。"""
 		self.assertTrue(self.workdir)
-		self.assertNotEqual(CONTAINER_APP_DIR, self.workdir)
-		self.assertFalse(CONTAINER_APP_DIR.startswith(self.workdir.rstrip("/") + "/"))
+		# api/data のマウントは WORKDIR 配下に置く前提のため、app 側のマウントだけを見る
+		for source, target in self.mounts.items():
+			if source.startswith("./api/"):
+				continue
+			with self.subTest(mount=source):
+				self.assertFalse(is_nested(self.workdir, target))
+				self.assertFalse(is_nested(target, self.workdir))
 
 
 if __name__ == "__main__":
