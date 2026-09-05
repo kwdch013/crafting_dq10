@@ -90,19 +90,15 @@ docker compose exec api python scripts/export_recipes.py --craft cooking
 
 `api/data` はホストの `./api/data` をマウントしているため、`recipes.json` はホストへ直接反映されます。
 
-一方 `app/` はAPIイメージへ含めていません。`--app-dir` の既定値は `export_recipes.py` から見た
-リポジトリ直下の `app` ですが、コンテナ内ではこれが `/usr/src/app` を指すため、
-`recipes.js` は既存内容と比較されないまま `/usr/src/app/crafts/<職人>/` へ新規生成されます。
-出力内容はDB由来のため正しいものの、ホストのコミット対象ファイルへは反映されず、
-`--dry-run` の「変更」表示もホスト側との差分ではないため当てになりません。
+`app/` もホストの `./app` を `/usr/src/frontend-app` へマウントし、composeが `APP_DIR` でその位置を
+コンテナへ渡しています。`export_recipes.py` は出力先を `--app-dir`、環境変数 `APP_DIR`、
+リポジトリ構成からの推定の順で決めるため、コンテナ内実行でもホストの
+`app/crafts/<職人>/recipes.js` が直接更新され、`--dry-run` もホスト側との差分を表示します。
 
-コミット対象のフォールバックを更新するには、実行後にホストへ取り出して `git diff` で差分を確認します。
+APIイメージのWORKDIR `/usr/src/app` は `api/` の配置先です。ここへ `app/` を重ねると
+APIのソースが隠れて起動できなくなるため、マウント先は別のパスにしています。
 
-```bash
-for craft in tool-smithing weapon-smithing armor-smithing sewing woodworking cooking; do
-	docker cp dq10-api:/usr/src/app/crafts/$craft/recipes.js app/crafts/$craft/recipes.js
-done
-```
+出力後は `git diff` でフォールバックの差分を確認してからコミットします。
 
 DBからの復元時には、`items[].id` は読み順で `part-1` から再採番され、`items` は読み順に
 並びます。鍛冶では欠落していた `items[].target` が `ceil((successMin + successMax) / 2)` で補われ、
