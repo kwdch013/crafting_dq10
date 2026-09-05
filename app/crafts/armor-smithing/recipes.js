@@ -2,6 +2,8 @@ registerDQ10CraftRecipes("armor-smithing", [
   {
     "id": "armor-2x2",
     "name": "防具 2×2テンプレート",
+    "category": "盾",
+    "categoryId": "shield",
     "items": [
       {
         "id": "part-1",

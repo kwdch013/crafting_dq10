@@ -12,7 +12,7 @@
 
     const safeFallbackOptions = Array.isArray(fallbackOptions) ? fallbackOptions : [];
     // レシピ側の categoryId は legacyId 文字列のため、legacyId の無い分類を選択肢に出しても該当レシピが0件になる。
-    // 未分類やDB移行時の変換用分類 (テンプレート) が該当する。DB由来の分類を画面へ出すのは、分類の新規作成を扱う段階3dの担当。
+    // 現在は未分類 (categoryId 0) だけが該当する。DB由来の分類を画面へ出すのは、分類の新規作成を扱う段階3dの担当。
     const apiByLegacyId = new Map(
       apiCategories
         .filter((category) => category?.legacyId)

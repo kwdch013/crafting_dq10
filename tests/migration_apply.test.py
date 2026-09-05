@@ -63,6 +63,7 @@ class MigrationFileTest(unittest.TestCase):
 				"0002_recipes.sql",
 				"0003_seed_master.sql",
 				"0004_seed_recipes.sql",
+				"0005_reassign_conversion_categories.sql",
 			],
 		)
 
@@ -90,16 +91,22 @@ class MigrationApplyTest(unittest.TestCase):
 		applied = self.apply.apply_all(self.conn)
 		self.assertEqual(
 			applied,
-			["0001_init", "0002_recipes", "0003_seed_master", "0004_seed_recipes"],
+			[
+				"0001_init",
+				"0002_recipes",
+				"0003_seed_master",
+				"0004_seed_recipes",
+				"0005_reassign_conversion_categories",
+			],
 		)
 		self.assertEqual(self.count("craft_master"), 70)
-		self.assertEqual(self.count("schema_migration"), 4)
+		self.assertEqual(self.count("schema_migration"), 5)
 
 	def test_apply_all_is_idempotent(self):
 		self.apply.apply_all(self.conn)
 		self.assertEqual(self.apply.apply_all(self.conn), [])
 		self.assertEqual(self.count("craft_master"), 70)
-		self.assertEqual(self.count("schema_migration"), 4)
+		self.assertEqual(self.count("schema_migration"), 5)
 
 	def test_dry_run_does_not_create_migration_table(self):
 		"""--dry-run は記録テーブルを作らず、全件を未適用として扱います。"""

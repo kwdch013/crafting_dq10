@@ -1430,6 +1430,8 @@ registerDQ10CraftRecipes("cooking", [
   {
     "id": "cooking-001",
     "name": "きようさにくまん",
+    "category": "肉料理",
+    "categoryId": "meat-dishes",
     "items": [
       {
         "id": "part-1",
@@ -1469,6 +1471,8 @@ registerDQ10CraftRecipes("cooking", [
   {
     "id": "cooking-002",
     "name": "パワフルステーキ",
+    "category": "肉料理",
+    "categoryId": "meat-dishes",
     "items": [
       {
         "id": "part-1",
@@ -1522,6 +1526,8 @@ registerDQ10CraftRecipes("cooking", [
   {
     "id": "cooking-019",
     "name": "バランスパスタ",
+    "category": "肉料理",
+    "categoryId": "meat-dishes",
     "items": [
       {
         "id": "part-1",
@@ -1599,6 +1605,8 @@ registerDQ10CraftRecipes("cooking", [
   {
     "id": "cooking-006",
     "name": "あいじょうオムレツ",
+    "category": "肉料理",
+    "categoryId": "meat-dishes",
     "items": [
       {
         "id": "part-1",
@@ -1680,6 +1688,8 @@ registerDQ10CraftRecipes("cooking", [
   {
     "id": "cooking-024",
     "name": "ファイアタルト",
+    "category": "肉料理",
+    "categoryId": "meat-dishes",
     "items": [
       {
         "id": "part-1",
@@ -1747,6 +1757,8 @@ registerDQ10CraftRecipes("cooking", [
   {
     "id": "cooking-027",
     "name": "ダークタルト",
+    "category": "肉料理",
+    "categoryId": "meat-dishes",
     "items": [
       {
         "id": "part-1",
@@ -1810,6 +1822,8 @@ registerDQ10CraftRecipes("cooking", [
   {
     "id": "cooking-025",
     "name": "アイスタルト",
+    "category": "肉料理",
+    "categoryId": "meat-dishes",
     "items": [
       {
         "id": "part-1",
@@ -1877,6 +1891,8 @@ registerDQ10CraftRecipes("cooking", [
   {
     "id": "cooking-028",
     "name": "ストームタルト",
+    "category": "肉料理",
+    "categoryId": "meat-dishes",
     "items": [
       {
         "id": "part-1",
@@ -1940,6 +1956,8 @@ registerDQ10CraftRecipes("cooking", [
   {
     "id": "cooking-014",
     "name": "スマッシュポテト",
+    "category": "肉料理",
+    "categoryId": "meat-dishes",
     "items": [
       {
         "id": "part-1",
@@ -2031,6 +2049,8 @@ registerDQ10CraftRecipes("cooking", [
   {
     "id": "cooking-022",
     "name": "クイックケーキ",
+    "category": "肉料理",
+    "categoryId": "meat-dishes",
     "items": [
       {
         "id": "part-1",
@@ -2052,6 +2072,8 @@ registerDQ10CraftRecipes("cooking", [
   {
     "id": "cooking-026",
     "name": "ライトタルト",
+    "category": "肉料理",
+    "categoryId": "meat-dishes",
     "items": [
       {
         "id": "part-1",

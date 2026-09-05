@@ -88,6 +88,22 @@ docker compose exec api python scripts/export_recipes.py --craft cooking
 出力先を検証用ディレクトリへ変える場合は、`--data-dir` と `--app-dir` を指定します。
 `--database-url` を省略すると `DATABASE_URL` を使います。
 
+`api/data` はホストの `./api/data` をマウントしているため、`recipes.json` はホストへ直接反映されます。
+
+一方 `app/` はAPIイメージへ含めていません。`--app-dir` の既定値は `export_recipes.py` から見た
+リポジトリ直下の `app` ですが、コンテナ内ではこれが `/usr/src/app` を指すため、
+`recipes.js` は既存内容と比較されないまま `/usr/src/app/crafts/<職人>/` へ新規生成されます。
+出力内容はDB由来のため正しいものの、ホストのコミット対象ファイルへは反映されず、
+`--dry-run` の「変更」表示もホスト側との差分ではないため当てになりません。
+
+コミット対象のフォールバックを更新するには、実行後にホストへ取り出して `git diff` で差分を確認します。
+
+```bash
+for craft in tool-smithing weapon-smithing armor-smithing sewing woodworking cooking; do
+	docker cp dq10-api:/usr/src/app/crafts/$craft/recipes.js app/crafts/$craft/recipes.js
+done
+```
+
 DBからの復元時には、`items[].id` は読み順で `part-1` から再採番され、`items` は読み順に
 並びます。鍛冶では欠落していた `items[].target` が `ceil((successMin + successMax) / 2)` で補われ、
 調理の食材グループ番号も再採番されます。これらは仕様上の再生成差分です。

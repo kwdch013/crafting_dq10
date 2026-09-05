@@ -68,7 +68,7 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/218
 
 2026-09-03 に PR #238 で対応済みです。マージ規則は [マスタ参照API](../design/14-recipe-master-api.md) を参照します。
 
-分類の選択肢は `GET /api/crafts/{craftId}/masters` 由来になり、`config.js` はAPI停止時のフォールバックと、表示順・使用マステンプレートの供給元として残ります。`legacyId` を持たない分類 (未分類・DB移行時の変換用テンプレート) は選択肢に出しません。残課題は #239 で扱います。
+分類の選択肢は `GET /api/crafts/{craftId}/masters` 由来になり、`config.js` はAPI停止時のフォールバックと、表示順・使用マステンプレートの供給元として残ります。未分類 (`category_id` 0) は選択肢に出しません。DB移行時の変換用分類は#239で実分類へ再割当し、無効化します。
 
 現状:
 
@@ -140,19 +140,14 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/224
 `craft_master.sort_order` と分類テーブルの `category_id` は、いずれも既存の最大値 + 1 で採番しています。2つのリクエストが同時に新規登録すると双方が同じ値を採番し、一意制約により片方の保存が失敗します。PR #229 で DB の `UniqueViolation` を 400 の固定エラー識別子 (`recipe_sort_order_conflict` 等) へ変換したため 500 や空応答にはなりませんが、競合そのものは残っています。`craft_master_sort_order_unique` は DEFERRABLE INITIALLY DEFERRED のため、違反は `commit()` の時点で発生します。対応方針はテーブルロックによる直列化か、シーケンス / IDENTITY への移行です。`category_id` は #221 (段階3d) で分類の作成APIを実装する際に同じ判断が必要になるため、あわせて決めるのが効率的です。利用者が1人であれば実際には競合しないため優先度は低いです。URL: https://github.com/kwdch013/crafting_dq10/issues/231
 
 
-### #239 共通: DB移行時の変換用分類と未分類レシピの扱いを決める
+### #239 共通: 変換用分類を実分類へ再割当し、未分類レシピを肉料理へ暫定分類する (対応中)
 
-現状:
+決定済みの対応:
 
-- DB移行時に、既存の大項目に当てはまらない盤面形状のレシピ用として `legacy_category_id` が NULL の変換用分類が作られています。
-- 該当レシピの `categoryId` は `null` になり、大項目で絞り込む画面には表示されません。
-- 段階3bでは、選んでも0件になる空の大項目が増えるのを避けるため、`legacyId` を持たない分類を選択肢から除外しています。
-
-完了条件:
-
-- 変換用分類と変換用レシピの扱いが決まっている。
-- `未分類` を画面の大項目として出すかどうかが決まっている。
-- 決定内容が設計ドキュメントへ反映されている。
+- 変換用分類の使用マスは同一職人の実分類と完全に一致していたため、レシピを片手剣・盾・木工刀・ハンマーへ再割り当てし、変換用分類4件を無効化する。
+- 調理の `category_id = 0` の11件は、正しい料理区分を別issueで決めるまで肉料理へ暫定分類する。
+- `未分類` (`category_id` 0) はレシピ登録時の既定値としてDBに残すが、画面の大項目には出さない。
+- 0005マイグレーションの適用後にフォールバックレシピを再生成し、全ての有効かつ未archiveのレシピが有効な実分類に属することを回帰テストで確認する。
 
 URL: https://github.com/kwdch013/crafting_dq10/issues/239
 
@@ -167,3 +162,21 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/239
 `PostgresRecipeStore.create()` の復活処理は、利用者が同名で作り直す経路 (#217) を維持するため残しています。
 
 URL: https://github.com/kwdch013/crafting_dq10/issues/242
+
+### #247 調理職人: 暫定で肉料理へ寄せたレシピ11件を正しい料理区分へ割り当てる
+
+#239 の派生タスクです。#239 では表示されないレシピを無くすことを優先し、`category_id = 0` だった調理11件 (きようさにくまん / パワフルステーキ / バランスパスタ / あいじょうオムレツ / ファイアタルト / ダークタルト / アイスタルト / ストームタルト / スマッシュポテト / クイックケーキ / ライトタルト) を暫定的に一律で肉料理へ寄せました。
+
+ゲーム内の実際の料理区分 (肉料理 / 魚料理 / パスタ＆ライス / スイーツ) を確認したうえで、新しいマイグレーションで `cooking_recipes.category_id` を更新し、`export_recipes.py` でフォールバックを再生成します。
+
+URL: https://github.com/kwdch013/crafting_dq10/issues/247
+
+### #249 共通: export_recipes.py をコンテナ内で実行してもホストの recipes.js が更新されない
+
+`api/Dockerfile` は `COPY api/ ./` のみで `app/` をイメージへ含めていません。`export_recipes.py` の `DEFAULT_APP_DIR` は `Path(__file__).resolve().parents[2] / "app"` で、コンテナ内ではこれが `WORKDIR` と同じ `/usr/src/app` を指します。
+
+このため `docker compose exec api python scripts/export_recipes.py` を実行しても、`recipes.js` は既存内容と比較されないまま `/usr/src/app/crafts/<職人>/` へ新規生成され、ホストのコミット対象ファイルへは反映されません。`--dry-run` の「変更」表示もホストとの差分ではないため当てになりません。出力内容自体はDB由来のため正しいものです。
+
+暫定対応として、PR #248 で `docker cp` による取り出し手順を [運用手順](../design/13-recipe-db-operations.md) へ追記しました。恒久対応の案は compose へのマウント追加、`APP_DIR` 環境変数の追加、ホスト側実行への変更です。
+
+URL: https://github.com/kwdch013/crafting_dq10/issues/249

@@ -2,6 +2,8 @@ registerDQ10CraftRecipes("weapon-smithing", [
   {
     "id": "weapon-vertical-3",
     "name": "武器 3マステンプレート",
+    "category": "片手剣",
+    "categoryId": "one-handed-sword",
     "items": [
       {
         "id": "part-1",

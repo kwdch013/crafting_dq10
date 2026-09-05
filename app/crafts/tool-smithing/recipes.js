@@ -578,6 +578,8 @@ registerDQ10CraftRecipes("tool-smithing", [
   {
     "id": "tool-vertical-3",
     "name": "道具 3マステンプレート",
+    "category": "木工刀",
+    "categoryId": "woodworking-knife",
     "items": [
       {
         "id": "part-1",
@@ -621,6 +623,8 @@ registerDQ10CraftRecipes("tool-smithing", [
   {
     "id": "tool-2x2",
     "name": "道具 2×2テンプレート",
+    "category": "ハンマー",
+    "categoryId": "smithing-hammer",
     "items": [
       {
         "id": "part-1",
