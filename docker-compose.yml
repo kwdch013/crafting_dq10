@@ -33,7 +33,8 @@ services:
     volumes:
       - ./api/data:/usr/src/app/data
       # recipes.js はコミット対象のため、コンテナ内実行でホストへ直接反映させる
-      - ./app:/usr/src/frontend-app
+      # 書き込み対象は app/crafts のみのため、app 全体は渡さない
+      - ./app/crafts:/usr/src/frontend-app/crafts
     ports:
       - "${API_PORT:-8000}:8000"
     networks:

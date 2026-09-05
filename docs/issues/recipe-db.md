@@ -181,6 +181,6 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/247
 
 暫定対応として、PR #248 で `docker cp` による取り出し手順を [運用手順](../design/13-recipe-db-operations.md) へ追記しました。
 
-対応: composeでホストの `./app` を `/usr/src/frontend-app` へマウントし、その位置を環境変数 `APP_DIR` でコンテナへ渡します。`export_recipes.py` は出力先を `--app-dir`、`APP_DIR`、リポジトリ構成からの推定の順で決めるため、コンテナ内実行でもホストの `recipes.js` が更新され、`--dry-run` もホスト側との差分を表示します。WORKDIR の `/usr/src/app` へ重ねるとAPIのソースが隠れるため、マウント先は別パスにしています。`docker cp` の暫定手順は削除しました。
+対応: composeでホストの `./app/crafts` を `/usr/src/frontend-app/crafts` へマウントし、`APP_DIR` に `/usr/src/frontend-app` を渡します。`export_recipes.py` は出力先を `--app-dir`、`APP_DIR`、リポジトリ構成からの推定の順で決めるため、コンテナ内実行でもホストの `recipes.js` が更新され、`--dry-run` もホスト側との差分を表示します。WORKDIR の `/usr/src/app` へ重ねるとAPIのソースが隠れるため、マウント先は別パスにしています。`docker cp` の暫定手順は削除しました。
 
 URL: https://github.com/kwdch013/crafting_dq10/issues/249

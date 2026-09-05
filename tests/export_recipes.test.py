@@ -1,6 +1,8 @@
 """DBからのレシピファイル出力を検証します。"""
 
+import contextlib
 import importlib.util
+import io
 import json
 import os
 import sys
@@ -15,6 +17,8 @@ TEST_DATABASE_URL = os.environ.get("TEST_DATABASE_URL", "")
 MIGRATION_DIR = REPO_ROOT / "api" / "migrations"
 # compose が api コンテナへホストの app をマウントする位置。WORKDIR の /usr/src/app とは分ける
 CONTAINER_APP_DIR = "/usr/src/frontend-app"
+# 書き込み対象は app/crafts のみのため、composeではその配下だけをマウントする
+CONTAINER_CRAFTS_DIR = f"{CONTAINER_APP_DIR}/crafts"
 
 
 def load_script(path, name):
@@ -23,6 +27,24 @@ def load_script(path, name):
 	module = importlib.util.module_from_spec(spec)
 	spec.loader.exec_module(module)
 	return module
+
+
+def api_service_block(compose: str) -> str:
+	"""docker-compose.yml から api サービスの定義部分だけを取り出します。"""
+	lines = compose.splitlines()
+	start = lines.index("  api:") + 1
+	end = start
+	while end < len(lines) and (not lines[end].strip() or lines[end].startswith("    ")):
+		end += 1
+	return "\n".join(lines[start:end])
+
+
+def dockerfile_workdir(path: Path) -> str:
+	"""Dockerfile の WORKDIR を読み取り、マウント先との衝突判定に使います。"""
+	for line in path.read_text(encoding="utf-8").splitlines():
+		if line.startswith("WORKDIR "):
+			return line.removeprefix("WORKDIR ").strip()
+	return ""
 
 
 @unittest.skipUnless(TEST_DATABASE_URL, "TEST_DATABASE_URL が未設定のためスキップします")
@@ -102,6 +124,50 @@ class ExportRecipesTest(unittest.TestCase):
 		self.assertEqual(self.export_all("--dry-run"), 0)
 		self.assertEqual(path.read_bytes(), before)
 
+	def export_via_environment(self, *extra_args):
+		"""コンテナ内実行と同じく、出力先を環境変数 APP_DIR だけで与えます。"""
+		original = os.environ.get("APP_DIR")
+		os.environ["APP_DIR"] = str(self.app_dir)
+		try:
+			return self.exporter.main([
+				"--database-url", TEST_DATABASE_URL,
+				"--data-dir", str(self.data_dir),
+				*extra_args,
+			])
+		finally:
+			if original is None:
+				os.environ.pop("APP_DIR", None)
+			else:
+				os.environ["APP_DIR"] = original
+
+	def test_app_dir_environment_variable_updates_existing_recipes_js(self):
+		"""#249: --app-dir 無しでも APP_DIR の既存 recipes.js を更新します。"""
+		self.assertEqual(self.export_via_environment(), 0)
+		path = self.app_dir / "crafts" / "cooking" / "recipes.js"
+		expected = path.read_bytes()
+		path.write_text("// 変更済み\n", encoding="utf-8")
+		self.assertEqual(self.export_via_environment("--craft", "cooking"), 0)
+		self.assertEqual(path.read_bytes(), expected)
+
+	def test_dry_run_detects_difference_against_existing_recipes_js(self):
+		"""#249: --dry-run が既存 recipes.js との差分を判定し、書き換えません。"""
+		self.assertEqual(self.export_via_environment(), 0)
+		path = self.app_dir / "crafts" / "cooking" / "recipes.js"
+		modified = "// 変更済み\n"
+		path.write_text(modified, encoding="utf-8")
+		output = io.StringIO()
+		with contextlib.redirect_stdout(output):
+			self.assertEqual(self.export_via_environment("--craft", "cooking", "--dry-run"), 0)
+		self.assertIn(f"変更: {path}", output.getvalue())
+		self.assertEqual(path.read_text(encoding="utf-8"), modified)
+
+		# 差分が無い状態では「変更なし」と判定します
+		self.assertEqual(self.export_via_environment("--craft", "cooking"), 0)
+		output = io.StringIO()
+		with contextlib.redirect_stdout(output):
+			self.assertEqual(self.export_via_environment("--craft", "cooking", "--dry-run"), 0)
+		self.assertIn(f"変更なし: {path}", output.getvalue())
+
 
 class AppDirResolutionTest(unittest.TestCase):
 	"""コンテナ内実行でもホストの app へ出力できる解決順序かを検証します。"""
@@ -132,22 +198,38 @@ class AppDirResolutionTest(unittest.TestCase):
 		os.environ["APP_DIR"] = "   "
 		self.assertEqual(self.exporter.resolve_app_dir(None), REPO_ROOT / "app")
 
+	def test_blank_command_line_option_is_rejected(self):
+		# 空文字を許すとカレントディレクトリへ書き出してしまうため、明示的に落とします
+		os.environ["APP_DIR"] = CONTAINER_APP_DIR
+		with self.assertRaises(SystemExit):
+			self.exporter.resolve_app_dir("")
+		with self.assertRaises(SystemExit):
+			self.exporter.resolve_app_dir("   ")
+
 
 class ComposeAppMountTest(unittest.TestCase):
 	"""コンテナからホストの recipes.js を更新できる compose 設定かを検証します。"""
 
 	def setUp(self):
-		self.compose = (REPO_ROOT / "docker-compose.yml").read_text(encoding="utf-8")
+		compose = (REPO_ROOT / "docker-compose.yml").read_text(encoding="utf-8")
+		self.api_service = api_service_block(compose)
+		self.workdir = dockerfile_workdir(REPO_ROOT / "api" / "Dockerfile")
 
-	def test_api_service_mounts_repository_app_directory(self):
-		self.assertIn(f"- ./app:{CONTAINER_APP_DIR}", self.compose)
+	def test_api_service_mounts_repository_crafts_directory(self):
+		self.assertIn(f"- ./app/crafts:{CONTAINER_CRAFTS_DIR}", self.api_service)
 
 	def test_api_service_passes_app_dir_to_container(self):
-		self.assertIn(f"APP_DIR: {CONTAINER_APP_DIR}", self.compose)
+		self.assertIn(f"APP_DIR: {CONTAINER_APP_DIR}", self.api_service)
+
+	def test_mount_target_matches_app_dir_layout(self):
+		# export_recipes.py は app_dir/crafts/<職人> へ書き出すため、両者がずれてはいけない
+		self.assertEqual(CONTAINER_CRAFTS_DIR, f"{CONTAINER_APP_DIR}/crafts")
 
 	def test_container_app_dir_does_not_collide_with_workdir(self):
-		# /usr/src/app は api/ の配置先。同じ場所へマウントすると起動できなくなる
-		self.assertNotEqual(CONTAINER_APP_DIR, "/usr/src/app")
+		# WORKDIR は api/ の配置先。ここへ重ねるとAPIのソースが隠れて起動できなくなる
+		self.assertTrue(self.workdir)
+		self.assertNotEqual(CONTAINER_APP_DIR, self.workdir)
+		self.assertFalse(CONTAINER_APP_DIR.startswith(self.workdir.rstrip("/") + "/"))
 
 
 if __name__ == "__main__":

@@ -27,7 +27,10 @@ def resolve_app_dir(argument: str | None) -> Path:
 	コンテナ内はWORKDIRが /usr/src/app のため、DEFAULT_APP_DIR がリポジトリの app と
 	一致しません。composeがマウント先を APP_DIR で渡すことでホストのファイルを更新します。
 	"""
-	if argument:
+	if argument is not None:
+		# 空文字はカレントディレクトリへの書き出しになり事故につながるため受け付けません。
+		if not argument.strip():
+			raise SystemExit("--app-dir が空です。出力先ディレクトリを指定してください。")
 		return Path(argument)
 	from_environment = os.environ.get("APP_DIR", "").strip()
 	if from_environment:

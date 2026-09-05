@@ -90,13 +90,16 @@ docker compose exec api python scripts/export_recipes.py --craft cooking
 
 `api/data` はホストの `./api/data` をマウントしているため、`recipes.json` はホストへ直接反映されます。
 
-`app/` もホストの `./app` を `/usr/src/frontend-app` へマウントし、composeが `APP_DIR` でその位置を
-コンテナへ渡しています。`export_recipes.py` は出力先を `--app-dir`、環境変数 `APP_DIR`、
+`app/` もホストの `./app/crafts` を `/usr/src/frontend-app/crafts` へマウントし、composeが
+`APP_DIR` に `/usr/src/frontend-app` を渡しています。書き込み対象は `app/crafts` のみのため、
+`app` 全体はコンテナへ渡しません。`export_recipes.py` は出力先を `--app-dir`、環境変数 `APP_DIR`、
 リポジトリ構成からの推定の順で決めるため、コンテナ内実行でもホストの
 `app/crafts/<職人>/recipes.js` が直接更新され、`--dry-run` もホスト側との差分を表示します。
 
 APIイメージのWORKDIR `/usr/src/app` は `api/` の配置先です。ここへ `app/` を重ねると
 APIのソースが隠れて起動できなくなるため、マウント先は別のパスにしています。
+
+`--app-dir` に空文字を渡すと、カレントディレクトリへの書き出し事故を避けるためエラーになります。
 
 出力後は `git diff` でフォールバックの差分を確認してからコミットします。
 
