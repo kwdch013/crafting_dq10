@@ -17,11 +17,25 @@ from pathlib import Path
 # api/ をパスに追加し、repository パッケージを読み込めるようにします。
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from repository import mapping, queries  # noqa: E402
-from repository.json_store import write_json  # noqa: E402
-
 DEFAULT_DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 DEFAULT_APP_DIR = Path(__file__).resolve().parents[2] / "app"
+
+
+def resolve_app_dir(argument: str | None) -> Path:
+	"""appの出力先を --app-dir、環境変数 APP_DIR、リポジトリ構成の順で決めます。
+
+	コンテナ内はWORKDIRが /usr/src/app のため、DEFAULT_APP_DIR がリポジトリの app と
+	一致しません。composeがマウント先を APP_DIR で渡すことでホストのファイルを更新します。
+	"""
+	if argument is not None:
+		# 空文字はカレントディレクトリへの書き出しになり事故につながるため受け付けません。
+		if not argument.strip():
+			raise SystemExit("--app-dir が空です。出力先ディレクトリを指定してください。")
+		return Path(argument)
+	from_environment = os.environ.get("APP_DIR", "").strip()
+	if from_environment:
+		return Path(from_environment)
+	return DEFAULT_APP_DIR
 
 
 def json_text(recipes: list[dict]) -> str:
@@ -41,6 +55,9 @@ def has_change(path: Path, content: str) -> bool:
 
 def export_recipes(conn, data_dir: Path, app_dir: Path, craft_ids: list[str], dry_run: bool) -> dict[str, int]:
 	"""指定職人のレシピを2種類のフォールバックファイルへ出力します。"""
+	from repository import queries
+	from repository.json_store import write_json
+
 	all_recipes = queries.load_all_recipes(conn)
 	counts: dict[str, int] = {}
 	for craft_id in craft_ids:
@@ -66,10 +83,12 @@ def export_recipes(conn, data_dir: Path, app_dir: Path, craft_ids: list[str], dr
 
 
 def main(argv: list[str] | None = None) -> int:
+	from repository import mapping
+
 	parser = argparse.ArgumentParser(description="DBのレシピをJSONとrecipes.jsへ出力します")
 	parser.add_argument("--database-url", help="接続先。未指定なら環境変数 DATABASE_URL を使います")
 	parser.add_argument("--data-dir", default=str(DEFAULT_DATA_DIR), help="api/data の出力先")
-	parser.add_argument("--app-dir", default=str(DEFAULT_APP_DIR), help="app の出力先")
+	parser.add_argument("--app-dir", help="app の出力先。未指定なら環境変数 APP_DIR を使います")
 	parser.add_argument("--craft", choices=sorted(mapping.CRAFT_CLASSES), help="出力する職人ID")
 	parser.add_argument("--dry-run", action="store_true", help="ファイルを書き込まず変更対象だけを表示します")
 	args = parser.parse_args(argv)
@@ -81,7 +100,7 @@ def main(argv: list[str] | None = None) -> int:
 
 	craft_ids = [args.craft] if args.craft else list(mapping.CRAFT_CLASSES)
 	with psycopg.connect(url, autocommit=True) as conn:
-		counts = export_recipes(conn, Path(args.data_dir), Path(args.app_dir), craft_ids, args.dry_run)
+		counts = export_recipes(conn, Path(args.data_dir), resolve_app_dir(args.app_dir), craft_ids, args.dry_run)
 	for craft_id, count in counts.items():
 		print(f"出力: {craft_id} {count}件")
 	print(f"合計 {sum(counts.values())}件")

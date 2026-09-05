@@ -27,8 +27,14 @@ services:
       RECIPE_STORE: ${RECIPE_STORE:-postgres}
       # PostgreSQL への接続先。認証情報を含むため .env にのみ記載する
       DATABASE_URL: ${DATABASE_URL:-}
+      # export_recipes.py がフォールバックの recipes.js を書き出す先
+      # WORKDIR (/usr/src/app) は api/ の配置先のため、app は別パスへマウントする
+      APP_DIR: /usr/src/frontend-app
     volumes:
       - ./api/data:/usr/src/app/data
+      # recipes.js はコミット対象のため、コンテナ内実行でホストへ直接反映させる
+      # 書き込み対象は app/crafts のみのため、app 全体は渡さない
+      - ./app/crafts:/usr/src/frontend-app/crafts
     ports:
       - "${API_PORT:-8000}:8000"
     networks:

@@ -90,19 +90,27 @@ docker compose exec api python scripts/export_recipes.py --craft cooking
 
 `api/data` はホストの `./api/data` をマウントしているため、`recipes.json` はホストへ直接反映されます。
 
-一方 `app/` はAPIイメージへ含めていません。`--app-dir` の既定値は `export_recipes.py` から見た
-リポジトリ直下の `app` ですが、コンテナ内ではこれが `/usr/src/app` を指すため、
-`recipes.js` は既存内容と比較されないまま `/usr/src/app/crafts/<職人>/` へ新規生成されます。
-出力内容はDB由来のため正しいものの、ホストのコミット対象ファイルへは反映されず、
-`--dry-run` の「変更」表示もホスト側との差分ではないため当てになりません。
+`app/` もホストの `./app/crafts` を `/usr/src/frontend-app/crafts` へマウントし、composeが
+`APP_DIR` に `/usr/src/frontend-app` を渡しています。書き込み対象は `app/crafts` のみのため、
+`app` 全体はコンテナへ渡しません。`export_recipes.py` は出力先を `--app-dir`、環境変数 `APP_DIR`、
+リポジトリ構成からの推定の順で決めるため、コンテナ内実行でもホストの
+`app/crafts/<職人>/recipes.js` が直接更新され、`--dry-run` もホスト側との差分を表示します。
 
-コミット対象のフォールバックを更新するには、実行後にホストへ取り出して `git diff` で差分を確認します。
+APIイメージのWORKDIR `/usr/src/app` は `api/` の配置先です。ここへ `app/` を重ねると
+APIのソースが隠れて起動できなくなるため、マウント先は別のパスにしています。
+
+`--app-dir` に空文字を渡すと、カレントディレクトリへの書き出し事故を避けるためエラーになります。
+
+出力後は `git diff` でフォールバックの差分を確認してからコミットします。
+
+APIコンテナはrootで動くため、**新しい職人を追加して `app/crafts/<職人>/` がまだ存在しない場合**は、
+コンテナ側が作成したディレクトリとファイルがホストでroot所有になります。この場合は所有者を戻します。
 
 ```bash
-for craft in tool-smithing weapon-smithing armor-smithing sewing woodworking cooking; do
-	docker cp dq10-api:/usr/src/app/crafts/$craft/recipes.js app/crafts/$craft/recipes.js
-done
+sudo chown -R "$(id -u):$(id -g)" app/crafts
 ```
+
+既存職人の `recipes.js` を更新するだけであれば、既存ファイルへの書き込みのため所有者は変わりません。
 
 DBからの復元時には、`items[].id` は読み順で `part-1` から再採番され、`items` は読み順に
 並びます。鍛冶では欠落していた `items[].target` が `ceil((successMin + successMax) / 2)` で補われ、

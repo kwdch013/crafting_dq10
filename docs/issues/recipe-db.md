@@ -179,6 +179,8 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/247
 
 このため `docker compose exec api python scripts/export_recipes.py` を実行しても、`recipes.js` は既存内容と比較されないまま `/usr/src/app/crafts/<職人>/` へ新規生成され、ホストのコミット対象ファイルへは反映されません。`--dry-run` の「変更」表示もホストとの差分ではないため当てになりません。出力内容自体はDB由来のため正しいものです。
 
-暫定対応として、PR #248 で `docker cp` による取り出し手順を [運用手順](../design/13-recipe-db-operations.md) へ追記しました。恒久対応の案は compose へのマウント追加、`APP_DIR` 環境変数の追加、ホスト側実行への変更です。
+暫定対応として、PR #248 で `docker cp` による取り出し手順を [運用手順](../design/13-recipe-db-operations.md) へ追記しました。
+
+対応: composeでホストの `./app/crafts` を `/usr/src/frontend-app/crafts` へマウントし、`APP_DIR` に `/usr/src/frontend-app` を渡します。`export_recipes.py` は出力先を `--app-dir`、`APP_DIR`、リポジトリ構成からの推定の順で決めるため、コンテナ内実行でもホストの `recipes.js` が更新され、`--dry-run` もホスト側との差分を表示します。WORKDIR の `/usr/src/app` へ重ねるとAPIのソースが隠れるため、マウント先は別パスにしています。`docker cp` の暫定手順は削除しました。
 
 URL: https://github.com/kwdch013/crafting_dq10/issues/249
