@@ -107,7 +107,7 @@ issueには対象領域に応じてラベルを付与します。
 | #227 | API: 不正なJSONのPUTで invalid_json が返らない (except の順序で到達不能) | [common.md](issues/common.md) |
 | #230 | 共通: 保存失敗時のalert文言をエラーの種類に応じて分ける | [common.md](issues/common.md) |
 | #231 | 共通: sort_order と category_id の採番が並行登録で衝突する | [recipe-db.md](issues/recipe-db.md) |
-| #239 | 共通: 変換用分類を実分類へ再割当し、未分類レシピを肉料理へ暫定分類する (対応中) | [recipe-db.md](issues/recipe-db.md) |
+| #239 | 共通: 変換用分類を実分類へ再割当し、未分類レシピを肉料理へ暫定分類する (2026-09-05 close済み) | [recipe-db.md](issues/recipe-db.md) |
 | #242 | 共通: 別ブラウザで削除したレシピが起動時の取り込みで復活する (2026-09-04 close済み) | [recipe-db.md](issues/recipe-db.md) |
 | #247 | 調理職人: 暫定で肉料理へ寄せたレシピ11件を正しい料理区分へ割り当てる | [recipe-db.md](issues/recipe-db.md) |
 | #249 | 共通: export_recipes.py をコンテナ内で実行してもホストの recipes.js が更新されない | [recipe-db.md](issues/recipe-db.md) |
