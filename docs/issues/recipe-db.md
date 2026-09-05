@@ -68,7 +68,7 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/218
 
 2026-09-03 に PR #238 で対応済みです。マージ規則は [マスタ参照API](../design/14-recipe-master-api.md) を参照します。
 
-分類の選択肢は `GET /api/crafts/{craftId}/masters` 由来になり、`config.js` はAPI停止時のフォールバックと、表示順・使用マステンプレートの供給元として残ります。未分類 (`category_id` 0) は選択肢に出しません。DB移行時の変換用分類は#239で実分類へ再割当し、無効化します。
+分類の選択肢は `GET /api/crafts/{craftId}/masters` 由来になり、`config.js` はAPI停止時のフォールバックと、表示順・使用マステンプレートの供給元として残ります。未分類 (`category_id` 0) は選択肢に出しません。DB移行時の変換用分類は#239で実分類へ再割当し、無効化しました。
 
 現状:
 
@@ -140,7 +140,7 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/224
 `craft_master.sort_order` と分類テーブルの `category_id` は、いずれも既存の最大値 + 1 で採番しています。2つのリクエストが同時に新規登録すると双方が同じ値を採番し、一意制約により片方の保存が失敗します。PR #229 で DB の `UniqueViolation` を 400 の固定エラー識別子 (`recipe_sort_order_conflict` 等) へ変換したため 500 や空応答にはなりませんが、競合そのものは残っています。`craft_master_sort_order_unique` は DEFERRABLE INITIALLY DEFERRED のため、違反は `commit()` の時点で発生します。対応方針はテーブルロックによる直列化か、シーケンス / IDENTITY への移行です。`category_id` は #221 (段階3d) で分類の作成APIを実装する際に同じ判断が必要になるため、あわせて決めるのが効率的です。利用者が1人であれば実際には競合しないため優先度は低いです。URL: https://github.com/kwdch013/crafting_dq10/issues/231
 
 
-### #239 共通: 変換用分類を実分類へ再割当し、未分類レシピを肉料理へ暫定分類する (対応中)
+### #239 共通: 変換用分類を実分類へ再割当し、未分類レシピを肉料理へ暫定分類する (2026-09-05 close済み)
 
 決定済みの対応:
 
@@ -148,6 +148,8 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/224
 - 調理の `category_id = 0` の11件は、正しい料理区分を別issueで決めるまで肉料理へ暫定分類する。
 - `未分類` (`category_id` 0) はレシピ登録時の既定値としてDBに残すが、画面の大項目には出さない。
 - 0005マイグレーションの適用後にフォールバックレシピを再生成し、全ての有効かつ未archiveのレシピが有効な実分類に属することを回帰テストで確認する。
+
+2026-09-05 に PR #248 で対応済みです。適用は `api/migrations/0005_reassign_conversion_categories.sql` で、IDは `legacy_id` / `legacy_category_id` / `category_name` の副問い合わせで解決しているため、0001→0005 を通した新規DBでも同じ結果になります。正しい料理区分への再分類は#247で扱います。
 
 URL: https://github.com/kwdch013/crafting_dq10/issues/239
 
