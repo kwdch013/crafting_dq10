@@ -173,7 +173,7 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/242
 
 URL: https://github.com/kwdch013/crafting_dq10/issues/247
 
-### #249 共通: export_recipes.py をコンテナ内で実行してもホストの recipes.js が更新されない
+### #249 共通: export_recipes.py をコンテナ内で実行してもホストの recipes.js が更新されない (2026-09-05 close済み)
 
 `api/Dockerfile` は `COPY api/ ./` のみで `app/` をイメージへ含めていません。`export_recipes.py` の `DEFAULT_APP_DIR` は `Path(__file__).resolve().parents[2] / "app"` で、コンテナ内ではこれが `WORKDIR` と同じ `/usr/src/app` を指します。
 
@@ -183,4 +183,14 @@ URL: https://github.com/kwdch013/crafting_dq10/issues/247
 
 対応: composeでホストの `./app/crafts` を `/usr/src/frontend-app/crafts` へマウントし、`APP_DIR` に `/usr/src/frontend-app` を渡します。`export_recipes.py` は出力先を `--app-dir`、`APP_DIR`、リポジトリ構成からの推定の順で決めるため、コンテナ内実行でもホストの `recipes.js` が更新され、`--dry-run` もホスト側との差分を表示します。WORKDIR の `/usr/src/app` へ重ねるとAPIのソースが隠れるため、マウント先は別パスにしています。`docker cp` の暫定手順は削除しました。
 
+2026-09-05 に PR #251 で対応済みです。CIでDB依存テストが実行されない点は #252 へ切り出しました。
+
 URL: https://github.com/kwdch013/crafting_dq10/issues/249
+
+### #252 共通: CI に PostgreSQL を用意して DB 依存テストを実行する
+
+PR #251 (#249) のレビューで判明した、CIの構成課題です。`.github/workflows/ci.yml` はPostgreSQLを用意しないため、`TEST_DATABASE_URL` を使うテスト8ファイルがすべてスキップされます。CIは成功しますが、DBに関わる振る舞いは検証されていません。
+
+CIでPostgreSQLを起動して `TEST_DATABASE_URL` を渡し、DB依存テストも実行される状態にします。各テストは `DROP SCHEMA IF EXISTS public CASCADE` を実行するため、CI専用の使い捨てDBを使います。
+
+URL: https://github.com/kwdch013/crafting_dq10/issues/252
