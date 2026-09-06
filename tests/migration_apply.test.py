@@ -65,6 +65,7 @@ class MigrationFileTest(unittest.TestCase):
 				"0004_seed_recipes.sql",
 				"0005_reassign_conversion_categories.sql",
 				"0006_add_recipe_name_views.sql",
+				"0007_add_craft_tools.sql",
 			],
 		)
 
@@ -99,16 +100,17 @@ class MigrationApplyTest(unittest.TestCase):
 				"0004_seed_recipes",
 				"0005_reassign_conversion_categories",
 				"0006_add_recipe_name_views",
+				"0007_add_craft_tools",
 			],
 		)
 		self.assertEqual(self.count("craft_master"), 70)
-		self.assertEqual(self.count("schema_migration"), 6)
+		self.assertEqual(self.count("schema_migration"), 7)
 
 	def test_apply_all_is_idempotent(self):
 		self.apply.apply_all(self.conn)
 		self.assertEqual(self.apply.apply_all(self.conn), [])
 		self.assertEqual(self.count("craft_master"), 70)
-		self.assertEqual(self.count("schema_migration"), 6)
+		self.assertEqual(self.count("schema_migration"), 7)
 
 	def test_dry_run_does_not_create_migration_table(self):
 		"""--dry-run は記録テーブルを作らず、全件を未適用として扱います。"""
@@ -129,6 +131,53 @@ class MigrationApplyTest(unittest.TestCase):
 			with self.assertRaises(psycopg.Error):
 				self.apply.apply_all(self.conn, directory)
 		self.assertEqual(self.count("schema_migration"), 0)
+
+	def test_craft_tools_insert_succeeds(self):
+		"""正常な道具マスタ1行を登録できます。"""
+		self.apply.apply_all(self.conn)
+		self.conn.execute(
+			"INSERT INTO craft_tools (class, name, rank, value, concentration, satisfaction, tool_desc, shop)"
+			" VALUES (1, 'げんませんの砂', 0, 100, 10, 1.5, '集中力を回復する', false)"
+		)
+		self.conn.commit()
+		self.assertEqual(self.count("craft_tools"), 1)
+
+	def test_craft_tools_rejects_duplicate_class_name_rank(self):
+		"""同一 (class, name, rank) の重複登録はUNIQUE制約で拒否されます。"""
+		import psycopg
+
+		self.apply.apply_all(self.conn)
+		self.conn.execute(
+			"INSERT INTO craft_tools (class, name, rank, value) VALUES (1, 'げんませんの砂', 0, 100)"
+		)
+		self.conn.commit()
+		with self.assertRaises(psycopg.errors.UniqueViolation):
+			self.conn.execute(
+				"INSERT INTO craft_tools (class, name, rank, value) VALUES (1, 'げんませんの砂', 0, 200)"
+			)
+		self.conn.rollback()
+
+	def test_craft_tools_rejects_rank_out_of_range(self):
+		"""rank は0から3までのみ許容します。"""
+		import psycopg
+
+		self.apply.apply_all(self.conn)
+		with self.assertRaises(psycopg.errors.CheckViolation):
+			self.conn.execute(
+				"INSERT INTO craft_tools (class, name, rank, value) VALUES (1, 'げんませんの砂', 4, 100)"
+			)
+		self.conn.rollback()
+
+	def test_craft_tools_rejects_class_out_of_range(self):
+		"""class は1から6までのみ許容します。"""
+		import psycopg
+
+		self.apply.apply_all(self.conn)
+		with self.assertRaises(psycopg.errors.CheckViolation):
+			self.conn.execute(
+				"INSERT INTO craft_tools (class, name, rank, value) VALUES (0, 'げんませんの砂', 0, 100)"
+			)
+		self.conn.rollback()
 
 
 if __name__ == "__main__":
