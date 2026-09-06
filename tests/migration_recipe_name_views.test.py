@@ -81,15 +81,28 @@ class RecipeNameViewTest(unittest.TestCase):
 				self.assertEqual(mismatches, 0)
 
 	def test_view_includes_inactive_rows_without_filtering(self):
-		"""ビュー自身は is_active でフィルタしないため、非アクティブ行も含まれます。"""
-		self.conn.execute(
-			"UPDATE craft_master SET is_active = false WHERE class = 1 AND sort_order = 1"
-		)
-		self.conn.commit()
-		visible = self.conn.execute(
-			"SELECT count(*) FROM v_tool_recipes WHERE craft_master_is_active = false"
-		).fetchone()[0]
-		self.assertEqual(visible, 1)
+		"""ビュー自身は is_active でフィルタしないため、全ビューで非アクティブ行も含まれます。"""
+		for view_name, table_name in RECIPE_VIEWS:
+			with self.subTest(view=view_name):
+				recipe_id = self.conn.execute(
+					f"SELECT id FROM {table_name} LIMIT 1"
+				).fetchone()[0]
+				self.conn.execute(
+					"UPDATE craft_master SET is_active = false WHERE id = %s", (recipe_id,)
+				)
+				self.conn.execute(
+					f"UPDATE {table_name} SET is_active = false WHERE id = %s", (recipe_id,)
+				)
+				self.conn.commit()
+				row = self.conn.execute(
+					f"""
+					SELECT craft_master_is_active, recipe_is_active
+					FROM {view_name}
+					WHERE id = %s
+					""",
+					(recipe_id,),
+				).fetchone()
+				self.assertEqual(row, (False, False))
 
 
 if __name__ == "__main__":
