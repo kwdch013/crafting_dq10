@@ -39,6 +39,25 @@
 | レシピ | `wood_recipes` | 木工のマス別基準値と木目 |
 | レシピ | `cooking_recipes` | 調理のマス別食材と基準値 |
 
+## レシピ名付き参照用ビュー
+
+各 `*_recipes` は `name` を持たず (「原案からの変更点」#8)、SQLで直接見たときにどのレシピか分からない。
+この設計自体は変えず、`craft_master` と JOIN した参照専用ビューを追加して可読性だけを解決する。
+
+| ビュー | 対象テーブル |
+| --- | --- |
+| `v_tool_recipes` | `tool_recipes` |
+| `v_weapon_recipes` | `weapon_recipes` |
+| `v_armor_recipes` | `armor_recipes` |
+| `v_sewing_recipes` | `sewing_recipes` |
+| `v_wood_recipes` | `wood_recipes` |
+| `v_cooking_recipes` | `cooking_recipes` |
+
+- 列順は `id, name, ...` とし、`id` の次にレシピ名が見えるようにする。
+- `craft_master.is_active` と各 `*_recipes.is_active` はそれぞれ `craft_master_is_active` / `recipe_is_active` の別名で両方含め、フィルタはビュー側で行わず呼び出し側に委ねる。
+- 参照専用のためAPI・アプリケーションコードからは使用しない。SQLで直接調査・確認する用途に限る。
+- 定義は `api/migrations/0006_add_recipe_name_views.sql` を参照する。
+
 ## 共通ルール
 
 ### 型
