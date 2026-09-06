@@ -192,6 +192,25 @@
 基準値の上限を持たないのは、現行の全133マスで上限と下限の幅が30だったためです。
 幅が異なるレシピが見つかった場合は `a_max` 列の追加を検討します。
 
+## craft_tools
+
+職人共通の使用道具マスタです。各職人がクラフト作業で使用する道具 (星ランク0〜3の消費アイテム) を1テーブルで管理します。
+道具体系が職人間で似ているため、`craft_master` と同様に `class` 列で職人を区別する共通テーブルとします。
+
+| 列 | 論理名 | 型 | 必須 | unique | 説明 |
+| --- | --- | --- | --- | --- | --- |
+| `tool_id` | ID | integer | o | o | 主キー。`GENERATED ALWAYS AS IDENTITY` |
+| `class` | 分類 | smallint | o | | 1-6のみ許容。`craft_master.class` と同じ体系 |
+| `name` | 道具名 | text | o | | 星ランク違いは別行として持つ |
+| `rank` | 星ランク | smallint | o | | 0以上3以下。0が無印、1〜3が星の数に対応する |
+| `value` | 価格 | integer | o | | `shop = true` なら店売り価格、`false` ならバザー相場価格として同じ列を兼用する |
+| `concentration` | 集中力効果 | integer | | | 未設定の道具はNULL |
+| `satisfaction` | 満足度効果 | numeric | | | 小数を含むため numeric で保持する。未設定の道具はNULL |
+| `tool_desc` | 説明文 | text | | | `desc` はPostgreSQLの予約語のため列名を変更した |
+| `shop` | 店売り可否 | boolean | o | | `true` で店売りにより購入できる。既定は `false` |
+
+`(class, name, rank)` の組にUNIQUE制約 (`craft_tools_class_name_rank_unique`) を付け、同一道具・同一ランクの重複登録を防ぎます。
+
 ## 初期データ
 
 固定シード (`api/migrations/0003_seed_master.sql`) で投入するものは以下です。
