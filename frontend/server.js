@@ -36,7 +36,7 @@ function resolveApiBaseUrl(request) {
     return process.env.API_BASE_URL;
   }
 
-  const apiPort = Number(process.env.API_PORT || 8000);
+  const apiPort = Number(process.env.API_HTTP_PORT || 8000);
   const hostName = extractHostName(request && request.headers && request.headers.host);
 
   return `http://${hostName || "localhost"}:${apiPort}`;

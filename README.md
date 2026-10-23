@@ -25,9 +25,9 @@ cp .env.example .env
 
 | 環境変数 | デフォルト | 説明 |
 | --- | --- | --- |
-| `FRONTEND_PORT` | `3000` | frontend のホスト側公開ポート |
-| `API_PORT` | `8000` | api のホスト側公開ポート |
-| `API_BASE_URL` | (自動導出) | ブラウザから API へ到達する URL。未指定時は画面を開いたときのホスト名と `API_PORT` から自動導出するため通常は指定不要。frontend とは別ホストで API を公開する場合のみ指定する |
+| `FRONTEND_WEB_PORT` | `3000` | frontend のホスト側公開ポート |
+| `API_HTTP_PORT` | `8000` | api のホスト側公開ポート |
+| `API_BASE_URL` | (自動導出) | ブラウザから API へ到達する URL。未指定時は画面を開いたときのホスト名と `API_HTTP_PORT` から自動導出するため通常は指定不要。frontend とは別ホストで API を公開する場合のみ指定する |
 
 ### 別端末 (スマホ・別PC) から利用する
 
